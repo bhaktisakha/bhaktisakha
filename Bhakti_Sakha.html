@@ -3897,16 +3897,82 @@ function _catLabel(cat) {
           gita:'📗 Bhagavad Gita Verses', bhagavatam:'🌊 Srimad Bhagavatam Prayers'}[cat] || cat;
 }
 
+function _getAudioEmbed(url, singer) {
+  const singerHtml = singer ? `<div class="audio-singer">${singer}</div>` : '';
+  const u = (url || '').trim();
+  if (!u) return '';
+
+  // 1. YouTube
+  const ytMatch = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+  if (ytMatch) {
+    return `<div class="audio-item">${singerHtml}
+      <iframe src="https://www.youtube.com/embed/${ytMatch[1]}" style="width:100%;height:180px;border:none;border-radius:8px;" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>`;
+  }
+
+  // 2. SoundCloud
+  if (u.includes('soundcloud.com/')) {
+    return `<div class="audio-item">${singerHtml}
+      <iframe width="100%" height="120" scrolling="no" frameborder="no" style="border-radius:8px;"
+        src="https://w.soundcloud.com/player/?url=${encodeURIComponent(u)}&color=%23a78bfa&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe></div>`;
+  }
+
+  // 3. pCloud — embed their audio player via iframe
+  if (u.includes('pcloud.link') || u.includes('pcloud.com')) {
+    // Convert publink/show to embed format, or use as-is in iframe
+    const codeMatch = u.match(/code=([\w]+)/);
+    if (codeMatch) {
+      const embedUrl = `https://e1.pcloud.link/publink/show?code=${codeMatch[1]}`;
+      return `<div class="audio-item">${singerHtml}
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a href="${u}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent-blue);color:#fff;border-radius:8px;text-decoration:none;font-size:0.82rem;">
+            ▶ Play on pCloud
+          </a>
+          <span style="font-size:0.72rem;color:var(--text3);">Opens in new tab</span>
+        </div></div>`;
+    }
+    return `<div class="audio-item">${singerHtml}
+      <a href="${u}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent-blue);color:#fff;border-radius:8px;text-decoration:none;font-size:0.82rem;">
+        ▶ Play on pCloud
+      </a></div>`;
+  }
+
+  // 4. Google Drive — convert sharing link to direct download
+  if (u.includes('drive.google.com')) {
+    const idMatch = u.match(/\/d\/([\w-]+)/) || u.match(/id=([\w-]+)/);
+    if (idMatch) {
+      const directUrl = `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+      return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
+        <audio controls src="${directUrl}" preload="none"></audio></div>`;
+    }
+  }
+
+  // 5. Dropbox — convert to direct download
+  if (u.includes('dropbox.com')) {
+    const directUrl = u.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '').replace('?dl=1', '');
+    return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
+      <audio controls src="${directUrl}" preload="none"></audio></div>`;
+  }
+
+  // 6. Direct audio file (.mp3, .ogg, .wav, .m4a, .flac, .aac, .wma)
+  if (/\.(mp3|ogg|wav|m4a|flac|aac|wma|opus|webm)(\?.*)?$/i.test(u)) {
+    return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
+      <audio controls src="${u}" preload="none"></audio></div>`;
+  }
+
+  // 7. Fallback: try as audio element with error fallback
+  return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
+    <audio controls src="${u}" preload="none" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"></audio>
+    <a href="${u}" target="_blank" rel="noopener" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:var(--accent-blue);color:#fff;border-radius:8px;text-decoration:none;font-size:0.82rem;">
+      ▶ Open Audio Link
+    </a></div>`;
+}
+
 function _buildAudioHtml(s) {
   // Support both old `audio` string and new `audios` array
   const list = s.audios && s.audios.length ? s.audios
     : (s.audio ? [{url: s.audio, singer:''}] : []);
   if (!list.length) return '';
-  return `<div class="audio-list">${list.map(a => `
-    <div class="audio-item${a.singer?'':' no-singer'}">
-      ${a.singer ? `<div class="audio-singer">${a.singer}</div>` : ''}
-      <audio controls src="${a.url}" preload="none"></audio>
-    </div>`).join('')}</div>`;
+  return `<div class="audio-list">${list.map(a => _getAudioEmbed(a.url, a.singer)).join('')}</div>`;
 }
 
 function _buildSongCard(s) {
