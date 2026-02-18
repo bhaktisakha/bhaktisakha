@@ -13,7 +13,7 @@
 <meta name="msapplication-TileColor" content="#0d1b2a">
 <meta name="msapplication-TileImage" content="icon-144x144.png">
 <title>Bhakti Sakha</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Philosopher:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0d1b2a;
@@ -124,6 +124,16 @@ body {
   transition: color 0.2s;
 }
 .header-icons button:active { color: var(--text); }
+.header.header-songs { justify-content:center; }
+.header.header-songs .header-date-wrap { width:100%; text-align:center; }
+.header-date.songs-title {
+  font-family:'Playfair Display', serif;
+  font-style:italic; font-weight:600;
+  font-size:1.2rem; letter-spacing:0.5px;
+  background:linear-gradient(135deg, #c9a84c, #f0d68a, #c9a84c);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
 
 /* ===== SCREENS ===== */
 .screens { flex:1; overflow:hidden; display:flex; flex-direction:column; }
@@ -2037,7 +2047,6 @@ body {
     <!-- Fixed top bar -->
     <div class="kirtan-topbar">
       <div class="kirtan-search-wrap">
-        <svg class="kirtan-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="kirtan-search-inp" id="kirtanSearchInp" placeholder="Search songs, author, lyrics…" autocomplete="off"
           oninput="kirtanSearch(this.value)" onfocus="kirtanSearch(this.value)" onblur="setTimeout(()=>kirtanHideDropdown(),200)">
         <button class="kirtan-clear-btn" id="kirtanClearBtn" onclick="kirtanClear()" style="display:none;">✕</button>
@@ -2046,7 +2055,6 @@ body {
       <div class="kirtan-dropdown" id="kirtanDropdown"></div>
       <div class="kirtan-actions">
         <div class="kirtan-sort-wrap">
-          <button class="songs-sort-btn active" id="ksort-cat" onclick="setSongSort('cat',this)">Category</button>
           <button class="songs-sort-btn" id="ksort-author" onclick="setSongSort('author',this)">Author</button>
         </div>
         <button class="kirtan-add-btn" style="margin-left:auto;" onclick="openAdminSong()">＋</button>
@@ -6275,15 +6283,24 @@ function switchScreen(name, btn) {
   const headerDate = document.getElementById('headerDate');
   const headerMasa = document.getElementById('headerMasa');
   const headerIcons = document.getElementById('headerIcons');
-  const TITLES = {calendar:null, search:'Search Calendar', songs:'Audio', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas'};
+  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas'};
   if (name === 'calendar') {
     updateHeaderDate();
     headerIcons.style.display = '';
     headerMasa.style.display = '';
+    headerDate.classList.remove('songs-title');
+    document.querySelector('.header').classList.remove('header-songs');
   } else {
     headerDate.textContent = TITLES[name] || name;
     headerIcons.style.display = 'none';
     headerMasa.style.display = 'none';
+    if (name === 'songs') {
+      headerDate.classList.add('songs-title');
+      document.querySelector('.header').classList.add('header-songs');
+    } else {
+      headerDate.classList.remove('songs-title');
+      document.querySelector('.header').classList.remove('header-songs');
+    }
   }
 
   if (name==='songs') renderSongs();
