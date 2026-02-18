@@ -5160,19 +5160,73 @@ async function registerUpcomingEvents() {
     // Compute next 14 days of events
     const upcoming = [];
     const today = new Date();
+    const s = JSON.parse(localStorage.getItem('settings') || '{}');
+    const gayatriOn = document.getElementById('n-gayatri')?.checked || s['n-gayatri'] || false;
+    const rahuOn = document.getElementById('n-rahu')?.checked || s['n-rahu'] || false;
+
     for (let d = 0; d < 14; d++) {
       const dt = new Date(today);
       dt.setDate(dt.getDate() + d);
       const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      
+      // Calendar events (ekadashi, festivals, etc.)
       const evts = getEventsForDate(dateStr);
       evts.forEach(e => {
         upcoming.push({
           date: dateStr,
           name: e.n || e.name || '',
           type: e.t || 'event',
-          icon: e.i || '📅'
+          icon: e.i || '📅',
+          time: '' // no specific time — uses user's alertTime
         });
       });
+
+      // Gayatri / Sandhya times (precise times based on location)
+      if (gayatriOn) {
+        const st = getSunTimes(dt, curLoc.lat, curLoc.lon, curLoc.tz);
+        if (st) {
+          // 10 min before sunrise
+          const srParts = st.sunrise.split(':');
+          const srMins = parseInt(srParts[0]) * 60 + parseInt(srParts[1]) - 10;
+          const pratahTime = `${String(Math.floor(srMins/60)).padStart(2,'0')}:${String(srMins%60).padStart(2,'0')}`;
+          upcoming.push({
+            date: dateStr, name: `Prātaḥ Sandhyā (sunrise ${st.sunrise})`,
+            type: 'gayatri', icon: '🔱', time: pratahTime
+          });
+
+          // 10 min before noon
+          const nParts = st.noon.split(':');
+          const nMins = parseInt(nParts[0]) * 60 + parseInt(nParts[1]) - 10;
+          const madhyaTime = `${String(Math.floor(nMins/60)).padStart(2,'0')}:${String(nMins%60).padStart(2,'0')}`;
+          upcoming.push({
+            date: dateStr, name: `Mādhyāhnika Sandhyā (noon ${st.noon})`,
+            type: 'gayatri', icon: '☀️', time: madhyaTime
+          });
+
+          // 10 min before sunset
+          const ssParts = st.sunset.split(':');
+          const ssMins = parseInt(ssParts[0]) * 60 + parseInt(ssParts[1]) - 10;
+          const sayamTime = `${String(Math.floor(ssMins/60)).padStart(2,'0')}:${String(ssMins%60).padStart(2,'0')}`;
+          upcoming.push({
+            date: dateStr, name: `Sāyam Sandhyā (sunset ${st.sunset})`,
+            type: 'gayatri', icon: '🌅', time: sayamTime
+          });
+        }
+      }
+
+      // Rahu Kalam (notify at start)
+      if (rahuOn) {
+        const stR = getSunTimes(dt, curLoc.lat, curLoc.lon, curLoc.tz);
+        if (stR) {
+          const rahu = getRahuKalam(dt, stR.srMins, stR.ssMins);
+          if (rahu && rahu.start) {
+            upcoming.push({
+              date: dateStr, name: `Rahu Kalam (${rahu.start} – ${rahu.end})`,
+              type: 'rahu', icon: '🚫', time: rahu.start
+            });
+          }
+        }
+      }
     }
 
     if (upcoming.length === 0) return;
