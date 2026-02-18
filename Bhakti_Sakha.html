@@ -3310,9 +3310,37 @@ let notes = JSON.parse(localStorage.getItem('notes') || '[]');
 // Migrate old notes to new format (add pinned/locked fields)
 notes.forEach(n => { if (n.pinned===undefined) n.pinned=false; if (n.locked===undefined) n.locked=false; });
 
-let songs = JSON.parse(localStorage.getItem('songs') || 'null') || defaultSongs();
-// Clear old default songs if user hasn't added any custom ones (first load migration)
-if (songs.length > 0 && !localStorage.getItem('songsUserAdded')) { songs = []; localStorage.removeItem('songs'); }
+let songs = JSON.parse(localStorage.getItem('songs') || 'null') || [];
+// Google Sheets shared songs API
+const SONGS_API_URL = 'https://script.google.com/macros/s/AKfycbyXVSKWf_Ox9h12kw17uwcJcoUkhgG_mv931P9XTLOcWI6rYgAfmXGSnws1PxBemeniYA/exec';
+
+// Fetch shared songs from Google Sheets on load
+async function fetchSharedSongs() {
+  try {
+    const resp = await fetch(SONGS_API_URL);
+    const data = await resp.json();
+    if (data.success && data.songs) {
+      // Songs come back as full objects from the sheet
+      const sharedSongs = data.songs.map(s => {
+        // Ensure audios is parsed if it's a string
+        if (s.audios && typeof s.audios === 'string') {
+          try { s.audios = JSON.parse(s.audios); } catch(e) { s.audios = []; }
+        }
+        s.id = parseInt(s.id) || Date.now();
+        s._shared = true;
+        return s;
+      });
+      songs = sharedSongs;
+      localStorage.setItem('songs', JSON.stringify(songs));
+      renderSongs();
+    }
+  } catch(e) {
+    console.warn('Could not fetch shared songs:', e);
+    // Fall back to localStorage cache
+  }
+}
+// Fetch on page load
+setTimeout(fetchSharedSongs, 1000);
 let settings = JSON.parse(localStorage.getItem('settings') || '{}');
 
 // ===================================================================
@@ -4021,11 +4049,21 @@ function deleteSongFromDetail() {
   const s = songs.find(x => x.id === _currentSongId);
   if (!s) return;
   if (!confirm('Delete "' + s.title + '"?')) return;
+  const deletedId = _currentSongId;
   songs = songs.filter(x => x.id !== _currentSongId);
   localStorage.setItem('songs', JSON.stringify(songs));
   closeSongDetail();
   renderSongs();
-  showToast('Song deleted');
+  showToast('Deleting…');
+  // Sync delete to Google Sheets
+  const userEmail = (gUser && gUser.email) ? gUser.email : '';
+  fetch(SONGS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'delete', email: userEmail, songId: deletedId })
+  }).then(r => r.json()).then(data => {
+    showToast(data.success ? 'Song deleted from shared library' : '⚠️ ' + (data.error || 'Delete failed'));
+  }).catch(e => { console.error('Sheet delete error:', e); });
 }
 
 
@@ -4122,7 +4160,16 @@ function deleteSong(id) {
   songs = songs.filter(s => s.id !== id);
   localStorage.setItem('songs', JSON.stringify(songs));
   renderSongs();
-  showToast('Song deleted');
+  showToast('Deleting…');
+  // Sync delete to Google Sheets
+  const userEmail = (gUser && gUser.email) ? gUser.email : '';
+  fetch(SONGS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'delete', email: userEmail, songId: id })
+  }).then(r => r.json()).then(data => {
+    showToast(data.success ? 'Song deleted from shared library' : '⚠️ ' + (data.error || 'Delete failed'));
+  }).catch(e => { console.error('Sheet delete error:', e); });
 }
 
 
@@ -4466,15 +4513,12 @@ async function gSyncAll() {
     // Merge strategy: last-write wins by id, newest items survive
     const mergedNotes  = mergeById(notes,       remote.notes  || []);
     const mergedEvents = mergeById(customEvts,   remote.events || []);
-    const mergedSongs  = mergeById(songs,        remote.songs  || []);
 
     // Save merged back to local
     notes      = mergedNotes;
     customEvts = mergedEvents;
-    songs      = mergedSongs;
     localStorage.setItem('notes',      JSON.stringify(notes));
     localStorage.setItem('customEvts', JSON.stringify(customEvts));
-    localStorage.setItem('songs',      JSON.stringify(songs));
 
     // Merge admin list from remote (so admins added on one device appear on others)
     if (remote.adminEmails && Array.isArray(remote.adminEmails)) {
@@ -4486,11 +4530,12 @@ async function gSyncAll() {
     // Re-render whatever is visible
     renderNotes();
     renderEvts();
-    renderSongs();
+    // Songs are managed via Google Sheets — refresh them
+    fetchSharedSongs();
 
-    // Upload merged data to Drive
+    // Upload merged data to Drive (notes & events only)
     const payload = JSON.stringify({
-      notes: mergedNotes, events: mergedEvents, songs: mergedSongs,
+      notes: mergedNotes, events: mergedEvents,
       adminEmails: _getAdminList(),
       lastSync: new Date().toISOString(), device: navigator.userAgent.split(' ').slice(-2).join(' ')
     });
@@ -4503,7 +4548,7 @@ async function gSyncAll() {
 
     const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     if (statusEl) statusEl.textContent = `✓ Synced at ${now}`;
-    if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${mergedEvents.length} events · ${mergedSongs.length} songs`;
+    if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${mergedEvents.length} events · ${songs.length} songs`;
     updateAdminUI();
     showToast('✓ Synced to Google Drive');
 
@@ -4827,7 +4872,7 @@ function adminAddSong() {
   const editId = document.getElementById('adminSongModal').dataset.editId;
   if (editId) {
     const idx = songs.findIndex(x => x.id === parseInt(editId));
-    if (idx > -1) { songs[idx] = {...songs[idx], ...s, id: songs[idx].id}; }
+    if (idx > -1) { songs[idx] = {...songs[idx], ...s, id: songs[idx].id}; s.id = songs[idx].id; }
     delete document.getElementById('adminSongModal').dataset.editId;
     document.querySelector('#adminSongModal .modal-title').textContent = '🎵 Add Song / Kirtan';
   } else {
@@ -4837,7 +4882,29 @@ function adminAddSong() {
   localStorage.setItem('songsUserAdded', '1');
   closeModal('adminSongModal');
   renderSongs();
-  showToast(editId ? `"${t}" updated! ✏️` : `"${t}" saved! 🎵`);
+  showToast(editId ? `"${t}" updating… ⏳` : `"${t}" saving… ⏳`);
+
+  // Sync to Google Sheets
+  const userEmail = (gUser && gUser.email) ? gUser.email : '';
+  fetch(SONGS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: editId ? 'update' : 'add',
+      email: userEmail,
+      song: s
+    })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      showToast(editId ? `"${t}" updated! ✏️` : `"${t}" saved to shared library! 🎵`);
+    } else {
+      showToast('⚠️ ' + (data.error || 'Sync failed'));
+    }
+  }).catch(e => {
+    console.error('Sheet sync error:', e);
+    showToast('Saved locally — will sync when online');
+  });
+
   // Clear all fields
   ['aSongTitle','aSongOfficialName','aSongAuthor','aSongBook','aSongLyrics','aSongTrans'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('aSongLang').value = 'Sanskrit';

@@ -1,5 +1,5 @@
 // Bhakti Sakha - Service Worker for PWA
-const CACHE_NAME = 'bhakti-sakha-v1';
+const CACHE_NAME = 'bhakti-sakha-v2';
 const STATIC_ASSETS = [
   './',
   './Bhakti_Sakha.html',
@@ -44,6 +44,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (url.hostname.includes('googleapis.com') && url.pathname.includes('/drive/')) return;
   if (url.hostname.includes('accounts.google.com')) return;
+  if (url.hostname.includes('script.google.com') || url.hostname.includes('script.googleusercontent.com')) return;
 
   // Google Fonts: Cache-first (fonts rarely change)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
