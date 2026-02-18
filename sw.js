@@ -1,17 +1,14 @@
 // Bhakti Sakha - Service Worker for PWA
-const CACHE_NAME = 'bhakti-sakha-v2';
+const CACHE_NAME = 'bhakti-sakha-v3';
 const STATIC_ASSETS = [
-  './',
-  './Bhakti_Sakha.html',
   './manifest.json',
   './icon-192x192.png',
   './icon-512x512.png'
 ];
 
 const FONT_CACHE = 'bhakti-sakha-fonts-v1';
-const DYNAMIC_CACHE = 'bhakti-sakha-dynamic-v1';
 
-// Install: cache core assets
+// Install: cache icons and manifest only (not HTML)
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -26,7 +23,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME && key !== FONT_CACHE && key !== DYNAMIC_CACHE)
+        keys.filter(key => key !== CACHE_NAME && key !== FONT_CACHE)
             .map(key => {
               console.log('[SW] Removing old cache:', key);
               return caches.delete(key);
@@ -36,17 +33,19 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch strategy: Network-first for API calls, Cache-first for static assets
+// Fetch strategy
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Skip non-GET requests and Google API calls (Drive sync needs fresh tokens)
+  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
-  if (url.hostname.includes('googleapis.com') && url.pathname.includes('/drive/')) return;
+
+  // Always go to network for these (API calls, auth, Google Sheets)
+  if (url.hostname.includes('googleapis.com')) return;
   if (url.hostname.includes('accounts.google.com')) return;
   if (url.hostname.includes('script.google.com') || url.hostname.includes('script.googleusercontent.com')) return;
 
-  // Google Fonts: Cache-first (fonts rarely change)
+  // Google Fonts: Cache-first
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(
       caches.open(FONT_CACHE).then(cache => {
@@ -62,21 +61,26 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static assets: Cache-first, fallback to network
+  // HTML files: Always network-first, no caching
+  if (url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Icons, manifest, other static: Cache-first
   if (url.origin === location.origin) {
     event.respondWith(
       caches.match(event.request).then(cached => {
-        // Return cached version, but also update cache in background
-        const fetchPromise = fetch(event.request).then(response => {
+        return cached || fetch(event.request).then(response => {
           if (response.ok) {
             caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, response.clone());
             });
           }
           return response;
-        }).catch(() => cached); // If network fails, rely on cache
-
-        return cached || fetchPromise;
+        });
       })
     );
     return;
