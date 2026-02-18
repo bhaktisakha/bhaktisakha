@@ -1720,6 +1720,8 @@ body {
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <!-- Google API client -->
   <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
@@ -1997,10 +1999,21 @@ body {
       <div class="sett-section">
         <div class="sett-stitle">🔔 Notifications</div>
 
+        <!-- Push notifications toggle -->
+        <div class="sett-row" style="margin-bottom:14px;">
+          <div class="sett-info">
+            <div class="sett-name">📱 Push Notifications</div>
+            <div class="sett-desc" id="pushNotifStatus">Tap to enable real phone notifications</div>
+          </div>
+          <button id="pushNotifBtn" class="g-sync-btn" onclick="togglePushNotifications()" style="min-width:80px;">Enable</button>
+        </div>
+
+        <div class="notif-divider"></div>
+
         <!-- How it works info box -->
         <div class="notif-info-box">
           <div class="notif-info-title">ℹ️ How reminders work</div>
-          <div class="notif-info-text">Reminders appear as an <strong>in-app banner</strong> when you open the calendar on the alert day. For real push notifications, the app needs to be hosted online. All alerts show at the time you set below.</div>
+          <div class="notif-info-text">With push notifications <strong>enabled</strong>, you'll receive real phone notifications for upcoming events even when the app is closed. Reminders are sent daily based on your settings below.</div>
         </div>
 
         <!-- Notification time -->
@@ -4980,6 +4993,226 @@ function adminAddSong() {
 
 
 // ===================================================================
+// ===================================================================
+// PUSH NOTIFICATIONS (Firebase Cloud Messaging)
+// ===================================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDEgka4rqL6_HNMWERzzggcmv0YlVVoUT8",
+  authDomain: "bhaktisakhaapp1.firebaseapp.com",
+  projectId: "bhaktisakhaapp1",
+  storageBucket: "bhaktisakhaapp1.firebasestorage.app",
+  messagingSenderId: "246206438622",
+  appId: "1:246206438622:web:cbf20d06941eb82b87364f"
+};
+const VAPID_KEY = 'BITE4jynQCQ-wgKZ5jPWi7dgbr6Ms61Kx2llidYuNIT0EtbRtTEaGGAHtkL4-h4N_8vXnmgohwEmjt-ff5NPfQQ';
+
+let _fcmToken = null;
+let _firebaseApp = null;
+let _firebaseMessaging = null;
+
+function initFirebase() {
+  try {
+    if (!firebase || !firebase.initializeApp) return;
+    _firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    _firebaseMessaging = firebase.messaging();
+
+    // Handle foreground messages
+    _firebaseMessaging.onMessage((payload) => {
+      console.log('[FCM] Foreground message:', payload);
+      const title = payload.notification?.title || payload.data?.title || '🙏 Bhakti Sakha';
+      const body = payload.notification?.body || payload.data?.body || '';
+      showAlertBanner(title, body, '#a78bfa');
+    });
+
+    // Check if already subscribed
+    const savedToken = localStorage.getItem('fcmToken');
+    if (savedToken) {
+      _fcmToken = savedToken;
+      updatePushUI(true);
+      // Re-register upcoming events silently
+      setTimeout(() => registerUpcomingEvents(), 3000);
+    }
+  } catch(e) {
+    console.warn('Firebase init error:', e);
+  }
+}
+
+async function togglePushNotifications() {
+  if (_fcmToken) {
+    // Already enabled — disable
+    _fcmToken = null;
+    localStorage.removeItem('fcmToken');
+    updatePushUI(false);
+    // Unregister from server
+    try {
+      const savedToken = localStorage.getItem('fcmToken');
+      if (savedToken) {
+        await fetch(SONGS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'unregisterToken', token: savedToken })
+        });
+      }
+    } catch(e) {}
+    showToast('Push notifications disabled');
+    return;
+  }
+
+  // Request permission
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      showToast('Notification permission denied. Please enable in browser settings.');
+      return;
+    }
+
+    updatePushUI('loading');
+
+    // Register Firebase messaging service worker
+    const swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+    
+    // Get FCM token
+    if (!_firebaseMessaging) initFirebase();
+    const token = await _firebaseMessaging.getToken({
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: swReg
+    });
+
+    if (token) {
+      _fcmToken = token;
+      localStorage.setItem('fcmToken', token);
+      updatePushUI(true);
+
+      // Register token + preferences with server
+      await registerTokenWithServer(token);
+      // Register upcoming events
+      await registerUpcomingEvents();
+
+      showToast('✅ Push notifications enabled!');
+    } else {
+      showToast('Could not get notification token. Try again.');
+      updatePushUI(false);
+    }
+  } catch(e) {
+    console.error('Push notification error:', e);
+    showToast('Error enabling notifications: ' + e.message);
+    updatePushUI(false);
+  }
+}
+
+function updatePushUI(state) {
+  const btn = document.getElementById('pushNotifBtn');
+  const status = document.getElementById('pushNotifStatus');
+  if (!btn || !status) return;
+
+  if (state === 'loading') {
+    btn.textContent = '⏳';
+    btn.disabled = true;
+    status.textContent = 'Setting up…';
+  } else if (state === true) {
+    btn.textContent = 'Disable';
+    btn.disabled = false;
+    btn.style.background = 'rgba(231,76,60,0.2)';
+    btn.style.color = '#e74c3c';
+    status.textContent = '✅ Active — you\'ll receive phone notifications';
+  } else {
+    btn.textContent = 'Enable';
+    btn.disabled = false;
+    btn.style.background = '';
+    btn.style.color = '';
+    status.textContent = 'Tap to enable real phone notifications';
+  }
+}
+
+async function registerTokenWithServer(token) {
+  try {
+    const s = JSON.parse(localStorage.getItem('settings') || '{}');
+    const prefs = {
+      ekadashi: document.getElementById('n-ekadashi')?.checked ?? true,
+      festival: document.getElementById('n-festival')?.checked ?? true,
+      appearance: document.getElementById('n-appearance')?.checked ?? true,
+      custom: document.getElementById('n-custom')?.checked ?? true,
+      gayatri: document.getElementById('n-gayatri')?.checked ?? false,
+      rahu: document.getElementById('n-rahu')?.checked ?? false,
+      alertTime: document.getElementById('n-time')?.value || '07:00',
+      advance: document.getElementById('n-advance')?.value || '1'
+    };
+    const email = (gUser && gUser.email) ? gUser.email : 'anonymous';
+
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'registerToken',
+        token: token,
+        email: email,
+        prefs: prefs
+      })
+    });
+  } catch(e) {
+    console.warn('Token registration error:', e);
+  }
+}
+
+async function registerUpcomingEvents() {
+  if (!_fcmToken) return;
+  try {
+    // Compute next 14 days of events
+    const upcoming = [];
+    const today = new Date();
+    for (let d = 0; d < 14; d++) {
+      const dt = new Date(today);
+      dt.setDate(dt.getDate() + d);
+      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      const evts = getEventsForDate(dateStr);
+      evts.forEach(e => {
+        upcoming.push({
+          date: dateStr,
+          name: e.n || e.name || '',
+          type: e.t || 'event',
+          icon: e.i || '📅'
+        });
+      });
+    }
+
+    if (upcoming.length === 0) return;
+
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'registerEvents',
+        token: _fcmToken,
+        events: upcoming
+      })
+    });
+  } catch(e) {
+    console.warn('Event registration error:', e);
+  }
+}
+
+// Re-register when notification settings change
+function onNotifSettingsChanged() {
+  saveS();
+  if (_fcmToken) {
+    registerTokenWithServer(_fcmToken);
+    registerUpcomingEvents();
+  }
+}
+
+// Initialize Firebase when page loads
+setTimeout(initFirebase, 1500);
+
+// Hook notification toggles to re-register preferences
+setTimeout(() => {
+  ['n-ekadashi','n-festival','n-appearance','n-custom','n-gayatri','n-rahu','n-time','n-advance'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => {
+      if (_fcmToken) { registerTokenWithServer(_fcmToken); registerUpcomingEvents(); }
+    });
+  });
+}, 2000);
+
 // DATE PICKER
 // ===================================================================
 const DP_MONTHS = ['January','February','March','April','May','June',
