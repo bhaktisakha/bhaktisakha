@@ -572,6 +572,43 @@ body {
   display:flex; align-items:center; gap:6px;
 }
 .cat-title:first-child { padding-top:4px; }
+/* Category folder cards */
+.cat-folders-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px;
+}
+.cat-folder-card {
+  position:relative; background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08); border-radius:16px;
+  padding:20px 14px 16px; cursor:pointer; text-align:center;
+  transition: all 0.25s ease; overflow:hidden;
+}
+.cat-folder-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  border-radius:16px 16px 0 0; opacity:0.8;
+}
+.cat-folder-card[data-cat="vbhajan"]::before { background: linear-gradient(90deg, #f472b6, #ec4899); }
+.cat-folder-card[data-cat="hkkirtan"]::before { background: linear-gradient(90deg, #818cf8, #6366f1); }
+.cat-folder-card[data-cat="astakam"]::before { background: linear-gradient(90deg, #fb923c, #f97316); }
+.cat-folder-card[data-cat="stotram"]::before { background: linear-gradient(90deg, #34d399, #10b981); }
+.cat-folder-card[data-cat="gita"]::before { background: linear-gradient(90deg, #a3e635, #84cc16); }
+.cat-folder-card[data-cat="bhagavatam"]::before { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+.cat-folder-card:active { transform:scale(0.97); background:rgba(255,255,255,0.08); }
+.cat-folder-icon { font-size:2.2rem; margin-bottom:10px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+.cat-folder-name { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px; }
+.cat-folder-count { font-size:0.68rem; color:var(--text3); }
+.cat-folder-card:hover { border-color:rgba(255,255,255,0.15); box-shadow:0 4px 20px rgba(0,0,0,0.2); }
+/* Category detail header */
+.cat-detail-header {
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:var(--bg2); border-bottom:1px solid var(--border);
+}
+.cat-back-btn {
+  display:flex; align-items:center; gap:4px;
+  background:none; border:none; color:var(--accent-blue);
+  font-family:inherit; font-size:0.85rem; cursor:pointer; padding:4px 0;
+}
+.cat-detail-title { font-size:0.95rem; font-weight:600; color:var(--text); }
+.cat-detail-count { font-size:0.72rem; color:var(--text3); margin-left:auto; }
 .song-card {
   display:flex; align-items:center; justify-content:space-between;
   padding:11px 14px; border-bottom:1px solid var(--border);
@@ -799,12 +836,29 @@ body {
 .loc-search:focus { border-color:var(--accent-blue); }
 .loc-region-title { font-size:0.65rem; color:var(--accent-gold); text-transform:uppercase;
   letter-spacing:1px; padding:8px 0 4px; border-bottom:1px solid var(--border); margin-bottom:6px; }
-.loc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; max-height:340px; overflow-y:auto; }
-.loc-opt { background:var(--card); border:1px solid var(--border); border-radius:10px;
-  padding:8px 10px; cursor:pointer; transition:all 0.2s; }
-.loc-opt.sel { border-color:var(--accent-blue); background:rgba(61,127,212,0.15); }
-.loc-name { font-size:0.78rem; color:var(--text); line-height:1.2; }
-.loc-country { font-size:0.62rem; color:var(--text3); margin-top:2px; }
+.loc-grid { max-height:360px; overflow-y:auto; margin-top:6px; border-radius:12px; border:1px solid var(--border); background:var(--card); }
+.loc-region-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; cursor:pointer; user-select:none;
+  background:rgba(255,255,255,0.03); border-bottom:1px solid var(--border);
+  transition:background 0.2s;
+}
+.loc-region-hdr:hover { background:rgba(255,255,255,0.06); }
+.loc-region-hdr .region-label { font-size:0.78rem; font-weight:600; color:var(--accent-gold); letter-spacing:0.5px; }
+.loc-region-hdr .region-arrow { font-size:0.7rem; color:var(--text3); transition:transform 0.2s; }
+.loc-region-hdr.open .region-arrow { transform:rotate(90deg); }
+.loc-region-body { display:none; }
+.loc-region-body.open { display:block; }
+.loc-opt { display:flex; align-items:center; justify-content:space-between;
+  padding:9px 14px 9px 24px; cursor:pointer; transition:all 0.15s; border-bottom:1px solid rgba(255,255,255,0.03); }
+.loc-opt:last-child { border-bottom:none; }
+.loc-opt:hover { background:rgba(61,127,212,0.06); }
+.loc-opt.sel { background:rgba(61,127,212,0.12); }
+.loc-opt.sel .loc-name { color:var(--accent-blue); font-weight:600; }
+.loc-name { font-size:0.82rem; color:var(--text); line-height:1.2; }
+.loc-country { font-size:0.65rem; color:var(--text3); }
+.loc-check { color:var(--accent-blue); font-size:0.75rem; opacity:0; transition:opacity 0.15s; }
+.loc-opt.sel .loc-check { opacity:1; }
 
 .admin-box { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
   border-radius:12px; padding:14px; }
@@ -1698,6 +1752,22 @@ body {
   color: var(--text2); cursor: pointer;
 }
 .admin-export-btn:active { background: rgba(255,255,255,0.12); }
+/* Admin permissions */
+.admin-perms-wrap { margin-top: 8px; }
+.admin-perms-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 6px; }
+.admin-perm-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+  background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 4px;
+}
+.admin-perm-row label { font-size: 0.8rem; color: var(--text2); cursor: pointer; display:flex; align-items:center; gap:8px; flex:1; }
+.admin-perm-row input[type="checkbox"] { accent-color: var(--lavender); width:16px; height:16px; cursor:pointer; }
+.admin-perm-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.admin-perm-tag {
+  font-size: 0.6rem; padding: 2px 7px; border-radius: 4px;
+  background: rgba(61,127,212,0.12); color: var(--accent-blue); font-weight: 500;
+}
+.admin-perm-tag.perm-songs { background: rgba(167,139,250,0.12); color: var(--lavender); }
+.admin-perm-tag.perm-dhamas { background: rgba(212,175,55,0.12); color: var(--accent-gold); }
 .evt-modal-icon {
   padding: 18px 20px 0;
   font-size: 2.4rem; text-align: center;
@@ -1974,6 +2044,15 @@ body {
         <div class="admin-add-row">
           <input class="admin-add-input" id="adminAddInput" placeholder="Enter email to grant admin…" type="email">
           <button class="admin-add-btn" onclick="addAdmin()">+ Add</button>
+        </div>
+        <div class="admin-perms-wrap" id="adminPermsWrap">
+          <div class="admin-perms-label">Permissions for new admin:</div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="permSongs" checked> 🎵 Add / Edit Songs & Kirtans</label>
+          </div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="permDhamas" checked> 🛕 Add Dhamas</label>
+          </div>
         </div>
         <div class="admin-export-row">
           <button class="admin-export-btn" onclick="exportSharedEvtInfo()">📤 Export Event Info</button>
@@ -2279,12 +2358,12 @@ body {
     <div class="f-grp">
       <label class="f-lbl">Category</label>
       <select class="f-sel" id="aSongCat">
-        <option value="vbhajan">🌸 Vaishnava Bhajans</option>
-        <option value="hkkirtan">🎶 Hare Krsna Kirtans</option>
-        <option value="astakam">🙏 Astakams</option>
-        <option value="stotram">📿 Stotrams</option>
-        <option value="gita">📗 Bhagavad Gita Verses</option>
-        <option value="bhagavatam">🌊 Srimad Bhagavatam Prayers</option>
+        <option value="vbhajan">Vaishnava Bhajans</option>
+        <option value="hkkirtan">Hare Krsna Kirtans</option>
+        <option value="astakam">Astakams</option>
+        <option value="stotram">Stotrams</option>
+        <option value="gita">Bhagavad Gita Verses</option>
+        <option value="bhagavatam">Srimad Bhagavatam Prayers</option>
       </select>
     </div>
     <div class="f-grp">
@@ -2528,6 +2607,28 @@ function _getAdminList() {
 function _saveAdminList(list) {
   if (!list.includes(SUPER_ADMIN_EMAIL)) list.unshift(SUPER_ADMIN_EMAIL);
   localStorage.setItem('adminEmails', JSON.stringify(list));
+}
+function _getAdminPermissions() {
+  try {
+    return JSON.parse(localStorage.getItem('adminPermissions') || '{}');
+  } catch(e) { return {}; }
+}
+function _saveAdminPermissions(perms) {
+  localStorage.setItem('adminPermissions', JSON.stringify(perms));
+}
+function hasPermission(perm) {
+  if (!gUser || !gUser.email) return false;
+  const email = gUser.email.toLowerCase();
+  // Super admin has all permissions
+  if (email === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
+  // Must be in admin list
+  if (!_getAdminList().includes(email)) return false;
+  // Check specific permission
+  const perms = _getAdminPermissions();
+  const userPerms = perms[email];
+  // Legacy admins without permissions get full access
+  if (!userPerms) return true;
+  return userPerms.includes(perm);
 }
 function isAdmin() {
   if (!gUser || !gUser.email) return false;
@@ -3879,6 +3980,7 @@ let songFontIdx = 2; // default M
 
 function setSongSort(mode, btn) {
   songSortMode = mode;
+  _openCatKey = null; // Reset category folder view
   document.querySelectorAll('.songs-sort-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderSongs();
@@ -4013,6 +4115,27 @@ function _buildSongCard(s) {
   </div>`;
 }
 
+let _openCatKey = null; // Track which category folder is open
+
+const CAT_FOLDER_INFO = {
+  vbhajan:    { icon:'🌸', name:'Vaishnava Bhajans', gradient:'linear-gradient(135deg, rgba(244,114,182,0.15), rgba(236,72,153,0.05))' },
+  hkkirtan:   { icon:'🎶', name:'Hare Krsna Kirtans', gradient:'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(99,102,241,0.05))' },
+  astakam:    { icon:'🙏', name:'Astakams', gradient:'linear-gradient(135deg, rgba(251,146,60,0.15), rgba(249,115,22,0.05))' },
+  stotram:    { icon:'📿', name:'Stotrams', gradient:'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.05))' },
+  gita:       { icon:'📗', name:'Bhagavad Gita Verses', gradient:'linear-gradient(135deg, rgba(163,230,53,0.15), rgba(132,204,22,0.05))' },
+  bhagavatam: { icon:'🌊', name:'Srimad Bhagavatam Prayers', gradient:'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(14,165,233,0.05))' },
+};
+
+function openCatFolder(catKey) {
+  _openCatKey = catKey;
+  renderSongs();
+}
+
+function closeCatFolder() {
+  _openCatKey = null;
+  renderSongs();
+}
+
 function renderSongs(filter) {
   // Update sort button states
   const sb = document.getElementById('ksort-cat');
@@ -4042,6 +4165,7 @@ function renderSongs(filter) {
       <div style="font-size:0.85rem;color:var(--text3);">${q ? 'No songs match "'+q+'"' : 'No songs yet — tap ＋ to add!'}</div>
     </div>`;
   } else if (songSortMode === 'author') {
+    _openCatKey = null;
     const authors = [...new Set(pool.map(s => s.author))].sort((a,b) => a.localeCompare(b));
     authors.forEach(author => {
       pool.filter(s => s.author === author).forEach((s,i) => {
@@ -4049,11 +4173,14 @@ function renderSongs(filter) {
         cards += _buildSongCard(s);
       });
     });
-  } else {
+    document.getElementById('songsContent').innerHTML = `<div style="padding:8px 12px 100px;">${cards}</div>`;
+  } else if (q) {
+    // When searching, show flat list grouped by cat (no folders)
+    _openCatKey = null;
     const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
     const rendered = new Set();
     CAT_ORDER.forEach(key => {
-      const cs = pool.filter(s => s.cat === key);
+      const cs = pool.filter(s => s.cat === key).sort((a,b) => a.title.localeCompare(b.title));
       if (!cs.length) return;
       cards += `<div class="cat-title">${_catLabel(key)}</div>`;
       cs.forEach(s => { cards += _buildSongCard(s); rendered.add(s.id); });
@@ -4063,8 +4190,55 @@ function renderSongs(filter) {
       cards += `<div class="cat-title">📌 Other</div>`;
       rest.forEach(s => { cards += _buildSongCard(s); });
     }
+    document.getElementById('songsContent').innerHTML = `<div style="padding:8px 12px 100px;">${cards}</div>`;
+  } else if (_openCatKey) {
+    // Show songs inside the opened category folder
+    const CAT_ORDER_KEYS = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
+    const info = CAT_FOLDER_INFO[_openCatKey] || { icon:'📌', name:'Other' };
+    const catSongs = _openCatKey === 'other'
+      ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort((a,b) => a.title.localeCompare(b.title))
+      : pool.filter(s => s.cat === _openCatKey).sort((a,b) => a.title.localeCompare(b.title));
+    let innerCards = '';
+    catSongs.forEach(s => { innerCards += _buildSongCard(s); });
+    if (!innerCards) innerCards = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.85rem;">No songs in this category yet</div>';
+    document.getElementById('songsContent').innerHTML = `
+      <div class="cat-detail-header">
+        <button class="cat-back-btn" onclick="closeCatFolder()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span style="font-size:1.2rem;">${info.icon}</span>
+        <span class="cat-detail-title">${info.name}</span>
+        <span class="cat-detail-count">${catSongs.length} song${catSongs.length!==1?'s':''}</span>
+      </div>
+      <div style="padding:4px 12px 100px;">${innerCards}</div>`;
+  } else {
+    // Show category folder cards
+    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
+    let folderCards = '';
+    CAT_ORDER.forEach(key => {
+      const count = pool.filter(s => s.cat === key).length;
+      const info = CAT_FOLDER_INFO[key];
+      folderCards += `<div class="cat-folder-card" data-cat="${key}" onclick="openCatFolder('${key}')" style="background:${info.gradient};">
+        <div class="cat-folder-icon">${info.icon}</div>
+        <div class="cat-folder-name">${info.name}</div>
+        <div class="cat-folder-count">${count} song${count!==1?'s':''}</div>
+      </div>`;
+    });
+    // Check for uncategorized
+    const rest = pool.filter(s => !CAT_ORDER.includes(s.cat));
+    if (rest.length) {
+      folderCards += `<div class="cat-folder-card" data-cat="other" onclick="openCatFolder('other')" style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));">
+        <div class="cat-folder-icon">📌</div>
+        <div class="cat-folder-name">Other</div>
+        <div class="cat-folder-count">${rest.length} song${rest.length!==1?'s':''}</div>
+      </div>`;
+    }
+    document.getElementById('songsContent').innerHTML = `<div class="cat-folders-grid">${folderCards}</div>`;
   }
-  document.getElementById('songsContent').innerHTML = `<div style="padding:8px 12px 100px;">${cards}</div>`;
+  if (songSortMode === 'author' || q) {
+    // Already rendered above
+  }
 }
 
 let _currentSongId = null;
@@ -4136,12 +4310,12 @@ function closeSongDetail() {
 }
 
 function openEditSongFromDetail() {
-  if (!isAdmin()) { showToast('Admin access required'); return; }
+  if (!hasPermission('songs')) { showToast('Songs admin access required'); return; }
   if (_currentSongId) openEditSong(_currentSongId);
 }
 
 function deleteSongFromDetail() {
-  if (!isAdmin()) { showToast('Admin access required'); return; }
+  if (!hasPermission('songs')) { showToast('Songs admin access required'); return; }
   if (!_currentSongId) return;
   const s = songs.find(x => x.id === _currentSongId);
   if (!s) return;
@@ -4472,26 +4646,38 @@ function updateAdminUI() {
   } else {
     panel.style.display = 'none';
   }
-  // Show/hide song add button and edit/delete buttons based on admin status
+  // Show/hide song add button and edit/delete buttons based on songs permission
   const songAddBtn = document.querySelector('.kirtan-add-btn');
-  if (songAddBtn) songAddBtn.style.display = isAdmin() ? '' : 'none';
+  if (songAddBtn) songAddBtn.style.display = hasPermission('songs') ? '' : 'none';
   const songEditBtn = document.querySelector('.song-edit-btn');
-  if (songEditBtn) songEditBtn.style.display = isAdmin() ? '' : 'none';
+  if (songEditBtn) songEditBtn.style.display = hasPermission('songs') ? '' : 'none';
   const songDelBtns = document.querySelectorAll('.song-del-btn');
-  songDelBtns.forEach(b => b.style.display = isAdmin() ? '' : 'none');
+  songDelBtns.forEach(b => b.style.display = hasPermission('songs') ? '' : 'none');
   // Update dham admin UI
   updateDhamAdminUI();
 }
 
 function renderAdminList() {
   const list = _getAdminList();
+  const perms = _getAdminPermissions();
   const el = document.getElementById('adminEmailList');
   if (!el) return;
   el.innerHTML = list.map(email => {
     const isSelf = email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+    const userPerms = perms[email.toLowerCase()];
+    let permTags = '';
+    if (!isSelf) {
+      if (!userPerms || userPerms.includes('songs')) permTags += '<span class="admin-perm-tag perm-songs">Songs</span>';
+      if (!userPerms || userPerms.includes('dhamas')) permTags += '<span class="admin-perm-tag perm-dhamas">Dhamas</span>';
+    }
     return `<div class="admin-email-row">
-      <span>${email}</span>
-      ${isSelf ? '<span class="admin-super">SUPER ADMIN</span>' : ''}
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${email}</span>
+          ${isSelf ? '<span class="admin-super">SUPER ADMIN</span>' : ''}
+        </div>
+        ${!isSelf && permTags ? '<div class="admin-perm-tags">'+permTags+'</div>' : ''}
+      </div>
       ${!isSelf ? `<button class="admin-remove-btn" onclick="removeAdmin('${email}')">Remove</button>` : ''}
     </div>`;
   }).join('');
@@ -4504,8 +4690,18 @@ function addAdmin() {
   if (!email || !email.includes('@')) { showToast('Enter a valid email'); return; }
   const list = _getAdminList();
   if (list.map(e => e.toLowerCase()).includes(email)) { showToast('Already an admin'); return; }
+  // Get selected permissions
+  const selectedPerms = [];
+  if (document.getElementById('permSongs').checked) selectedPerms.push('songs');
+  if (document.getElementById('permDhamas').checked) selectedPerms.push('dhamas');
+  if (!selectedPerms.length) { showToast('Select at least one permission'); return; }
+  // Save admin
   list.push(email);
   _saveAdminList(list);
+  // Save permissions
+  const allPerms = _getAdminPermissions();
+  allPerms[email] = selectedPerms;
+  _saveAdminPermissions(allPerms);
   input.value = '';
   renderAdminList();
   showToast('Admin added ✓');
@@ -4517,6 +4713,10 @@ function removeAdmin(email) {
   if (!confirm('Remove admin rights for ' + email + '?')) return;
   let list = _getAdminList().filter(e => e.toLowerCase() !== email.toLowerCase());
   _saveAdminList(list);
+  // Also remove permissions
+  const perms = _getAdminPermissions();
+  delete perms[email.toLowerCase()];
+  _saveAdminPermissions(perms);
   renderAdminList();
   showToast('Admin removed');
 }
@@ -4623,6 +4823,12 @@ async function gSyncAll() {
       const mergedAdmins = [...new Set([...currentAdmins, ...remote.adminEmails].map(e => e.toLowerCase()))];
       _saveAdminList(mergedAdmins);
     }
+    // Merge admin permissions from remote
+    if (remote.adminPermissions && typeof remote.adminPermissions === 'object') {
+      const currentPerms = _getAdminPermissions();
+      const mergedPerms = { ...currentPerms, ...remote.adminPermissions };
+      _saveAdminPermissions(mergedPerms);
+    }
 
     // Re-render whatever is visible
     renderNotes();
@@ -4634,6 +4840,7 @@ async function gSyncAll() {
     const payload = JSON.stringify({
       notes: mergedNotes, events: mergedEvents,
       adminEmails: _getAdminList(),
+      adminPermissions: _getAdminPermissions(),
       lastSync: new Date().toISOString(), device: navigator.userAgent.split(' ').slice(-2).join(' ')
     });
 
@@ -4689,18 +4896,51 @@ function signInG() {
 // ===================================================================
 // SETTINGS
 // ===================================================================
+const LOC_REGIONS = [
+  { label: '🇮🇳  India', filter: l => l.country === 'India' },
+  { label: '🇺🇸  USA', filter: l => l.country === 'USA' },
+  { label: '🇬🇧  UK & Europe', filter: l => ['UK','France','Netherlands','Germany','Spain','Switzerland','Russia','Sweden','Poland'].includes(l.country) },
+  { label: '🌍  Middle East & Africa', filter: l => ['UAE','Saudi Arabia','S. Africa','Kenya','Mauritius'].includes(l.country) },
+  { label: '🌏  Asia-Pacific', filter: l => ['Singapore','Malaysia','Indonesia','Thailand','Hong Kong','Japan','Australia','New Zealand'].includes(l.country) },
+  { label: '🌎  Americas', filter: l => ['Canada','Brazil','Argentina','Mexico'].includes(l.country) },
+];
+
+function _buildLocGroupedHtml(filtered) {
+  if (!filtered.length) return '<div style="color:var(--text3);font-size:0.8rem;padding:12px;text-align:center;">No results</div>';
+  let html = '';
+  const isSearching = filtered.length < LOCS.length;
+  LOC_REGIONS.forEach((region, ri) => {
+    const cities = filtered.filter(region.filter);
+    if (!cities.length) return;
+    const openClass = isSearching ? 'open' : (ri === 0 ? 'open' : '');
+    html += `<div class="loc-region-hdr ${openClass}" onclick="toggleLocRegion(this)">
+      <span class="region-label">${region.label}</span>
+      <span class="region-arrow">›</span>
+    </div>
+    <div class="loc-region-body ${openClass}">
+      ${cities.map(l => `<div class="loc-opt ${l.key===curLoc.key?'sel':''}" onclick="setLoc('${l.key}')">
+        <div><div class="loc-name">${l.name}</div><div class="loc-country">${l.country}</div></div>
+        <span class="loc-check">✓</span>
+      </div>`).join('')}
+    </div>`;
+  });
+  return html;
+}
+
+function toggleLocRegion(hdr) {
+  hdr.classList.toggle('open');
+  const body = hdr.nextElementSibling;
+  if (body) body.classList.toggle('open');
+}
+
 function renderLocGrid(filter) {
   const q = (filter||'').toLowerCase();
   const filtered = q ? LOCS.filter(l =>
     l.name.toLowerCase().includes(q) || l.country.toLowerCase().includes(q)
   ) : LOCS;
-  const html = filtered.map(l => `
-    <div class="loc-opt ${l.key===curLoc.key?'sel':''}" onclick="setLoc('${l.key}')">
-      <div class="loc-name">${l.name}</div>
-      <div class="loc-country">${l.country}</div>
-    </div>`).join('');
+  const html = _buildLocGroupedHtml(filtered);
   const els = document.querySelectorAll('#locGridSettings, #modalLocGrid');
-  els.forEach(el => { if(el) el.innerHTML = html || '<div style="color:var(--text3);font-size:0.8rem;padding:8px;">No results</div>'; });
+  els.forEach(el => { if(el) el.innerHTML = html; });
   const nameEl = document.getElementById('curLocName');
   if (nameEl) nameEl.textContent = curLoc.name;
 }
@@ -4710,13 +4950,9 @@ function filterLocGrid(q, gridId) {
     l.name.toLowerCase().includes(q.toLowerCase()) ||
     l.country.toLowerCase().includes(q.toLowerCase())
   ) : LOCS;
-  const html = filtered.map(l => `
-    <div class="loc-opt ${l.key===curLoc.key?'sel':''}" onclick="setLoc('${l.key}')">
-      <div class="loc-name">${l.name}</div>
-      <div class="loc-country">${l.country}</div>
-    </div>`).join('');
+  const html = _buildLocGroupedHtml(filtered);
   const el = document.getElementById(gridId);
-  if (el) el.innerHTML = html || '<div style="color:var(--text3);font-size:0.8rem;padding:8px;">No results</div>';
+  if (el) el.innerHTML = html;
 }
 
 function setLoc(key) {
@@ -4933,7 +5169,7 @@ function updateNotifDescs() {
 }
 
 function openAdminSong() {
-  if (!isAdmin()) { showToast('Admin access required'); return; }
+  if (!hasPermission('songs')) { showToast('Songs admin access required'); return; }
   _audioFieldsShown = 1;
   // Reset all audio rows
   for (let i = 1; i < 5; i++) document.getElementById('aRow' + i).style.display = 'none';
@@ -6977,7 +7213,7 @@ function renderDhamas(filter) {
     return;
   }
 
-  const admin = isAdmin();
+  const admin = hasPermission('dhamas');
   grid.innerHTML = pool.map(d => {
     const isCustom = d.id.startsWith('custom_');
     const delBtn = admin && isCustom
@@ -6997,7 +7233,7 @@ function renderDhamas(filter) {
 }
 
 function deleteCustomDham(id) {
-  if (!isAdmin()) return;
+  if (!hasPermission('dhamas')) return;
   if (!confirm('Delete this Dham?')) return;
   customDhamas = customDhamas.filter(d => d.id !== id);
   localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
@@ -7164,7 +7400,7 @@ function closeDhamDetail() {
 
 // ===== ADMIN: ADD DHAM =====
 function openAddDham() {
-  if (!isAdmin()) { showToast('Admin access required'); return; }
+  if (!hasPermission('dhamas')) { showToast('Dhamas admin access required'); return; }
   // Clear form
   ['dhamFName','dhamFLoc','dhamFIcon','dhamFOverview','dhamFScript','dhamFReach',
    'dhamFDarshan','dhamFFest','dhamFAccom','dhamFFood','dhamFSeva','dhamFPlaces',
@@ -7177,7 +7413,7 @@ function openAddDham() {
 }
 
 function saveNewDham() {
-  if (!isAdmin()) return;
+  if (!hasPermission('dhamas')) return;
   const name = document.getElementById('dhamFName').value.trim();
   const loc  = document.getElementById('dhamFLoc').value.trim();
   const overview = document.getElementById('dhamFOverview').value.trim();
@@ -7224,7 +7460,7 @@ function saveNewDham() {
 // Update dham add button visibility
 function updateDhamAdminUI() {
   const btn = document.getElementById('dhamAddBtn');
-  if (btn) btn.style.display = isAdmin() ? '' : 'none';
+  if (btn) btn.style.display = hasPermission('dhamas') ? '' : 'none';
 }
 
 function init() {
