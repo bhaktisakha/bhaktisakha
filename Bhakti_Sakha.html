@@ -3474,11 +3474,6 @@ function changeMonth(dir) {
   if (curMonth > 11) { curMonth=0; curYear++; }
   if (curMonth < 0) { curMonth=11; curYear--; }
   renderCalendar();
-  restoreGoogleSession();
-  // Init Google Sign-In after scripts load
-  window.addEventListener('load', () => {
-    setTimeout(initGoogleSignIn, 500);
-  });
 }
 
 function selectDay(date) {
@@ -5249,6 +5244,17 @@ function saveNote(silent) {
 
 // Auto-save on typing
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Google Sign-In after GSI library loads
+  function tryInitGoogle() {
+    if (window.google && window.google.accounts) {
+      restoreGoogleSession();
+      initGoogleSignIn();
+    } else {
+      setTimeout(tryInitGoogle, 300);
+    }
+  }
+  setTimeout(tryInitGoogle, 500);
+
   const bodyEl = document.getElementById('neBody');
   if (bodyEl) {
     bodyEl.addEventListener('input', function() {
