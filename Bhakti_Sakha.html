@@ -2501,14 +2501,16 @@ const D2R = Math.PI / 180;
 // ADMIN & ROLE SYSTEM
 // ===================================================================
 const SUPER_ADMIN_EMAIL = 'sajeev1478@gmail.com';
+const ADMIN_EMAILS = ['sajeev1478@gmail.com', 'bhaktisakhaapp@gmail.com'];
 
 function _getAdminList() {
   try {
     const stored = localStorage.getItem('adminEmails');
-    const list = stored ? JSON.parse(stored) : [];
-    if (!list.includes(SUPER_ADMIN_EMAIL)) list.unshift(SUPER_ADMIN_EMAIL);
-    return list;
-  } catch(e) { return [SUPER_ADMIN_EMAIL]; }
+    const localList = stored ? JSON.parse(stored) : [];
+    // Merge hardcoded + localStorage admins (deduplicated)
+    const merged = [...new Set([...ADMIN_EMAILS, ...localList].map(e => e.toLowerCase()))];
+    return merged;
+  } catch(e) { return ADMIN_EMAILS.map(e => e.toLowerCase()); }
 }
 function _saveAdminList(list) {
   if (!list.includes(SUPER_ADMIN_EMAIL)) list.unshift(SUPER_ADMIN_EMAIL);
@@ -4474,6 +4476,13 @@ async function gSyncAll() {
     localStorage.setItem('customEvts', JSON.stringify(customEvts));
     localStorage.setItem('songs',      JSON.stringify(songs));
 
+    // Merge admin list from remote (so admins added on one device appear on others)
+    if (remote.adminEmails && Array.isArray(remote.adminEmails)) {
+      const currentAdmins = _getAdminList();
+      const mergedAdmins = [...new Set([...currentAdmins, ...remote.adminEmails].map(e => e.toLowerCase()))];
+      _saveAdminList(mergedAdmins);
+    }
+
     // Re-render whatever is visible
     renderNotes();
     renderEvts();
@@ -4482,6 +4491,7 @@ async function gSyncAll() {
     // Upload merged data to Drive
     const payload = JSON.stringify({
       notes: mergedNotes, events: mergedEvents, songs: mergedSongs,
+      adminEmails: _getAdminList(),
       lastSync: new Date().toISOString(), device: navigator.userAgent.split(' ').slice(-2).join(' ')
     });
 
@@ -4494,6 +4504,7 @@ async function gSyncAll() {
     const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     if (statusEl) statusEl.textContent = `✓ Synced at ${now}`;
     if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${mergedEvents.length} events · ${mergedSongs.length} songs`;
+    updateAdminUI();
     showToast('✓ Synced to Google Drive');
 
   } catch(e) {
