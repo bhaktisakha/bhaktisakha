@@ -1843,6 +1843,46 @@ body {
   text-align:center; opacity:0; pointer-events:none; }
 .toast.show { transform:translateX(-50%) translateY(0); opacity:1; pointer-events:auto; }
 
+/* Update notification banner */
+.update-banner {
+  position:fixed; top:0; left:0; right:0; max-width:430px; margin:0 auto;
+  z-index:500; transform:translateY(-100%); transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;
+}
+.update-banner.show { transform:translateY(0); pointer-events:auto; }
+.update-banner-inner {
+  margin:12px; padding:16px 18px;
+  background:linear-gradient(135deg, rgba(61,127,212,0.95), rgba(99,102,241,0.95));
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-radius:16px; border:1px solid rgba(255,255,255,0.15);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  display:flex; align-items:center; gap:14px;
+  animation:bannerGlow 2s ease-in-out infinite alternate;
+}
+@keyframes bannerGlow {
+  from { box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  to { box-shadow:0 8px 32px rgba(61,127,212,0.3); }
+}
+.update-banner-icon {
+  font-size:1.6rem; flex-shrink:0;
+  animation:bannerPulse 1.5s ease-in-out infinite;
+}
+@keyframes bannerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.update-banner-text { flex:1; min-width:0; }
+.update-banner-title {
+  font-size:0.88rem; font-weight:700; color:#fff; margin-bottom:3px;
+}
+.update-banner-desc {
+  font-size:0.72rem; color:rgba(255,255,255,0.8); line-height:1.4;
+}
+.update-banner-dismiss {
+  background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.25);
+  border-radius:8px; padding:6px 14px; color:#fff; font-size:0.75rem;
+  font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0;
+  font-family:inherit; transition:background 0.2s;
+}
+.update-banner-dismiss:active { background:rgba(255,255,255,0.35); }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-track { background:transparent; }
@@ -1889,6 +1929,18 @@ body {
 </div>
 
 <!-- Header -->
+<!-- Update notification banner -->
+<div class="update-banner" id="updateBanner">
+  <div class="update-banner-inner">
+    <div class="update-banner-icon">✨</div>
+    <div class="update-banner-text">
+      <div class="update-banner-title">Bhakti Sakha Updated!</div>
+      <div class="update-banner-desc">Enjoy the latest improvements and features.</div>
+    </div>
+    <button class="update-banner-dismiss" onclick="dismissUpdateBanner()">OK</button>
+  </div>
+</div>
+
 <header class="header">
   <div class="header-date-wrap">
     <div class="header-date" id="headerDate">18 February 2026</div>
@@ -7580,6 +7632,57 @@ function updateDhamAdminUI() {
   if (btn) btn.style.display = hasPermission('dhamas') ? '' : 'none';
 }
 
+// ═══════════════════════════════════════
+// AUTO UPDATE NOTIFICATION
+// ═══════════════════════════════════════
+function _appContentHash() {
+  // Generate a simple hash from the page's own script content
+  const scripts = document.querySelectorAll('script:not([src])');
+  let content = '';
+  scripts.forEach(s => content += s.textContent);
+  // Also include key structural HTML (categories, settings sections, etc.)
+  const mainEl = document.getElementById('screen-settings');
+  if (mainEl) content += mainEl.innerHTML.length;
+  const songsEl = document.getElementById('screen-songs');
+  if (songsEl) content += songsEl.innerHTML.length;
+  // djb2 hash
+  let hash = 5381;
+  for (let i = 0; i < content.length; i++) {
+    hash = ((hash << 5) + hash + content.charCodeAt(i)) & 0xFFFFFFFF;
+  }
+  return hash.toString(36);
+}
+
+function checkForAppUpdate() {
+  try {
+    const currentHash = _appContentHash();
+    const storedHash = localStorage.getItem('_appHash');
+    if (!storedHash) {
+      // First time using the app — just store hash, don't show banner
+      localStorage.setItem('_appHash', currentHash);
+      return;
+    }
+    if (storedHash !== currentHash) {
+      // App has been updated — show banner after a short delay
+      setTimeout(() => {
+        const banner = document.getElementById('updateBanner');
+        if (banner) banner.classList.add('show');
+        // Auto-dismiss after 8 seconds
+        setTimeout(() => dismissUpdateBanner(), 4000);
+      }, 1200);
+    }
+  } catch(e) {}
+}
+
+function dismissUpdateBanner() {
+  const banner = document.getElementById('updateBanner');
+  if (banner) banner.classList.remove('show');
+  // Save current hash so banner doesn't show again
+  try {
+    localStorage.setItem('_appHash', _appContentHash());
+  } catch(e) {}
+}
+
 function init() {
   // Load settings
   const s = JSON.parse(localStorage.getItem('settings')||'{}');
@@ -7597,6 +7700,9 @@ function init() {
   curYear=td.getFullYear(); curMonth=td.getMonth();
   selectDay(td);
   startAlertTicker();
+
+  // Check if app was updated since last visit
+  checkForAppUpdate();
 }
 
 init();
