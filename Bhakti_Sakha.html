@@ -1269,10 +1269,28 @@ body {
 .notif-time-input {
   background:var(--card); border:1.5px solid var(--border); border-radius:8px;
   padding:6px 10px; color:var(--text); font-family:inherit; font-size:0.85rem;
-  outline:none; width:90px; text-align:center;
-  color-scheme: dark;
+  outline:none; width:110px; text-align:center;
+  color-scheme: dark; display:none;
 }
 .notif-time-input:focus { border-color:var(--accent-blue); }
+.notif-time-display {
+  display:flex; align-items:center; gap:6px;
+}
+.notif-time-display select {
+  background:var(--card); border:1.5px solid var(--border); border-radius:8px;
+  padding:8px 6px; color:var(--text); font-family:inherit; font-size:0.82rem;
+  outline:none; text-align:center; color-scheme:dark; -webkit-appearance:none;
+  appearance:none; cursor:pointer; min-width:0;
+}
+.notif-time-display select:focus { border-color:var(--accent-blue); }
+.notif-time-display .time-colon { color:var(--text2); font-weight:600; font-size:0.9rem; }
+.notif-advance-sel {
+  background:var(--card); border:1.5px solid var(--border); border-radius:8px;
+  padding:8px 12px; color:var(--text); font-family:inherit; font-size:0.82rem;
+  outline:none; text-align:center; color-scheme:dark; min-width:100px;
+  cursor:pointer;
+}
+.notif-advance-sel:focus { border-color:var(--accent-blue); }
 .notif-divider { height:1px; background:var(--border); margin:10px 0 14px; }
 
 /* ===== HOLY DHAMAS ===== */
@@ -2147,6 +2165,24 @@ body {
             <div class="sett-desc">Time of day to show reminders</div>
           </div>
           <input type="time" id="n-time" value="07:00" onchange="saveS()" class="notif-time-input">
+          <div class="notif-time-display">
+            <select id="n-time-hour" onchange="syncTimeFromSelects()" style="width:52px;">
+              <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+              <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+              <option value="07" selected>07</option><option value="08">08</option><option value="09">09</option>
+              <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+            </select>
+            <span class="time-colon">:</span>
+            <select id="n-time-min" onchange="syncTimeFromSelects()" style="width:52px;">
+              <option value="00" selected>00</option><option value="05">05</option><option value="10">10</option>
+              <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+              <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+              <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+            </select>
+            <select id="n-time-ampm" onchange="syncTimeFromSelects()" style="width:56px;">
+              <option value="AM" selected>AM</option><option value="PM">PM</option>
+            </select>
+          </div>
         </div>
 
         <!-- Advance days -->
@@ -2155,7 +2191,7 @@ body {
             <div class="sett-name">Advance Notice</div>
             <div class="sett-desc">How many days before to remind</div>
           </div>
-          <select class="f-sel" id="n-advance" style="width:72px" onchange="saveS();updateNotifDescs()">
+          <select class="notif-advance-sel" id="n-advance" onchange="saveS();updateNotifDescs()">
             <option value="1">1 day</option>
             <option value="2">2 days</option>
             <option value="3">3 days</option>
@@ -5166,12 +5202,48 @@ function loadNotifSettings() {
     const tim = document.getElementById('n-time');
     if (adv && s['n-advance']) adv.value = s['n-advance'];
     if (tim && s['n-time']) tim.value = s['n-time'];
+    syncTimeToSelects();
     ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom'].forEach(id=>{
       const el=document.getElementById(id);
       if(el && s[id]!==undefined) el.checked=s[id];
     });
     updateNotifDescs();
   } catch(e) {}
+}
+
+function syncTimeToSelects() {
+  const tim = document.getElementById('n-time');
+  if (!tim) return;
+  const val = tim.value || '07:00';
+  const [h24, m] = val.split(':').map(Number);
+  const ampm = h24 < 12 ? 'AM' : 'PM';
+  let h12 = h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24;
+  const hSel = document.getElementById('n-time-hour');
+  const mSel = document.getElementById('n-time-min');
+  const apSel = document.getElementById('n-time-ampm');
+  if (hSel) hSel.value = String(h12).padStart(2, '0');
+  if (mSel) {
+    // Find closest 5-min option
+    const rounded = Math.round(m / 5) * 5;
+    mSel.value = String(rounded === 60 ? 0 : rounded).padStart(2, '0');
+  }
+  if (apSel) apSel.value = ampm;
+}
+
+function syncTimeFromSelects() {
+  const hSel = document.getElementById('n-time-hour');
+  const mSel = document.getElementById('n-time-min');
+  const apSel = document.getElementById('n-time-ampm');
+  if (!hSel || !mSel || !apSel) return;
+  let h12 = parseInt(hSel.value);
+  const min = mSel.value;
+  const ampm = apSel.value;
+  let h24 = h12;
+  if (ampm === 'AM') { if (h12 === 12) h24 = 0; }
+  else { if (h12 !== 12) h24 = h12 + 12; }
+  const tim = document.getElementById('n-time');
+  if (tim) tim.value = String(h24).padStart(2, '0') + ':' + min;
+  saveS();
 }
 
 function saveS() {
