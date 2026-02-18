@@ -3965,6 +3965,25 @@ function _getAudioEmbed(url, singer) {
       <audio controls src="${directUrl}" preload="none"></audio></div>`;
   }
 
+  // 5b. OneDrive — convert sharing link to direct download
+  if (u.includes('1drv.ms') || u.includes('onedrive.live.com') || u.includes('sharepoint.com')) {
+    // Convert 1drv.ms or onedrive sharing links to direct download
+    // Method: replace "redir" with "download" or use embed trick
+    let directUrl = u;
+    if (u.includes('1drv.ms')) {
+      // Short link — encode to base64 API URL
+      const encodedUrl = btoa(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      directUrl = `https://api.onedrive.com/v1.0/shares/u!${encodedUrl}/root/content`;
+    } else if (u.includes('onedrive.live.com') && u.includes('resid=')) {
+      directUrl = u.replace('onedrive.live.com/redir', 'onedrive.live.com/download');
+    }
+    return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
+      <audio controls src="${directUrl}" preload="none" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"></audio>
+      <a href="${u}" target="_blank" rel="noopener" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:var(--accent-blue);color:#fff;border-radius:8px;text-decoration:none;font-size:0.82rem;">
+        ▶ Play on OneDrive
+      </a></div>`;
+  }
+
   // 6. Direct audio file (.mp3, .ogg, .wav, .m4a, .flac, .aac, .wma)
   if (/\.(mp3|ogg|wav|m4a|flac|aac|wma|opus|webm)(\?.*)?$/i.test(u)) {
     return `<div class="audio-item${singer?'':' no-singer'}">${singerHtml}
