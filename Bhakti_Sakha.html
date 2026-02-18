@@ -795,17 +795,35 @@ body {
 }
 
 /* ===== SETTINGS ===== */
-.settings-screen { overflow-y:auto; padding:16px 16px 100px; }
-.sett-section { margin-bottom:24px; }
-.sett-stitle {
-  font-size:0.8rem; color:var(--text3); text-transform:uppercase;
-  letter-spacing:1px; margin-bottom:12px; padding-bottom:8px;
-  border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px;
+.settings-screen { overflow-y:auto; padding:20px 16px 100px; }
+.settings-screen-title {
+  font-size:1.15rem; font-weight:700; color:var(--text); margin-bottom:20px;
+  display:flex; align-items:center; gap:8px;
 }
+.sett-section {
+  margin-bottom:16px; background:rgba(255,255,255,0.03);
+  border:1px solid var(--border); border-radius:16px; padding:18px 16px;
+  transition:border-color 0.2s;
+}
+.sett-section:hover { border-color:rgba(255,255,255,0.1); }
+.sett-stitle {
+  font-size:0.82rem; color:var(--text); font-weight:600;
+  margin-bottom:14px; padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;
+}
+.sett-stitle-icon {
+  width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:0.95rem; flex-shrink:0;
+}
+.sett-stitle-icon.blue { background:rgba(61,127,212,0.15); }
+.sett-stitle-icon.purple { background:rgba(167,139,250,0.15); }
+.sett-stitle-icon.green { background:rgba(39,174,96,0.15); }
+.sett-stitle-icon.orange { background:rgba(251,146,60,0.15); }
 .sett-row {
   display:flex; align-items:center; justify-content:space-between;
-  padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+  padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04);
 }
+.sett-row:last-child { border-bottom:none; }
 .sett-info { flex:1; }
 .sett-name { font-size:0.88rem; color:var(--text); }
 .sett-desc { font-size:0.7rem; color:var(--text3); margin-top:2px; }
@@ -829,6 +847,33 @@ body {
   background:var(--accent-blue); transform:translateX(20px);
 }
 .tog-slider { display:none; }
+
+/* About Modal */
+.about-modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:250;
+  display:none; align-items:center; justify-content:center; max-width:430px; margin:0 auto;
+}
+.about-modal-overlay.open { display:flex; }
+.about-modal {
+  background:var(--bg2); border:1px solid var(--border); border-radius:20px;
+  width:calc(100% - 40px); max-width:360px; padding:28px 24px; text-align:center;
+  animation:aboutFadeIn 0.25s ease;
+}
+@keyframes aboutFadeIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+.about-app-icon { font-size:3rem; margin-bottom:12px; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+.about-app-name { font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+.about-app-version { font-size:0.72rem; color:var(--accent-blue); font-weight:600; margin-bottom:16px;
+  display:inline-block; background:rgba(61,127,212,0.12); padding:3px 10px; border-radius:20px; }
+.about-divider { height:1px; background:var(--border); margin:14px 0; }
+.about-info-row { font-size:0.8rem; color:var(--text2); line-height:1.8; margin-bottom:4px; }
+.about-info-row strong { color:var(--text); }
+.about-glory { font-size:0.85rem; color:var(--accent-gold); font-style:italic; margin-top:12px; font-weight:500; }
+.about-close-btn {
+  margin-top:20px; background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:10px; padding:10px 28px; color:var(--text2); font-size:0.85rem;
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+}
+.about-close-btn:active { background:rgba(255,255,255,0.12); }
 
 .loc-search { width:100%; background:var(--card); border:1.5px solid var(--border);
   border-radius:10px; padding:9px 14px; color:var(--text); font-family:inherit;
@@ -1841,6 +1886,9 @@ body {
     <button onclick="switchScreen('settings', null)" title="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
+    <button onclick="openAboutModal()" title="About">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    </button>
   </div>
 
 </header>
@@ -2009,9 +2057,10 @@ body {
   <!-- SETTINGS -->
   <div class="screen" id="screen-settings">
     <div class="settings-screen">
+      <div class="settings-screen-title">⚙️ Settings</div>
       <!-- GOOGLE ACCOUNT SECTION -->
       <div class="sett-section" id="googleAccountSection">
-        <div class="sett-stitle">🔑 Google Account</div>
+        <div class="sett-stitle"><span class="sett-stitle-icon blue">🔑</span> Google Account</div>
         <div id="gSignedOut" class="g-signed-out-box">
           <div class="g-desc">Sign in to automatically sync your <strong>Notes</strong>, <strong>Events</strong> and <strong>Kirtans</strong> across all your devices via Google Drive.</div>
           <div id="g_signin_btn" class="g-signin-btn-wrap"></div>
@@ -2036,7 +2085,7 @@ body {
 
       <!-- ADMIN PANEL (only visible to super admin) -->
       <div class="sett-section admin-section" id="adminPanelSection" style="display:none;">
-        <div class="sett-stitle">🛡️ Admin Panel <span class="admin-badge">Admin</span></div>
+        <div class="sett-stitle"><span class="sett-stitle-icon purple">🛡️</span> Admin Panel <span class="admin-badge">Admin</span></div>
         <div style="font-size:0.78rem; color:var(--text3); margin-bottom:10px; line-height:1.5;">
           Admins can edit event descriptions and manage kirtans/bhajans. Only you (super admin) can add or remove other admins.
         </div>
@@ -2061,7 +2110,7 @@ body {
       </div>
 
       <div class="sett-section">
-        <div class="sett-stitle">📍 Location</div>
+        <div class="sett-stitle"><span class="sett-stitle-icon green">📍</span> Location</div>
         <div style="font-size:0.78rem;color:var(--text2);margin-bottom:8px;">Currently: <strong id="curLocName" style="color:var(--accent-blue);">Mumbai</strong></div>
         <input class="loc-search" id="locSearchInp" placeholder="🔍  Search city..." oninput="filterLocGrid(this.value,'locGridSettings')" autocomplete="off">
         <div class="loc-grid" id="locGridSettings"></div>
@@ -2076,7 +2125,7 @@ body {
         </div>
       </div>
       <div class="sett-section">
-        <div class="sett-stitle">🔔 Notifications</div>
+        <div class="sett-stitle"><span class="sett-stitle-icon orange">🔔</span> Notifications</div>
 
         <!-- Push notifications toggle -->
         <div class="sett-row" style="margin-bottom:14px;">
@@ -2164,15 +2213,6 @@ body {
           <label class="toggle"><input type="checkbox" id="n-rahu" onchange="saveS()"></label>
         </div>
       </div>
-      <div class="sett-section">
-        <div class="sett-stitle">ℹ️ About</div>
-        <div style="font-size:0.8rem;color:var(--text3);line-height:1.8;">
-          Bhakti Sakha App V2.0<br>
-          Data range: 1975–2075 CE<br>
-          Per ISKCON standards & Panchangam<br>
-          <em>All glories to Srila Prabhupada!</em>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -2238,6 +2278,21 @@ body {
       <button class="dham-form-save" onclick="saveNewDham()">Save Dham</button>
       <button class="f-cancel" onclick="closeModal('addDhamModal')" style="margin-top:8px;">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="about-modal-overlay" id="aboutModal" onclick="if(event.target===this)closeAboutModal()">
+  <div class="about-modal">
+    <div class="about-app-icon">🙏</div>
+    <div class="about-app-name">Bhakti Sakha</div>
+    <div class="about-app-version">V2.0</div>
+    <div class="about-divider"></div>
+    <div class="about-info-row"><strong>Data range:</strong> 1975–2075 CE</div>
+    <div class="about-info-row">Per <strong>ISKCON standards</strong> & Panchangam</div>
+    <div class="about-divider"></div>
+    <div class="about-glory">All glories to Srila Prabhupada!</div>
+    <button class="about-close-btn" onclick="closeAboutModal()">Close</button>
   </div>
 </div>
 
@@ -6120,6 +6175,8 @@ function switchScreen(name, btn) {
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openAboutModal() { document.getElementById('aboutModal').classList.add('open'); }
+function closeAboutModal() { document.getElementById('aboutModal').classList.remove('open'); }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
