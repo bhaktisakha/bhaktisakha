@@ -3348,8 +3348,7 @@ async function fetchSharedSongs() {
       renderSongs();
     }
   } catch(e) {
-    console.warn('Could not fetch shared songs:', e);
-    // Fall back to localStorage cache
+    // Silently fall back to localStorage cache (normal when offline or in preview)
   }
 }
 // Fetch on page load
@@ -5012,7 +5011,7 @@ let _firebaseMessaging = null;
 
 function initFirebase() {
   try {
-    if (!firebase || !firebase.initializeApp) return;
+    if (typeof firebase === 'undefined' || !firebase.initializeApp) return;
     _firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
     _firebaseMessaging = firebase.messaging();
 
@@ -5033,7 +5032,7 @@ function initFirebase() {
       setTimeout(() => registerUpcomingEvents(), 3000);
     }
   } catch(e) {
-    console.warn('Firebase init error:', e);
+    // Firebase only works on deployed site with proper scripts loaded
   }
 }
 
@@ -7248,7 +7247,7 @@ if ('serviceWorker' in navigator) {
           });
         });
       })
-      .catch(err => console.log('[PWA] SW registration failed:', err));
+      .catch(() => {}); // SW only works on deployed site
   });
 }
 </script>
