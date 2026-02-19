@@ -672,10 +672,10 @@ body {
 .sd-info-value {
   font-size:0.85rem; color:var(--text); text-align:right; line-height:1.4;
 }
-.sd-lyrics { white-space:pre-line; line-height:2; color:var(--text); margin-bottom:20px; }
-.sd-trans { white-space:pre-line; line-height:1.8; color:var(--text2); font-style:italic; }
+.sd-lyrics { white-space:pre-line; line-height:1.6; color:var(--text); margin-bottom:20px; }
+.sd-trans { white-space:pre-line; line-height:1.5; color:var(--text2); font-style:italic; }
 .sd-divider { height:1px; background:var(--border); margin:16px 0; }
-.lyrics-text { color:var(--text); line-height:2; white-space:pre-line; }
+.lyrics-text { color:var(--text); line-height:1.6; white-space:pre-line; }
 .lyrics-trans { margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
   color:var(--text2); font-style:italic; line-height:1.7; white-space:pre-line; }
 /* Multi-audio player */
@@ -3568,6 +3568,29 @@ let songs = JSON.parse(localStorage.getItem('songs') || 'null') || [];
 const SONGS_API_URL = 'https://script.google.com/macros/s/AKfycbyXVSKWf_Ox9h12kw17uwcJcoUkhgG_mv931P9XTLOcWI6rYgAfmXGSnws1PxBemeniYA/exec';
 
 // Fetch shared songs from Google Sheets on load
+// Clean lyrics spacing: collapse multiple blank lines, keep single gap between verses
+function _cleanLyrics(text) {
+  if (!text) return '';
+  // Replace 3+ newlines with 2 (verse separator)
+  let cleaned = text.replace(/\n{3,}/g, '\n\n');
+  // Collapse double newlines within verses (lines that aren't verse numbers)
+  // Split into verse blocks by (N) markers
+  const blocks = cleaned.split(/(\(\d+\))/);
+  let result = '';
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i].trim();
+    if (!block) continue;
+    if (/^\(\d+\)$/.test(block)) {
+      // Verse number — add gap before it (except first)
+      result += (result ? '\n\n' : '') + block + '\n';
+    } else {
+      // Lyrics lines — collapse double newlines to single
+      result += block.replace(/\n\s*\n/g, '\n');
+    }
+  }
+  return result.trim();
+}
+
 async function fetchSharedSongs() {
   try {
     const resp = await fetch(SONGS_API_URL);
@@ -3581,6 +3604,9 @@ async function fetchSharedSongs() {
         }
         s.id = parseInt(s.id) || Date.now();
         s._shared = true;
+        // Clean lyrics and translation spacing
+        if (s.lyrics) s.lyrics = _cleanLyrics(s.lyrics);
+        if (s.trans) s.trans = _cleanLyrics(s.trans);
         return s;
       });
       songs = sharedSongs;
@@ -5370,8 +5396,8 @@ function adminAddSong() {
     cat: catVal, i: CAT_ICONS[catVal] || '🎵',
     book: document.getElementById('aSongBook').value.trim(),
     lang: document.getElementById('aSongLang').value,
-    lyrics: document.getElementById('aSongLyrics').value.trim(),
-    trans: document.getElementById('aSongTrans').value.trim(),
+    lyrics: _cleanLyrics(document.getElementById('aSongLyrics').value.trim()),
+    trans: _cleanLyrics(document.getElementById('aSongTrans').value.trim()),
     audios
   };
   const editId = document.getElementById('adminSongModal').dataset.editId;
