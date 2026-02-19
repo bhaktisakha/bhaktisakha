@@ -681,6 +681,21 @@ body {
 .sd-info-value {
   font-size:0.85rem; color:var(--text); text-align:right; line-height:1.4;
 }
+.sd-cat-change-btn {
+  background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.25);
+  border-radius:6px; padding:2px 8px; font-size:0.65rem; font-weight:600;
+  color:var(--lavender); cursor:pointer; margin-left:6px; vertical-align:middle;
+}
+.sd-cat-change-btn:active { background:rgba(167,139,250,0.25); }
+.sd-cat-changer { padding:8px 0 12px; }
+.sd-cat-options { display:flex; flex-wrap:wrap; gap:8px; }
+.sd-cat-opt {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:10px; padding:8px 14px; font-size:0.78rem; color:var(--text2);
+  cursor:pointer; transition:all 0.15s;
+}
+.sd-cat-opt:active { transform:scale(0.96); }
+.sd-cat-opt.current { border-color:var(--accent-gold); color:var(--accent-gold); background:rgba(201,168,76,0.1); }
 .sd-lyrics { white-space:pre-line; line-height:1.6; color:var(--text); margin-bottom:20px; }
 .sd-trans { white-space:pre-line; line-height:1.5; color:var(--text2); font-style:italic; }
 .sd-trans-cards { display:flex; flex-direction:column; gap:16px; }
@@ -4996,7 +5011,7 @@ function openSongDetail(id) {
     { label: 'Song Name',     value: displayTitle },
     { label: 'Official Name', value: s.officialName || null },
     { label: 'Author',        value: s.author || null },
-    { label: 'Category',      value: catFull || null },
+    { label: 'Category',      value: catFull || null, editable: true },
     { label: 'Book',          value: s.book || null },
     { label: 'Language',      value: s.lang || null },
   ].filter(r => r.value);
@@ -5006,8 +5021,12 @@ function openSongDetail(id) {
       ${infoRows.map(r => `
         <div class="sd-info-row">
           <span class="sd-info-label">${r.label}</span>
-          <span class="sd-info-value">${r.value}</span>
+          <span class="sd-info-value">${r.value}${r.editable && isAdmin() ? ` <button class="sd-cat-change-btn" onclick="showCatChanger(${id})">Change</button>` : ''}</span>
         </div>`).join('')}
+    </div>
+    <div class="sd-cat-changer" id="sdCatChanger" style="display:none;">
+      <div class="sd-section-lbl">Move to Category</div>
+      <div class="sd-cat-options" id="sdCatOptions"></div>
     </div>
 
     ${audioHtml}
@@ -5034,6 +5053,41 @@ function openSongDetail(id) {
 
 function refreshSongDetail() {
   if (_currentSongId) openSongDetail(_currentSongId);
+}
+
+function showCatChanger(songId) {
+  const s = songs.find(x => x.id === songId);
+  if (!s) return;
+  const changer = document.getElementById('sdCatChanger');
+  if (changer.style.display !== 'none') { changer.style.display = 'none'; return; }
+  const cats = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
+  const html = cats.map(c => {
+    const isCurrent = s.cat === c;
+    return `<div class="sd-cat-opt${isCurrent ? ' current' : ''}" onclick="changeSongCat(${songId},'${c}')">${_catLabel(c)}</div>`;
+  }).join('');
+  document.getElementById('sdCatOptions').innerHTML = html;
+  changer.style.display = '';
+}
+
+async function changeSongCat(songId, newCat) {
+  const s = songs.find(x => x.id === songId);
+  if (!s || s.cat === newCat) return;
+  const oldCat = _catLabel(s.cat);
+  s.cat = newCat;
+  localStorage.setItem('songs', JSON.stringify(songs));
+  showToast(`Moved to ${_catLabel(newCat)} ✓`);
+  // Sync to server
+  try {
+    const userEmail = (gUser && gUser.email) ? gUser.email : '';
+    const resp = await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'update', email: userEmail, song: s })
+    });
+    const data = await resp.json();
+    if (!data.success) showToast('⚠️ Sync failed: ' + (data.error || ''));
+  } catch(e) { console.error('Cat change sync error:', e); }
+  refreshSongDetail();
 }
 
 function closeSongDetail() {
