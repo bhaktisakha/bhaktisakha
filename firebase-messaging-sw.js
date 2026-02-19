@@ -1,5 +1,4 @@
 // Firebase Messaging Service Worker — handles background push notifications
-// No Firebase SDK needed — we handle push events directly
 
 // Force immediate activation
 self.addEventListener('install', (event) => {
@@ -27,9 +26,6 @@ self.addEventListener('push', (event) => {
     badge: './icon-72x72.png',
     vibrate: [200, 100, 200],
     tag: data.tag || 'bhakti-sakha-reminder',
-    data: {
-      url: 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html'
-    },
     actions: [
       { action: 'dismiss', title: 'Dismiss' },
       { action: 'open', title: 'Open App' }
@@ -44,10 +40,11 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   if (event.action === 'dismiss') {
+    // Must call waitUntil to prevent Chrome's default open behavior
+    event.waitUntil(Promise.resolve());
     return;
   }
 
-  const urlToOpen = 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
@@ -55,7 +52,7 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      return clients.openWindow(urlToOpen);
+      return clients.openWindow('https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html');
     })
   );
 });
