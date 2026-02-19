@@ -1,6 +1,5 @@
 // Firebase Messaging Service Worker — handles background push notifications
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+// No Firebase SDK needed — we handle push events directly
 
 // Force immediate activation
 self.addEventListener('install', (event) => {
@@ -9,16 +8,6 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
-
-firebase.initializeApp({
-  apiKey: "AIzaSyDEgka4rqL6_HNMWERzzggcmv0YlVVoUT8",
-  authDomain: "bhaktisakhaapp1.firebaseapp.com",
-  projectId: "bhaktisakhaapp1",
-  storageBucket: "bhaktisakhaapp1.firebasestorage.app",
-  messagingSenderId: "246206438622",
-  appId: "1:246206438622:web:cbf20d06941eb82b87364f"
-});
-const messaging = firebase.messaging();
 
 // Handle push directly for full control
 self.addEventListener('push', (event) => {
@@ -58,7 +47,7 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  const urlToOpen = event.notification.data?.url || 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html';
+  const urlToOpen = 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
