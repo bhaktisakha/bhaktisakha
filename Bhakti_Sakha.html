@@ -602,6 +602,7 @@ body {
 .cat-folder-card[data-cat="stotram"]::before { background: linear-gradient(90deg, #34d399, #10b981); }
 .cat-folder-card[data-cat="gita"]::before { background: linear-gradient(90deg, #a3e635, #84cc16); }
 .cat-folder-card[data-cat="bhagavatam"]::before { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+.cat-folder-card[data-cat="samhita"]::before { background: linear-gradient(90deg, #e879f9, #a855f7); }
 .cat-folder-card:active { transform:scale(0.97); background:rgba(255,255,255,0.08); }
 .cat-folder-icon { font-size:2.2rem; margin-bottom:10px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
 .cat-folder-name { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px; }
@@ -2504,6 +2505,7 @@ body {
         <option value="stotram">Stotrams</option>
         <option value="gita">Bhagavad Gita Verses</option>
         <option value="bhagavatam">Srimad Bhagavatam Prayers</option>
+        <option value="samhita">Samhita</option>
       </select>
     </div>
     <div class="f-grp">
@@ -4174,7 +4176,7 @@ function showNextAudioField() {
 function _catLabel(cat) {
   return {vbhajan:'🌸 Vaishnava Bhajans', hkkirtan:'🎶 Hare Krsna Kirtans',
           astakam:'🙏 Astakams', stotram:'📿 Stotrams',
-          gita:'📗 Bhagavad Gita Verses', bhagavatam:'🌊 Srimad Bhagavatam Prayers'}[cat] || cat;
+          gita:'📗 Bhagavad Gita Verses', bhagavatam:'🌊 Srimad Bhagavatam Prayers', samhita:'📜 Samhita'}[cat] || cat;
 }
 
 function _getAudioEmbed(url, singer) {
@@ -4290,6 +4292,7 @@ const CAT_FOLDER_INFO = {
   stotram:    { icon:'📿', name:'Stotrams', gradient:'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.05))' },
   gita:       { icon:'📗', name:'Bhagavad Gita Verses', gradient:'linear-gradient(135deg, rgba(163,230,53,0.15), rgba(132,204,22,0.05))' },
   bhagavatam: { icon:'🌊', name:'Srimad Bhagavatam Prayers', gradient:'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(14,165,233,0.05))' },
+  samhita:    { icon:'📜', name:'Samhita', gradient:'linear-gradient(135deg, rgba(232,121,249,0.15), rgba(168,85,247,0.05))' },
 };
 
 function openCatFolder(catKey) {
@@ -4343,7 +4346,7 @@ function renderSongs(filter) {
   } else if (q) {
     // When searching, show flat list grouped by cat (no folders)
     _openCatKey = null;
-    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
+    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
     const rendered = new Set();
     CAT_ORDER.forEach(key => {
       const cs = pool.filter(s => s.cat === key).sort((a,b) => a.title.localeCompare(b.title));
@@ -4359,7 +4362,7 @@ function renderSongs(filter) {
     document.getElementById('songsContent').innerHTML = `<div style="padding:8px 12px 100px;">${cards}</div>`;
   } else if (_openCatKey) {
     // Show songs inside the opened category folder
-    const CAT_ORDER_KEYS = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
+    const CAT_ORDER_KEYS = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
     const info = CAT_FOLDER_INFO[_openCatKey] || { icon:'📌', name:'Other' };
     const catSongs = _openCatKey === 'other'
       ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort((a,b) => a.title.localeCompare(b.title))
@@ -4380,7 +4383,7 @@ function renderSongs(filter) {
       <div style="padding:4px 12px 100px;">${innerCards}</div>`;
   } else {
     // Show category folder cards
-    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam'];
+    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
     let folderCards = '';
     CAT_ORDER.forEach(key => {
       const count = pool.filter(s => s.cat === key).length;
@@ -5388,7 +5391,7 @@ function adminAddSong() {
     audios.push({ url, singer: singerEl ? singerEl.value.trim() : '' });
   });
   const catVal = document.getElementById('aSongCat').value;
-  const CAT_ICONS = {vbhajan:'🌸',hkkirtan:'🎶',astakam:'🙏',stotram:'📿',gita:'📗',bhagavatam:'🌊'};
+  const CAT_ICONS = {vbhajan:'🌸',hkkirtan:'🎶',astakam:'🙏',stotram:'📿',gita:'📗',bhagavatam:'🌊',samhita:'📜'};
   const s = {
     id: Date.now(),
     title: t,
