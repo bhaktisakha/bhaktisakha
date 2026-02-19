@@ -2598,25 +2598,33 @@ body {
       <textarea class="f-area" id="aSongTrans" style="min-height:80px" placeholder="English meaning or word-for-word translation..."></textarea>
     </div>
     <div style="font-size:0.78rem;color:var(--text2);margin-bottom:8px;font-weight:500;">🎤 Audio Recordings (up to 5)</div>
+    <datalist id="singerList">
+      <option value="HG Jai Sacinandana Pr">
+      <option value="HG RadhaGopinath Pr">
+      <option value="HG Svarupa Damodar Pr">
+      <option value="HH BB Govinda Swami Maharaj">
+      <option value="HH Bhakti Caru Swami Maharaj">
+      <option value="HH Radhanath Swami Maharaj">
+    </datalist>
     <div id="audioFieldsWrap">
       <div class="audio-field-row" id="aRow0">
-        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 1</label><input class="f-inp a-singer" data-idx="0" placeholder="e.g. Srila Prabhupada"></div>
+        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 1</label><input class="f-inp a-singer" data-idx="0" placeholder="Select or type name" list="singerList"></div>
         <div class="f-grp"><label class="f-lbl">Audio URL 1</label><input class="f-inp a-url" data-idx="0" placeholder="https://...mp3"></div>
       </div>
       <div class="audio-field-row" id="aRow1" style="display:none;">
-        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 2</label><input class="f-inp a-singer" data-idx="1" placeholder="e.g. Indradyumna Swami"></div>
+        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 2</label><input class="f-inp a-singer" data-idx="1" placeholder="Select or type name" list="singerList"></div>
         <div class="f-grp"><label class="f-lbl">Audio URL 2</label><input class="f-inp a-url" data-idx="1" placeholder="https://...mp3"></div>
       </div>
       <div class="audio-field-row" id="aRow2" style="display:none;">
-        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 3</label><input class="f-inp a-singer" data-idx="2" placeholder=""></div>
+        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 3</label><input class="f-inp a-singer" data-idx="2" placeholder="Select or type name" list="singerList"></div>
         <div class="f-grp"><label class="f-lbl">Audio URL 3</label><input class="f-inp a-url" data-idx="2" placeholder="https://...mp3"></div>
       </div>
       <div class="audio-field-row" id="aRow3" style="display:none;">
-        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 4</label><input class="f-inp a-singer" data-idx="3" placeholder=""></div>
+        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 4</label><input class="f-inp a-singer" data-idx="3" placeholder="Select or type name" list="singerList"></div>
         <div class="f-grp"><label class="f-lbl">Audio URL 4</label><input class="f-inp a-url" data-idx="3" placeholder="https://...mp3"></div>
       </div>
       <div class="audio-field-row" id="aRow4" style="display:none;">
-        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 5</label><input class="f-inp a-singer" data-idx="4" placeholder=""></div>
+        <div class="f-grp" style="margin-bottom:4px;"><label class="f-lbl">Singer / Artist 5</label><input class="f-inp a-singer" data-idx="4" placeholder="Select or type name" list="singerList"></div>
         <div class="f-grp"><label class="f-lbl">Audio URL 5</label><input class="f-inp a-url" data-idx="4" placeholder="https://...mp3"></div>
       </div>
     </div>
