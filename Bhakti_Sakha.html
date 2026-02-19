@@ -1782,13 +1782,13 @@ body {
 }
 .nav-btn {
   flex:1; display:flex; flex-direction:column; align-items:center;
-  padding:8px 4px; cursor:pointer; border:none; background:transparent;
-  color:var(--text3); gap:4px; transition:color 0.2s;
+  padding:8px 2px; cursor:pointer; border:none; background:transparent;
+  color:var(--text3); gap:3px; transition:color 0.2s; min-width:0;
 }
 .nav-btn.active { color:var(--accent-blue); }
-.nav-btn svg { width:22px; height:22px; }
-.nav-icon-text { font-size:1.4rem; line-height:1; color:inherit; }
-.nav-lbl { font-size:0.58rem; letter-spacing:0.5px; text-transform:uppercase; }
+.nav-btn svg { width:20px; height:20px; }
+.nav-icon-text { font-size:1.3rem; line-height:1; color:inherit; }
+.nav-lbl { font-size:0.52rem; letter-spacing:0.3px; text-transform:uppercase; }
 
 /* ===== MODAL ===== */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200;
@@ -2081,6 +2081,7 @@ body {
 }
 .admin-perm-tag.perm-songs { background: rgba(167,139,250,0.12); color: var(--lavender); }
 .admin-perm-tag.perm-dhamas { background: rgba(212,175,55,0.12); color: var(--accent-gold); }
+.admin-perm-tag.perm-sevakart { background: rgba(180,120,40,0.12); color: #d4a017; }
 .evt-modal-icon {
   padding: 18px 20px 0;
   font-size: 2.4rem; text-align: center;
@@ -2140,6 +2141,239 @@ body {
 
 .empty-state { text-align:center; padding:40px 20px; color:var(--text3); font-size:0.85rem; }
 .empty-state-icon { font-size:2.5rem; margin-bottom:10px; }
+
+/* ===== SEVAKART ===== */
+.sk-screen { flex:1; overflow-y:auto; padding-bottom:70px; }
+.sk-header {
+  text-align:center; padding:18px 18px 12px;
+  background:linear-gradient(180deg, rgba(180,120,40,0.08) 0%, transparent 100%);
+}
+.sk-title { font-family:'Philosopher',serif; font-size:1.3rem; font-weight:700;
+  background:linear-gradient(135deg, #d4a017, #f0d060, #d4a017);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.sk-subtitle { font-size:0.72rem; color:var(--text3); letter-spacing:1.5px; margin-top:2px; }
+.sk-search-bar {
+  display:flex; gap:8px; padding:8px 18px 12px; align-items:center;
+}
+.sk-search-inp {
+  flex:1; background:var(--card); border:1.5px solid var(--border); border-radius:10px;
+  padding:9px 14px; color:var(--text); font-size:0.85rem; outline:none; font-family:inherit;
+}
+.sk-search-inp:focus { border-color:var(--accent-gold); }
+.sk-search-inp::placeholder { color:var(--text3); }
+.sk-filter-btn {
+  background:var(--card); border:1.5px solid var(--border); border-radius:10px;
+  padding:8px 12px; color:var(--text2); font-size:0.85rem; cursor:pointer;
+}
+.sk-filter-btn:active { border-color:var(--accent-gold); }
+.sk-actions { display:flex; gap:8px; padding:0 18px 14px; }
+.sk-action-btn {
+  flex:1; background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.25);
+  border-radius:10px; padding:10px 8px; text-align:center;
+  font-size:0.78rem; font-weight:600; color:var(--accent-gold); cursor:pointer;
+}
+.sk-action-btn:active { background:rgba(212,160,23,0.2); }
+.sk-action-btn.secondary { background:rgba(167,139,250,0.08); border-color:rgba(167,139,250,0.25); color:var(--lavender); }
+.sk-action-btn.secondary:active { background:rgba(167,139,250,0.18); }
+.sk-section-title {
+  font-size:0.7rem; color:var(--text3); text-transform:uppercase; letter-spacing:1px;
+  padding:0 18px 8px; font-weight:600;
+}
+.sk-categories {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  padding:0 18px 16px;
+}
+.sk-cat-card {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:12px 4px 10px; cursor:pointer; transition:border-color 0.2s;
+}
+.sk-cat-card:active { border-color:var(--accent-gold); }
+.sk-cat-icon { font-size:1.4rem; }
+.sk-cat-name { font-size:0.6rem; color:var(--text2); text-align:center; line-height:1.2; }
+.sk-listings { padding:0 18px 16px; display:flex; flex-direction:column; gap:10px; }
+.sk-listing-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  overflow:hidden; cursor:pointer; transition:border-color 0.2s;
+}
+.sk-listing-card:active { border-color:var(--accent-gold); }
+.sk-listing-img {
+  width:100%; height:140px; object-fit:cover; background:var(--bg3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem; color:var(--text3);
+}
+.sk-listing-img img { width:100%; height:140px; object-fit:cover; }
+.sk-listing-body { padding:12px 14px; }
+.sk-listing-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.sk-listing-name { font-size:0.92rem; font-weight:600; color:var(--text); }
+.sk-listing-verified { font-size:0.6rem; background:rgba(39,174,96,0.15); color:var(--accent-green);
+  border-radius:4px; padding:2px 6px; white-space:nowrap; font-weight:600; }
+.sk-listing-desc { font-size:0.78rem; color:var(--text2); margin-top:4px; line-height:1.3;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.sk-listing-meta { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+.sk-listing-city { font-size:0.7rem; color:var(--text3); }
+.sk-listing-rating { font-size:0.7rem; color:var(--accent-gold); }
+.sk-listing-cat-tag { font-size:0.6rem; background:rgba(167,139,250,0.1); color:var(--lavender);
+  border-radius:4px; padding:2px 6px; }
+.sk-listing-status { font-size:0.6rem; border-radius:4px; padding:2px 6px; font-weight:600; }
+.sk-listing-status.pending { background:rgba(241,196,15,0.15); color:#f1c40f; }
+.sk-listing-status.approved { background:rgba(39,174,96,0.15); color:var(--accent-green); }
+.sk-listing-status.rejected { background:rgba(192,57,43,0.15); color:var(--accent-red); }
+.sk-listing-status.suspended { background:rgba(155,89,182,0.15); color:#9b59b6; }
+.sk-empty { text-align:center; padding:40px 20px; color:var(--text3); }
+.sk-empty-icon { font-size:2.5rem; margin-bottom:10px; }
+
+/* SevaKart Detail Screen */
+.sk-detail { flex:1; overflow-y:auto; padding-bottom:70px; }
+.sk-detail-header {
+  display:flex; align-items:center; gap:12px; padding:12px 18px;
+  border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.sk-detail-back { background:none; border:none; color:var(--text); font-size:1.2rem; cursor:pointer; padding:4px; }
+.sk-detail-htitle { font-size:1rem; font-weight:600; color:var(--text); flex:1;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sk-detail-gallery { position:relative; height:200px; background:var(--bg3);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.sk-detail-gallery img { width:100%; height:200px; object-fit:cover; }
+.sk-detail-gallery-placeholder { font-size:3rem; color:var(--text3); }
+.sk-detail-gallery-dots { position:absolute; bottom:8px; display:flex; gap:6px; }
+.sk-detail-gallery-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.4); }
+.sk-detail-gallery-dot.active { background:var(--accent-gold); }
+.sk-detail-body { padding:16px 18px; }
+.sk-detail-name { font-size:1.15rem; font-weight:700; color:var(--text); }
+.sk-detail-badges { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+.sk-detail-cat { font-size:0.7rem; background:rgba(167,139,250,0.1); color:var(--lavender);
+  border-radius:5px; padding:3px 8px; }
+.sk-detail-city-tag { font-size:0.7rem; background:rgba(61,127,212,0.1); color:var(--accent-blue);
+  border-radius:5px; padding:3px 8px; }
+.sk-detail-verified { font-size:0.7rem; background:rgba(39,174,96,0.15); color:var(--accent-green);
+  border-radius:5px; padding:3px 8px; font-weight:600; }
+.sk-detail-rating-row { display:flex; align-items:center; gap:8px; margin-top:10px; }
+.sk-detail-stars { color:var(--accent-gold); font-size:0.9rem; }
+.sk-detail-rating-num { font-size:0.8rem; color:var(--text2); }
+.sk-detail-desc { font-size:0.88rem; color:var(--text2); line-height:1.5; margin-top:14px;
+  white-space:pre-wrap; }
+.sk-detail-years { font-size:0.78rem; color:var(--text3); margin-top:8px; }
+.sk-detail-section {
+  margin-top:18px; padding-top:14px; border-top:1px solid var(--border);
+}
+.sk-detail-section-title { font-size:0.72rem; color:var(--text3); text-transform:uppercase;
+  letter-spacing:0.8px; margin-bottom:10px; font-weight:600; }
+.sk-contact-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.sk-contact-btn {
+  flex:1; min-width:80px; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+  font-size:0.8rem; font-weight:600; cursor:pointer; text-decoration:none;
+}
+.sk-contact-btn.whatsapp { background:rgba(37,211,102,0.1); border-color:rgba(37,211,102,0.3); color:#25d366; }
+.sk-contact-btn.call { background:rgba(61,127,212,0.1); border-color:rgba(61,127,212,0.3); color:var(--accent-blue); }
+.sk-contact-btn.email { background:rgba(155,89,182,0.1); border-color:rgba(155,89,182,0.3); color:#9b59b6; }
+.sk-contact-btn.website { background:rgba(212,160,23,0.1); border-color:rgba(212,160,23,0.3); color:var(--accent-gold); }
+.sk-contact-btn:active { opacity:0.7; }
+.sk-disclaimer {
+  font-size:0.68rem; color:var(--text3); text-align:center; margin-top:14px;
+  padding:10px; background:rgba(255,255,255,0.02); border-radius:8px; line-height:1.4;
+}
+.sk-report-btn {
+  display:block; width:100%; text-align:center; margin-top:12px;
+  font-size:0.75rem; color:var(--accent-red); cursor:pointer;
+  background:none; border:none; padding:8px;
+}
+.sk-report-btn:active { opacity:0.6; }
+
+/* Reviews */
+.sk-review-card {
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px; margin-bottom:8px;
+}
+.sk-review-top { display:flex; justify-content:space-between; align-items:center; }
+.sk-review-user { font-size:0.8rem; font-weight:600; color:var(--text); }
+.sk-review-stars { font-size:0.75rem; color:var(--accent-gold); }
+.sk-review-text { font-size:0.78rem; color:var(--text2); margin-top:4px; line-height:1.3; }
+.sk-review-date { font-size:0.62rem; color:var(--text3); margin-top:4px; }
+.sk-add-review-btn {
+  background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.25);
+  border-radius:10px; padding:10px; text-align:center; font-size:0.8rem;
+  font-weight:600; color:var(--accent-gold); cursor:pointer; margin-top:8px; width:100%;
+}
+.sk-add-review-btn:active { background:rgba(212,160,23,0.2); }
+
+/* Admin badge on detail */
+.sk-admin-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.sk-admin-btn {
+  flex:1; min-width:80px; padding:8px; border-radius:8px; border:1px solid var(--border);
+  font-size:0.72rem; font-weight:600; cursor:pointer; text-align:center;
+}
+.sk-admin-btn.approve { background:rgba(39,174,96,0.1); border-color:rgba(39,174,96,0.3); color:var(--accent-green); }
+.sk-admin-btn.reject { background:rgba(192,57,43,0.1); border-color:rgba(192,57,43,0.3); color:var(--accent-red); }
+.sk-admin-btn.verify { background:rgba(167,139,250,0.1); border-color:rgba(167,139,250,0.3); color:var(--lavender); }
+.sk-admin-btn.suspend { background:rgba(241,196,15,0.1); border-color:rgba(241,196,15,0.3); color:#f1c40f; }
+.sk-admin-btn.delete { background:rgba(192,57,43,0.08); border-color:rgba(192,57,43,0.2); color:var(--accent-red); }
+.sk-admin-btn:active { opacity:0.7; }
+
+/* Admin dashboard */
+.sk-admin-dashboard { padding:0 18px 16px; }
+.sk-admin-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
+.sk-admin-stat {
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:12px; text-align:center;
+}
+.sk-admin-stat-num { font-size:1.3rem; font-weight:700; color:var(--text); }
+.sk-admin-stat-lbl { font-size:0.62rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+.sk-admin-pending-list { display:flex; flex-direction:column; gap:8px; }
+
+/* Listing form steps */
+.sk-form-step { display:none; }
+.sk-form-step.active { display:block; }
+.sk-step-indicator { display:flex; gap:4px; justify-content:center; margin-bottom:16px; }
+.sk-step-dot { width:8px; height:8px; border-radius:50%; background:var(--border); }
+.sk-step-dot.active { background:var(--accent-gold); }
+.sk-step-dot.done { background:var(--accent-green); }
+.sk-eligibility-check { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px;
+  padding:10px; background:rgba(255,255,255,0.02); border-radius:8px; }
+.sk-eligibility-check input { accent-color:var(--accent-gold); width:18px; height:18px; margin-top:2px; flex-shrink:0; cursor:pointer; }
+.sk-eligibility-check label { font-size:0.82rem; color:var(--text2); line-height:1.4; cursor:pointer; }
+.sk-photo-upload {
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.sk-photo-slot {
+  width:80px; height:80px; border:2px dashed var(--border); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-size:1.2rem; color:var(--text3); position:relative; overflow:hidden;
+  background:var(--bg3);
+}
+.sk-photo-slot img { width:100%; height:100%; object-fit:cover; }
+.sk-photo-slot .sk-photo-remove {
+  position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.7);
+  color:#fff; border:none; border-radius:50%; width:18px; height:18px;
+  font-size:0.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.sk-preview-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:14px; margin-bottom:12px;
+}
+.sk-preview-label { font-size:0.65rem; color:var(--text3); text-transform:uppercase;
+  letter-spacing:0.5px; margin-bottom:2px; }
+.sk-preview-value { font-size:0.88rem; color:var(--text); }
+
+/* Star rating input */
+.sk-star-input { display:flex; gap:4px; }
+.sk-star-input span { font-size:1.5rem; cursor:pointer; color:var(--text3); transition:color 0.15s; }
+.sk-star-input span.filled { color:var(--accent-gold); }
+
+/* My Listings */
+.sk-my-listings { padding:0 18px 16px; display:flex; flex-direction:column; gap:10px; }
+
+/* Filter modal */
+.sk-filter-section { margin-bottom:14px; }
+.sk-filter-lbl { font-size:0.7rem; color:var(--text3); text-transform:uppercase;
+  letter-spacing:0.5px; margin-bottom:6px; }
+.sk-filter-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.sk-filter-chip {
+  background:var(--card); border:1px solid var(--border); border-radius:20px;
+  padding:6px 12px; font-size:0.75rem; color:var(--text2); cursor:pointer;
+}
+.sk-filter-chip.active { background:rgba(212,160,23,0.15); border-color:rgba(212,160,23,0.4); color:var(--accent-gold); }
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -2430,6 +2664,9 @@ body {
           </div>
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permDhamas" checked> 🛕 Add Dhamas</label>
+          </div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="permSevakart" checked> 🪔 SevaKart Admin</label>
           </div>
         </div>
       </div>
@@ -2843,6 +3080,68 @@ body {
 </div>
 
 <!-- Bottom Nav -->
+  <!-- SEVAKART SCREEN -->
+  <div class="screen" id="screen-sevakart">
+    <div class="sk-screen">
+      <div class="sk-header">
+        <div class="sk-title">🪔 SevaKart</div>
+        <div class="sk-subtitle">Devotees Supporting Devotees</div>
+      </div>
+      <div class="sk-search-bar">
+        <input class="sk-search-inp" id="skSearchInp" placeholder="🔍 Search service, city, category..." oninput="skFilterListings()">
+        <button class="sk-filter-btn" onclick="openModal('skFilterModal')">⚙ Filter</button>
+      </div>
+      <div class="sk-actions">
+        <button class="sk-action-btn" onclick="skStartListing()">🪔 List Your Service</button>
+        <button class="sk-action-btn secondary" onclick="skShowMyListings()">📋 My Listings</button>
+      </div>
+      <!-- Admin Dashboard (visible to admins) -->
+      <div id="skAdminDashboard" style="display:none;">
+        <div class="sk-section-title">🛡️ Admin Dashboard</div>
+        <div class="sk-admin-dashboard">
+          <div class="sk-admin-stats">
+            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatTotal">0</div><div class="sk-admin-stat-lbl">Total</div></div>
+            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatPending">0</div><div class="sk-admin-stat-lbl">Pending</div></div>
+            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatVerified">0</div><div class="sk-admin-stat-lbl">Verified</div></div>
+            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatReported">0</div><div class="sk-admin-stat-lbl">Reported</div></div>
+          </div>
+          <button class="sk-action-btn" onclick="skShowPendingListings()" style="width:100%;margin-bottom:8px;">📝 Review Pending Listings</button>
+          <button class="sk-action-btn secondary" onclick="skShowReportedListings()" style="width:100%;">🚩 View Reported</button>
+        </div>
+      </div>
+      <div class="sk-section-title">Browse Categories</div>
+      <div class="sk-categories" id="skCategoriesGrid"></div>
+      <div class="sk-section-title" id="skListingsTitle">Featured Listings</div>
+      <div class="sk-listings" id="skListingsContainer"></div>
+      <div class="sk-empty" id="skEmptyState" style="display:none;">
+        <div class="sk-empty-icon">🪔</div>
+        <div>No listings yet. Be the first to list your service!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEVAKART DETAIL SCREEN -->
+  <div class="screen" id="screen-sevakart-detail">
+    <div class="sk-detail">
+      <div class="sk-detail-header">
+        <button class="sk-detail-back" onclick="skCloseDetail()">←</button>
+        <div class="sk-detail-htitle" id="skDetailHTitle"></div>
+      </div>
+      <div id="skDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- SEVAKART MY LISTINGS SCREEN -->
+  <div class="screen" id="screen-sevakart-mylistings">
+    <div class="sk-detail">
+      <div class="sk-detail-header">
+        <button class="sk-detail-back" onclick="skBackToMain()">←</button>
+        <div class="sk-detail-htitle">My Listings</div>
+      </div>
+      <div class="sk-my-listings" id="skMyListingsContainer" style="padding-top:14px;"></div>
+    </div>
+  </div>
+
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="switchScreen('calendar',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -2864,7 +3163,10 @@ body {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 10h.01"/><path d="M14 10h.01"/></svg>
     <span class="nav-lbl">Dhamas</span>
   </button>
-
+  <button class="nav-btn" onclick="switchScreen('sevakart',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 4 6 4 10c0 5.33 8 12 8 12s8-6.67 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span class="nav-lbl">SevaKart</span>
+  </button>
 </nav>
 
 <!-- Location Modal -->
@@ -2928,6 +3230,171 @@ body {
     </div>
     <button class="f-submit" onclick="saveEvt()">Save Event</button>
     <button class="f-cancel" onclick="closeModal('addEvtModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- SevaKart: List Service Modal -->
+<div class="modal-overlay" id="skListModal">
+  <div class="modal-sheet" style="max-height:92vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="skListModalTitle">🪔 List Your Service</div>
+    <div class="sk-step-indicator" id="skStepIndicator">
+      <div class="sk-step-dot active"></div>
+      <div class="sk-step-dot"></div>
+      <div class="sk-step-dot"></div>
+    </div>
+    <!-- Step 1: Eligibility -->
+    <div class="sk-form-step active" id="skStep1">
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:14px;">Please confirm before proceeding:</div>
+      <div class="sk-eligibility-check">
+        <input type="checkbox" id="skElig1">
+        <label for="skElig1">I confirm this service aligns with Bhakti values.</label>
+      </div>
+      <div class="sk-eligibility-check">
+        <input type="checkbox" id="skElig2">
+        <label for="skElig2">No alcohol, meat, gambling, political or speculative activities involved.</label>
+      </div>
+      <button class="f-submit" onclick="skNextStep(1)" style="margin-top:10px;">Continue →</button>
+      <button class="f-cancel" onclick="closeModal('skListModal')">Cancel</button>
+    </div>
+    <!-- Step 2: Details -->
+    <div class="sk-form-step" id="skStep2">
+      <div class="f-grp"><label class="f-lbl">Business / Service Name *</label>
+        <input class="f-inp" id="skBizName" placeholder="e.g. Radha's Prasadam Kitchen"></div>
+      <div class="f-grp"><label class="f-lbl">Contact Person Name *</label>
+        <input class="f-inp" id="skContactName" placeholder="Your name"></div>
+      <div class="f-grp"><label class="f-lbl">Mobile Number *</label>
+        <input class="f-inp" id="skMobile" type="tel" placeholder="+91 98765 43210"></div>
+      <div class="f-grp">
+        <label class="f-lbl">WhatsApp Number (same as mobile?)</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label style="font-size:0.8rem;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="skWASame" checked onchange="document.getElementById('skWA').disabled=this.checked; if(this.checked) document.getElementById('skWA').value='';" style="accent-color:var(--accent-gold);"> Same as mobile
+          </label>
+          <input class="f-inp" id="skWA" type="tel" placeholder="WhatsApp number" disabled style="flex:1;">
+        </div>
+      </div>
+      <div class="f-grp"><label class="f-lbl">Email (optional)</label>
+        <input class="f-inp" id="skEmail" type="email" placeholder="email@example.com"></div>
+      <div class="f-grp"><label class="f-lbl">City *</label>
+        <input class="f-inp" id="skCity" placeholder="e.g. Mumbai, Vrindavan, Dallas"></div>
+      <div class="f-grp"><label class="f-lbl">Category *</label>
+        <select class="f-sel" id="skCategory">
+          <option value="">Select category</option>
+          <option value="Deity Services">🪷 Deity Services</option>
+          <option value="Prasadam & Catering">🍲 Prasadam & Catering</option>
+          <option value="Kirtan & Events">🎵 Kirtan & Events</option>
+          <option value="Devotional Products">📿 Devotional Products</option>
+          <option value="Education">📖 Education</option>
+          <option value="Professional Services">💼 Professional Services</option>
+          <option value="Temple Supplies">🛕 Temple Supplies</option>
+          <option value="Yatra & Travel">🚐 Yatra & Travel</option>
+        </select></div>
+      <div class="f-grp"><label class="f-lbl">Short Description (max 100 chars) *</label>
+        <input class="f-inp" id="skShortDesc" maxlength="100" placeholder="Brief summary of your service"></div>
+      <div class="f-grp"><label class="f-lbl">Full Description (max 500 chars)</label>
+        <textarea class="f-area" id="skFullDesc" maxlength="500" placeholder="Detailed description..." style="min-height:100px;"></textarea></div>
+      <div class="f-grp"><label class="f-lbl">Years in Service (optional)</label>
+        <input class="f-inp" id="skYears" type="number" min="0" placeholder="e.g. 5"></div>
+      <div class="f-grp"><label class="f-lbl">Website / Instagram link (optional)</label>
+        <input class="f-inp" id="skWebsite" type="url" placeholder="https://..."></div>
+      <div class="f-grp"><label class="f-lbl">Photos (up to 3)</label>
+        <div class="sk-photo-upload" id="skPhotoUpload">
+          <div class="sk-photo-slot" onclick="skPickPhoto(0)">＋</div>
+          <div class="sk-photo-slot" onclick="skPickPhoto(1)">＋</div>
+          <div class="sk-photo-slot" onclick="skPickPhoto(2)">＋</div>
+        </div>
+        <input type="file" id="skPhotoInput" accept="image/*" style="display:none;" onchange="skHandlePhoto(event)">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="f-cancel" onclick="skPrevStep(2)" style="flex:1;">← Back</button>
+        <button class="f-submit" onclick="skNextStep(2)" style="flex:1;">Preview →</button>
+      </div>
+    </div>
+    <!-- Step 3: Preview & Submit -->
+    <div class="sk-form-step" id="skStep3">
+      <div id="skPreviewContainer"></div>
+      <div class="sk-eligibility-check" style="margin-top:10px;">
+        <input type="checkbox" id="skTerms">
+        <label for="skTerms">I agree to the <span style="color:var(--accent-gold);cursor:pointer;" onclick="alert('SevaKart Terms:\\n\\n1. Only Bhakti-aligned services allowed.\\n2. No alcohol, meat, gambling, political campaigns, MLM, or financial schemes.\\n3. SevaKart facilitates connection only — all transactions are between users.\\n4. Listings may be reviewed and moderated by admins.\\n5. Misleading or inappropriate listings will be removed.')">Terms & Conditions</span>.</label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="f-cancel" onclick="skPrevStep(3)" style="flex:1;">← Edit</button>
+        <button class="f-submit" onclick="skSubmitListing()" style="flex:1;">Submit for Approval</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SevaKart: Filter Modal -->
+<div class="modal-overlay" id="skFilterModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙ Filter Listings</div>
+    <div class="sk-filter-section">
+      <div class="sk-filter-lbl">Category</div>
+      <div class="sk-filter-chips" id="skFilterCats"></div>
+    </div>
+    <div class="f-grp"><label class="f-lbl">City</label>
+      <input class="f-inp" id="skFilterCity" placeholder="Filter by city..."></div>
+    <button class="f-submit" onclick="skApplyFilter()">Apply Filter</button>
+    <button class="f-cancel" onclick="skClearFilter()">Clear Filters</button>
+  </div>
+</div>
+
+<!-- SevaKart: Review Modal -->
+<div class="modal-overlay" id="skReviewModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⭐ Write a Review</div>
+    <div class="f-grp">
+      <label class="f-lbl">Your Rating *</label>
+      <div class="sk-star-input" id="skReviewStars">
+        <span onclick="skSetReviewRating(1)">☆</span>
+        <span onclick="skSetReviewRating(2)">☆</span>
+        <span onclick="skSetReviewRating(3)">☆</span>
+        <span onclick="skSetReviewRating(4)">☆</span>
+        <span onclick="skSetReviewRating(5)">☆</span>
+      </div>
+    </div>
+    <div class="f-grp"><label class="f-lbl">Your Review (max 300 chars)</label>
+      <textarea class="f-area" id="skReviewText" maxlength="300" placeholder="Share your experience..."></textarea></div>
+    <button class="f-submit" onclick="skSubmitReview()">Submit Review</button>
+    <button class="f-cancel" onclick="closeModal('skReviewModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- SevaKart: Report Modal -->
+<div class="modal-overlay" id="skReportModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚩 Report Listing</div>
+    <div class="f-grp"><label class="f-lbl">Reason for reporting *</label>
+      <select class="f-sel" id="skReportReason">
+        <option value="">Select reason</option>
+        <option value="not_bhakti">Not aligned with Bhakti values</option>
+        <option value="misleading">Misleading information</option>
+        <option value="inappropriate">Inappropriate content</option>
+        <option value="spam">Spam or duplicate</option>
+        <option value="fraud">Suspected fraud</option>
+        <option value="other">Other</option>
+      </select></div>
+    <div class="f-grp"><label class="f-lbl">Details (optional)</label>
+      <textarea class="f-area" id="skReportDetails" placeholder="Additional details..."></textarea></div>
+    <button class="f-submit" onclick="skSubmitReport()">Submit Report</button>
+    <button class="f-cancel" onclick="closeModal('skReportModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- SevaKart: Admin Reject Modal -->
+<div class="modal-overlay" id="skRejectModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">❌ Reject Listing</div>
+    <div class="f-grp"><label class="f-lbl">Reason for rejection *</label>
+      <textarea class="f-area" id="skRejectReason" placeholder="Explain why this listing is being rejected..."></textarea></div>
+    <button class="f-submit" onclick="skConfirmReject()" style="background:var(--accent-red);">Reject Listing</button>
+    <button class="f-cancel" onclick="closeModal('skRejectModal')">Cancel</button>
   </div>
 </div>
 
@@ -5816,6 +6283,7 @@ function renderAdminList() {
     if (!isSelf) {
       if (!userPerms || userPerms.includes('songs')) permTags += '<span class="admin-perm-tag perm-songs">Songs</span>';
       if (!userPerms || userPerms.includes('dhamas')) permTags += '<span class="admin-perm-tag perm-dhamas">Dhamas</span>';
+      if (!userPerms || userPerms.includes('sevakart')) permTags += '<span class="admin-perm-tag perm-sevakart">SevaKart</span>';
     }
     return `<div class="admin-email-row">
       <div style="flex:1;min-width:0;">
@@ -5841,6 +6309,7 @@ function addAdmin() {
   const selectedPerms = [];
   if (document.getElementById('permSongs').checked) selectedPerms.push('songs');
   if (document.getElementById('permDhamas').checked) selectedPerms.push('dhamas');
+  if (document.getElementById('permSevakart').checked) selectedPerms.push('sevakart');
   if (!selectedPerms.length) { showToast('Select at least one permission'); return; }
   // Save admin
   list.push(email);
@@ -7387,7 +7856,7 @@ function switchScreen(name, btn) {
   const headerDate = document.getElementById('headerDate');
   const headerMasa = document.getElementById('headerMasa');
   const headerIcons = document.getElementById('headerIcons');
-  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha'};
+  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings'};
   if (name === 'calendar') {
     updateHeaderDate();
     headerIcons.style.display = '';
@@ -7411,6 +7880,7 @@ function switchScreen(name, btn) {
   if (name==='events') renderEvts();
   if (name==='notes') renderNotes();
   if (name==='dhamas') renderDhamas();
+  if (name==='sevakart') skRenderHome();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
 }
@@ -8801,6 +9271,692 @@ function dismissUpdateBanner() {
     localStorage.setItem('_appHash', _appContentHash());
   } catch(e) {}
 }
+
+// ===================================================================
+// SEVAKART — Devotee Service Directory
+// ===================================================================
+const SK_CATEGORIES = [
+  {id:'Deity Services', icon:'🪷', name:'Deity Services'},
+  {id:'Prasadam & Catering', icon:'🍲', name:'Prasadam'},
+  {id:'Kirtan & Events', icon:'🎵', name:'Kirtan & Events'},
+  {id:'Devotional Products', icon:'📿', name:'Products'},
+  {id:'Education', icon:'📖', name:'Education'},
+  {id:'Professional Services', icon:'💼', name:'Professional'},
+  {id:'Temple Supplies', icon:'🛕', name:'Temple'},
+  {id:'Yatra & Travel', icon:'🚐', name:'Yatra'}
+];
+
+// Data storage
+let skListings = JSON.parse(localStorage.getItem('skListings') || '[]');
+let skReviews = JSON.parse(localStorage.getItem('skReviews') || '[]');
+let skReports = JSON.parse(localStorage.getItem('skReports') || '[]');
+let _skFilter = {category:'', city:''};
+let _skViewingId = null;
+let _skPhotoData = [null,null,null];
+let _skPhotoSlot = 0;
+let _skReviewRating = 0;
+let _skRejectingId = null;
+let _skEditingId = null;
+
+function _skSave() {
+  localStorage.setItem('skListings', JSON.stringify(skListings));
+  localStorage.setItem('skReviews', JSON.stringify(skReviews));
+  localStorage.setItem('skReports', JSON.stringify(skReports));
+  // Sync to server
+  _skSyncToServer();
+}
+
+// Sync to Google Sheets (reuses SONGS_API_URL endpoint)
+async function _skSyncToServer() {
+  try {
+    const userEmail = (gUser && gUser.email) ? gUser.email : '';
+    await fetch(SONGS_API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({
+        action:'saveSevakart',
+        listings: skListings,
+        reviews: skReviews,
+        reports: skReports,
+        updatedBy: userEmail
+      })
+    });
+  } catch(e) { /* offline fallback */ }
+}
+
+async function _skFetchFromServer() {
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=sevakart');
+    const data = await resp.json();
+    if (data.success && data.listings) {
+      skListings = data.listings;
+      if (data.reviews) skReviews = data.reviews;
+      if (data.reports) skReports = data.reports;
+      localStorage.setItem('skListings', JSON.stringify(skListings));
+      localStorage.setItem('skReviews', JSON.stringify(skReviews));
+      localStorage.setItem('skReports', JSON.stringify(skReports));
+    }
+  } catch(e) { /* offline - use localStorage */ }
+}
+
+function _skGetApprovedListings() {
+  return skListings.filter(l => l.status === 'approved');
+}
+
+function _skGetRating(listingId) {
+  const revs = skReviews.filter(r => r.listingId === listingId);
+  if (!revs.length) return {avg:0, count:0};
+  const sum = revs.reduce((a,r) => a + r.rating, 0);
+  return {avg: (sum/revs.length).toFixed(1), count: revs.length};
+}
+
+function _skStarStr(rating) {
+  const full = Math.floor(rating);
+  let s = '';
+  for (let i=0;i<5;i++) s += i < full ? '★' : '☆';
+  return s;
+}
+
+// ---- Render Home ----
+function skRenderHome() {
+  // Categories grid
+  const catGrid = document.getElementById('skCategoriesGrid');
+  catGrid.innerHTML = SK_CATEGORIES.map(c =>
+    `<div class="sk-cat-card" onclick="skFilterByCategory('${c.id}')">
+      <div class="sk-cat-icon">${c.icon}</div>
+      <div class="sk-cat-name">${c.name}</div>
+    </div>`
+  ).join('');
+
+  // Admin dashboard
+  const dash = document.getElementById('skAdminDashboard');
+  if (hasPermission('sevakart')) {
+    dash.style.display = '';
+    document.getElementById('skStatTotal').textContent = skListings.length;
+    document.getElementById('skStatPending').textContent = skListings.filter(l=>l.status==='pending').length;
+    document.getElementById('skStatVerified').textContent = skListings.filter(l=>l.verified).length;
+    document.getElementById('skStatReported').textContent = skReports.filter(r=>!r.resolved).length;
+  } else {
+    dash.style.display = 'none';
+  }
+
+  // Filter chips in modal
+  const filterCats = document.getElementById('skFilterCats');
+  filterCats.innerHTML = SK_CATEGORIES.map(c =>
+    `<div class="sk-filter-chip ${_skFilter.category===c.id?'active':''}" onclick="this.classList.toggle('active');skToggleFilterCat('${c.id}')">${c.icon} ${c.name}</div>`
+  ).join('');
+
+  skRenderListings();
+}
+
+function skRenderListings() {
+  const container = document.getElementById('skListingsContainer');
+  const empty = document.getElementById('skEmptyState');
+  const titleEl = document.getElementById('skListingsTitle');
+  const query = (document.getElementById('skSearchInp')?.value || '').toLowerCase();
+
+  let listings = _skGetApprovedListings();
+
+  // Apply filters
+  if (_skFilter.category) {
+    listings = listings.filter(l => l.category === _skFilter.category);
+    titleEl.textContent = _skFilter.category;
+  } else {
+    titleEl.textContent = 'Featured Listings';
+  }
+  if (_skFilter.city) {
+    listings = listings.filter(l => l.city.toLowerCase().includes(_skFilter.city.toLowerCase()));
+  }
+  if (query) {
+    listings = listings.filter(l =>
+      l.bizName.toLowerCase().includes(query) ||
+      l.city.toLowerCase().includes(query) ||
+      l.category.toLowerCase().includes(query) ||
+      (l.shortDesc||'').toLowerCase().includes(query)
+    );
+  }
+
+  if (!listings.length) {
+    container.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  container.innerHTML = listings.map(l => {
+    const r = _skGetRating(l.id);
+    const img = l.photos && l.photos[0]
+      ? `<img src="${l.photos[0]}" alt="">`
+      : (SK_CATEGORIES.find(c=>c.id===l.category)?.icon || '🪔');
+    return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+      <div class="sk-listing-img">${typeof img === 'string' && img.startsWith('<') ? img : img}</div>
+      <div class="sk-listing-body">
+        <div class="sk-listing-top">
+          <div class="sk-listing-name">${l.bizName}</div>
+          ${l.verified ? '<div class="sk-listing-verified">✓ Verified</div>' : ''}
+        </div>
+        <div class="sk-listing-desc">${l.shortDesc||''}</div>
+        <div class="sk-listing-meta">
+          <span class="sk-listing-city">📍 ${l.city}</span>
+          ${r.count ? `<span class="sk-listing-rating">${_skStarStr(r.avg)} ${r.avg} (${r.count})</span>` : ''}
+          <span class="sk-listing-cat-tag">${l.category}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function skFilterListings() { skRenderListings(); }
+function skFilterByCategory(cat) {
+  _skFilter.category = _skFilter.category === cat ? '' : cat;
+  skRenderListings();
+}
+function skToggleFilterCat(cat) { _skFilter.category = _skFilter.category === cat ? '' : cat; }
+function skApplyFilter() {
+  _skFilter.city = document.getElementById('skFilterCity').value;
+  closeModal('skFilterModal');
+  skRenderListings();
+}
+function skClearFilter() {
+  _skFilter = {category:'',city:''};
+  document.getElementById('skFilterCity').value = '';
+  closeModal('skFilterModal');
+  skRenderListings();
+}
+
+// ---- Detail View ----
+function skOpenDetail(id) {
+  const l = skListings.find(x => x.id === id);
+  if (!l) return;
+  _skViewingId = id;
+
+  document.getElementById('skDetailHTitle').textContent = l.bizName;
+  const content = document.getElementById('skDetailContent');
+
+  const r = _skGetRating(id);
+  const reviews = skReviews.filter(rv => rv.listingId === id).slice(-3).reverse();
+  const isSkAdmin = hasPermission('sevakart');
+  const userEmail = gUser?.email?.toLowerCase() || '';
+  const hasReviewed = skReviews.some(rv => rv.listingId === id && rv.userEmail === userEmail);
+  const hasContacted = localStorage.getItem('skContacted:'+id);
+
+  // Gallery
+  const photos = (l.photos||[]).filter(Boolean);
+  let galleryHTML = '';
+  if (photos.length) {
+    galleryHTML = `<div class="sk-detail-gallery"><img src="${photos[0]}" alt="" id="skGalleryImg">
+      ${photos.length > 1 ? `<div class="sk-detail-gallery-dots">${photos.map((_,i) =>
+        `<div class="sk-detail-gallery-dot ${i===0?'active':''}" onclick="document.getElementById('skGalleryImg').src='${photos[i]}';document.querySelectorAll('.sk-detail-gallery-dot').forEach((d,j)=>d.classList.toggle('active',j===${i}))"></div>`
+      ).join('')}</div>` : ''}
+    </div>`;
+  } else {
+    const catIcon = SK_CATEGORIES.find(c=>c.id===l.category)?.icon || '🪔';
+    galleryHTML = `<div class="sk-detail-gallery"><div class="sk-detail-gallery-placeholder">${catIcon}</div></div>`;
+  }
+
+  content.innerHTML = `
+    ${galleryHTML}
+    <div class="sk-detail-body">
+      <div class="sk-detail-name">${l.bizName}</div>
+      <div class="sk-detail-badges">
+        <span class="sk-detail-cat">${l.category}</span>
+        <span class="sk-detail-city-tag">📍 ${l.city}</span>
+        ${l.verified ? '<span class="sk-detail-verified">✓ Verified Devotee</span>' : ''}
+      </div>
+      ${r.count ? `<div class="sk-detail-rating-row">
+        <span class="sk-detail-stars">${_skStarStr(r.avg)}</span>
+        <span class="sk-detail-rating-num">${r.avg} · ${r.count} review${r.count>1?'s':''}</span>
+      </div>` : ''}
+      <div class="sk-detail-desc">${l.fullDesc || l.shortDesc || ''}</div>
+      ${l.years ? `<div class="sk-detail-years">🕐 ${l.years} years in service</div>` : ''}
+
+      <div class="sk-detail-section">
+        <div class="sk-detail-section-title">Contact</div>
+        <div class="sk-contact-btns">
+          ${l.whatsapp || l.mobile ? `<a class="sk-contact-btn whatsapp" href="https://wa.me/${(l.whatsapp||l.mobile).replace(/[^0-9]/g,'')}" target="_blank" rel="noopener" onclick="localStorage.setItem('skContacted:${id}','1')">💬 WhatsApp</a>` : ''}
+          ${l.mobile ? `<a class="sk-contact-btn call" href="tel:${l.mobile}" onclick="localStorage.setItem('skContacted:${id}','1')">📞 Call</a>` : ''}
+          ${l.email ? `<a class="sk-contact-btn email" href="mailto:${l.email}">✉ Email</a>` : ''}
+          ${l.website ? `<a class="sk-contact-btn website" href="${l.website}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
+        </div>
+        <div class="sk-disclaimer">SevaKart facilitates connection. All transactions happen directly between users.</div>
+      </div>
+
+      <div class="sk-detail-section">
+        <div class="sk-detail-section-title">Reviews</div>
+        ${reviews.length ? reviews.map(rv => `
+          <div class="sk-review-card">
+            <div class="sk-review-top">
+              <span class="sk-review-user">${rv.userName||'Devotee'}</span>
+              <span class="sk-review-stars">${_skStarStr(rv.rating)}</span>
+            </div>
+            ${rv.text ? `<div class="sk-review-text">${rv.text}</div>` : ''}
+            <div class="sk-review-date">${rv.date||''}</div>
+          </div>
+        `).join('') : '<div style="font-size:0.8rem;color:var(--text3);margin-bottom:8px;">No reviews yet.</div>'}
+        ${!hasReviewed && hasContacted && isSignedIn() ? `<button class="sk-add-review-btn" onclick="skOpenReview()">⭐ Write a Review</button>` : ''}
+        ${!hasReviewed && !hasContacted && isSignedIn() ? '<div style="font-size:0.72rem;color:var(--text3);margin-top:4px;">Contact the service first to leave a review.</div>' : ''}
+        ${!isSignedIn() ? '<div style="font-size:0.72rem;color:var(--text3);margin-top:4px;">Sign in to leave a review.</div>' : ''}
+      </div>
+
+      <button class="sk-report-btn" onclick="skOpenReport()">🚩 Report this listing</button>
+
+      ${isSkAdmin ? `<div class="sk-detail-section">
+        <div class="sk-detail-section-title">🛡️ Admin Actions</div>
+        <div style="font-size:0.72rem;color:var(--text3);margin-bottom:8px;">Status: <strong>${l.status}</strong> ${l.verified?'· ✓ Verified':''}</div>
+        <div class="sk-admin-actions">
+          ${l.status!=='approved' ? `<button class="sk-admin-btn approve" onclick="skAdminAction('approve')">✓ Approve</button>` : ''}
+          ${l.status!=='rejected' ? `<button class="sk-admin-btn reject" onclick="skAdminAction('reject')">✕ Reject</button>` : ''}
+          ${!l.verified ? `<button class="sk-admin-btn verify" onclick="skAdminAction('verify')">🏅 Verify</button>` : `<button class="sk-admin-btn verify" onclick="skAdminAction('unverify')">Remove Badge</button>`}
+          ${l.status!=='suspended' ? `<button class="sk-admin-btn suspend" onclick="skAdminAction('suspend')">⏸ Suspend</button>` : `<button class="sk-admin-btn approve" onclick="skAdminAction('approve')">Unsuspend</button>`}
+          <button class="sk-admin-btn delete" onclick="skAdminAction('delete')">🗑 Delete</button>
+        </div>
+      </div>` : ''}
+    </div>
+  `;
+
+  // Switch screen
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart-detail').classList.add('active');
+}
+
+function skCloseDetail() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart').classList.add('active');
+  _skViewingId = null;
+}
+
+function skBackToMain() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart').classList.add('active');
+}
+
+// ---- My Listings ----
+function skShowMyListings() {
+  if (!isSignedIn()) { showToast('Please sign in first'); return; }
+  const container = document.getElementById('skMyListingsContainer');
+  const email = gUser.email.toLowerCase();
+  const mine = skListings.filter(l => l.ownerEmail === email);
+
+  if (!mine.length) {
+    container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">📋</div><div>You haven\'t listed any services yet.</div></div>';
+  } else {
+    container.innerHTML = mine.map(l => {
+      const statusCls = l.status || 'pending';
+      return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+        <div class="sk-listing-body">
+          <div class="sk-listing-top">
+            <div class="sk-listing-name">${l.bizName}</div>
+            <div class="sk-listing-status ${statusCls}">${statusCls.toUpperCase()}</div>
+          </div>
+          <div class="sk-listing-desc">${l.shortDesc||''}</div>
+          <div class="sk-listing-meta">
+            <span class="sk-listing-city">📍 ${l.city}</span>
+            <span class="sk-listing-cat-tag">${l.category}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart-mylistings').classList.add('active');
+}
+
+// ---- Pending/Reported for Admin ----
+function skShowPendingListings() {
+  const container = document.getElementById('skMyListingsContainer');
+  const pending = skListings.filter(l => l.status === 'pending');
+  document.querySelector('#screen-sevakart-mylistings .sk-detail-htitle').textContent = 'Pending Approvals';
+
+  if (!pending.length) {
+    container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">✅</div><div>No pending listings.</div></div>';
+  } else {
+    container.innerHTML = pending.map(l => `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+      <div class="sk-listing-body">
+        <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
+          <div class="sk-listing-status pending">PENDING</div></div>
+        <div class="sk-listing-desc">${l.shortDesc||''}</div>
+        <div class="sk-listing-meta"><span class="sk-listing-city">📍 ${l.city}</span>
+          <span class="sk-listing-cat-tag">${l.category}</span></div>
+      </div>
+    </div>`).join('');
+  }
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart-mylistings').classList.add('active');
+}
+
+function skShowReportedListings() {
+  const container = document.getElementById('skMyListingsContainer');
+  document.querySelector('#screen-sevakart-mylistings .sk-detail-htitle').textContent = 'Reported Listings';
+  const unresolvedReports = skReports.filter(r => !r.resolved);
+  const reportedIds = [...new Set(unresolvedReports.map(r => r.listingId))];
+  const reported = skListings.filter(l => reportedIds.includes(l.id));
+
+  if (!reported.length) {
+    container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">✅</div><div>No reported listings.</div></div>';
+  } else {
+    container.innerHTML = reported.map(l => {
+      const rCount = unresolvedReports.filter(r=>r.listingId===l.id).length;
+      return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+        <div class="sk-listing-body">
+          <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
+            <div class="sk-listing-status rejected">🚩 ${rCount} report${rCount>1?'s':''}</div></div>
+          <div class="sk-listing-desc">${l.shortDesc||''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart-mylistings').classList.add('active');
+}
+
+// ---- Admin Actions ----
+function skAdminAction(action) {
+  if (!hasPermission('sevakart')) { showToast('SevaKart admin access required'); return; }
+  const l = skListings.find(x => x.id === _skViewingId);
+  if (!l) return;
+
+  switch(action) {
+    case 'approve':
+      l.status = 'approved';
+      showToast('Listing approved ✓');
+      break;
+    case 'reject':
+      _skRejectingId = _skViewingId;
+      document.getElementById('skRejectModal').classList.add('open');
+      return;
+    case 'verify':
+      l.verified = true;
+      showToast('Verified badge added ✓');
+      break;
+    case 'unverify':
+      l.verified = false;
+      showToast('Verified badge removed');
+      break;
+    case 'suspend':
+      l.status = 'suspended';
+      showToast('Listing suspended');
+      break;
+    case 'delete':
+      if (!confirm('Permanently delete this listing?')) return;
+      skListings = skListings.filter(x => x.id !== _skViewingId);
+      _skSave();
+      skCloseDetail();
+      skRenderHome();
+      showToast('Listing deleted');
+      return;
+  }
+  _skSave();
+  skOpenDetail(_skViewingId); // Refresh detail
+}
+
+function skConfirmReject() {
+  const reason = document.getElementById('skRejectReason').value.trim();
+  if (!reason) { showToast('Please provide a reason'); return; }
+  const l = skListings.find(x => x.id === _skRejectingId);
+  if (l) {
+    l.status = 'rejected';
+    l.rejectReason = reason;
+    _skSave();
+  }
+  closeModal('skRejectModal');
+  document.getElementById('skRejectReason').value = '';
+  if (_skViewingId === _skRejectingId) skOpenDetail(_skViewingId);
+  showToast('Listing rejected');
+}
+
+// ---- Listing Form ----
+let _skFormStep = 1;
+
+function skStartListing() {
+  if (!isSignedIn()) { showToast('Please sign in to list a service'); return; }
+  _skEditingId = null;
+  _skFormStep = 1;
+  _skPhotoData = [null,null,null];
+  // Reset form
+  document.getElementById('skElig1').checked = false;
+  document.getElementById('skElig2').checked = false;
+  document.getElementById('skBizName').value = '';
+  document.getElementById('skContactName').value = gUser.name || '';
+  document.getElementById('skMobile').value = '';
+  document.getElementById('skWASame').checked = true;
+  document.getElementById('skWA').value = '';
+  document.getElementById('skWA').disabled = true;
+  document.getElementById('skEmail').value = gUser.email || '';
+  document.getElementById('skCity').value = '';
+  document.getElementById('skCategory').value = '';
+  document.getElementById('skShortDesc').value = '';
+  document.getElementById('skFullDesc').value = '';
+  document.getElementById('skYears').value = '';
+  document.getElementById('skWebsite').value = '';
+  document.getElementById('skTerms').checked = false;
+  _skUpdatePhotoSlots();
+  _skUpdateStepUI();
+  document.getElementById('skListModalTitle').textContent = '🪔 List Your Service';
+  document.getElementById('skListModal').classList.add('open');
+}
+
+function _skUpdateStepUI() {
+  document.querySelectorAll('.sk-form-step').forEach((s,i) => {
+    s.classList.toggle('active', i === _skFormStep - 1);
+  });
+  document.querySelectorAll('#skStepIndicator .sk-step-dot').forEach((d,i) => {
+    d.className = 'sk-step-dot' + (i === _skFormStep-1 ? ' active' : (i < _skFormStep-1 ? ' done' : ''));
+  });
+}
+
+function skNextStep(from) {
+  if (from === 1) {
+    if (!document.getElementById('skElig1').checked || !document.getElementById('skElig2').checked) {
+      showToast('Please confirm both eligibility checks'); return;
+    }
+    _skFormStep = 2;
+  } else if (from === 2) {
+    // Validate
+    const bn = document.getElementById('skBizName').value.trim();
+    const cn = document.getElementById('skContactName').value.trim();
+    const mob = document.getElementById('skMobile').value.trim();
+    const city = document.getElementById('skCity').value.trim();
+    const cat = document.getElementById('skCategory').value;
+    const sd = document.getElementById('skShortDesc').value.trim();
+    if (!bn||!cn||!mob||!city||!cat||!sd) { showToast('Please fill all required fields (*)'); return; }
+    _skFormStep = 3;
+    _skBuildPreview();
+  }
+  _skUpdateStepUI();
+}
+
+function skPrevStep(from) {
+  _skFormStep = from - 1;
+  _skUpdateStepUI();
+}
+
+function _skBuildPreview() {
+  const p = document.getElementById('skPreviewContainer');
+  const fields = [
+    ['Business Name', document.getElementById('skBizName').value],
+    ['Contact', document.getElementById('skContactName').value],
+    ['Mobile', document.getElementById('skMobile').value],
+    ['City', document.getElementById('skCity').value],
+    ['Category', document.getElementById('skCategory').value],
+    ['Description', document.getElementById('skShortDesc').value],
+  ];
+  const full = document.getElementById('skFullDesc').value;
+  if (full) fields.push(['Full Description', full]);
+  const yrs = document.getElementById('skYears').value;
+  if (yrs) fields.push(['Years in Service', yrs]);
+
+  p.innerHTML = '<div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px;">Review your listing:</div>' +
+    fields.map(([lbl,val]) => `<div class="sk-preview-card"><div class="sk-preview-label">${lbl}</div><div class="sk-preview-value">${val}</div></div>`).join('');
+}
+
+// Photo handling
+function skPickPhoto(slot) {
+  _skPhotoSlot = slot;
+  document.getElementById('skPhotoInput').click();
+}
+
+function skHandlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // Compress if needed
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxW = 600;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = h * maxW / w; w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      _skPhotoData[_skPhotoSlot] = canvas.toDataURL('image/jpeg', 0.7);
+      _skUpdatePhotoSlots();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function skRemovePhoto(slot) {
+  _skPhotoData[slot] = null;
+  _skUpdatePhotoSlots();
+}
+
+function _skUpdatePhotoSlots() {
+  const slots = document.querySelectorAll('#skPhotoUpload .sk-photo-slot');
+  slots.forEach((slot, i) => {
+    if (_skPhotoData[i]) {
+      slot.innerHTML = `<img src="${_skPhotoData[i]}" alt=""><button class="sk-photo-remove" onclick="event.stopPropagation();skRemovePhoto(${i})">✕</button>`;
+    } else {
+      slot.innerHTML = '＋';
+    }
+  });
+}
+
+function skSubmitListing() {
+  if (!document.getElementById('skTerms').checked) { showToast('Please agree to Terms & Conditions'); return; }
+  if (!isSignedIn()) { showToast('Please sign in'); return; }
+
+  const mobile = document.getElementById('skMobile').value.trim();
+  const waSame = document.getElementById('skWASame').checked;
+
+  const listing = {
+    id: _skEditingId || ('sk_' + Date.now() + '_' + Math.random().toString(36).substr(2,5)),
+    bizName: document.getElementById('skBizName').value.trim(),
+    contactName: document.getElementById('skContactName').value.trim(),
+    mobile: mobile,
+    whatsapp: waSame ? mobile : (document.getElementById('skWA').value.trim() || mobile),
+    email: document.getElementById('skEmail').value.trim(),
+    city: document.getElementById('skCity').value.trim(),
+    category: document.getElementById('skCategory').value,
+    shortDesc: document.getElementById('skShortDesc').value.trim(),
+    fullDesc: document.getElementById('skFullDesc').value.trim(),
+    years: document.getElementById('skYears').value || '',
+    website: document.getElementById('skWebsite').value.trim(),
+    photos: _skPhotoData.filter(Boolean),
+    ownerEmail: gUser.email.toLowerCase(),
+    ownerName: gUser.name || '',
+    status: 'pending',
+    verified: false,
+    createdAt: new Date().toISOString(),
+  };
+
+  if (_skEditingId) {
+    const idx = skListings.findIndex(l => l.id === _skEditingId);
+    if (idx >= 0) {
+      listing.status = skListings[idx].status;
+      listing.verified = skListings[idx].verified;
+      listing.createdAt = skListings[idx].createdAt;
+      skListings[idx] = listing;
+    }
+  } else {
+    skListings.push(listing);
+  }
+
+  _skSave();
+  closeModal('skListModal');
+  showToast(_skEditingId ? 'Listing updated ✓' : 'Listing submitted for approval ✓');
+  skRenderHome();
+}
+
+// ---- Reviews ----
+function skOpenReview() {
+  if (!isSignedIn()) { showToast('Please sign in'); return; }
+  _skReviewRating = 0;
+  document.getElementById('skReviewText').value = '';
+  document.querySelectorAll('#skReviewStars span').forEach(s => { s.textContent = '☆'; s.classList.remove('filled'); });
+  document.getElementById('skReviewModal').classList.add('open');
+}
+
+function skSetReviewRating(n) {
+  _skReviewRating = n;
+  document.querySelectorAll('#skReviewStars span').forEach((s,i) => {
+    s.textContent = i < n ? '★' : '☆';
+    s.classList.toggle('filled', i < n);
+  });
+}
+
+function skSubmitReview() {
+  if (!_skReviewRating) { showToast('Please select a rating'); return; }
+  if (!isSignedIn()) { showToast('Please sign in'); return; }
+  const email = gUser.email.toLowerCase();
+
+  // Check one review per user
+  if (skReviews.some(r => r.listingId === _skViewingId && r.userEmail === email)) {
+    showToast('You have already reviewed this listing'); return;
+  }
+
+  const review = {
+    id: 'rv_' + Date.now(),
+    listingId: _skViewingId,
+    userEmail: email,
+    userName: gUser.name || 'Devotee',
+    rating: _skReviewRating,
+    text: document.getElementById('skReviewText').value.trim(),
+    date: new Date().toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}),
+  };
+
+  skReviews.push(review);
+  _skSave();
+  closeModal('skReviewModal');
+  showToast('Review submitted ✓');
+  skOpenDetail(_skViewingId);
+}
+
+// ---- Reports ----
+function skOpenReport() {
+  if (!isSignedIn()) { showToast('Please sign in to report'); return; }
+  document.getElementById('skReportReason').value = '';
+  document.getElementById('skReportDetails').value = '';
+  document.getElementById('skReportModal').classList.add('open');
+}
+
+function skSubmitReport() {
+  const reason = document.getElementById('skReportReason').value;
+  if (!reason) { showToast('Please select a reason'); return; }
+
+  const report = {
+    id: 'rp_' + Date.now(),
+    listingId: _skViewingId,
+    reason: reason,
+    details: document.getElementById('skReportDetails').value.trim(),
+    reportedBy: gUser?.email || 'anonymous',
+    date: new Date().toISOString(),
+    resolved: false,
+  };
+
+  skReports.push(report);
+  _skSave();
+  closeModal('skReportModal');
+  showToast('Report submitted. Thank you.');
+}
+
+// Fetch SevaKart data on load
+setTimeout(_skFetchFromServer, 2000);
 
 function init() {
   // Load settings
