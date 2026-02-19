@@ -2,7 +2,7 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
-// Force immediate activation — no waiting
+// Force immediate activation
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
@@ -20,30 +20,37 @@ firebase.initializeApp({
 });
 const messaging = firebase.messaging();
 
-// Handle background messages (when app is not in foreground)
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw] Background message:', payload);
-  const title = payload.notification?.title || payload.data?.title || '🙏 Bhakti Sakha';
-  const body = payload.notification?.body || payload.data?.body || 'You have a reminder';
-  const icon = payload.data?.icon || './icon-192x192.png';
+// Handle push directly for full control
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data.json().data || event.data.json();
+  } catch(e) {
+    try { data = event.data.json(); } catch(e2) {}
+  }
+
+  const title = data.title || '🙏 Bhakti Sakha';
+  const body = data.body || 'You have a reminder';
+
   const options = {
     body: body,
-    icon: icon,
+    icon: './icon-192x192.png',
     badge: './icon-72x72.png',
     vibrate: [200, 100, 200],
-    tag: payload.data?.tag || 'bhakti-sakha-reminder',
+    tag: data.tag || 'bhakti-sakha-reminder',
     data: {
-      url: payload.data?.url || './Bhakti_Sakha.html'
+      url: 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html'
     },
     actions: [
       { action: 'dismiss', title: 'Dismiss' },
       { action: 'open', title: 'Open App' }
     ]
   };
-  return self.registration.showNotification(title, options);
+
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Handle notification click — Dismiss or Open App
+// Handle notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
@@ -51,7 +58,7 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  const urlToOpen = event.notification.data?.url || './Bhakti_Sakha.html';
+  const urlToOpen = event.notification.data?.url || 'https://bhaktisakha.github.io/bhaktisakha/Bhakti_Sakha.html';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
