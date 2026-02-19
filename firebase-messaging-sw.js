@@ -27,7 +27,6 @@ self.addEventListener('push', (event) => {
     vibrate: [200, 100, 200],
     tag: data.tag || 'bhakti-sakha-reminder',
     actions: [
-      { action: 'dismiss', title: 'Dismiss' },
       { action: 'open', title: 'Open App' }
     ]
   };
