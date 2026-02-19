@@ -643,7 +643,15 @@ body {
   background:none; border:none; color:var(--accent-blue);
   font-family:inherit; font-size:0.88rem; cursor:pointer; padding:4px 0;
 }
-.song-detail-hdr-actions { display:flex; gap:8px; }
+.song-detail-hdr-actions { display:flex; gap:8px; align-items:center; }
+.song-lang-sel {
+  background:rgba(61,127,212,0.12); border:1px solid rgba(61,127,212,0.3);
+  color:var(--accent-blue); font-family:inherit; font-size:0.72rem; font-weight:600;
+  padding:4px 6px; border-radius:8px; cursor:pointer;
+  -webkit-appearance:none; appearance:none; text-align:center;
+  min-width:38px;
+}
+.song-lang-sel option { background:var(--bg2); color:var(--text); }
 .song-detail-body {
   flex:1; overflow-y:auto; padding:20px 18px 100px;
 }
@@ -2100,6 +2108,11 @@ body {
         <div class="kirtan-sort-wrap">
           <button class="songs-sort-btn active" id="ksort-cat" onclick="setSongSort('cat',this)">Category</button>
           <button class="songs-sort-btn" id="ksort-author" onclick="setSongSort('author',this)">Author</button>
+          <select class="song-lang-sel" id="songLangSelList" onchange="setSongLang(this.value)" style="margin-left:6px;">
+            <option value="en">EN</option>
+            <option value="hi">हिं</option>
+            <option value="mr">मर</option>
+          </select>
         </div>
         <button class="kirtan-add-btn" style="margin-left:auto;" onclick="openAdminSong()">＋</button>
       </div>
@@ -2117,6 +2130,11 @@ body {
           Back
         </button>
         <div class="song-detail-hdr-actions">
+          <select class="song-lang-sel" id="songLangSel" onchange="setSongLang(this.value)">
+            <option value="en">EN</option>
+            <option value="hi">हिं</option>
+            <option value="mr">मर</option>
+          </select>
           <button class="songs-font-btn" onclick="changeSongFont(-1)" style="width:28px;height:28px;">A−</button>
           <button class="songs-font-btn" onclick="changeSongFont(1)" style="width:28px;height:28px;">A+</button>
           <button class="song-edit-btn" onclick="openEditSongFromDetail()">✏️</button>
@@ -3664,6 +3682,13 @@ async function fetchSharedSongs() {
 }
 // Fetch on page load
 setTimeout(fetchSharedSongs, 1000);
+// Init language dropdowns from stored preference
+setTimeout(() => {
+  const sel1 = document.getElementById('songLangSel');
+  const sel2 = document.getElementById('songLangSelList');
+  if (sel1) sel1.value = songLang;
+  if (sel2) sel2.value = songLang;
+}, 100);
 let settings = JSON.parse(localStorage.getItem('settings') || '{}');
 
 // ===================================================================
@@ -4178,6 +4203,77 @@ function initJumpSelects() {
 // ===================================================================
 // SONGS
 // ===================================================================
+
+// ---- Language / Script system ----
+let songLang = localStorage.getItem('songLang') || 'en'; // 'en' | 'hi' | 'mr'
+
+function setSongLang(lang) {
+  songLang = lang;
+  localStorage.setItem('songLang', lang);
+  // Sync both dropdowns
+  const sel1 = document.getElementById('songLangSel');
+  const sel2 = document.getElementById('songLangSelList');
+  if (sel1) sel1.value = lang;
+  if (sel2) sel2.value = lang;
+  renderSongs();
+  if (_currentSongId) openSongDetail(_currentSongId);
+}
+
+// IAST romanized → Devanagari transliterator
+function iastToDev(text) {
+  if (!text) return '';
+  const C2 = {'kh':'ख','gh':'घ','ch':'छ','jh':'झ','ṭh':'ठ','ḍh':'ढ','th':'थ','dh':'ध','ph':'फ','bh':'भ'};
+  const C1 = {'ṅ':'ङ','ñ':'ञ','ṇ':'ण','ń':'ङ','ṭ':'ट','ḍ':'ड','ś':'श','ṣ':'ष',
+    'k':'क','g':'ग','c':'च','j':'ज','t':'त','d':'द','n':'न',
+    'p':'प','b':'ब','m':'म','y':'य','r':'र','l':'ल','v':'व','w':'व',
+    's':'स','h':'ह','ḻ':'ळ'};
+  const V2 = {'ai':'ऐ','au':'औ'};
+  const V1 = {'ā':'आ','ī':'ई','ū':'ऊ','ṛ':'ऋ','ṝ':'ॠ','a':'अ','i':'इ','u':'उ','e':'ए','o':'ओ'};
+  const M2 = {'ai':'ै','au':'ौ'};
+  const M1 = {'ā':'ा','ī':'ी','ū':'ू','ṛ':'ृ','ṝ':'ॄ','a':'','i':'ि','u':'ु','e':'े','o':'ो'};
+  let r='', i=0, ac=false;
+  while(i<text.length){
+    const ch=text[i], ch2=text.substring(i,i+2), cl=ch.toLowerCase(), c2l=ch2.toLowerCase();
+    let hit=false;
+    if(C2[c2l]){if(ac)r+='्';r+=C2[c2l];ac=true;i+=2;hit=true;}
+    else if(C1[cl]){if(ac)r+='्';r+=C1[cl];ac=true;i+=1;hit=true;}
+    else if(ch==='ṁ'||ch==='ḿ'){r+='ं';ac=false;i+=1;hit=true;}
+    else if(ch==='ḥ'){r+='ः';ac=false;i+=1;hit=true;}
+    else{
+      if(V2[c2l]){r+=(ac?M2[c2l]:V2[c2l]);ac=false;i+=2;hit=true;}
+      else if(V1[cl]){r+=(ac?M1[cl]:V1[cl]);ac=false;i+=1;hit=true;}
+    }
+    if(!hit){
+      if(ac)r+='्';
+      ac=false;
+      if(ch==="'"||ch==='\u2018'||ch==='\u2019')r+='ऽ'; else r+=ch;
+      i+=1;
+    }
+  }
+  if(ac)r+='्';
+  return r;
+}
+
+// Apply script to song title (for list view)
+function _songTitle(s) {
+  if (songLang === 'en') return s.title || '';
+  // Use stored Devanagari title if available, else transliterate
+  return s.title_dev || iastToDev(s.title || '');
+}
+
+// Apply script to lyrics
+function _songLyrics(s) {
+  if (songLang === 'en') return s.lyrics || '';
+  return iastToDev(s.lyrics || '');
+}
+
+// Apply translation language
+function _songTrans(s) {
+  if (songLang === 'hi' && s.trans_hi) return s.trans_hi;
+  if (songLang === 'mr' && s.trans_mr) return s.trans_mr;
+  return s.trans || '';
+}
+
 function defaultSongs() {
   return [];
 }
@@ -4322,7 +4418,7 @@ function _buildAudioHtml(s) {
 
 function _buildSongCard(s) {
   return `<div class="song-card" id="sc-${s.id}" onclick="openSongDetail(${s.id})">
-    <div class="song-title-text">${s.title}</div>
+    <div class="song-title-text">${_songTitle(s)}</div>
     <span class="song-row-arrow">›</span>
   </div>`;
 }
@@ -4368,7 +4464,8 @@ function renderSongs(filter) {
     (s.author||'').toLowerCase().includes(q) ||
     (s.book||'').toLowerCase().includes(q) ||
     (s.lyrics||'').toLowerCase().includes(q) ||
-    (s.trans||'').toLowerCase().includes(q)
+    (s.trans||'').toLowerCase().includes(q) ||
+    (songLang !== 'en' && _songTitle(s).includes(q))
   ) : songs;
 
   let cards = '';
@@ -4520,9 +4617,13 @@ function openSongDetail(id) {
   ].filter(Boolean);
 
   const catFull = s.cat ? _catLabel(s.cat) : '';
+  const displayTitle = _songTitle(s);
+  const lyrics = _songLyrics(s);
+  const trans = _songTrans(s);
+  const transLabel = songLang === 'hi' ? 'Translation (Hindi)' : songLang === 'mr' ? 'Translation (Marathi)' : 'Translation';
 
   const infoRows = [
-    { label: 'Song Name',     value: s.title },
+    { label: 'Song Name',     value: displayTitle },
     { label: 'Official Name', value: s.officialName || null },
     { label: 'Author',        value: s.author || null },
     { label: 'Category',      value: catFull || null },
@@ -4541,16 +4642,20 @@ function openSongDetail(id) {
 
     ${audioHtml}
 
-    ${s.lyrics ? `
-      <div class="sd-section-lbl">Lyrics</div>
-      ${_buildVerseCards(s.lyrics, sz)}
+    ${lyrics ? `
+      <div class="sd-section-lbl">${songLang !== 'en' ? 'पद (Lyrics)' : 'Lyrics'}</div>
+      ${_buildVerseCards(lyrics, sz)}
     ` : ''}
-    ${s.trans ? `
+    ${trans ? `
       <div class="sd-divider"></div>
-      <div class="sd-section-lbl">Translation</div>
-      ${_buildTransCards(s.trans, sz)}
+      <div class="sd-section-lbl">${transLabel}</div>
+      ${_buildTransCards(trans, sz)}
     ` : ''}
   `;
+
+  // Sync language dropdown
+  const langSel = document.getElementById('songLangSel');
+  if (langSel) langSel.value = songLang;
 
   // Switch to detail screen (no nav highlight change)
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -4609,7 +4714,8 @@ function kirtanSearch(q) {
     (s.author||'').toLowerCase().includes(ql) ||
     (s.book||'').toLowerCase().includes(ql) ||
     (s.lyrics||'').toLowerCase().includes(ql) ||
-    (s.trans||'').toLowerCase().includes(ql)
+    (s.trans||'').toLowerCase().includes(ql) ||
+    (songLang !== 'en' && _songTitle(s).includes(ql))
   ).slice(0, 12);
 
   if (!matches.length) {
@@ -4619,10 +4725,11 @@ function kirtanSearch(q) {
       const escaped = ql.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
       const hl = t => (t||'').replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
+      const displayTitle = _songTitle(s);
       return `<div class="kd-item" onmousedown="kirtanSelectFromDropdown(${s.id})">
         <div class="kd-icon">${s.i}</div>
         <div class="kd-info">
-          <div class="kd-title">${hl(s.title)}</div>
+          <div class="kd-title">${hl(displayTitle)}</div>
           ${s.officialName ? `<div class="kd-meta" style="color:var(--accent-gold)">${hl(s.officialName)}</div>` : ''}
           <div class="kd-meta">${meta}</div>
         </div>
