@@ -2647,7 +2647,7 @@ body {
       <option value="reminder">🟢 Reminder</option>
       <option value="other">⚪ Other</option>
     </select>
-    <input class="ne-meta-date" id="neLinkedDate" type="date" title="Link to date">
+    <input class="ne-meta-date" id="neLinkedDate" type="date" title="Link to date" style="display:none;">
   </div>
   <div class="ne-toolbar">
     <button class="ne-fmt-btn" onclick="neExec('bold')" title="Bold"><b>B</b></button>
@@ -6129,30 +6129,31 @@ function pinDelete() {
 }
 
 async function processPinEntry() {
+  const noteId = _pendingPinNoteId; // Save before closePinOverlay resets it
   if (_pinMode === 'setup') {
     _pinSetupFirst = _pinBuffer;
-    openPinOverlay('confirm-setup', _pendingPinNoteId);
+    openPinOverlay('confirm-setup', noteId);
   } else if (_pinMode === 'confirm-setup') {
     if (_pinBuffer === _pinSetupFirst) {
       const hash = await hashPin(_pinBuffer);
       localStorage.setItem('notesPinHash', hash);
       showToast('PIN set successfully 🔐');
       closePinOverlay();
-      if (_pendingPinNoteId) { actualToggleLock(_pendingPinNoteId); }
+      if (noteId) { actualToggleLock(noteId); }
     } else {
       showPinError('PINs do not match. Try again.');
       _pinSetupFirst = '';
-      setTimeout(()=>openPinOverlay('setup', _pendingPinNoteId), 800);
+      setTimeout(()=>openPinOverlay('setup', noteId), 800);
     }
   } else if (_pinMode === 'unlock') {
     if (await verifyPin(_pinBuffer)) {
       closePinOverlay();
-      if (_pendingPinNoteId) openEditNote(_pendingPinNoteId, true);
+      if (noteId) openEditNote(noteId, true);
     } else { showPinError('Incorrect PIN'); }
   } else if (_pinMode === 'lock-toggle') {
     if (await verifyPin(_pinBuffer)) {
       closePinOverlay();
-      if (_pendingPinNoteId) actualToggleLock(_pendingPinNoteId);
+      if (noteId) actualToggleLock(noteId);
     } else { showPinError('Incorrect PIN'); }
   }
 }
@@ -6431,6 +6432,11 @@ function actualToggleLock(id) {
   if (idx<0) return;
   notes[idx].locked = !notes[idx].locked;
   localStorage.setItem('notes', JSON.stringify(notes));
+  if (notes[idx].locked) {
+    // Close editor so content is hidden immediately
+    document.getElementById('noteEditorOverlay').classList.remove('open');
+    _currentEditNoteId = null;
+  }
   if (_currentEditNoteId === id) updateEditorPinLockUI(notes[idx].pinned, notes[idx].locked);
   renderNotes();
   showToast(notes[idx].locked ? 'Note locked 🔒' : 'Note unlocked 🔓');
