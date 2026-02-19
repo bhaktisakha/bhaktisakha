@@ -1816,6 +1816,13 @@ body {
   color: var(--lavender); cursor: pointer; transition: background 0.15s;
 }
 .evt-notes-edit-btn:active { background: rgba(167,139,250,0.25); }
+.evt-notes-font-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 6px; padding: 3px 8px; font-size: 0.68rem; font-weight: 700;
+  color: var(--text3); cursor: pointer; transition: background 0.15s;
+  min-width: 28px; text-align: center;
+}
+.evt-notes-font-btn:active { background: rgba(255,255,255,0.12); }
 .evt-notes-display {
   font-size: 0.88rem; color: var(--text2); line-height: 1.65;
   white-space: pre-wrap; word-wrap: break-word;
@@ -3004,7 +3011,11 @@ body {
       <hr class="evt-notes-divider">
       <div class="evt-notes-header">
         <span class="evt-notes-label">About This Day</span>
-        <button class="evt-notes-edit-btn" id="evtNotesEditBtn" onclick="toggleEvtNoteEditor()" style="display:none;">✎ Edit</button>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="evt-notes-font-btn" onclick="changeEvtNoteFont(-1)" title="Decrease font">A−</button>
+          <button class="evt-notes-font-btn" onclick="changeEvtNoteFont(1)" title="Increase font">A+</button>
+          <button class="evt-notes-edit-btn" id="evtNotesEditBtn" onclick="toggleEvtNoteEditor()" style="display:none;">✎ Edit</button>
+        </div>
       </div>
       <div class="evt-notes-display" id="evtNotesDisplay"></div>
       <div class="evt-notes-editor" id="evtNotesEditor">
@@ -4415,6 +4426,9 @@ function _showEvtNoteDisplay() {
   document.getElementById('evtNotesEditBtn').style.display = isAdmin() ? '' : 'none';
   document.getElementById('evtNotesEditor').classList.remove('active');
   document.getElementById('evtNotesDeleteBtn').style.display = note.trim() ? '' : 'none';
+  // Apply saved font size
+  const sz = parseFloat(localStorage.getItem('evtNoteFontSize')) || 0.88;
+  _applyEvtNoteFont(sz);
 }
 
 function toggleEvtNoteEditor() {
@@ -4443,6 +4457,21 @@ async function saveEvtNote() {
 
 function cancelEvtNoteEdit() {
   _showEvtNoteDisplay();
+}
+
+function changeEvtNoteFont(delta) {
+  const key = 'evtNoteFontSize';
+  let size = parseFloat(localStorage.getItem(key)) || 0.88;
+  size = Math.max(0.7, Math.min(1.3, size + delta * 0.04));
+  localStorage.setItem(key, size.toFixed(2));
+  _applyEvtNoteFont(size);
+}
+
+function _applyEvtNoteFont(size) {
+  const display = document.getElementById('evtNotesDisplay');
+  const desc = document.getElementById('evtModalDesc');
+  if (display) display.style.fontSize = size + 'rem';
+  if (desc) desc.style.fontSize = size + 'rem';
 }
 
 async function deleteEvtNote() {
