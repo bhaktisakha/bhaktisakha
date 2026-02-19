@@ -649,7 +649,7 @@ body {
   color:var(--accent-blue); font-family:inherit; font-size:0.72rem; font-weight:600;
   padding:4px 6px; border-radius:8px; cursor:pointer;
   -webkit-appearance:none; appearance:none; text-align:center;
-  min-width:38px;
+  min-width:58px;
 }
 .song-lang-sel option { background:var(--bg2); color:var(--text); }
 .song-detail-body {
@@ -2109,9 +2109,9 @@ body {
           <button class="songs-sort-btn active" id="ksort-cat" onclick="setSongSort('cat',this)">Category</button>
           <button class="songs-sort-btn" id="ksort-author" onclick="setSongSort('author',this)">Author</button>
           <select class="song-lang-sel" id="songLangSelList" onchange="setSongLang(this.value)" style="margin-left:6px;">
-            <option value="en">EN</option>
-            <option value="hi">हिं</option>
-            <option value="mr">मर</option>
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="mr">मराठी</option>
           </select>
         </div>
         <button class="kirtan-add-btn" style="margin-left:auto;" onclick="openAdminSong()">＋</button>
@@ -2131,9 +2131,9 @@ body {
         </button>
         <div class="song-detail-hdr-actions">
           <select class="song-lang-sel" id="songLangSel" onchange="setSongLang(this.value)">
-            <option value="en">EN</option>
-            <option value="hi">हिं</option>
-            <option value="mr">मर</option>
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="mr">मराठी</option>
           </select>
           <button class="songs-font-btn" onclick="changeSongFont(-1)" style="width:28px;height:28px;">A−</button>
           <button class="songs-font-btn" onclick="changeSongFont(1)" style="width:28px;height:28px;">A+</button>
@@ -4222,6 +4222,10 @@ function setSongLang(lang) {
 // IAST romanized → Devanagari transliterator
 function iastToDev(text) {
   if (!text) return '';
+  // Normalize decomposed Unicode (e.g. n + combining accent → ń)
+  text = text.normalize('NFC');
+  // Replace non-breaking spaces, special chars
+  text = text.replace(/\u00a0/g, ' ').replace(/ï/g, 'i');
   const C2 = {'kh':'ख','gh':'घ','ch':'छ','jh':'झ','ṭh':'ठ','ḍh':'ढ','th':'थ','dh':'ध','ph':'फ','bh':'भ'};
   const C1 = {'ṅ':'ङ','ñ':'ञ','ṇ':'ण','ń':'ङ','ṭ':'ट','ḍ':'ड','ś':'श','ṣ':'ष',
     'k':'क','g':'ग','c':'च','j':'ज','t':'त','d':'द','n':'न',
@@ -4233,24 +4237,26 @@ function iastToDev(text) {
   const M1 = {'ā':'ा','ī':'ी','ū':'ू','ṛ':'ृ','ṝ':'ॄ','a':'','i':'ि','u':'ु','e':'े','o':'ो'};
   let r='', i=0, ac=false;
   while(i<text.length){
-    const ch=text[i], ch2=text.substring(i,i+2), cl=ch.toLowerCase(), c2l=ch2.toLowerCase();
+    let ch=text[i], ch2=text.substring(i,i+2), cl=ch.toLowerCase(), c2l=ch2.toLowerCase();
+    // Skip any remaining combining marks (U+0300-U+036F)
+    if(ch.charCodeAt(0)>=0x300 && ch.charCodeAt(0)<=0x36F){i++;continue;}
     let hit=false;
-    if(C2[c2l]){if(ac)r+='्';r+=C2[c2l];ac=true;i+=2;hit=true;}
-    else if(C1[cl]){if(ac)r+='्';r+=C1[cl];ac=true;i+=1;hit=true;}
-    else if(ch==='ṁ'||ch==='ḿ'){r+='ं';ac=false;i+=1;hit=true;}
-    else if(ch==='ḥ'){r+='ः';ac=false;i+=1;hit=true;}
+    if(C2[c2l]){if(ac)r+='\u094D';r+=C2[c2l];ac=true;i+=2;hit=true;}
+    else if(C1[cl]){if(ac)r+='\u094D';r+=C1[cl];ac=true;i+=1;hit=true;}
+    else if(ch==='\u1E41'||ch==='\u1E3F'||ch==='\u1E43'){r+='\u0902';ac=false;i+=1;hit=true;}
+    else if(ch==='\u1E25'){r+='\u0903';ac=false;i+=1;hit=true;}
     else{
       if(V2[c2l]){r+=(ac?M2[c2l]:V2[c2l]);ac=false;i+=2;hit=true;}
       else if(V1[cl]){r+=(ac?M1[cl]:V1[cl]);ac=false;i+=1;hit=true;}
     }
     if(!hit){
-      if(ac)r+='्';
+      if(ac)r+='\u094D';
       ac=false;
-      if(ch==="'"||ch==='\u2018'||ch==='\u2019')r+='ऽ'; else r+=ch;
+      if(ch==="'"||ch==='\u2018'||ch==='\u2019')r+='\u093D'; else r+=ch;
       i+=1;
     }
   }
-  if(ac)r+='्';
+  if(ac)r+='\u094D';
   return r;
 }
 
