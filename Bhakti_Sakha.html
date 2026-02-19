@@ -5198,8 +5198,7 @@ function initGoogleSignIn() {
   google.accounts.id.initialize({
     client_id: G_CLIENT_ID,
     callback: onGoogleSignIn,
-    auto_select: true,
-    use_fedcm_for_prompt: true
+    auto_select: true
   });
   google.accounts.id.renderButton(
     document.getElementById('g_signin_btn'),
@@ -5209,10 +5208,8 @@ function initGoogleSignIn() {
   // Only show One Tap prompt if user is NOT already signed in
   if (!savedUser) {
     google.accounts.id.prompt();
-  } else {
-    // For returning users, silently get a fresh access token for Drive
-    _silentTokenRefresh();
   }
+  // For returning users, token is fetched on-demand when they sync (gSyncAll handles this)
 }
 
 // Silently get a fresh Drive access token without showing consent popup
@@ -6025,17 +6022,17 @@ function initFirebase() {
 async function togglePushNotifications() {
   if (_fcmToken) {
     // Already enabled — disable
+    const tokenToUnregister = _fcmToken;  // Save before clearing
     _fcmToken = null;
     localStorage.removeItem('fcmToken');
     updatePushUI(false);
     // Unregister from server
     try {
-      const savedToken = localStorage.getItem('fcmToken');
-      if (savedToken) {
+      if (tokenToUnregister) {
         await fetch(SONGS_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'unregisterToken', token: savedToken })
+          body: JSON.stringify({ action: 'unregisterToken', token: tokenToUnregister })
         });
       }
     } catch(e) {}
