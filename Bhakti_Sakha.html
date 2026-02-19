@@ -4409,9 +4409,6 @@ function openSongDetail(id) {
   ].filter(r => r.value);
 
   document.getElementById('songDetailBody').innerHTML = `
-    <div class="sd-title">${s.title}</div>
-    ${s.officialName ? `<div class="sd-official">${s.officialName}</div>` : ''}
-
     <div class="sd-info-card">
       ${infoRows.map(r => `
         <div class="sd-info-row">
