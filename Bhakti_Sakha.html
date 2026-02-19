@@ -912,31 +912,90 @@ body {
 .tog-slider { display:none; }
 
 /* About Modal */
-.about-modal-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:250;
-  display:none; align-items:center; justify-content:center; max-width:430px; margin:0 auto;
+/* INFO SCREEN */
+.info-screen { padding:0 16px 100px; overflow-y:auto; height:100%; }
+.info-hero {
+  text-align:center; padding:28px 0 20px;
 }
-.about-modal-overlay.open { display:flex; }
-.about-modal {
-  background:var(--bg2); border:1px solid var(--border); border-radius:20px;
-  width:calc(100% - 40px); max-width:360px; padding:28px 24px; text-align:center;
-  animation:aboutFadeIn 0.25s ease;
+.info-hero-icon { font-size:3.2rem; margin-bottom:10px; filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
+.info-hero-name { font-size:1.4rem; font-weight:700; color:var(--text); letter-spacing:0.5px; }
+.info-hero-version {
+  font-size:0.72rem; color:var(--accent-blue); font-weight:600; margin-top:6px;
+  display:inline-block; background:rgba(61,127,212,0.12); padding:3px 12px; border-radius:20px;
 }
-@keyframes aboutFadeIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
-.about-app-icon { font-size:3rem; margin-bottom:12px; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
-.about-app-name { font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:4px; }
-.about-app-version { font-size:0.72rem; color:var(--accent-blue); font-weight:600; margin-bottom:16px;
-  display:inline-block; background:rgba(61,127,212,0.12); padding:3px 10px; border-radius:20px; }
-.about-divider { height:1px; background:var(--border); margin:14px 0; }
-.about-info-row { font-size:0.8rem; color:var(--text2); line-height:1.8; margin-bottom:4px; }
-.about-info-row strong { color:var(--text); }
-.about-glory { font-size:0.85rem; color:var(--accent-gold); font-style:italic; margin-top:12px; font-weight:500; }
-.about-close-btn {
-  margin-top:20px; background:rgba(255,255,255,0.06); border:1px solid var(--border);
-  border-radius:10px; padding:10px 28px; color:var(--text2); font-size:0.85rem;
-  cursor:pointer; font-family:inherit; transition:all 0.2s;
+.info-hero-sub {
+  font-size:0.78rem; color:var(--text2); margin-top:8px; line-height:1.5;
 }
-.about-close-btn:active { background:rgba(255,255,255,0.12); }
+.info-hero-glory {
+  font-size:0.88rem; color:var(--accent-gold); font-style:italic; margin-top:14px; font-weight:500;
+}
+.info-section {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:18px 16px; margin-bottom:14px;
+}
+.info-section-title {
+  font-size:0.92rem; font-weight:700; color:var(--accent-blue); margin-bottom:12px;
+  display:flex; align-items:center; gap:8px;
+}
+.info-section-title .info-icon {
+  font-size:1.1rem;
+}
+.info-text {
+  font-size:0.82rem; color:var(--text2); line-height:1.7; margin-bottom:0;
+}
+.info-text strong { color:var(--text); }
+.info-step {
+  display:flex; align-items:flex-start; gap:12px; margin-bottom:12px;
+}
+.info-step-num {
+  min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:0.72rem; font-weight:700; color:#fff; flex-shrink:0; margin-top:1px;
+}
+.info-step-num.blue { background:linear-gradient(135deg,#3d7fd4,#60a5fa); }
+.info-step-num.purple { background:linear-gradient(135deg,#a78bfa,#7c3aed); }
+.info-step-num.green { background:linear-gradient(135deg,#34d399,#059669); }
+.info-step-num.amber { background:linear-gradient(135deg,#fbbf24,#d97706); }
+.info-step-text {
+  font-size:0.82rem; color:var(--text2); line-height:1.6;
+}
+.info-step-text strong { color:var(--text); }
+.info-toggle-row {
+  display:flex; align-items:center; gap:10px; padding:8px 12px; margin-bottom:6px;
+  background:rgba(255,255,255,0.03); border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+}
+.info-toggle-emoji { font-size:1rem; flex-shrink:0; }
+.info-toggle-label { font-size:0.8rem; color:var(--text); font-weight:500; }
+.info-toggle-desc { font-size:0.7rem; color:var(--text3); }
+.info-note-box {
+  background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.2);
+  border-radius:12px; padding:14px 14px; margin-top:14px;
+}
+.info-note-box .info-note-title {
+  font-size:0.8rem; font-weight:700; color:var(--accent-gold); margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.info-note-box .info-note-text {
+  font-size:0.78rem; color:var(--text2); line-height:1.6;
+}
+.info-note-box .info-note-text strong { color:var(--text); }
+.info-tip-box {
+  background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.2);
+  border-radius:12px; padding:14px 14px; margin-top:10px;
+}
+.info-tip-box .info-tip-title {
+  font-size:0.8rem; font-weight:700; color:var(--accent-blue); margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.info-tip-box .info-tip-text {
+  font-size:0.78rem; color:var(--text2); line-height:1.6;
+}
+.info-back-btn {
+  display:flex; align-items:center; gap:6px; background:none; border:none; color:var(--accent-blue);
+  font-size:0.88rem; font-weight:600; cursor:pointer; padding:8px 0; font-family:inherit;
+  margin-bottom:4px;
+}
+.info-back-btn:active { opacity:0.7; }
+.info-divider { height:1px; background:var(--border); margin:4px 0 14px; }
 
 .loc-search { width:100%; background:var(--card); border:1.5px solid var(--border);
   border-radius:10px; padding:9px 14px; color:var(--text); font-family:inherit;
@@ -2019,7 +2078,7 @@ body {
     <button onclick="switchScreen('settings', null)" title="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
-    <button onclick="openAboutModal()" title="About">
+    <button onclick="switchScreen('info',null)" title="About">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
     </button>
   </div>
@@ -2397,6 +2456,207 @@ body {
     </div>
   </div>
 
+  <!-- INFO SCREEN -->
+  <div class="screen" id="screen-info">
+    <div class="info-screen">
+
+      <button class="info-back-btn" onclick="switchScreen('calendar',document.querySelector('.nav-btn'))">← Back to Calendar</button>
+
+      <!-- Hero Section -->
+      <div class="info-hero">
+        <div class="info-hero-icon">🙏</div>
+        <div class="info-hero-name">Bhakti Sakha</div>
+        <div class="info-hero-version">V2.0</div>
+        <div class="info-hero-sub"><strong>Data range:</strong> 1975–2075 CE &nbsp;·&nbsp; Per <strong>ISKCON standards</strong> &amp; Panchangam</div>
+        <div class="info-hero-glory">All glories to Srila Prabhupada!</div>
+      </div>
+
+      <!-- NOTIFICATION GUIDE -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">🔔</span> How Notifications Work
+        </div>
+        <div class="info-text">
+          Bhakti Sakha sends you timely reminders for Vaishnava events, Ekadashis, festivals, appearance days, and your own custom events — so you never miss an important day of devotional service.
+        </div>
+      </div>
+
+      <!-- STEP 1: Phone Permission -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">📱</span> Step 1 — Enable Phone Permission
+        </div>
+        <div class="info-text" style="margin-bottom:14px;">
+          Before enabling notifications inside the app, you must first allow notification permissions on your phone:
+        </div>
+
+        <div class="info-step">
+          <div class="info-step-num amber">1</div>
+          <div class="info-step-text">Open your phone's <strong>Settings</strong> app</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num amber">2</div>
+          <div class="info-step-text">Go to <strong>Notifications</strong> → <strong>App Notifications</strong> (or <strong>Apps & Notifications</strong> on some phones)</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num amber">3</div>
+          <div class="info-step-text">Find your <strong>browser app</strong> (Chrome, Safari, etc.) or <strong>Bhakti Sakha</strong> if installed as a PWA</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num amber">4</div>
+          <div class="info-step-text">Make sure notifications are <strong>turned ON</strong> for this app. Also check that <strong>"Show on Lock Screen"</strong> and <strong>"Allow Sound"</strong> are enabled.</div>
+        </div>
+
+        <div class="info-note-box">
+          <div class="info-note-title">⚠️ Important</div>
+          <div class="info-note-text">If phone-level permissions are not enabled, the app will not be able to send you any notifications — even if they are turned on inside Bhakti Sakha.</div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Enable in App -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">⚙️</span> Step 2 — Enable Inside the App
+        </div>
+        <div class="info-step">
+          <div class="info-step-num blue">1</div>
+          <div class="info-step-text">Open Bhakti Sakha and go to the <strong>Settings</strong> screen (gear icon in header)</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num blue">2</div>
+          <div class="info-step-text">Scroll to the <strong>Notifications</strong> section</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num blue">3</div>
+          <div class="info-step-text">Tap the <strong>"Enable"</strong> button next to <strong>Push Notifications</strong></div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num blue">4</div>
+          <div class="info-step-text">When your browser prompts "Allow notifications?", tap <strong>Allow</strong></div>
+        </div>
+        <div class="info-step" style="margin-bottom:0;">
+          <div class="info-step-num blue">5</div>
+          <div class="info-step-text">The button will change to <strong>"Enabled ✓"</strong> — you're all set!</div>
+        </div>
+      </div>
+
+      <!-- CUSTOMIZE -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">🎛️</span> What You Can Customize
+        </div>
+        <div class="info-text" style="margin-bottom:12px;">Once enabled, you can tailor your reminders in Settings:</div>
+
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">⏰</div>
+          <div>
+            <div class="info-toggle-label">Alert Time</div>
+            <div class="info-toggle-desc">Choose what time of day you receive reminders (default 7:00 AM)</div>
+          </div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">📅</div>
+          <div>
+            <div class="info-toggle-label">Advance Notice</div>
+            <div class="info-toggle-desc">Get reminded 1, 2, 3, or 7 days before the event</div>
+          </div>
+        </div>
+
+        <div class="info-divider"></div>
+
+        <div class="info-text" style="margin-bottom:10px;"><strong>Toggle reminders ON/OFF individually:</strong></div>
+
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">🟣</div>
+          <div><div class="info-toggle-label">Ekadashi Reminders</div></div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">🟠</div>
+          <div><div class="info-toggle-label">Festival Reminders</div></div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">🔵</div>
+          <div><div class="info-toggle-label">Appearance Day Reminders</div></div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">🟢</div>
+          <div><div class="info-toggle-label">Your Custom Events</div></div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">🌅</div>
+          <div>
+            <div class="info-toggle-label">Gayatri / Sandhya Times</div>
+            <div class="info-toggle-desc">Reminders 10 min before sunrise, noon &amp; sunset</div>
+          </div>
+        </div>
+        <div class="info-toggle-row">
+          <div class="info-toggle-emoji">⚫</div>
+          <div>
+            <div class="info-toggle-label">Rahu Kalam Alerts</div>
+            <div class="info-toggle-desc">Get notified at the start of Rahu Kalam each day</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">🧩</span> How It Works Behind the Scenes
+        </div>
+        <div class="info-step">
+          <div class="info-step-num purple">●</div>
+          <div class="info-step-text">Bhakti Sakha uses <strong>Firebase Cloud Messaging</strong> to deliver real push notifications to your phone or browser — even when the app is closed</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num purple">●</div>
+          <div class="info-step-text">Your notification preferences and upcoming events are synced with our server, which sends the reminders at the right time</div>
+        </div>
+        <div class="info-step" style="margin-bottom:0;">
+          <div class="info-step-num purple">●</div>
+          <div class="info-step-text"><strong>No personal data is shared</strong> — only your device token and event schedule are stored securely</div>
+        </div>
+      </div>
+
+      <!-- PLATFORM NOTES -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <span class="info-icon">💡</span> Platform-Specific Tips
+        </div>
+
+        <div class="info-tip-box" style="margin-top:0; margin-bottom:10px;">
+          <div class="info-tip-title">🤖 Android</div>
+          <div class="info-tip-text">Notifications work best when the app is <strong>installed as a PWA</strong> (tap the browser menu → "Add to Home Screen"). This ensures reliable background delivery.</div>
+        </div>
+
+        <div class="info-tip-box" style="margin-bottom:10px;">
+          <div class="info-tip-title">🍎 iOS (iPhone / iPad)</div>
+          <div class="info-tip-text">You <strong>must first "Add to Home Screen"</strong> from Safari, then open the installed app and enable notifications from within. iOS does not support push notifications in the browser — only through installed PWAs.</div>
+        </div>
+
+        <div class="info-note-box" style="margin-top:0;">
+          <div class="info-note-title">🔄 Troubleshooting</div>
+          <div class="info-note-text">
+            If notifications stop working, try these steps:<br><br>
+            <strong>1.</strong> Check that phone-level notification permissions are still ON (Settings → Notifications → App Notifications)<br>
+            <strong>2.</strong> Open Bhakti Sakha Settings and <strong>Disable</strong> then <strong>re-Enable</strong> push notifications<br>
+            <strong>3.</strong> Make sure you have an active internet connection<br>
+            <strong>4.</strong> On Android, ensure battery optimization is not killing the app in background
+          </div>
+        </div>
+      </div>
+
+      <!-- App Info -->
+      <div class="info-section" style="text-align:center; padding:20px 16px;">
+        <div style="font-size:0.78rem; color:var(--text3); line-height:1.7;">
+          Built with devotion for the Vaishnava community<br>
+          <strong style="color:var(--accent-gold);">Hare Krishna Hare Krishna Krishna Krishna Hare Hare</strong><br>
+          <strong style="color:var(--accent-gold);">Hare Rama Hare Rama Rama Rama Hare Hare</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 <!-- Add Dham Modal -->
 <div class="modal-overlay" id="addDhamModal">
   <div class="modal-sheet" style="max-height:92vh;">
@@ -2434,21 +2694,6 @@ body {
       <button class="dham-form-save" onclick="saveNewDham()">Save Dham</button>
       <button class="f-cancel" onclick="closeModal('addDhamModal')" style="margin-top:8px;">Cancel</button>
     </div>
-  </div>
-</div>
-
-<!-- About Modal -->
-<div class="about-modal-overlay" id="aboutModal" onclick="if(event.target===this)closeAboutModal()">
-  <div class="about-modal">
-    <div class="about-app-icon">🙏</div>
-    <div class="about-app-name">Bhakti Sakha</div>
-    <div class="about-app-version">V2.0</div>
-    <div class="about-divider"></div>
-    <div class="about-info-row"><strong>Data range:</strong> 1975–2075 CE</div>
-    <div class="about-info-row">Per <strong>ISKCON standards</strong> & Panchangam</div>
-    <div class="about-divider"></div>
-    <div class="about-glory">All glories to Srila Prabhupada!</div>
-    <button class="about-close-btn" onclick="closeAboutModal()">Close</button>
   </div>
 </div>
 
@@ -6562,7 +6807,7 @@ function switchScreen(name, btn) {
   const headerDate = document.getElementById('headerDate');
   const headerMasa = document.getElementById('headerMasa');
   const headerIcons = document.getElementById('headerIcons');
-  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas'};
+  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha'};
   if (name === 'calendar') {
     updateHeaderDate();
     headerIcons.style.display = '';
@@ -6591,8 +6836,6 @@ function switchScreen(name, btn) {
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function openAboutModal() { document.getElementById('aboutModal').classList.add('open'); }
-function closeAboutModal() { document.getElementById('aboutModal').classList.remove('open'); }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
