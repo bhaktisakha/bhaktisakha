@@ -4869,6 +4869,10 @@ function closeCatFolder() {
   renderSongs();
 }
 
+function _naturalSongSort(a, b) {
+  return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+}
+
 function renderSongs(filter) {
   // Update sort button states
   const sb = document.getElementById('ksort-cat');
@@ -4914,7 +4918,7 @@ function renderSongs(filter) {
     const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
     const rendered = new Set();
     CAT_ORDER.forEach(key => {
-      const cs = pool.filter(s => s.cat === key).sort((a,b) => a.title.localeCompare(b.title));
+      const cs = pool.filter(s => s.cat === key).sort(_naturalSongSort);
       if (!cs.length) return;
       cards += `<div class="cat-title">${_catLabel(key)}</div>`;
       cs.forEach(s => { cards += _buildSongCard(s); rendered.add(s.id); });
@@ -4930,8 +4934,8 @@ function renderSongs(filter) {
     const CAT_ORDER_KEYS = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
     const info = CAT_FOLDER_INFO[_openCatKey] || { icon:'📌', name:'Other' };
     const catSongs = _openCatKey === 'other'
-      ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort((a,b) => a.title.localeCompare(b.title))
-      : pool.filter(s => s.cat === _openCatKey).sort((a,b) => a.title.localeCompare(b.title));
+      ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort(_naturalSongSort)
+      : pool.filter(s => s.cat === _openCatKey).sort(_naturalSongSort);
     let innerCards = '';
     catSongs.forEach(s => { innerCards += _buildSongCard(s); });
     if (!innerCards) innerCards = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.85rem;">No songs in this category yet</div>';
