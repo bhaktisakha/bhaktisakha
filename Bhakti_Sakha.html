@@ -5185,18 +5185,58 @@ function initGoogleSignIn() {
     if (wrap) wrap.innerHTML = '<div style="font-size:0.75rem;color:var(--text3);padding:8px;background:rgba(255,255,255,0.04);border-radius:8px;text-align:center;">⚙️ Google Sign-In needs Client ID setup<br><span style="font-size:0.68rem;opacity:0.7">See the setup guide below</span></div>';
     return;
   }
+
+  // Restore saved user immediately (show UI without waiting for token)
+  const savedUser = localStorage.getItem('gUser');
+  if (savedUser) {
+    try {
+      gUser = JSON.parse(savedUser);
+      updateGoogleUI(true);
+    } catch(e) { localStorage.removeItem('gUser'); }
+  }
+
   google.accounts.id.initialize({
     client_id: G_CLIENT_ID,
     callback: onGoogleSignIn,
-    auto_select: false,
+    auto_select: true,
     use_fedcm_for_prompt: true
   });
   google.accounts.id.renderButton(
     document.getElementById('g_signin_btn'),
     { theme: 'filled_blue', size: 'large', shape: 'rectangular', text: 'signin_with', width: 280 }
   );
-  // Try silent sign-in for returning users
-  google.accounts.id.prompt();
+
+  // Only show One Tap prompt if user is NOT already signed in
+  if (!savedUser) {
+    google.accounts.id.prompt();
+  } else {
+    // For returning users, silently get a fresh access token for Drive
+    _silentTokenRefresh();
+  }
+}
+
+// Silently get a fresh Drive access token without showing consent popup
+function _silentTokenRefresh() {
+  if (!gUser || !window.google || !google.accounts.oauth2) return;
+  try {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: G_CLIENT_ID,
+      scope: G_DRIVE_SCOPE,
+      callback: (tokenResp) => {
+        if (tokenResp.error) {
+          console.log('[Auth] Silent token refresh failed:', tokenResp.error);
+          // Don't force re-auth — user can manually sync when needed
+          return;
+        }
+        gAccessToken = tokenResp.access_token;
+        console.log('[Auth] Token refreshed silently');
+      }
+    });
+    // prompt: '' means try silent/automatic, no popup
+    client.requestAccessToken({ prompt: '' });
+  } catch(e) {
+    console.log('[Auth] Silent refresh error:', e.message);
+  }
 }
 
 function onGoogleSignIn(response) {
@@ -5420,6 +5460,30 @@ async function gFindOrCreateFile() {
 }
 
 async function gSyncAll() {
+  // If no token but user is signed in, try to get a fresh token first
+  if (!gAccessToken && gUser && window.google && google.accounts.oauth2) {
+    try {
+      const statusEl = document.getElementById('gSyncStatus');
+      if (statusEl) statusEl.textContent = '⟳ Getting token…';
+      await new Promise((resolve, reject) => {
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: G_CLIENT_ID,
+          scope: G_DRIVE_SCOPE,
+          callback: (tokenResp) => {
+            if (tokenResp.error) { reject(new Error(tokenResp.error)); return; }
+            gAccessToken = tokenResp.access_token;
+            resolve();
+          }
+        });
+        client.requestAccessToken({ prompt: '' });
+        // Timeout after 8 seconds
+        setTimeout(() => reject(new Error('timeout')), 8000);
+      });
+    } catch(e) {
+      showToast('Session expired — please sign in again via the button below');
+      return;
+    }
+  }
   if (!gAccessToken) { showToast('Please sign in first'); return; }
   const statusEl = document.getElementById('gSyncStatus');
   const detailEl = document.getElementById('gSyncDetails');
