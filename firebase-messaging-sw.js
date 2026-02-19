@@ -1,7 +1,15 @@
 // Firebase Messaging Service Worker — handles background push notifications
-// This file MUST be at the root of your site (same level as Bhakti_Sakha.html)
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+
+// Force immediate activation — no waiting
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
+});
+
 firebase.initializeApp({
   apiKey: "AIzaSyDEgka4rqL6_HNMWERzzggcmv0YlVVoUT8",
   authDomain: "bhaktisakhaapp1.firebaseapp.com",
@@ -39,22 +47,18 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  // If Dismiss was tapped, just close and do nothing
   if (event.action === 'dismiss') {
     return;
   }
 
-  // "Open App" button or tapping the notification body itself
   const urlToOpen = event.notification.data?.url || './Bhakti_Sakha.html';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // If app is already open, focus it
       for (const client of windowClients) {
         if (client.url.includes('Bhakti_Sakha') && 'focus' in client) {
           return client.focus();
         }
       }
-      // Otherwise open new window
       return clients.openWindow(urlToOpen);
     })
   );
