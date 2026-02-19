@@ -3100,16 +3100,90 @@ function isSignedIn() {
   return gUser && gUser.email;
 }
 
-// Shared event info (admin-edited, visible to all)
+// Shared event info (admin-edited, visible to all via server)
+let _sharedEvtNotes = {};  // Cache: { eventName: noteText }
+let _evtNotesLoaded = false;
+
 function _getSharedEvtInfo(key) {
-  try { return localStorage.getItem('evtInfo:' + key) || ''; } catch(e) { return ''; }
+  return _sharedEvtNotes[key] || '';
 }
-function _saveSharedEvtInfo(key, text) {
+
+async function _saveSharedEvtInfo(key, text) {
+  // Update local cache immediately
+  if (text.trim()) _sharedEvtNotes[key] = text;
+  else delete _sharedEvtNotes[key];
+  // Also keep localStorage as offline fallback
   try {
     if (text.trim()) localStorage.setItem('evtInfo:' + key, text);
     else localStorage.removeItem('evtInfo:' + key);
   } catch(e) {}
+  // Save to server so ALL users see it
+  try {
+    const userEmail = (gUser && gUser.email) ? gUser.email : 'admin';
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: text.trim() ? 'saveEventNote' : 'deleteEventNote',
+        eventName: key,
+        noteText: text.trim(),
+        updatedBy: userEmail
+      })
+    });
+  } catch(e) {
+    console.log('[EventNotes] Server save failed, kept locally:', e.message);
+  }
 }
+
+async function fetchSharedEventNotes() {
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=eventNotes');
+    const data = await resp.json();
+    if (data.success && data.eventNotes) {
+      _sharedEvtNotes = {};
+      data.eventNotes.forEach(n => {
+        if (n.eventName && n.noteText) _sharedEvtNotes[n.eventName] = n.noteText;
+      });
+      // Cache in localStorage as offline fallback
+      try { localStorage.setItem('evtNotesCache', JSON.stringify(_sharedEvtNotes)); } catch(e) {}
+      _evtNotesLoaded = true;
+    }
+  } catch(e) {
+    // Offline — restore from localStorage cache
+    try {
+      const cached = localStorage.getItem('evtNotesCache');
+      if (cached) _sharedEvtNotes = JSON.parse(cached);
+    } catch(ex) {}
+    _evtNotesLoaded = true;
+  }
+}
+// Fetch event notes on page load (after songs)
+setTimeout(fetchSharedEventNotes, 1500);
+
+// One-time migration: move old localStorage notes (date:name keys) to server (name-only keys)
+setTimeout(async function migrateOldEvtNotes() {
+  if (localStorage.getItem('evtNotesMigrated')) return;
+  try {
+    const keysToMigrate = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('evtInfo:') && k.match(/^evtInfo:\d{4}-\d{2}-\d{2}:/)) {
+        // Old format: evtInfo:2026-02-19:Event Name → extract just "Event Name"
+        const eventName = k.replace(/^evtInfo:\d{4}-\d{2}-\d{2}:/, '');
+        const noteText = localStorage.getItem(k);
+        if (eventName && noteText && noteText.trim()) {
+          keysToMigrate.push({ eventName, noteText: noteText.trim(), oldKey: k });
+        }
+      }
+    }
+    for (const m of keysToMigrate) {
+      await _saveSharedEvtInfo(m.eventName, m.noteText);
+      localStorage.removeItem(m.oldKey);
+    }
+    if (keysToMigrate.length) console.log('[EventNotes] Migrated', keysToMigrate.length, 'notes to server');
+  } catch(e) {}
+  localStorage.setItem('evtNotesMigrated', '1');
+}, 3000);
 
 // Sign-in prompt for personal features
 function requireSignIn(featureName) {
@@ -4329,7 +4403,8 @@ function closeEvtModal(e) {
 let _currentEvtKey = '';
 
 function _evtNoteKey(dateStr, name) {
-  return dateStr + ':' + name;
+  // Use name only (no date) so notes carry forward to future years
+  return name;
 }
 
 function _showEvtNoteDisplay() {
@@ -4358,21 +4433,21 @@ function toggleEvtNoteEditor() {
   setTimeout(() => textarea.focus(), 200);
 }
 
-function saveEvtNote() {
+async function saveEvtNote() {
   if (!isAdmin()) return;
   const text = document.getElementById('evtNotesTextarea').value;
-  _saveSharedEvtInfo(_currentEvtKey, text);
+  await _saveSharedEvtInfo(_currentEvtKey, text);
   _showEvtNoteDisplay();
-  showToast('Info saved ✓');
+  showToast('Info saved & shared with all users ✓');
 }
 
 function cancelEvtNoteEdit() {
   _showEvtNoteDisplay();
 }
 
-function deleteEvtNote() {
+async function deleteEvtNote() {
   if (!isAdmin()) return;
-  _saveSharedEvtInfo(_currentEvtKey, '');
+  await _saveSharedEvtInfo(_currentEvtKey, '');
   _showEvtNoteDisplay();
   showToast('Info deleted');
 }
