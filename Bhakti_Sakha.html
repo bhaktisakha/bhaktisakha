@@ -1736,6 +1736,32 @@ body {
 .f-inp::placeholder { color:var(--text3); }
 .f-sel option { background:var(--bg2); }
 .f-area { min-height:80px; resize:vertical; }
+/* Rich text editor */
+.rte-toolbar {
+  display:flex; align-items:center; gap:4px; padding:4px 6px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-bottom:none; border-radius:10px 10px 0 0;
+}
+.rte-btn {
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:5px; padding:3px 8px; font-size:0.78rem; color:var(--text2);
+  cursor:pointer; min-width:28px; text-align:center; line-height:1.2;
+}
+.rte-btn:active { background:rgba(167,139,250,0.2); color:var(--lavender); }
+.rte-sep { width:1px; height:18px; background:var(--border); margin:0 2px; }
+.rte-color {
+  width:26px; height:26px; border:1px solid var(--border); border-radius:5px;
+  padding:1px; cursor:pointer; background:transparent;
+}
+.rte-editable {
+  border-radius:0 0 10px 10px !important; outline:none;
+  white-space:pre-wrap; word-wrap:break-word; overflow-y:auto;
+  max-height:300px; line-height:1.6;
+}
+.rte-editable:empty::before {
+  content:attr(data-placeholder); color:var(--text3); font-style:italic;
+  pointer-events:none;
+}
 .f-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .f-submit {
   width:100%; background:var(--accent-blue); border:none;
@@ -2860,11 +2886,27 @@ body {
     </div>
     <div class="f-grp">
       <label class="f-lbl">Lyrics (Original)</label>
-      <textarea class="f-area" id="aSongLyrics" style="min-height:110px" placeholder="Full lyrics in original script or transliteration..."></textarea>
+      <div class="rte-toolbar">
+        <button class="rte-btn" onclick="rteCmd('bold')" title="Bold"><b>B</b></button>
+        <button class="rte-btn" onclick="rteCmd('italic')" title="Italic"><i>I</i></button>
+        <button class="rte-btn" onclick="rteCmd('underline')" title="Underline"><u>U</u></button>
+        <span class="rte-sep"></span>
+        <input type="color" class="rte-color" id="rteLyricsColor" value="#c9a84c" onchange="rteColor(this.value)" title="Text Color">
+        <button class="rte-btn" onclick="rteRemoveFormat()" title="Clear Formatting" style="font-size:0.65rem;">✕</button>
+      </div>
+      <div class="f-area rte-editable" id="aSongLyrics" contenteditable="true" style="min-height:110px" data-placeholder="Full lyrics in original script or transliteration..."></div>
     </div>
     <div class="f-grp">
       <label class="f-lbl">Translation / Meaning</label>
-      <textarea class="f-area" id="aSongTrans" style="min-height:80px" placeholder="English meaning or word-for-word translation..."></textarea>
+      <div class="rte-toolbar">
+        <button class="rte-btn" onclick="rteCmd('bold')" title="Bold"><b>B</b></button>
+        <button class="rte-btn" onclick="rteCmd('italic')" title="Italic"><i>I</i></button>
+        <button class="rte-btn" onclick="rteCmd('underline')" title="Underline"><u>U</u></button>
+        <span class="rte-sep"></span>
+        <input type="color" class="rte-color" id="rteTransColor" value="#c9a84c" onchange="rteColor(this.value)" title="Text Color">
+        <button class="rte-btn" onclick="rteRemoveFormat()" title="Clear Formatting" style="font-size:0.65rem;">✕</button>
+      </div>
+      <div class="f-area rte-editable" id="aSongTrans" contenteditable="true" style="min-height:80px" data-placeholder="English meaning or word-for-word translation..."></div>
     </div>
     <div style="font-size:0.78rem;color:var(--text2);margin-bottom:8px;font-weight:500;">🎤 Audio Recordings (up to 5)</div>
     <datalist id="singerList">
@@ -5198,8 +5240,8 @@ function openEditSong(id) {
   document.getElementById('aSongCat').value = s.cat || 'vbhajan';
   document.getElementById('aSongBook').value = s.book || '';
   document.getElementById('aSongLang').value = s.lang || 'Sanskrit';
-  document.getElementById('aSongLyrics').value = s.lyrics || '';
-  document.getElementById('aSongTrans').value = s.trans || '';
+  _setRteHtml('aSongLyrics', s.lyrics || '');
+  _setRteHtml('aSongTrans', s.trans || '');
   // Fill audio fields
   const audios = s.audios || (s.audio ? [{url:s.audio,singer:''}] : []);
   audios.forEach((a, i) => {
@@ -6063,6 +6105,38 @@ function openAdminSong() {
   document.getElementById('adminSongModal').classList.add('open');
 }
 
+// ---- Rich Text Editor helpers ----
+function rteCmd(cmd) {
+  document.execCommand(cmd, false, null);
+}
+function rteColor(color) {
+  document.execCommand('foreColor', false, color);
+}
+function rteRemoveFormat() {
+  document.execCommand('removeFormat', false, null);
+}
+function _getRteHtml(id) {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  // Convert contenteditable HTML to storable format
+  let html = el.innerHTML || '';
+  // Convert <div> and <br> to newlines for storage
+  html = html.replace(/<div><br\s*\/?><\/div>/gi, '\n');
+  html = html.replace(/<div>/gi, '\n').replace(/<\/div>/gi, '');
+  html = html.replace(/<br\s*\/?>/gi, '\n');
+  // Clean up leading newline
+  if (html.startsWith('\n')) html = html.substring(1);
+  return html.trim();
+}
+function _setRteHtml(id, content) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!content) { el.innerHTML = ''; return; }
+  // Convert newlines to <br> for display in contenteditable
+  // But preserve existing HTML tags
+  el.innerHTML = content.replace(/\n/g, '<br>');
+}
+
 function adminAddSong() {
   const t = document.getElementById('aSongTitle').value.trim();
   if (!t) { showToast('Enter song title'); return; }
@@ -6084,8 +6158,8 @@ function adminAddSong() {
     cat: catVal, i: CAT_ICONS[catVal] || '🎵',
     book: document.getElementById('aSongBook').value.trim(),
     lang: document.getElementById('aSongLang').value,
-    lyrics: _cleanLyrics(document.getElementById('aSongLyrics').value.trim()),
-    trans: _cleanLyrics(document.getElementById('aSongTrans').value.trim()),
+    lyrics: _cleanLyrics(_getRteHtml('aSongLyrics')),
+    trans: _cleanLyrics(_getRteHtml('aSongTrans')),
     audios
   };
   const editId = document.getElementById('adminSongModal').dataset.editId;
@@ -6125,7 +6199,9 @@ function adminAddSong() {
   });
 
   // Clear all fields
-  ['aSongTitle','aSongOfficialName','aSongAuthor','aSongBook','aSongLyrics','aSongTrans'].forEach(id => document.getElementById(id).value = '');
+  ['aSongTitle','aSongOfficialName','aSongAuthor','aSongBook'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('aSongLyrics').innerHTML = '';
+  document.getElementById('aSongTrans').innerHTML = '';
   document.getElementById('aSongLang').value = 'Sanskrit';
   document.querySelectorAll('.a-singer, .a-url').forEach(el => el.value = '');
 }
