@@ -675,6 +675,27 @@ body {
 }
 .sd-lyrics { white-space:pre-line; line-height:1.6; color:var(--text); margin-bottom:20px; }
 .sd-trans { white-space:pre-line; line-height:1.5; color:var(--text2); font-style:italic; }
+.sd-trans-cards { display:flex; flex-direction:column; gap:12px; }
+.sd-trans-card {
+  background:rgba(61,127,212,0.04);
+  border:1px solid rgba(61,127,212,0.12);
+  border-radius:14px; padding:14px 16px;
+  box-shadow:0 0 12px rgba(61,127,212,0.06), 0 2px 8px rgba(0,0,0,0.15);
+  transition:box-shadow 0.3s;
+  display:flex; gap:12px; align-items:flex-start;
+}
+.sd-trans-card:hover { box-shadow:0 0 18px rgba(61,127,212,0.12), 0 4px 12px rgba(0,0,0,0.2); }
+.sd-trans-num {
+  min-width:28px; height:28px; border-radius:50%;
+  background:rgba(61,127,212,0.15); border:1px solid rgba(61,127,212,0.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.72rem; font-weight:700; color:var(--accent-blue);
+  flex-shrink:0; font-style:normal;
+}
+.sd-trans-text {
+  font-size:0.84rem; color:var(--text2); line-height:1.65;
+  font-style:italic; flex:1;
+}
 .sd-divider { height:1px; background:var(--border); margin:16px 0; }
 .lyrics-text { color:var(--text); line-height:1.6; white-space:pre-line; }
 .lyrics-trans { margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
@@ -4160,6 +4181,7 @@ function changeSongFont(delta) {
   // Update detail page lyrics (sd-lyrics / sd-trans)
   document.querySelectorAll('.sd-lyrics').forEach(el => el.style.fontSize = sz + 'rem');
   document.querySelectorAll('.sd-trans').forEach(el => el.style.fontSize = (sz * 0.92) + 'rem');
+  document.querySelectorAll('.sd-trans-text').forEach(el => el.style.fontSize = (sz * 0.92) + 'rem');
   // Also update list page lyrics if open (legacy)
   document.querySelectorAll('.lyrics-text, .lyrics-trans').forEach(el => el.style.fontSize = sz + 'rem');
 }
@@ -4413,6 +4435,31 @@ function renderSongs(filter) {
 let _currentSongId = null;
 let _songDetailPrevScreen = 'songs';
 
+function _buildTransCards(trans, sz) {
+  if (!trans) return '';
+  // Split translation by verse numbers like "1)", "2)", "10)" etc.
+  const parts = trans.split(/(?=\d+\)\s)/);
+  const cards = [];
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const m = trimmed.match(/^(\d+)\)\s*([\s\S]*)/);
+    if (m) {
+      cards.push({ num: m[1], text: m[2].trim() });
+    } else {
+      // No verse number — treat as standalone text
+      cards.push({ num: null, text: trimmed });
+    }
+  }
+  if (!cards.length) return `<div class="sd-trans" style="font-size:${sz * 0.92}rem">${trans}</div>`;
+  const fontSize = sz * 0.92;
+  return `<div class="sd-trans-cards">${cards.map(c => `
+    <div class="sd-trans-card">
+      ${c.num ? `<div class="sd-trans-num">${c.num}</div>` : ''}
+      <div class="sd-trans-text" style="font-size:${fontSize}rem">${c.text}</div>
+    </div>`).join('')}</div>`;
+}
+
 function openSongDetail(id) {
   const s = songs.find(s => s.id === id);
   if (!s) return;
@@ -4456,7 +4503,7 @@ function openSongDetail(id) {
     ${s.trans ? `
       <div class="sd-divider"></div>
       <div class="sd-section-lbl">Translation</div>
-      <div class="sd-trans" style="font-size:${sz * 0.92}rem">${s.trans}</div>
+      ${_buildTransCards(s.trans, sz)}
     ` : ''}
   `;
 
