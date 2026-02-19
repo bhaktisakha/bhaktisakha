@@ -4612,7 +4612,11 @@ function openSongDetail(id) {
   const s = songs.find(s => s.id === id);
   if (!s) return;
   _currentSongId = id;
-  _songDetailPrevScreen = document.querySelector('.screen.active')?.id?.replace('screen-','') || 'songs';
+  // Only update prev screen if we're NOT already on song-detail (i.e. not a refresh)
+  const activeScreen = document.querySelector('.screen.active')?.id?.replace('screen-','') || 'songs';
+  if (activeScreen !== 'song-detail') {
+    _songDetailPrevScreen = activeScreen;
+  }
 
   const sz = SONG_FONT_SIZES[songFontIdx];
   const audioHtml = _buildAudioHtml(s);
