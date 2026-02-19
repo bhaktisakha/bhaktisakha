@@ -694,7 +694,7 @@ body {
 }
 .sd-trans-text {
   font-size:0.84rem; color:var(--text2); line-height:1.65;
-  font-style:italic; width:100%;
+  font-style:italic; width:100%; text-align:center;
 }
 /* Lyrics verse cards */
 .sd-verse-cards { display:flex; flex-direction:column; gap:12px; }
@@ -715,7 +715,7 @@ body {
 }
 .sd-verse-text {
   font-size:0.88rem; color:var(--text); line-height:1.6;
-  white-space:pre-line; width:100%;
+  white-space:pre-line; width:100%; text-align:center;
 }
 .sd-divider { height:1px; background:var(--border); margin:16px 0; }
 .lyrics-text { color:var(--text); line-height:1.6; white-space:pre-line; }
@@ -4186,7 +4186,7 @@ function defaultSongs() {
 let songSortMode = 'cat';  // 'cat' | 'author'
 const SONG_FONT_SIZES = [0.76, 0.82, 0.88, 0.96, 1.05, 1.16];
 const SONG_FONT_LABELS = ['XS','S','M','L','XL','XXL'];
-let songFontIdx = 2; // default M
+let songFontIdx = 4; // default XL
 
 function setSongSort(mode, btn) {
   songSortMode = mode;
