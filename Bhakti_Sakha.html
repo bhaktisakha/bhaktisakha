@@ -683,21 +683,22 @@ body {
 }
 .sd-lyrics { white-space:pre-line; line-height:1.6; color:var(--text); margin-bottom:20px; }
 .sd-trans { white-space:pre-line; line-height:1.5; color:var(--text2); font-style:italic; }
-.sd-trans-cards { display:flex; flex-direction:column; gap:12px; }
+.sd-trans-cards { display:flex; flex-direction:column; gap:16px; }
 .sd-trans-card {
   background:rgba(61,127,212,0.04);
   border:1px solid rgba(61,127,212,0.12);
   border-radius:14px; padding:14px 16px;
   box-shadow:0 0 12px rgba(61,127,212,0.06), 0 2px 8px rgba(0,0,0,0.15);
   transition:box-shadow 0.3s;
-  display:flex; flex-direction:column; align-items:center; gap:8px;
+  position:relative;
 }
 .sd-trans-card:hover { box-shadow:0 0 18px rgba(61,127,212,0.12), 0 4px 12px rgba(0,0,0,0.2); }
 .sd-trans-num {
-  min-width:24px; height:24px; border-radius:12px; padding:0 6px;
-  background:rgba(61,127,212,0.15); border:1px solid rgba(61,127,212,0.25);
+  position:absolute; top:-8px; left:10px;
+  min-width:20px; height:20px; border-radius:10px; padding:0 5px;
+  background:rgba(61,127,212,0.2); border:1px solid rgba(61,127,212,0.35);
   display:flex; align-items:center; justify-content:center;
-  font-size:0.62rem; font-weight:700; color:var(--accent-blue);
+  font-size:0.52rem; font-weight:700; color:var(--accent-blue);
   font-style:normal;
 }
 .sd-trans-text {
@@ -705,21 +706,22 @@ body {
   font-style:italic; width:100%; text-align:center;
 }
 /* Lyrics verse cards */
-.sd-verse-cards { display:flex; flex-direction:column; gap:12px; }
+.sd-verse-cards { display:flex; flex-direction:column; gap:16px; }
 .sd-verse-card {
   background:rgba(201,168,76,0.04);
   border:1px solid rgba(201,168,76,0.12);
   border-radius:14px; padding:14px 16px;
   box-shadow:0 0 12px rgba(201,168,76,0.06), 0 2px 8px rgba(0,0,0,0.15);
   transition:box-shadow 0.3s;
-  display:flex; flex-direction:column; align-items:center; gap:8px;
+  position:relative;
 }
 .sd-verse-card:hover { box-shadow:0 0 18px rgba(201,168,76,0.12), 0 4px 12px rgba(0,0,0,0.2); }
 .sd-verse-num {
-  min-width:24px; height:24px; border-radius:12px; padding:0 6px;
-  background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.25);
+  position:absolute; top:-8px; left:10px;
+  min-width:20px; height:20px; border-radius:10px; padding:0 5px;
+  background:rgba(201,168,76,0.2); border:1px solid rgba(201,168,76,0.35);
   display:flex; align-items:center; justify-content:center;
-  font-size:0.62rem; font-weight:700; color:var(--accent-gold);
+  font-size:0.52rem; font-weight:700; color:var(--accent-gold);
 }
 .sd-verse-text {
   font-size:0.88rem; color:var(--text); line-height:1.6;
