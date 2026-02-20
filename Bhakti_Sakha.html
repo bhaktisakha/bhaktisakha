@@ -4890,7 +4890,13 @@ const D2R = Math.PI / 180;
 // ADMIN & ROLE SYSTEM
 // ===================================================================
 const SUPER_ADMIN_EMAIL = 'sajeev1478@gmail.com';
-const ADMIN_EMAILS = ['sajeev1478@gmail.com', 'bhaktisakhaapp@gmail.com'];
+const ADMIN_EMAILS = ['sajeev1478@gmail.com', 'bhaktisakhaapp@gmail.com', 'madan.murari.rns@iskcon.net'];
+
+// Hardcoded permissions for specific admins (overrides server/localStorage)
+const HARDCODED_PERMISSIONS = {
+  'madan.murari.rns@iskcon.net': ['dhamas', 'sevakart', 'prayer', 'users']
+  // Note: 'songs' intentionally excluded
+};
 
 function _getAdminList() {
   try {
@@ -4977,6 +4983,8 @@ function hasPermission(perm) {
   if (email === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
   // Must be in admin list
   if (!_getAdminList().includes(email)) return false;
+  // Check hardcoded permissions first (takes priority)
+  if (HARDCODED_PERMISSIONS[email]) return HARDCODED_PERMISSIONS[email].includes(perm);
   // Check specific permission
   const perms = _getAdminPermissions();
   const userPerms = perms[email];
