@@ -4775,7 +4775,7 @@ body {
 <div class="modal-overlay" id="addEvtModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">✨ Add Custom Event</div>
+    <div class="modal-title" id="addEvtModalTitle">✨ Add Custom Event</div>
     <div class="f-grp">
       <label class="f-lbl">Event Name *</label>
       <input class="f-inp" id="evtName" placeholder="e.g. Radha's Birthday Puja">
@@ -4819,7 +4819,7 @@ body {
       <div class="sett-info"><div class="sett-name">Enable Reminder</div></div>
       <label class="toggle"><input type="checkbox" id="evtReminder" checked></label>
     </div>
-    <button class="f-submit" onclick="saveEvt()">Save Event</button>
+    <button class="f-submit" id="evtSaveBtn" onclick="saveEvt()">Save Event</button>
     <button class="f-cancel" onclick="closeModal('addEvtModal')">Cancel</button>
   </div>
 </div>
@@ -7749,10 +7749,44 @@ function toggleEvtMore(uid) {
 // ===================================================================
 // EVENTS
 // ===================================================================
+let editingEvtId = null; // Track if we're editing an event
+
 function openAddEvt() {
   if (!isSignedIn()) { requireSignIn('My Events'); return; }
+  editingEvtId = null; // Reset edit mode
   const el = document.getElementById('evtDay');
   if (el.options.length<=1) for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`;
+  // Reset form fields
+  ['evtName','evtYear','evtNotes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('evtDay').selectedIndex = 0;
+  document.getElementById('evtMonth').selectedIndex = 0;
+  document.getElementById('evtType').value = 'birthday';
+  document.getElementById('evtReminder').checked = true;
+  // Set modal title & button for Add mode
+  document.getElementById('addEvtModalTitle').textContent = '✨ Add Custom Event';
+  document.getElementById('evtSaveBtn').textContent = 'Save Event';
+  document.getElementById('addEvtModal').classList.add('open');
+}
+
+function editEvt(id) {
+  if (!isSignedIn()) { requireSignIn('My Events'); return; }
+  const evt = customEvts.find(e => e.id === id);
+  if (!evt) { showToast('Event not found'); return; }
+  editingEvtId = id;
+  // Ensure day dropdown is populated
+  const el = document.getElementById('evtDay');
+  if (el.options.length<=1) for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`;
+  // Pre-fill form with event data
+  document.getElementById('evtName').value = evt.name || '';
+  document.getElementById('evtDay').value = evt.day;
+  document.getElementById('evtMonth').value = evt.month;
+  document.getElementById('evtYear').value = evt.year || '';
+  document.getElementById('evtType').value = evt.type || 'birthday';
+  document.getElementById('evtNotes').value = evt.notes || '';
+  document.getElementById('evtReminder').checked = evt.reminder !== false;
+  // Set modal title & button for Edit mode
+  document.getElementById('addEvtModalTitle').textContent = '✏️ Edit Event';
+  document.getElementById('evtSaveBtn').textContent = 'Update Event';
   document.getElementById('addEvtModal').classList.add('open');
 }
 
@@ -7761,20 +7795,37 @@ function saveEvt() {
   const day = document.getElementById('evtDay').value;
   const month = document.getElementById('evtMonth').value;
   if (!name||!day||month==='') { showToast('Fill required fields'); return; }
-  const evt = {
-    id: Date.now(), name, day:parseInt(day), month:parseInt(month),
-    year: document.getElementById('evtYear').value||null,
-    type: document.getElementById('evtType').value,
-    notes: document.getElementById('evtNotes').value.trim(),
-    reminder: document.getElementById('evtReminder').checked
-  };
-  customEvts.push(evt);
+  if (editingEvtId !== null) {
+    // Edit mode — update existing event
+    const idx = customEvts.findIndex(e => e.id === editingEvtId);
+    if (idx === -1) { showToast('Event not found'); return; }
+    customEvts[idx] = {
+      ...customEvts[idx],
+      name, day:parseInt(day), month:parseInt(month),
+      year: document.getElementById('evtYear').value||null,
+      type: document.getElementById('evtType').value,
+      notes: document.getElementById('evtNotes').value.trim(),
+      reminder: document.getElementById('evtReminder').checked
+    };
+    showToast('Event updated! ✏️');
+    editingEvtId = null;
+  } else {
+    // Add mode — create new event
+    const evt = {
+      id: Date.now(), name, day:parseInt(day), month:parseInt(month),
+      year: document.getElementById('evtYear').value||null,
+      type: document.getElementById('evtType').value,
+      notes: document.getElementById('evtNotes').value.trim(),
+      reminder: document.getElementById('evtReminder').checked
+    };
+    customEvts.push(evt);
+    showToast('Event saved! ✨');
+  }
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
   closeModal('addEvtModal');
   renderEvts();
   renderCalendar();
   if (selDate) renderDayDetail(selDate);
-  showToast('Event saved! ✨');
   ['evtName','evtYear','evtNotes'].forEach(id => document.getElementById(id).value='');
 }
 
@@ -7793,7 +7844,10 @@ function renderEvts() {
         <div class="evt-date">${MONTHS_SHORT[e.month]} ${e.day}${e.year?', '+e.year:''}</div>
         ${e.reminder?'<span style="font-size:0.65rem;color:#27ae60;">🔔 Reminder</span>':''}
       </div>
-      <button class="evt-del" onclick="delEvt(${e.id})">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="evt-del" onclick="editEvt(${e.id})" title="Edit" style="font-size:0.85rem;">✏️</button>
+        <button class="evt-del" onclick="delEvt(${e.id})" title="Delete">🗑</button>
+      </div>
     </div>`).join('');
 }
 
