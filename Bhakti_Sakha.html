@@ -1751,13 +1751,13 @@ body {
 }
 /* Formatting Toolbar */
 .ne-toolbar {
-  display:flex; align-items:center; gap:2px; padding:6px 12px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:2px; padding:6px 12px;
   border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0;
-  overflow-x:auto;
   background:rgba(17,32,53,0.85);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.ne-toolbar::-webkit-scrollbar { display:none; }
+.ne-toolbar .ne-row { display:flex; align-items:center; gap:2px; width:100%; }
+.ne-toolbar .ne-row + .ne-row { margin-top:2px; padding-top:4px; border-top:1px solid rgba(255,255,255,0.04); }
 .ne-fmt-btn {
   background:none; border:1px solid transparent; border-radius:6px;
   color:var(--text2); font-size:0.82rem; cursor:pointer; padding:5px 8px;
@@ -1785,7 +1785,7 @@ body {
 /* Background color picker */
 .ne-bg-picker-wrap { position:relative; display:inline-flex; }
 .ne-bg-palette {
-  display:none; position:absolute; top:38px; left:50%; transform:translateX(-50%);
+  display:none; position:absolute; bottom:38px; right:0;
   background:var(--card); border:1px solid rgba(255,255,255,0.12);
   border-radius:12px; padding:8px; z-index:10;
   box-shadow:0 8px 28px rgba(0,0,0,0.4);
@@ -5680,38 +5680,41 @@ body {
     <input class="ne-meta-date" id="neGratitudeDate" type="date" title="Entry date" style="display:none;">
   </div>
   <div class="ne-toolbar">
-    <button class="ne-fmt-btn" onclick="neExec('bold')" title="Bold"><b>B</b></button>
-    <button class="ne-fmt-btn" onclick="neExec('italic')" title="Italic"><i>I</i></button>
-    <button class="ne-fmt-btn" onclick="neExec('underline')" title="Underline"><u>U</u></button>
-    <div class="ne-fmt-sep"></div>
-    <button class="ne-fmt-btn" onclick="neExecAlign('left')" title="Align Left"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="10" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="10" y2="13"/></svg></button>
-    <button class="ne-fmt-btn" onclick="neExecAlign('center')" title="Align Center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="3.5" y1="6.3" x2="12.5" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="3.5" y1="13" x2="12.5" y2="13"/></svg></button>
-    <button class="ne-fmt-btn" onclick="neExecAlign('right')" title="Align Right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="6" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="6" y1="13" x2="15" y2="13"/></svg></button>
-    <button class="ne-fmt-btn" onclick="neExecAlign('justify')" title="Justify"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="15" y2="13"/></svg></button>
-    <div class="ne-fmt-sep"></div>
-    <button class="ne-fmt-btn" onclick="neExec('insertUnorderedList')" title="Bullet list">•≡</button>
-    <button class="ne-fmt-btn" onclick="neExec('insertOrderedList')" title="Numbered list">1.</button>
-    <div class="ne-fmt-sep"></div>
-    <button class="ne-fmt-btn" onclick="neExecHeading('h1')" title="Heading 1" style="font-weight:800;font-size:0.9rem;">H1</button>
-    <button class="ne-fmt-btn" onclick="neExecHeading('h2')" title="Heading 2" style="font-weight:700;font-size:0.82rem;">H2</button>
-    <div class="ne-fmt-sep"></div>
-    <button class="ne-fmt-btn" onclick="neExecHighlight()" title="Highlight" style="background:rgba(241,196,15,0.2);">🖍</button>
-    <button class="ne-fmt-btn" onclick="neOpenLinkModal()" title="Insert Link">🔗</button>
-    <button class="ne-fmt-btn" onclick="neAttachImage()" title="Attach Image">🖼️</button>
-    <div class="ne-fmt-sep"></div>
-    <div class="ne-bg-picker-wrap">
-      <button class="ne-fmt-btn" onclick="neToggleBgPicker()" title="Background Color" id="neBgBtn">🎨</button>
-      <div class="ne-bg-palette" id="neBgPalette">
-        <div class="ne-bg-swatch active" data-color="none" onclick="neSetBgColor('none',this)" title="No color">✕</div>
-        <div class="ne-bg-swatch" data-color="#1a1a2e" style="background:#1a1a2e;" onclick="neSetBgColor('#1a1a2e',this)" title="Night"></div>
-        <div class="ne-bg-swatch" data-color="#1b2a1b" style="background:#1b2a1b;" onclick="neSetBgColor('#1b2a1b',this)" title="Forest"></div>
-        <div class="ne-bg-swatch" data-color="#2a1b1b" style="background:#2a1b1b;" onclick="neSetBgColor('#2a1b1b',this)" title="Rose"></div>
-        <div class="ne-bg-swatch" data-color="#2a2518" style="background:#2a2518;" onclick="neSetBgColor('#2a2518',this)" title="Warm"></div>
-        <div class="ne-bg-swatch" data-color="#1b2230" style="background:#1b2230;" onclick="neSetBgColor('#1b2230',this)" title="Ocean"></div>
-        <div class="ne-bg-swatch" data-color="#261b2a" style="background:#261b2a;" onclick="neSetBgColor('#261b2a',this)" title="Lavender"></div>
-        <div class="ne-bg-swatch" data-color="#1e2a2a" style="background:#1e2a2a;" onclick="neSetBgColor('#1e2a2a',this)" title="Teal"></div>
-        <div class="ne-bg-swatch" data-color="#2d2010" style="background:#2d2010;" onclick="neSetBgColor('#2d2010',this)" title="Saffron"></div>
-        <div class="ne-bg-swatch" data-color="#232323" style="background:#232323;" onclick="neSetBgColor('#232323',this)" title="Charcoal"></div>
+    <div class="ne-row">
+      <button class="ne-fmt-btn" onclick="neExec('bold')" title="Bold"><b>B</b></button>
+      <button class="ne-fmt-btn" onclick="neExec('italic')" title="Italic"><i>I</i></button>
+      <button class="ne-fmt-btn" onclick="neExec('underline')" title="Underline"><u>U</u></button>
+      <div class="ne-fmt-sep"></div>
+      <button class="ne-fmt-btn" onclick="neExecAlign('left')" title="Align Left"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="10" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="10" y2="13"/></svg></button>
+      <button class="ne-fmt-btn" onclick="neExecAlign('center')" title="Align Center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="3.5" y1="6.3" x2="12.5" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="3.5" y1="13" x2="12.5" y2="13"/></svg></button>
+      <button class="ne-fmt-btn" onclick="neExecAlign('right')" title="Align Right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="6" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="6" y1="13" x2="15" y2="13"/></svg></button>
+      <button class="ne-fmt-btn" onclick="neExecAlign('justify')" title="Justify"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="15" y2="13"/></svg></button>
+      <div class="ne-fmt-sep"></div>
+      <button class="ne-fmt-btn" onclick="neExec('insertUnorderedList')" title="Bullet list">•≡</button>
+      <button class="ne-fmt-btn" onclick="neExec('insertOrderedList')" title="Numbered list">1.</button>
+    </div>
+    <div class="ne-row">
+      <button class="ne-fmt-btn" onclick="neExecHeading('h1')" title="Heading 1" style="font-weight:800;font-size:0.9rem;">H1</button>
+      <button class="ne-fmt-btn" onclick="neExecHeading('h2')" title="Heading 2" style="font-weight:700;font-size:0.82rem;">H2</button>
+      <div class="ne-fmt-sep"></div>
+      <button class="ne-fmt-btn" onclick="neExecHighlight()" title="Highlight" style="background:rgba(241,196,15,0.2);">🖍</button>
+      <button class="ne-fmt-btn" onclick="neOpenLinkModal()" title="Insert Link">🔗</button>
+      <button class="ne-fmt-btn" onclick="neAttachImage()" title="Attach Image">🖼️</button>
+      <div class="ne-fmt-sep"></div>
+      <div class="ne-bg-picker-wrap">
+        <button class="ne-fmt-btn" onclick="neToggleBgPicker()" title="Background Color" id="neBgBtn">🎨</button>
+        <div class="ne-bg-palette" id="neBgPalette">
+          <div class="ne-bg-swatch active" data-color="none" onclick="neSetBgColor('none',this)" title="No color">✕</div>
+          <div class="ne-bg-swatch" data-color="#1a1a2e" style="background:#1a1a2e;" onclick="neSetBgColor('#1a1a2e',this)" title="Night"></div>
+          <div class="ne-bg-swatch" data-color="#1b2a1b" style="background:#1b2a1b;" onclick="neSetBgColor('#1b2a1b',this)" title="Forest"></div>
+          <div class="ne-bg-swatch" data-color="#2a1b1b" style="background:#2a1b1b;" onclick="neSetBgColor('#2a1b1b',this)" title="Rose"></div>
+          <div class="ne-bg-swatch" data-color="#2a2518" style="background:#2a2518;" onclick="neSetBgColor('#2a2518',this)" title="Warm"></div>
+          <div class="ne-bg-swatch" data-color="#1b2230" style="background:#1b2230;" onclick="neSetBgColor('#1b2230',this)" title="Ocean"></div>
+          <div class="ne-bg-swatch" data-color="#261b2a" style="background:#261b2a;" onclick="neSetBgColor('#261b2a',this)" title="Lavender"></div>
+          <div class="ne-bg-swatch" data-color="#1e2a2a" style="background:#1e2a2a;" onclick="neSetBgColor('#1e2a2a',this)" title="Teal"></div>
+          <div class="ne-bg-swatch" data-color="#2d2010" style="background:#2d2010;" onclick="neSetBgColor('#2d2010',this)" title="Saffron"></div>
+          <div class="ne-bg-swatch" data-color="#232323" style="background:#232323;" onclick="neSetBgColor('#232323',this)" title="Charcoal"></div>
+        </div>
       </div>
     </div>
   </div>
