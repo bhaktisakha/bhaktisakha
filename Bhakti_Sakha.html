@@ -1578,6 +1578,121 @@ body {
 .note-editor-body { display:flex; flex-direction:column; gap:12px; }
 .note-char-count { font-size:0.65rem; color:var(--text3); text-align:right; margin-top:-8px; }
 
+/* ═══ Share Note Modal ═══ */
+.nf-share-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:270;
+  display:none; align-items:flex-end; justify-content:center;
+  max-width:430px; margin:0 auto;
+  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+}
+.nf-share-overlay.open { display:flex; }
+.nf-share-sheet {
+  background:rgba(17,32,53,0.97); border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px 20px 0 0; width:100%; padding:12px 20px 28px;
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: nfSheetUp 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes nfSheetUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.nf-share-handle {
+  width:36px; height:4px; background:rgba(255,255,255,0.15); border-radius:2px;
+  margin:0 auto 14px;
+}
+.nf-share-title {
+  font-size:1rem; font-weight:600; color:var(--text); margin-bottom:16px; text-align:center;
+}
+.nf-share-options { display:flex; flex-direction:column; gap:10px; }
+.nf-share-option {
+  display:flex; align-items:center; gap:14px; padding:14px 16px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px; cursor:pointer; transition:all 0.2s; text-align:left;
+  font-family:inherit; color:inherit;
+}
+.nf-share-option:active { transform:scale(0.98); background:rgba(255,255,255,0.08); }
+.nf-share-opt-icon {
+  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; flex-shrink:0;
+}
+.nf-share-opt-text { background:rgba(61,127,212,0.12); box-shadow:0 0 12px rgba(61,127,212,0.1); }
+.nf-share-opt-img { background:rgba(155,89,182,0.12); box-shadow:0 0 12px rgba(155,89,182,0.1); }
+.nf-share-opt-name { font-size:0.88rem; font-weight:600; color:var(--text); }
+.nf-share-opt-desc { font-size:0.72rem; color:var(--text3); margin-top:2px; }
+.nf-share-cancel {
+  display:block; width:100%; margin-top:14px; padding:12px;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; color:var(--text2); font-size:0.85rem; font-weight:500;
+  cursor:pointer; font-family:inherit; transition:all 0.15s;
+}
+.nf-share-cancel:active { background:rgba(255,255,255,0.1); }
+
+/* ═══ Share Image Card (rendered by html2canvas) ═══ */
+.nf-share-card {
+  width:400px; min-height:280px; position:relative;
+  background:#0d1b2a; border-radius:0; overflow:hidden;
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display:flex; flex-direction:column;
+}
+.nf-share-card-accent {
+  height:6px; width:100%;
+}
+.nf-share-card-accent.acc-gratitude { background:linear-gradient(90deg, #f39c12, #e67e22, #f1c40f); }
+.nf-share-card-accent.acc-spiritual { background:linear-gradient(90deg, #3d7fd4, #5b9bd5, #7ec8e3); }
+.nf-share-card-accent.acc-personal { background:linear-gradient(90deg, #9b59b6, #8e44ad, #c39bd3); }
+.nf-share-card-accent.acc-custom { background:linear-gradient(90deg, #27ae60, #2ecc71, #58d68d); }
+.nf-share-card-body {
+  flex:1; padding:24px 28px 18px;
+}
+.nf-share-card-folder {
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  margin-bottom:10px; opacity:0.6; color:#8fa8c0;
+}
+.nf-share-card-title {
+  font-size:22px; font-weight:700; color:#e8edf2; line-height:1.35;
+  margin-bottom:6px;
+}
+.nf-share-card-date {
+  font-size:11px; color:#5a7a99; margin-bottom:14px;
+}
+.nf-share-card-divider {
+  width:40px; height:2px; border-radius:1px; margin-bottom:16px; opacity:0.5;
+}
+.nf-share-card-divider.div-gratitude { background:#f39c12; }
+.nf-share-card-divider.div-spiritual { background:#3d7fd4; }
+.nf-share-card-divider.div-personal { background:#9b59b6; }
+.nf-share-card-divider.div-custom { background:#27ae60; }
+.nf-share-card-content {
+  font-size:14px; color:#a8bfd0; line-height:1.65;
+  overflow:hidden; max-height:260px;
+  word-break:break-word;
+}
+.nf-share-card-content h1 { font-size:18px; color:#e8edf2; margin:6px 0; }
+.nf-share-card-content h2 { font-size:16px; color:#e8edf2; margin:4px 0; }
+.nf-share-card-content ul, .nf-share-card-content ol { padding-left:18px; margin:4px 0; }
+.nf-share-card-content mark { background:rgba(241,196,15,0.3); color:inherit; border-radius:2px; padding:0 2px; }
+.nf-share-card-footer {
+  padding:12px 28px 16px; display:flex; align-items:center; justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.nf-share-card-brand {
+  font-size:11px; color:#5a7a99; letter-spacing:0.5px;
+}
+
+/* Share generating spinner */
+.nf-share-generating {
+  position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:280;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+  max-width:430px; margin:0 auto; color:var(--text);
+  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+}
+.nf-share-spinner {
+  width:32px; height:32px; border:3px solid rgba(255,255,255,0.15);
+  border-top-color:var(--accent-blue); border-radius:50%;
+  animation:nfSpin 0.7s linear infinite;
+}
+@keyframes nfSpin { to { transform:rotate(360deg); } }
+.nf-share-gen-text { font-size:0.82rem; color:var(--text2); }
+
 
 
 /* ===== DATE PICKER MODAL ===== */
@@ -3310,6 +3425,7 @@ body {
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <!-- Google API client -->
   <script src="https://apis.google.com/js/api.js" async defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async defer></script>
 </head>
 <body>
 <!-- Gayatri / Rahu in-app alert banner -->
@@ -4862,6 +4978,7 @@ body {
       <button class="songs-font-btn" onclick="changeNoteFont(1)" style="width:28px;height:28px;">A+</button>
       <button class="ne-action-btn" onclick="nfToggleNotePin()" id="nePinBtn" title="Pin note">📌</button>
       <button class="ne-action-btn" onclick="nfToggleNoteLock()" id="neLockBtn" title="Lock note" style="display:none;">🔒</button>
+      <button class="ne-action-btn" onclick="nfOpenShareMenu()" id="neShareBtn" title="Share note">📤</button>
       <button class="ne-action-btn" onclick="nfDeleteCurrentNote()" title="Delete note">🗑️</button>
       <button class="ne-save-btn" onclick="nfSaveNote()" title="Save">💾</button>
     </div>
@@ -4929,6 +5046,48 @@ body {
     <div class="nf-create-btns">
       <button class="nf-create-cancel" onclick="nfCloseCreateFolder()">Cancel</button>
       <button class="nf-create-confirm" onclick="nfConfirmCreateFolder()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Note Modal -->
+<div class="nf-share-overlay" id="nfShareOverlay" onclick="if(event.target===this)nfCloseShareMenu()">
+  <div class="nf-share-sheet">
+    <div class="nf-share-handle"></div>
+    <div class="nf-share-title">Share Note</div>
+    <div class="nf-share-options">
+      <button class="nf-share-option" onclick="nfShareAsText()">
+        <div class="nf-share-opt-icon nf-share-opt-text">💬</div>
+        <div class="nf-share-opt-info">
+          <div class="nf-share-opt-name">Share as Text</div>
+          <div class="nf-share-opt-desc">Send via WhatsApp, Telegram, email…</div>
+        </div>
+      </button>
+      <button class="nf-share-option" onclick="nfShareAsImage()">
+        <div class="nf-share-opt-icon nf-share-opt-img">🖼️</div>
+        <div class="nf-share-opt-info">
+          <div class="nf-share-opt-name">Share as Image</div>
+          <div class="nf-share-opt-desc">Beautiful card for social media & status</div>
+        </div>
+      </button>
+    </div>
+    <button class="nf-share-cancel" onclick="nfCloseShareMenu()">Cancel</button>
+  </div>
+</div>
+
+<!-- Hidden: Note Image Card (for html2canvas capture) -->
+<div id="nfShareCard" style="position:fixed;left:-9999px;top:0;z-index:-1;">
+  <div id="nfShareCardInner" class="nf-share-card">
+    <div class="nf-share-card-accent" id="nfShareCardAccent"></div>
+    <div class="nf-share-card-body">
+      <div class="nf-share-card-folder" id="nfShareCardFolder"></div>
+      <div class="nf-share-card-title" id="nfShareCardTitle"></div>
+      <div class="nf-share-card-date" id="nfShareCardDate"></div>
+      <div class="nf-share-card-divider"></div>
+      <div class="nf-share-card-content" id="nfShareCardContent"></div>
+    </div>
+    <div class="nf-share-card-footer">
+      <span class="nf-share-card-brand">🙏 Bhakti Sakha</span>
     </div>
   </div>
 </div>
@@ -9519,6 +9678,181 @@ function nfToggleNotePinList(id) {
   localStorage.setItem('notes', JSON.stringify(notes));
   nfRenderFolderNotes();
   showToast(notes[idx].pinned ? 'Pinned 📌' : 'Unpinned');
+}
+
+// ═══════════════════════════════
+// SHARE NOTE
+// ═══════════════════════════════
+function nfOpenShareMenu() {
+  if (!_nfCurrentEditNoteId) return;
+  // Save current state before sharing
+  nfSaveNote(true);
+  document.getElementById('nfShareOverlay').classList.add('open');
+}
+
+function nfCloseShareMenu() {
+  document.getElementById('nfShareOverlay').classList.remove('open');
+}
+
+function _nfGetCurrentNoteForShare() {
+  if (!_nfCurrentEditNoteId) return null;
+  const n = notes.find(x => x.id === _nfCurrentEditNoteId);
+  if (!n) return null;
+  const folderInfo = nfGetFolderInfo(n.folder);
+  const title = n.title || 'Untitled';
+  const bodyText = n.body ? stripHtml(n.body) : '';
+  const d = new Date(n.updatedAt || n.createdAt);
+  const dateStr = d.toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+  return { note: n, folderInfo, title, bodyText, dateStr };
+}
+
+// --- Share as Text ---
+async function nfShareAsText() {
+  nfCloseShareMenu();
+  const data = _nfGetCurrentNoteForShare();
+  if (!data) return;
+
+  const shareText = `${data.title}\n\n${data.bodyText}\n\n— ${data.folderInfo.name} • Bhakti Sakha 🙏`;
+
+  // Use Web Share API if available (mobile)
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: data.title, text: shareText });
+      showToast('Shared successfully');
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        _nfCopyToClipboard(shareText);
+      }
+    }
+  } else {
+    _nfCopyToClipboard(shareText);
+  }
+}
+
+function _nfCopyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => showToast('Copied to clipboard ✓'),
+      () => _nfFallbackCopy(text)
+    );
+  } else {
+    _nfFallbackCopy(text);
+  }
+}
+
+function _nfFallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;left:-999px;top:-999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('Copied to clipboard ✓'); }
+  catch(e) { showToast('Could not copy. Try manually.'); }
+  document.body.removeChild(ta);
+}
+
+// --- Share as Image ---
+async function nfShareAsImage() {
+  nfCloseShareMenu();
+  const data = _nfGetCurrentNoteForShare();
+  if (!data) return;
+
+  // Show generating spinner
+  const spinner = document.createElement('div');
+  spinner.className = 'nf-share-generating';
+  spinner.id = 'nfShareSpinner';
+  spinner.innerHTML = '<div class="nf-share-spinner"></div><div class="nf-share-gen-text">Creating image…</div>';
+  document.body.appendChild(spinner);
+
+  try {
+    // Determine folder type for theming
+    const def = DEFAULT_FOLDERS.find(f => f.id === data.note.folder);
+    const folderType = def ? def.type : 'custom';
+
+    // Populate the hidden card
+    const accent = document.getElementById('nfShareCardAccent');
+    accent.className = 'nf-share-card-accent acc-' + folderType;
+
+    const divider = document.querySelector('.nf-share-card-divider');
+    divider.className = 'nf-share-card-divider div-' + folderType;
+
+    document.getElementById('nfShareCardFolder').textContent = data.folderInfo.icon + ' ' + data.folderInfo.name;
+    document.getElementById('nfShareCardTitle').textContent = data.title;
+    document.getElementById('nfShareCardDate').textContent = data.dateStr;
+
+    // Render rich body (but sanitized)
+    const bodyHtml = data.note.body || '';
+    document.getElementById('nfShareCardContent').innerHTML = bodyHtml;
+
+    // Temporarily make the card visible for capture
+    const cardWrap = document.getElementById('nfShareCard');
+    cardWrap.style.left = '0';
+    cardWrap.style.top = '0';
+    cardWrap.style.position = 'fixed';
+    cardWrap.style.zIndex = '-1';
+    cardWrap.style.opacity = '0.01'; // nearly invisible but renderable
+
+    // Wait a frame for layout
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    if (typeof html2canvas === 'undefined') {
+      showToast('Image library loading… try again in a moment');
+      _nfRemoveSpinner();
+      cardWrap.style.left = '-9999px';
+      return;
+    }
+
+    const canvas = await html2canvas(document.getElementById('nfShareCardInner'), {
+      backgroundColor: '#0d1b2a',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: 400,
+      windowWidth: 400
+    });
+
+    // Hide card again
+    cardWrap.style.left = '-9999px';
+
+    // Convert canvas to blob
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+
+    if (!blob) { showToast('Failed to create image'); _nfRemoveSpinner(); return; }
+
+    // Try native share with file (mobile)
+    if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'note.png', { type: 'image/png' })] })) {
+      const file = new File([blob], data.title.replace(/[^a-zA-Z0-9]/g, '_') + '.png', { type: 'image/png' });
+      try {
+        await navigator.share({ title: data.title, files: [file] });
+        showToast('Shared successfully');
+      } catch(e) {
+        if (e.name !== 'AbortError') _nfDownloadBlob(blob, data.title);
+      }
+    } else {
+      // Desktop fallback — download the image
+      _nfDownloadBlob(blob, data.title);
+    }
+  } catch(e) {
+    console.error('Share as image error:', e);
+    showToast('Could not create image');
+  }
+  _nfRemoveSpinner();
+}
+
+function _nfDownloadBlob(blob, title) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (title || 'note').replace(/[^a-zA-Z0-9]/g, '_') + '.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  showToast('Image downloaded ✓');
+}
+
+function _nfRemoveSpinner() {
+  const s = document.getElementById('nfShareSpinner');
+  if (s) s.remove();
 }
 
 // --- Auto-save on typing ---
