@@ -1110,6 +1110,46 @@ body {
 .evt-cal-day .cal-dot.dot-appt { background:#3d7fd4; }
 .evt-cal-day .cal-dot.dot-spiritual { background:#e8a020; }
 .evt-cal-day .cal-dot.dot-reminder { background:#5ee8a0; }
+/* Multi-day span bars */
+.evt-multi-bar {
+  position:absolute; bottom:1px; left:0; right:0; height:5px;
+  pointer-events:none; opacity:0.75;
+}
+.evt-multi-bar.bar-start { left:30%; border-radius:3px 0 0 3px; }
+.evt-multi-bar.bar-end { right:30%; border-radius:0 3px 3px 0; }
+.evt-multi-bar.bar-start.bar-end { left:30%; right:30%; border-radius:3px; }
+.evt-multi-bar.bar-mid { border-radius:0; }
+.evt-multi-bar.bar-single { left:20%; right:20%; border-radius:3px; }
+.evt-multi-bar.bar-color-spiritual { background:#e8a020; }
+.evt-multi-bar.bar-color-health { background:#27ae60; }
+.evt-multi-bar.bar-color-work { background:#3d7fd4; }
+.evt-multi-bar.bar-color-personal { background:#f0c040; }
+.evt-multi-bar.bar-color-travel { background:#9b59b6; }
+.evt-multi-bar.bar-color-default { background:#3d7fd4; }
+/* Multi-day label in card */
+.evt-multiday-badge {
+  display:inline-block; font-size:0.58rem; font-weight:600;
+  color:#5ee8a0; background:rgba(94,232,160,0.1);
+  border:1px solid rgba(94,232,160,0.25); border-radius:6px;
+  padding:1px 6px; margin-left:4px; vertical-align:middle;
+}
+/* All Day toggle */
+.evt-allday-row {
+  display:flex; align-items:center; gap:10px; margin:6px 0 4px;
+}
+.evt-allday-row label { font-size:0.78rem; color:var(--text2); }
+.evt-toggle {
+  width:40px; height:22px; border-radius:11px; position:relative; cursor:pointer;
+  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
+  transition:all 0.2s; flex-shrink:0;
+}
+.evt-toggle.on { background:rgba(94,232,160,0.25); border-color:rgba(94,232,160,0.4); }
+.evt-toggle::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; transition:transform 0.2s;
+}
+.evt-toggle.on::after { transform:translateX(18px); }
 
 /* Calendar bottom sheet for selected day */
 .evt-cal-daysheet {
@@ -5229,13 +5269,23 @@ body {
       <div class="evt-form-section" id="evtFormAppointment">
         <div class="f-grp">
           <label class="f-lbl">Title *</label>
-          <input class="f-inp" id="evtApptTitle" placeholder="e.g. Doctor Appointment">
-        </div>
-        <div class="f-grp">
-          <label class="f-lbl">Date *</label>
-          <input class="f-inp" id="evtApptDate" type="date">
+          <input class="f-inp" id="evtApptTitle" placeholder="e.g. Doctor Appointment, Yatra, Retreat">
         </div>
         <div class="f-row">
+          <div class="f-grp">
+            <label class="f-lbl">Start Date *</label>
+            <input class="f-inp" id="evtApptDate" type="date">
+          </div>
+          <div class="f-grp">
+            <label class="f-lbl">End Date</label>
+            <input class="f-inp" id="evtApptEndDate" type="date">
+          </div>
+        </div>
+        <div class="evt-allday-row">
+          <div class="evt-toggle" id="evtAllDayToggle" onclick="evtToggleAllDay()"></div>
+          <label>All day event</label>
+        </div>
+        <div class="f-row" id="evtApptTimeRow">
           <div class="f-grp">
             <label class="f-lbl">Start Time *</label>
             <input class="f-inp" id="evtApptStart" type="time">
@@ -5274,6 +5324,10 @@ body {
             <option value="1440">1 day before</option>
           </select>
         </div>
+        <div class="evt-allday-row" id="evtRemindEveryDayRow" style="display:none;">
+          <div class="evt-toggle" id="evtRemindEveryDayToggle" onclick="this.classList.toggle('on')"></div>
+          <label>Remind every day during event</label>
+        </div>
         <div class="f-grp">
           <label class="f-lbl">Location (optional)</label>
           <input class="f-inp" id="evtApptLocation" placeholder="e.g. ISKCON Temple, New York">
@@ -5290,9 +5344,15 @@ body {
           <label class="f-lbl">Title *</label>
           <input class="f-inp" id="evtSpiritTitle" placeholder="e.g. Chant extra rounds">
         </div>
-        <div class="f-grp">
-          <label class="f-lbl">Date *</label>
-          <input class="f-inp" id="evtSpiritDate" type="date">
+        <div class="f-row">
+          <div class="f-grp">
+            <label class="f-lbl">Start Date *</label>
+            <input class="f-inp" id="evtSpiritDate" type="date">
+          </div>
+          <div class="f-grp">
+            <label class="f-lbl">End Date</label>
+            <input class="f-inp" id="evtSpiritEndDate" type="date">
+          </div>
         </div>
         <div class="f-row">
           <div class="f-grp">
@@ -6925,12 +6985,17 @@ const WDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Satu
 
 function getEventsForDate(dateStr) {
   const caldEvents = EVENTS.filter(e => e.d === dateStr);
-  const custom = customEvts.filter(e => {
-    const [y,m,d] = dateStr.split('-').map(Number);
-    if (parseInt(e.day) !== d || parseInt(e.month) !== m-1) return false;
-    if (e.year && parseInt(e.year) !== y) return false;
-    return true;
-  }).map(e => ({ d: dateStr, n: e.name, t:'custom', i: evtIcon(e.type), desc: e.notes||'', person: e.person, isCustom: true }));
+  const custom = customEvts.filter(e => _evtMatchesDate(e, dateStr))
+    .map(e => {
+      const name = e.name || e.apptTitle || e.spiritTitle || 'Event';
+      let desc = e.notes || '';
+      if (_evtIsMultiDay(e)) {
+        const total = _evtTotalDays(e);
+        const idx = _evtDayIndex(e, dateStr);
+        desc = `Day ${idx} of ${total}` + (desc ? ' · '+desc : '');
+      }
+      return { d: dateStr, n: name, t:'custom', i: evtIcon(e.type), desc, person: e.person, isCustom: true };
+    });
   return [...caldEvents, ...custom];
 }
 
@@ -8361,19 +8426,31 @@ function _evtFormatTime(t) {
 }
 function _evtIsToday(e) {
   const now = new Date();
-  if (e.type==='appointment') {
-    return e.apptDate===now.toISOString().slice(0,10);
-  }
-  if (e.type==='spiritual') {
-    if (e.spiritDate===now.toISOString().slice(0,10)) return true;
+  const todayStr = now.toISOString().slice(0,10);
+  if (e.type==='appointment'||e.type==='spiritual') {
+    // Multi-day range check
+    const {start, end} = _evtDateRange(e);
+    if (start && todayStr >= start && todayStr <= (end||start)) return true;
     if (e.repeat_type==='daily') return true;
     return false;
   }
   return parseInt(e.month)===now.getMonth() && parseInt(e.day)===now.getDate();
 }
 function _evtIsUpcoming7(e) {
-  const days = _evtDaysUntil(e);
-  return days > 0 && days <= 7;
+  if (_evtIsOccasion(e)) {
+    const days = _evtDaysUntil(e);
+    return days > 0 && days <= 7;
+  }
+  // For appointments/spiritual: check if any day in range falls within upcoming 7
+  const {start, end} = _evtDateRange(e);
+  if (!start) return false;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const s = new Date(start); s.setHours(0,0,0,0);
+  const en = new Date(end||start); en.setHours(0,0,0,0);
+  const daysTillStart = Math.ceil((s - now) / 86400000);
+  const daysTillEnd = Math.ceil((en - now) / 86400000);
+  // Event is upcoming if it starts within 7 days and hasn't fully passed
+  return daysTillEnd > 0 && daysTillStart <= 7 && daysTillStart > 0;
 }
 function _evtIsOccasion(e) {
   return e.type==='birthday'||e.type==='anniversary'||e.type==='marriage'||e.type==='puja'||e.type==='initiation';
@@ -8381,6 +8458,83 @@ function _evtIsOccasion(e) {
 function _evtIsAppointment(e) {
   return e.type==='appointment';
 }
+
+// ── Multi-Day Helpers ──
+function _evtIsMultiDay(e) {
+  const start = e.apptDate || e.spiritDate;
+  return start && e.endDate && e.endDate > start;
+}
+function _evtDateRange(e) {
+  const start = e.apptDate || e.spiritDate || null;
+  const end = e.endDate || start;
+  return { start, end };
+}
+function _evtTotalDays(e) {
+  const {start, end} = _evtDateRange(e);
+  if (!start || !end) return 1;
+  return Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+}
+function _evtDayIndex(e, dateStr) {
+  // Returns 1-based index: "Day X of Y"
+  const {start} = _evtDateRange(e);
+  if (!start) return 1;
+  return Math.round((new Date(dateStr) - new Date(start)) / 86400000) + 1;
+}
+function _evtMatchesDate(e, dateStr) {
+  // Check if event covers this date (single or multi-day)
+  if (_evtIsOccasion(e)) {
+    const [y,m,d] = dateStr.split('-').map(Number);
+    return parseInt(e.month)===(m-1) && parseInt(e.day)===d;
+  }
+  const {start, end} = _evtDateRange(e);
+  if (!start) return false;
+  // Multi-day range check
+  if (dateStr >= start && dateStr <= (end||start)) return true;
+  // Daily repeat
+  if (e.repeat_type==='daily' && dateStr >= start) return true;
+  return false;
+}
+function _evtBarColor(e) {
+  const cat = e.category || (e.type==='spiritual'?'spiritual':'default');
+  return 'bar-color-' + (['spiritual','health','work','personal','travel'].includes(cat)?cat:'default');
+}
+function evtToggleAllDay() {
+  const t = document.getElementById('evtAllDayToggle');
+  t.classList.toggle('on');
+  const isOn = t.classList.contains('on');
+  document.getElementById('evtApptTimeRow').style.display = isOn ? 'none' : '';
+}
+// Show/hide "Remind every day" based on end date
+function _evtCheckMultiDayUI() {
+  const startD = document.getElementById('evtApptDate').value;
+  const endD = document.getElementById('evtApptEndDate').value;
+  const row = document.getElementById('evtRemindEveryDayRow');
+  if (row) row.style.display = (endD && endD > startD) ? 'flex' : 'none';
+}
+// Attach listener (called once)
+document.addEventListener('DOMContentLoaded', function() {
+  const apptDate = document.getElementById('evtApptDate');
+  const apptEnd = document.getElementById('evtApptEndDate');
+  if (apptDate) apptDate.addEventListener('change', _evtCheckMultiDayUI);
+  if (apptEnd) apptEnd.addEventListener('change', function() {
+    // Validate end >= start
+    const s = document.getElementById('evtApptDate').value;
+    if (this.value && s && this.value < s) {
+      showToast('End date cannot be before start date');
+      this.value = s;
+    }
+    _evtCheckMultiDayUI();
+  });
+  const spiritEnd = document.getElementById('evtSpiritEndDate');
+  const spiritDate = document.getElementById('evtSpiritDate');
+  if (spiritEnd) spiritEnd.addEventListener('change', function() {
+    const s = spiritDate ? spiritDate.value : '';
+    if (this.value && s && this.value < s) {
+      showToast('End date cannot be before start date');
+      this.value = s;
+    }
+  });
+});
 
 // ── Tab Navigation ──
 function evtSwitchTab(tab, btn) {
@@ -8401,6 +8555,7 @@ function evtSwitchTab(tab, btn) {
 // ── Today Panel ──
 function evtRenderToday() {
   const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
   const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
   document.getElementById('evtTodayDate').textContent = now.toLocaleDateString('en-IN',opts);
 
@@ -8416,7 +8571,7 @@ function evtRenderToday() {
       const tb = b.startTime||b.spiritTime||'';
       return ta.localeCompare(tb);
     });
-    todayC.innerHTML = todayEvts.map(e => _evtCardHTML(e, true)).join('');
+    todayC.innerHTML = todayEvts.map(e => _evtCardHTML(e, true, false, todayStr)).join('');
   }
 
   // Upcoming 7 days
@@ -8431,21 +8586,47 @@ function evtRenderToday() {
 }
 
 // ── Card HTML Generator ──
-function _evtCardHTML(e, showTime, showCountdown) {
+function _evtCardHTML(e, showTime, showCountdown, contextDateStr) {
   const icon = _evtIcon(e.type);
   const catClass = _evtCatClass(e);
   const badgeClass = _evtBadgeClass(e);
   const label = _evtTypeLabel(e.type);
   const name = e.name || e.apptTitle || e.spiritTitle || 'Event';
+  const isMulti = _evtIsMultiDay(e);
   let timeStr = '';
-  if (showTime) {
+  if (showTime && !e.isAllDay) {
     if (e.startTime) timeStr = _evtFormatTime(e.startTime) + (e.endTime ? ' – ' + _evtFormatTime(e.endTime) : '');
     else if (e.spiritTime) timeStr = _evtFormatTime(e.spiritTime);
   }
+  if (e.isAllDay) timeStr = 'All day';
+
   let dateStr = '';
-  if (e.apptDate) dateStr = new Date(e.apptDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-  else if (e.spiritDate) dateStr = new Date(e.spiritDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-  else dateStr = MONTHS_SHORT[e.month]+' '+e.day+(e.year?', '+e.year:'');
+  if (e.apptDate || e.spiritDate) {
+    const sd = e.apptDate || e.spiritDate;
+    if (isMulti) {
+      const sDate = new Date(sd);
+      const eDate = new Date(e.endDate);
+      dateStr = sDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ' – ' + eDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else {
+      dateStr = new Date(sd).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    }
+  } else {
+    dateStr = MONTHS_SHORT[e.month]+' '+e.day+(e.year?', '+e.year:'');
+  }
+
+  // Multi-day badge: "Day X of Y"
+  let multiBadge = '';
+  if (isMulti) {
+    const total = _evtTotalDays(e);
+    const cDate = contextDateStr || new Date().toISOString().slice(0,10);
+    const {start, end} = _evtDateRange(e);
+    if (cDate >= start && cDate <= end) {
+      const dayIdx = _evtDayIndex(e, cDate);
+      multiBadge = `<span class="evt-multiday-badge">Day ${dayIdx} of ${total}</span>`;
+    } else {
+      multiBadge = `<span class="evt-multiday-badge">${total} days</span>`;
+    }
+  }
 
   const days = _evtDaysUntil(e);
   const countdown = showCountdown ? `<div class="evt-countdown">${_evtCountdownText(days)}</div>` : '';
@@ -8453,7 +8634,7 @@ function _evtCardHTML(e, showTime, showCountdown) {
   return `<div class="evt-card ${catClass}">
     <div class="evt-emoji">${icon}</div>
     <div class="evt-info">
-      <div class="evt-name-text">${name}</div>
+      <div class="evt-name-text">${name}${multiBadge}</div>
       ${timeStr?'<div class="evt-time-text">'+timeStr+'</div>':''}
       <span class="evt-type-badge ${badgeClass}">${label}</span>
       <div class="evt-date">${dateStr}${e.location?' · 📍'+e.location:''}</div>
@@ -8520,20 +8701,28 @@ function evtRenderAppointments() {
   let filtered;
   if (_evtApptSortMode==='today') {
     filtered = appts.filter(e => {
-      if (e.apptDate===todayStr) return true;
-      if (e.spiritDate===todayStr) return true;
+      // Multi-day: check if today falls within range
+      const {start, end} = _evtDateRange(e);
+      if (start && todayStr >= start && todayStr <= (end||start)) return true;
       if (e.repeat_type==='daily') return true;
       return false;
     });
   } else if (_evtApptSortMode==='upcoming') {
     filtered = appts.filter(e => {
-      const d = e.apptDate||e.spiritDate||'';
-      return d > todayStr;
+      const {start, end} = _evtDateRange(e);
+      const effectiveEnd = end || start || '';
+      // Upcoming: starts in future OR is ongoing (end date is future)
+      return effectiveEnd > todayStr || start > todayStr;
+    }).filter(e => {
+      // Exclude purely today events (those are in "today")
+      const {start, end} = _evtDateRange(e);
+      return start > todayStr || (end && end > todayStr);
     });
   } else {
     filtered = appts.filter(e => {
-      const d = e.apptDate||e.spiritDate||'';
-      return d < todayStr && d;
+      const {start, end} = _evtDateRange(e);
+      const effectiveEnd = end || start || '';
+      return effectiveEnd < todayStr && start;
     });
   }
   // Sort by date/time
@@ -8564,6 +8753,15 @@ function evtRenderCalendar() {
   const today = new Date();
   const todayStr = today.toISOString().slice(0,10);
 
+  // Precompute multi-day events that touch this month
+  const moStart = `${yr}-${String(mo+1).padStart(2,'0')}-01`;
+  const moEnd = `${yr}-${String(mo+1).padStart(2,'0')}-${String(daysInMo).padStart(2,'0')}`;
+  const multiEvts = customEvts.filter(e => {
+    if (!_evtIsMultiDay(e)) return false;
+    const {start, end} = _evtDateRange(e);
+    return start <= moEnd && end >= moStart;
+  });
+
   const DAY_NAMES = ['Su','Mo','Tu','We','Th','Fr','Sa'];
   let html = `<div class="evt-cal-month-nav">
     <button onclick="evtCalPrev()">‹</button>
@@ -8582,13 +8780,8 @@ function evtRenderCalendar() {
     const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = yr===today.getFullYear()&&mo===today.getMonth()&&d===today.getDate();
     const isSelected = _evtCalSelectedDate===dateStr;
-    // Find events on this date
-    const dayEvts = customEvts.filter(e => {
-      if (e.apptDate===dateStr) return true;
-      if (e.spiritDate===dateStr) return true;
-      if (parseInt(e.month)===mo && parseInt(e.day)===d) return true;
-      return false;
-    });
+    // Find single-day events on this date (existing logic)
+    const dayEvts = customEvts.filter(e => _evtMatchesDate(e, dateStr) && !_evtIsMultiDay(e));
     let dots = '';
     if (dayEvts.length) {
       const types = new Set(dayEvts.map(e => e.type==='birthday'?'birthday':e.type==='anniversary'||e.type==='marriage'?'anniversary':e.type==='appointment'?'appt':'spiritual'));
@@ -8596,7 +8789,21 @@ function evtRenderCalendar() {
       types.forEach(t => dots += `<div class="cal-dot dot-${t}"></div>`);
       dots += '</div>';
     }
-    html += `<div class="evt-cal-day${isToday?' today':''}${isSelected?' selected':''}" onclick="evtCalSelectDate('${dateStr}',${d})">${d}${dots}</div>`;
+    // Multi-day bars for this date
+    let bars = '';
+    multiEvts.forEach(me => {
+      const {start, end} = _evtDateRange(me);
+      if (dateStr >= start && dateStr <= end) {
+        const isStart = dateStr === start;
+        const isEnd = dateStr === end;
+        let posCls = 'bar-mid';
+        if (isStart && isEnd) posCls = 'bar-single';
+        else if (isStart) posCls = 'bar-start';
+        else if (isEnd) posCls = 'bar-end';
+        bars += `<div class="evt-multi-bar ${posCls} ${_evtBarColor(me)}" title="${me.name||me.apptTitle||me.spiritTitle||''}"></div>`;
+      }
+    });
+    html += `<div class="evt-cal-day${isToday?' today':''}${isSelected?' selected':''}" onclick="evtCalSelectDate('${dateStr}',${d})">${d}${dots}${bars}</div>`;
   }
   // Next month days
   const totalCells = firstDay + daysInMo;
@@ -8624,12 +8831,7 @@ function evtCalSelectDate(dateStr, day) {
 }
 function evtCalShowDayEvents(day, month, year) {
   const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-  const dayEvts = customEvts.filter(e => {
-    if (e.apptDate===dateStr) return true;
-    if (e.spiritDate===dateStr) return true;
-    if (parseInt(e.month)===month && parseInt(e.day)===day) return true;
-    return false;
-  });
+  const dayEvts = customEvts.filter(e => _evtMatchesDate(e, dateStr));
   const sheet = document.getElementById('evtCalDaySheet');
   if (!dayEvts.length) {
     sheet.innerHTML = `<div class="evt-cal-daysheet"><div class="evt-cal-daysheet-hdr">${MONTHS_SHORT[month]} ${day}, ${year}</div><div style="font-size:0.8rem;color:var(--text3);">No events on this day.</div></div>`;
@@ -8637,7 +8839,7 @@ function evtCalShowDayEvents(day, month, year) {
   }
   let html = `<div class="evt-cal-daysheet"><div class="evt-cal-daysheet-hdr">📅 ${MONTHS_SHORT[month]} ${day}, ${year} — ${dayEvts.length} event${dayEvts.length>1?'s':''}</div>`;
   dayEvts.forEach(e => {
-    html += _evtCardHTML(e, true, false);
+    html += _evtCardHTML(e, true, false, dateStr);
   });
   html += '</div>';
   sheet.innerHTML = html;
@@ -8683,7 +8885,12 @@ function openAddEvt() {
   if (el.options.length<=1) { el.innerHTML='<option value="">—</option>'; for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`; }
   // Reset all forms
   ['evtName','evtYear','evtNotes','evtApptTitle','evtApptLocation','evtApptNotes','evtSpiritTitle','evtSpiritNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  ['evtApptDate','evtApptStart','evtApptEnd','evtSpiritDate','evtSpiritTime'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['evtApptDate','evtApptStart','evtApptEnd','evtApptEndDate','evtSpiritDate','evtSpiritTime','evtSpiritEndDate'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  // Reset toggles
+  const adT = document.getElementById('evtAllDayToggle'); if(adT) adT.classList.remove('on');
+  document.getElementById('evtApptTimeRow').style.display = '';
+  const redT = document.getElementById('evtRemindEveryDayToggle'); if(redT) redT.classList.remove('on');
+  const redRow = document.getElementById('evtRemindEveryDayRow'); if(redRow) redRow.style.display = 'none';
   const md = document.getElementById('evtMonth'); if(md)md.selectedIndex=0;
   const dd = document.getElementById('evtDay'); if(dd)dd.selectedIndex=0;
   document.getElementById('evtRelation').selectedIndex=0;
@@ -8735,18 +8942,34 @@ function editEvt(id) {
     document.getElementById('evtFormAppointment').classList.add('visible');
     document.getElementById('evtApptTitle').value = evt.apptTitle||evt.name||'';
     document.getElementById('evtApptDate').value = evt.apptDate||'';
+    document.getElementById('evtApptEndDate').value = evt.endDate||'';
+    // All day toggle
+    const allDayT = document.getElementById('evtAllDayToggle');
+    if (evt.isAllDay) { allDayT.classList.add('on'); } else { allDayT.classList.remove('on'); }
+    document.getElementById('evtApptTimeRow').style.display = evt.isAllDay ? 'none' : '';
     document.getElementById('evtApptStart').value = evt.startTime||'';
     document.getElementById('evtApptEnd').value = evt.endTime||'';
     _evtSelectedCat = evt.category||'spiritual';
     document.querySelectorAll('.evt-cat-chip').forEach(c=>{c.classList.remove('selected');if(c.classList.contains('chip-'+_evtSelectedCat))c.classList.add('selected');});
     document.getElementById('evtApptRepeat').value = evt.repeat_type||'none';
     document.getElementById('evtApptReminder').value = evt.reminderMinutes||'30';
+    // Remind every day toggle
+    const redRow = document.getElementById('evtRemindEveryDayRow');
+    const redT = document.getElementById('evtRemindEveryDayToggle');
+    if (evt.endDate && evt.endDate > (evt.apptDate||'')) {
+      redRow.style.display = 'flex';
+      if (evt.remindEveryDay) redT.classList.add('on'); else redT.classList.remove('on');
+    } else {
+      redRow.style.display = 'none';
+      redT.classList.remove('on');
+    }
     document.getElementById('evtApptLocation').value = evt.location||'';
     document.getElementById('evtApptNotes').value = evt.notes||'';
   } else if (_evtSelectedType==='spiritual') {
     document.getElementById('evtFormSpiritual').classList.add('visible');
     document.getElementById('evtSpiritTitle').value = evt.spiritTitle||evt.name||'';
     document.getElementById('evtSpiritDate').value = evt.spiritDate||'';
+    document.getElementById('evtSpiritEndDate').value = evt.endDate||'';
     document.getElementById('evtSpiritTime').value = evt.spiritTime||'';
     document.getElementById('evtSpiritRepeat').value = evt.repeat_type||'none';
     document.getElementById('evtSpiritNotes').value = evt.notes||'';
@@ -8784,21 +9007,30 @@ function saveEvt() {
   } else if (_evtSelectedType==='appointment') {
     const title = document.getElementById('evtApptTitle').value.trim();
     const date = document.getElementById('evtApptDate').value;
-    const start = document.getElementById('evtApptStart').value;
-    if (!title||!date||!start) { showToast('Fill required fields (title, date, start time)'); return; }
+    const isAllDay = document.getElementById('evtAllDayToggle').classList.contains('on');
+    const start = isAllDay ? null : document.getElementById('evtApptStart').value;
+    if (!title||!date||(!isAllDay && !start)) { showToast('Fill required fields (title, date'+(isAllDay?'':' , start time')+')'); return; }
+    // End date validation
+    let endDate = document.getElementById('evtApptEndDate').value || null;
+    if (endDate && endDate < date) { showToast('End date cannot be before start date'); return; }
+    if (endDate === date) endDate = null; // Same date = single day
+    const remindEveryDay = document.getElementById('evtRemindEveryDayToggle').classList.contains('on');
     evtData = {
       ...evtData,
       type:'appointment',
       apptTitle: title,
       name: title,
       apptDate: date,
+      endDate: endDate,
+      isAllDay: isAllDay,
       day: parseInt(date.split('-')[2]),
       month: parseInt(date.split('-')[1])-1,
-      startTime: start,
-      endTime: document.getElementById('evtApptEnd').value||null,
+      startTime: start || null,
+      endTime: (!isAllDay ? document.getElementById('evtApptEnd').value : null)||null,
       category: _evtSelectedCat,
       repeat_type: document.getElementById('evtApptRepeat').value,
       reminderMinutes: parseInt(document.getElementById('evtApptReminder').value),
+      remindEveryDay: remindEveryDay,
       location: document.getElementById('evtApptLocation').value.trim()||null,
       notes: document.getElementById('evtApptNotes').value.trim()
     };
@@ -8806,12 +9038,17 @@ function saveEvt() {
     const title = document.getElementById('evtSpiritTitle').value.trim();
     const date = document.getElementById('evtSpiritDate').value;
     if (!title||!date) { showToast('Fill required fields (title, date)'); return; }
+    // End date
+    let endDate = document.getElementById('evtSpiritEndDate').value || null;
+    if (endDate && endDate < date) { showToast('End date cannot be before start date'); return; }
+    if (endDate === date) endDate = null;
     evtData = {
       ...evtData,
       type:'spiritual',
       spiritTitle: title,
       name: title,
       spiritDate: date,
+      endDate: endDate,
       day: parseInt(date.split('-')[2]),
       month: parseInt(date.split('-')[1])-1,
       spiritTime: document.getElementById('evtSpiritTime').value||null,
@@ -11805,14 +12042,28 @@ function _updateHomeEvtWidget() {
   const w = document.getElementById('homeEvtWidget');
   if (!w) return;
   if (!customEvts.length) { w.textContent = 'Personal reminders, custom events and alerts'; return; }
-  // Get next 3 events sorted chronologically
-  const sorted = [...customEvts].sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b)).filter(e => _evtDaysUntil(e)>=0).slice(0,3);
+  const todayStr = new Date().toISOString().slice(0,10);
+  // Get next 3 events: upcoming + ongoing multi-day
+  const sorted = [...customEvts].filter(e => {
+    if (_evtDaysUntil(e) >= 0) return true;
+    // Include ongoing multi-day events
+    if (_evtIsMultiDay(e)) {
+      const {end} = _evtDateRange(e);
+      return end >= todayStr;
+    }
+    return false;
+  }).sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b)).slice(0,3);
   if (!sorted.length) { w.textContent = 'No upcoming events'; return; }
   w.innerHTML = sorted.map(e => {
     const icon = _evtIcon(e.type);
     const name = e.name||e.apptTitle||e.spiritTitle||'Event';
     const days = _evtDaysUntil(e);
-    const label = days===0?'Today':days===1?'Tomorrow':days+' days';
+    let label;
+    if (_evtIsMultiDay(e) && days < 0) {
+      label = 'Ongoing';
+    } else {
+      label = days===0?'Today':days===1?'Tomorrow':days+' days';
+    }
     return `<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;margin-top:3px;"><span>${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span style="color:var(--accent-gold);font-weight:600;font-size:0.65rem;">${label}</span></div>`;
   }).join('');
 }
