@@ -3465,10 +3465,10 @@ body {
         <div class="admin-email-list" id="adminEmailList"></div>
         <div class="admin-add-row">
           <input class="admin-add-input" id="adminAddInput" placeholder="Enter email to grant admin…" type="email">
-          <button class="admin-add-btn" onclick="addAdmin()">+ Add</button>
+          <button class="admin-add-btn" onclick="addAdmin()">+ Add / Update</button>
         </div>
         <div class="admin-perms-wrap" id="adminPermsWrap">
-          <div class="admin-perms-label">Permissions for new admin:</div>
+          <div class="admin-perms-label">Permissions (for new or existing admin):</div>
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permSongs" checked> 🎵 Add / Edit Songs & Kirtans</label>
           </div>
@@ -7382,7 +7382,7 @@ function addAdmin() {
   const email = input.value.trim().toLowerCase();
   if (!email || !email.includes('@')) { showToast('Enter a valid email'); return; }
   const list = _getAdminList();
-  if (list.map(e => e.toLowerCase()).includes(email)) { showToast('Already an admin'); return; }
+  const alreadyExists = list.map(e => e.toLowerCase()).includes(email);
   // Get selected permissions
   const selectedPerms = [];
   if (document.getElementById('permSongs').checked) selectedPerms.push('songs');
@@ -7391,16 +7391,18 @@ function addAdmin() {
   if (document.getElementById('permPrayer').checked) selectedPerms.push('prayer');
   if (document.getElementById('permUsers').checked) selectedPerms.push('users');
   if (!selectedPerms.length) { showToast('Select at least one permission'); return; }
-  // Save admin
-  list.push(email);
-  _saveAdminList(list);
-  // Save permissions
+  // Add to list if new
+  if (!alreadyExists) {
+    list.push(email);
+    _saveAdminList(list);
+  }
+  // Save/update permissions
   const allPerms = _getAdminPermissions();
   allPerms[email] = selectedPerms;
   _saveAdminPermissions(allPerms);
   input.value = '';
   renderAdminList();
-  showToast('Admin added ✓');
+  showToast(alreadyExists ? 'Permissions updated ✓' : 'Admin added ✓');
 }
 
 function removeAdmin(email) {
