@@ -12218,7 +12218,7 @@ function switchScreen(name, btn) {
   if (name==='events') renderEvts();
   if (name==='notes') { nfRenderFolders(); if (_nfCurrentFolder) nfRenderFolderNotes(); }
   if (name==='dhamas') renderDhamas();
-  if (name==='sevakart') skRenderHome();
+  if (name==='sevakart') { skRenderHome(); _skFetchFromServer(); }
   if (name==='prayer') pcRenderFeed();
   if (name==='admin') { renderAdminDashboard(); _skFetchFromServer(); _pcFetchFromServer(); }
   if (name==='userlist') ulFetchAndRender();
@@ -13838,43 +13838,101 @@ function _skSave() {
   localStorage.setItem('skListings', JSON.stringify(skListings));
   localStorage.setItem('skReviews', JSON.stringify(skReviews));
   localStorage.setItem('skReports', JSON.stringify(skReports));
-  // Sync to server
+  // Sync to server with merge to prevent data loss
   _skSyncToServer();
 }
 
-// Sync to Google Sheets (reuses SONGS_API_URL endpoint)
+// Merge listings: server data is primary, but keep local-only items (new submissions not yet on server)
+function _skMergeListings(serverList, localList) {
+  const merged = new Map();
+  // Server data is the source of truth for existing items
+  for (const l of serverList) {
+    if (l && l.id) merged.set(l.id, l);
+  }
+  // Keep local items that don't exist on server (newly submitted, not yet fetched back)
+  for (const l of localList) {
+    if (l && l.id && !merged.has(l.id)) {
+      merged.set(l.id, l);
+    }
+  }
+  return Array.from(merged.values());
+}
+
+// Flag to prevent concurrent syncs
+let _skSyncing = false;
+
+// Sync to Google Sheets — fetch-merge-save to prevent overwriting other users' data
 async function _skSyncToServer() {
+  if (_skSyncing) return;
+  _skSyncing = true;
   try {
+    // Step 1: Fetch current server data first
+    let serverListings = [];
+    try {
+      const fetchResp = await fetch(SONGS_API_URL + '?type=sevakart');
+      const fetchData = await fetchResp.json();
+      if (fetchData.success && fetchData.listings) {
+        serverListings = fetchData.listings.map(l => {
+          if (l.status) l.status = l.status.toString().trim().toLowerCase();
+          else l.status = 'pending';
+          return l;
+        });
+      }
+    } catch(e) { /* if fetch fails, proceed with local data only */ }
+
+    // Step 2: Merge — local changes take precedence, but server-only items are preserved
+    const mergedMap = new Map();
+    // Start with server data
+    for (const l of serverListings) {
+      if (l && l.id) mergedMap.set(l.id, l);
+    }
+    // Overlay local data (local wins — it has the latest user changes like approve/reject/new)
+    for (const l of skListings) {
+      if (l && l.id) mergedMap.set(l.id, l);
+    }
+    const mergedListings = Array.from(mergedMap.values());
+
+    // Update local state with merged data
+    skListings = mergedListings;
+    localStorage.setItem('skListings', JSON.stringify(skListings));
+
+    // Step 3: Push merged data to server
     const userEmail = (gUser && gUser.email) ? gUser.email : '';
     await fetch(SONGS_API_URL, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
       body: JSON.stringify({
         action:'saveSevakart',
-        listings: skListings,
+        listings: mergedListings,
         reviews: skReviews,
         reports: skReports,
         updatedBy: userEmail
       })
     });
   } catch(e) { /* offline fallback */ }
+  _skSyncing = false;
 }
 
+// Fetch and merge server data (never replaces — always merges)
+let _skFetching = false;
 async function _skFetchFromServer() {
+  if (_skFetching) return;
+  _skFetching = true;
   try {
     const resp = await fetch(SONGS_API_URL + '?type=sevakart');
     const data = await resp.json();
     if (data.success && data.listings) {
-      // Normalize status to lowercase — Google Sheets may return 'Pending', 'PENDING', etc.
-      skListings = data.listings.map(l => {
+      // Normalize status to lowercase
+      const serverListings = data.listings.map(l => {
         if (l.status) {
           l.status = l.status.toString().trim().toLowerCase();
         } else {
-          // Listings without a status field default to 'pending'
           l.status = 'pending';
         }
         return l;
       });
+      // Merge: server is primary, keep local-only items
+      skListings = _skMergeListings(serverListings, skListings);
       if (data.reviews) skReviews = data.reviews;
       if (data.reports) skReports = data.reports;
       localStorage.setItem('skListings', JSON.stringify(skListings));
@@ -13885,13 +13943,24 @@ async function _skFetchFromServer() {
       if (admScreen && admScreen.classList.contains('active')) {
         renderAdminDashboard();
       }
-      // Re-render SevaKart home if currently visible
+      // Re-render SevaKart screens if currently visible
       const skScreen = document.getElementById('screen-sevakart');
       if (skScreen && skScreen.classList.contains('active')) {
         skRenderHome();
       }
+      // Re-render My Listings if visible
+      const myScreen = document.getElementById('screen-sevakart-mylistings');
+      if (myScreen && myScreen.classList.contains('active')) {
+        const titleEl = myScreen.querySelector('.sk-detail-htitle');
+        if (titleEl && titleEl.textContent === 'My Listings') {
+          _skRenderMyListings();
+        } else if (titleEl && titleEl.textContent === 'Pending Approvals') {
+          skShowPendingListings();
+        }
+      }
     }
   } catch(e) { /* offline - use localStorage */ }
+  _skFetching = false;
 }
 
 function _skGetApprovedListings() {
@@ -14126,9 +14195,20 @@ function skBackToMain() {
 // ---- My Listings ----
 function skShowMyListings() {
   if (!isSignedIn()) { showToast('Please sign in first'); return; }
+  document.querySelector('#screen-sevakart-mylistings .sk-detail-htitle').textContent = 'My Listings';
+  _skRenderMyListings();
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sevakart-mylistings').classList.add('active');
+
+  // Fetch fresh data from server — will re-render when done
+  _skFetchFromServer();
+}
+
+function _skRenderMyListings() {
   const container = document.getElementById('skMyListingsContainer');
   const email = gUser.email.toLowerCase();
-  const mine = skListings.filter(l => l.ownerEmail === email);
+  const mine = skListings.filter(l => (l.ownerEmail||'').toLowerCase() === email);
 
   if (!mine.length) {
     container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">📋</div><div>You haven\'t listed any services yet.</div></div>';
@@ -14150,9 +14230,6 @@ function skShowMyListings() {
       </div>`;
     }).join('');
   }
-
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-sevakart-mylistings').classList.add('active');
 }
 
 // ---- Pending/Reported for Admin ----
@@ -14164,7 +14241,7 @@ function skShowPendingListings() {
   if (!pending.length) {
     container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">✅</div><div>No pending listings.</div></div>';
   } else {
-    container.innerHTML = pending.map(l => `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+    container.innerHTML = pending.map(l => `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}','admin')">
       <div class="sk-listing-body">
         <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
           <div class="sk-listing-status pending">PENDING</div></div>
@@ -14191,7 +14268,7 @@ function skShowReportedListings() {
   } else {
     container.innerHTML = reported.map(l => {
       const rCount = unresolvedReports.filter(r=>r.listingId===l.id).length;
-      return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
+      return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}','admin')">
         <div class="sk-listing-body">
           <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
             <div class="sk-listing-status rejected">🚩 ${rCount} report${rCount>1?'s':''}</div></div>
