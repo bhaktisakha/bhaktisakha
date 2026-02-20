@@ -11534,6 +11534,7 @@ function _updateHomeEvtWidget() {
     const label = days===0?'Today':days===1?'Tomorrow':days+' days';
     return `<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;margin-top:3px;"><span>${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span style="color:var(--accent-gold);font-weight:600;font-size:0.65rem;">${label}</span></div>`;
   }).join('');
+}
 
 function updateHomeGoogleUI() {
   const signedIn = document.getElementById('homeGSignedIn');
