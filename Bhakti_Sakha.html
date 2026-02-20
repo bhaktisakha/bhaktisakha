@@ -2725,46 +2725,6 @@ body {
   text-align:center; opacity:0; pointer-events:none; }
 .toast.show { transform:translateX(-50%) translateY(0); opacity:1; pointer-events:auto; }
 
-/* Update notification banner */
-.update-banner {
-  position:fixed; top:0; left:0; right:0; max-width:430px; margin:0 auto;
-  z-index:500; transform:translateY(-100%); transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
-  pointer-events:none;
-}
-.update-banner.show { transform:translateY(0); pointer-events:auto; }
-.update-banner-inner {
-  margin:12px; padding:16px 18px;
-  background:linear-gradient(135deg, rgba(61,127,212,0.95), rgba(99,102,241,0.95));
-  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-  border-radius:16px; border:1px solid rgba(255,255,255,0.15);
-  box-shadow:0 8px 32px rgba(0,0,0,0.4);
-  display:flex; align-items:center; gap:14px;
-  animation:bannerGlow 2s ease-in-out infinite alternate;
-}
-@keyframes bannerGlow {
-  from { box-shadow:0 8px 32px rgba(0,0,0,0.4); }
-  to { box-shadow:0 8px 32px rgba(61,127,212,0.3); }
-}
-.update-banner-icon {
-  font-size:1.6rem; flex-shrink:0;
-  animation:bannerPulse 1.5s ease-in-out infinite;
-}
-@keyframes bannerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-.update-banner-text { flex:1; min-width:0; }
-.update-banner-title {
-  font-size:0.88rem; font-weight:700; color:#fff; margin-bottom:3px;
-}
-.update-banner-desc {
-  font-size:0.72rem; color:rgba(255,255,255,0.8); line-height:1.4;
-}
-.update-banner-dismiss {
-  background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.25);
-  border-radius:8px; padding:6px 14px; color:#fff; font-size:0.75rem;
-  font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0;
-  font-family:inherit; transition:background 0.2s;
-}
-.update-banner-dismiss:active { background:rgba(255,255,255,0.35); }
-
 /* Scrollbar */
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-track { background:transparent; }
@@ -3660,16 +3620,7 @@ body {
 
 <!-- Header -->
 <!-- Update notification banner -->
-<div class="update-banner" id="updateBanner">
-  <div class="update-banner-inner">
-    <div class="update-banner-icon">✨</div>
-    <div class="update-banner-text">
-      <div class="update-banner-title">Bhakti Sakha Updated!</div>
-      <div class="update-banner-desc">Enjoy the latest improvements and features.</div>
-    </div>
-    <button class="update-banner-dismiss" onclick="dismissUpdateBanner()">OK</button>
-  </div>
-</div>
+
 
 <header class="header">
   <div class="header-date-wrap">
@@ -10221,7 +10172,8 @@ async function nfShareAsPdf() {
     const pageH = doc.internal.pageSize.getHeight();
     const mL = 20, mR = 20, mT = 25, mB = 25;
     const cW = pageW - mL - mR;
-    const lineH = 5.5;
+    const bodyLineH = 6;
+    const paraSpacing = 4;
 
     // --- Accent bar ---
     doc.setFillColor(61, 127, 212);
@@ -10236,39 +10188,52 @@ async function nfShareAsPdf() {
     doc.text(titleLines, mL, y);
     y += titleLines.length * 8 + 4;
 
+    // --- Date ---
+    if (data.dateStr) {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      doc.text(data.dateStr, mL, y);
+      y += 6;
+    }
+
     // --- Divider ---
     doc.setDrawColor(61, 127, 212);
     doc.setLineWidth(0.5);
     doc.line(mL, y, mL + 30, y);
     y += 10;
 
-    // --- Parse HTML body into styled segments ---
-    function parseHtmlToSegments(html) {
-      const segments = []; // each: { text, bold, italic, newPara, listItem }
-      if (!html) return segments;
-      // Normalize whitespace within tags but preserve structure
+    // --- Convert HTML to structured blocks for PDF ---
+    function htmlToPdfBlocks(html) {
+      if (!html) return [];
+      const blocks = [];
       let h = html;
-      // Handle list items
-      h = h.replace(/<li[^>]*>/gi, '<LI_START>');
-      h = h.replace(/<\/li>/gi, '<NEWLINE>');
-      // Block elements to double newline
-      h = h.replace(/<\/p>/gi, '<PARA_BREAK>');
-      h = h.replace(/<\/div>/gi, '<NEWLINE>');
-      h = h.replace(/<\/h[1-6]>/gi, '<PARA_BREAK>');
-      h = h.replace(/<\/blockquote>/gi, '<PARA_BREAK>');
-      h = h.replace(/<br\s*\/?>/gi, '<NEWLINE>');
+
+      // Normalize: replace list items with bullet markers
+      h = h.replace(/<li[^>]*>/gi, '• ');
+      h = h.replace(/<\/li>/gi, '\n');
+      // Block closings to paragraph breaks
+      h = h.replace(/<\/p>/gi, '\n\n');
+      h = h.replace(/<\/div>/gi, '\n');
+      h = h.replace(/<\/h[1-6]>/gi, '\n\n');
+      h = h.replace(/<\/blockquote>/gi, '\n\n');
+      h = h.replace(/<br\s*\/?>/gi, '\n');
+      // Remove opening block tags
       h = h.replace(/<p[^>]*>/gi, '');
       h = h.replace(/<div[^>]*>/gi, '');
-      h = h.replace(/<h[1-6][^>]*>/gi, '<BOLD_ON>');
       h = h.replace(/<blockquote[^>]*>/gi, '');
-      // Inline formatting markers
-      h = h.replace(/<(strong|b)(\s[^>]*)?>/gi, '<BOLD_ON>');
-      h = h.replace(/<\/(strong|b)>/gi, '<BOLD_OFF>');
-      h = h.replace(/<(em|i)(\s[^>]*)?>/gi, '<ITALIC_ON>');
-      h = h.replace(/<\/(em|i)>/gi, '<ITALIC_OFF>');
-      h = h.replace(/<(u)(\s[^>]*)?>/gi, '<UNDERLINE_ON>');
-      h = h.replace(/<\/(u)>/gi, '<UNDERLINE_OFF>');
-      // Strip remaining HTML tags
+
+      // Now handle inline formatting: extract runs of bold/italic/normal
+      // Split into formatting-aware segments
+      const runs = [];
+      let bold = false, italic = false;
+      // Mark formatting
+      h = h.replace(/<h[1-6][^>]*>/gi, '<B_ON>');
+      h = h.replace(/<(strong|b)(\s[^>]*)?>/gi, '<B_ON>');
+      h = h.replace(/<\/(strong|b)>/gi, '<B_OFF>');
+      h = h.replace(/<(em|i)(\s[^>]*)?>/gi, '<I_ON>');
+      h = h.replace(/<\/(em|i)>/gi, '<I_OFF>');
+      // Strip all remaining HTML tags
       h = h.replace(/<[^>]*>/g, '');
       // Decode entities
       h = h.replace(/&nbsp;/g, ' ');
@@ -10279,39 +10244,85 @@ async function nfShareAsPdf() {
       h = h.replace(/&#39;/g, "'");
       h = h.replace(/&[a-zA-Z]+;/g, ' ');
 
-      // Now parse markers into segments
-      let bold = false, italic = false;
-      const tokens = h.split(/(<BOLD_ON>|<BOLD_OFF>|<ITALIC_ON>|<ITALIC_OFF>|<UNDERLINE_ON>|<UNDERLINE_OFF>|<NEWLINE>|<PARA_BREAK>|<LI_START>)/);
+      // Parse into runs with formatting
+      const tokens = h.split(/(<B_ON>|<B_OFF>|<I_ON>|<I_OFF>)/);
       for (const tok of tokens) {
-        if (tok === '<BOLD_ON>') { bold = true; continue; }
-        if (tok === '<BOLD_OFF>') { bold = false; continue; }
-        if (tok === '<ITALIC_ON>') { italic = true; continue; }
-        if (tok === '<ITALIC_OFF>') { italic = false; continue; }
-        if (tok === '<UNDERLINE_ON>' || tok === '<UNDERLINE_OFF>') continue;
-        if (tok === '<NEWLINE>') { segments.push({ text: '', bold, italic, newLine: true }); continue; }
-        if (tok === '<PARA_BREAK>') { segments.push({ text: '', bold, italic, paraBreak: true }); continue; }
-        if (tok === '<LI_START>') { segments.push({ text: '', bold, italic, listItem: true }); continue; }
-        if (tok.trim() || tok.includes(' ')) {
-          segments.push({ text: tok, bold, italic });
+        if (tok === '<B_ON>') { bold = true; continue; }
+        if (tok === '<B_OFF>') { bold = false; continue; }
+        if (tok === '<I_ON>') { italic = true; continue; }
+        if (tok === '<I_OFF>') { italic = false; continue; }
+        if (tok) {
+          runs.push({ text: tok, bold, italic });
         }
       }
-      return segments;
+
+      // Now flatten runs into a single string preserving newlines
+      let fullText = runs.map(r => r.text).join('');
+
+      // Clean up whitespace while preserving newlines
+      fullText = fullText.replace(/[ \t]+/g, ' ');
+      fullText = fullText.replace(/ *\n */g, '\n');
+      fullText = fullText.replace(/\n{3,}/g, '\n\n');
+      fullText = fullText.trim();
+
+      // Split into paragraphs (double newline = paragraph break)
+      const paragraphs = fullText.split(/\n\n/);
+
+      // For each paragraph, build a block with formatting info
+      for (const para of paragraphs) {
+        const trimmed = para.trim();
+        if (!trimmed) continue;
+
+        // Split paragraph into lines (single newline = line break within paragraph)
+        const lines = trimmed.split('\n');
+        const blockLines = [];
+
+        for (const line of lines) {
+          const tl = line.trim();
+          if (!tl) continue;
+
+          // Find which formatting runs apply to this text
+          // For simplicity and reliability, detect if the line has bold/italic markers
+          // by checking the original runs
+          let isBold = false;
+          let isItalic = false;
+          // Check if this text falls within a bold or italic run
+          for (const run of runs) {
+            if (run.text.includes(tl.substring(0, Math.min(20, tl.length)))) {
+              isBold = run.bold;
+              isItalic = run.italic;
+              break;
+            }
+          }
+          blockLines.push({ text: tl, bold: isBold, italic: isItalic });
+        }
+
+        if (blockLines.length > 0) {
+          blocks.push(blockLines);
+        }
+      }
+
+      return blocks;
     }
 
-    function setFontStyle(doc, bold, italic) {
+    function setFontStyle(bold, italic) {
       if (bold && italic) doc.setFont('helvetica', 'bolditalic');
       else if (bold) doc.setFont('helvetica', 'bold');
       else if (italic) doc.setFont('helvetica', 'italic');
       else doc.setFont('helvetica', 'normal');
     }
 
+    function addNewPage() {
+      _nfPdfFooter(doc, pageW, pageH);
+      doc.addPage();
+      doc.setFillColor(61, 127, 212);
+      doc.rect(0, 0, pageW, 2, 'F');
+      y = mT;
+    }
+
     function checkPageBreak() {
-      if (y + lineH > pageH - mB - 10) {
-        _nfPdfFooter(doc, pageW, pageH);
-        doc.addPage();
-        doc.setFillColor(61, 127, 212);
-        doc.rect(0, 0, pageW, 2, 'F');
-        y = mT;
+      if (y + bodyLineH > pageH - mB - 10) {
+        addNewPage();
         doc.setFontSize(11);
         doc.setTextColor(50, 50, 50);
         return true;
@@ -10319,86 +10330,37 @@ async function nfShareAsPdf() {
       return false;
     }
 
-    const segments = parseHtmlToSegments(data.bodyHtml);
+    // Parse and render
+    const blocks = htmlToPdfBlocks(data.bodyHtml);
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
 
-    // Render segments: collect inline text, flush on breaks
-    let currentLine = []; // array of { text, bold, italic }
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const block = blocks[bi];
 
-    function flushLine(lineSegments) {
-      if (!lineSegments.length) return;
-      // Concatenate all text in this logical line
-      let fullText = lineSegments.map(s => s.text).join('');
-      fullText = fullText.replace(/[ \t]+/g, ' ').trim();
-      if (!fullText) return;
-
-      // Split into physical lines that fit page width
-      // For simplicity with mixed formatting, measure the full text first
-      doc.setFont('helvetica', 'normal');
-      const wrappedLines = doc.splitTextToSize(fullText, cW);
-
-      // For each wrapped line, find which segments cover it and render with formatting
-      let charPos = 0;
-      for (const wLine of wrappedLines) {
+      // Add paragraph spacing before (except first block)
+      if (bi > 0) {
+        y += paraSpacing;
         checkPageBreak();
-        // Find formatting for chars in this line
-        let x = mL;
-        let lineCharStart = charPos;
-        let lineCharEnd = charPos + wLine.length;
+      }
 
-        // Walk through segments to find formatting spans for this line
-        let segCharPos = 0;
-        for (const seg of lineSegments) {
-          const segText = seg.text;
-          const segStart = segCharPos;
-          const segEnd = segCharPos + segText.length;
+      for (const line of block) {
+        setFontStyle(line.bold, line.italic);
+        doc.setFontSize(line.bold ? 12 : 11);
 
-          // Find overlap with current line
-          const overlapStart = Math.max(segStart, lineCharStart);
-          const overlapEnd = Math.min(segEnd, lineCharEnd);
+        // Word-wrap this line to fit page width
+        const wrappedLines = doc.splitTextToSize(line.text, cW);
 
-          if (overlapStart < overlapEnd) {
-            const piece = fullText.substring(overlapStart, overlapEnd);
-            if (piece) {
-              setFontStyle(doc, seg.bold, seg.italic);
-              doc.text(piece, x, y);
-              x += doc.getTextWidth(piece);
-            }
-          }
-          segCharPos += segText.length;
+        for (const wl of wrappedLines) {
+          checkPageBreak();
+          setFontStyle(line.bold, line.italic);
+          doc.setFontSize(line.bold ? 12 : 11);
+          doc.setTextColor(50, 50, 50);
+          doc.text(wl, mL, y);
+          y += bodyLineH;
         }
-
-        y += lineH;
-        charPos = lineCharEnd;
-        // Skip space at line break
-        while (charPos < fullText.length && fullText[charPos] === ' ') charPos++;
       }
     }
-
-    for (const seg of segments) {
-      if (seg.paraBreak) {
-        flushLine(currentLine);
-        currentLine = [];
-        y += lineH * 0.6; // paragraph spacing
-        continue;
-      }
-      if (seg.newLine) {
-        flushLine(currentLine);
-        currentLine = [];
-        continue;
-      }
-      if (seg.listItem) {
-        flushLine(currentLine);
-        currentLine = [];
-        currentLine.push({ text: '•  ', bold: false, italic: false });
-        continue;
-      }
-      if (seg.text) {
-        currentLine.push(seg);
-      }
-    }
-    flushLine(currentLine);
 
     // --- Footer ---
     _nfPdfFooter(doc, pageW, pageH);
@@ -12255,57 +12217,6 @@ function updateDhamAdminUI() {
   if (btn) btn.style.display = hasPermission('dhamas') ? '' : 'none';
 }
 
-// ═══════════════════════════════════════
-// AUTO UPDATE NOTIFICATION
-// ═══════════════════════════════════════
-function _appContentHash() {
-  // Generate a simple hash from the page's own script content
-  const scripts = document.querySelectorAll('script:not([src])');
-  let content = '';
-  scripts.forEach(s => content += s.textContent);
-  // Also include key structural HTML (categories, settings sections, etc.)
-  const mainEl = document.getElementById('screen-settings');
-  if (mainEl) content += mainEl.innerHTML.length;
-  const songsEl = document.getElementById('screen-songs');
-  if (songsEl) content += songsEl.innerHTML.length;
-  // djb2 hash
-  let hash = 5381;
-  for (let i = 0; i < content.length; i++) {
-    hash = ((hash << 5) + hash + content.charCodeAt(i)) & 0xFFFFFFFF;
-  }
-  return hash.toString(36);
-}
-
-function checkForAppUpdate() {
-  try {
-    const currentHash = _appContentHash();
-    const storedHash = localStorage.getItem('_appHash');
-    if (!storedHash) {
-      // First time using the app — just store hash, don't show banner
-      localStorage.setItem('_appHash', currentHash);
-      return;
-    }
-    if (storedHash !== currentHash) {
-      // App has been updated — show banner after a short delay
-      setTimeout(() => {
-        const banner = document.getElementById('updateBanner');
-        if (banner) banner.classList.add('show');
-        // Auto-dismiss after 8 seconds
-        setTimeout(() => dismissUpdateBanner(), 4000);
-      }, 1200);
-    }
-  } catch(e) {}
-}
-
-function dismissUpdateBanner() {
-  const banner = document.getElementById('updateBanner');
-  if (banner) banner.classList.remove('show');
-  // Save current hash so banner doesn't show again
-  try {
-    localStorage.setItem('_appHash', _appContentHash());
-  } catch(e) {}
-}
-
 // ===================================================================
 // SEVAKART — Devotee Service Directory
 // ===================================================================
@@ -14037,9 +13948,6 @@ function init() {
   const header = document.querySelector('.header');
   if (header) header.style.display = 'none';
   updateHomeScreen();
-
-  // Check if app was updated since last visit
-  checkForAppUpdate();
 }
 
 init();
@@ -14052,15 +13960,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
         console.log('[PWA] Service Worker registered, scope:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'activated') {
-              showToast('App updated! Refresh for latest version.');
-            }
-          });
-        });
       })
       .catch(() => {}); // SW only works on deployed site
   });
