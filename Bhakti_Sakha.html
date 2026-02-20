@@ -1616,6 +1616,7 @@ body {
 }
 .nf-share-opt-text { background:rgba(61,127,212,0.12); box-shadow:0 0 12px rgba(61,127,212,0.1); }
 .nf-share-opt-img { background:rgba(155,89,182,0.12); box-shadow:0 0 12px rgba(155,89,182,0.1); }
+.nf-share-opt-pdf { background:rgba(231,76,60,0.12); box-shadow:0 0 12px rgba(231,76,60,0.1); }
 .nf-share-opt-name { font-size:0.88rem; font-weight:600; color:var(--text); }
 .nf-share-opt-desc { font-size:0.72rem; color:var(--text3); margin-top:2px; }
 .nf-share-cancel {
@@ -3558,6 +3559,7 @@ body {
   <!-- Google API client -->
   <script src="https://apis.google.com/js/api.js" async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" async defer></script>
 </head>
 <body>
 <!-- Gayatri / Rahu in-app alert banner -->
@@ -5202,6 +5204,13 @@ body {
           <div class="nf-share-opt-desc">Beautiful card for social media & status</div>
         </div>
       </button>
+      <button class="nf-share-option" onclick="nfShareAsPdf()">
+        <div class="nf-share-opt-icon nf-share-opt-pdf">📄</div>
+        <div class="nf-share-opt-info">
+          <div class="nf-share-opt-name">Share as PDF</div>
+          <div class="nf-share-opt-desc">Printable document for sharing & archiving</div>
+        </div>
+      </button>
     </div>
     <button class="nf-share-cancel" onclick="nfCloseShareMenu()">Cancel</button>
   </div>
@@ -5226,9 +5235,9 @@ body {
   <div id="nfShareCardInner" class="nf-share-card">
     <div class="nf-share-card-accent" id="nfShareCardAccent"></div>
     <div class="nf-share-card-body">
-      <div class="nf-share-card-folder" id="nfShareCardFolder"></div>
+      <div class="nf-share-card-folder" id="nfShareCardFolder" style="display:none;"></div>
       <div class="nf-share-card-title" id="nfShareCardTitle"></div>
-      <div class="nf-share-card-date" id="nfShareCardDate"></div>
+      <div class="nf-share-card-date" id="nfShareCardDate" style="display:none;"></div>
       <div class="nf-share-card-divider"></div>
       <div class="nf-share-card-content" id="nfShareCardContent"></div>
     </div>
@@ -9943,7 +9952,7 @@ async function nfShareAsText() {
   const data = _nfGetCurrentNoteForShare();
   if (!data) return;
 
-  const shareText = `${data.title}\n\n${data.bodyText}\n\n— ${data.folderInfo.name} • Bhakti Sakha 🙏`;
+  const shareText = `${data.title}\n\n${data.bodyText}\n\n— Bhakti Sakha 🙏`;
 
   if (navigator.share) {
     try {
@@ -10033,9 +10042,9 @@ async function nfConfirmBgAndShare() {
     const divider = document.querySelector('.nf-share-card-divider');
     divider.className = 'nf-share-card-divider div-' + folderType;
 
-    document.getElementById('nfShareCardFolder').textContent = data.folderInfo.icon + ' ' + data.folderInfo.name;
+    document.getElementById('nfShareCardFolder').textContent = '';
     document.getElementById('nfShareCardTitle').textContent = data.title;
-    document.getElementById('nfShareCardDate').textContent = data.dateStr;
+    document.getElementById('nfShareCardDate').textContent = '';
 
     const bodyHtml = data.note.body || '';
     document.getElementById('nfShareCardContent').innerHTML = bodyHtml;
@@ -10102,6 +10111,124 @@ function _nfDownloadBlob(blob, title) {
 function _nfRemoveSpinner() {
   const s = document.getElementById('nfShareSpinner');
   if (s) s.remove();
+}
+
+// --- Share as PDF ---
+async function nfShareAsPdf() {
+  nfCloseShareMenu();
+  const data = _nfGetCurrentNoteForShare();
+  if (!data) return;
+
+  if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+    showToast('PDF library loading… try again in a moment');
+    return;
+  }
+
+  // Show spinner
+  const spinner = document.createElement('div');
+  spinner.className = 'nf-share-generating';
+  spinner.id = 'nfShareSpinner';
+  spinner.innerHTML = '<div class="nf-share-spinner"></div><div class="nf-share-gen-text">Creating PDF…</div>';
+  document.body.appendChild(spinner);
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const marginL = 20, marginR = 20, marginT = 25, marginB = 25;
+    const contentW = pageW - marginL - marginR;
+
+    // --- Accent bar at top ---
+    doc.setFillColor(61, 127, 212);
+    doc.rect(0, 0, pageW, 4, 'F');
+
+    // --- Title ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(30, 30, 30);
+    let y = marginT + 6;
+    const titleLines = doc.splitTextToSize(data.title, contentW);
+    doc.text(titleLines, marginL, y);
+    y += titleLines.length * 8 + 4;
+
+    // --- Divider ---
+    doc.setDrawColor(61, 127, 212);
+    doc.setLineWidth(0.5);
+    doc.line(marginL, y, marginL + 30, y);
+    y += 10;
+
+    // --- Body text ---
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(50, 50, 50);
+    const bodyText = data.bodyText || '';
+    const bodyLines = doc.splitTextToSize(bodyText, contentW);
+    const lineH = 5.5;
+
+    for (let i = 0; i < bodyLines.length; i++) {
+      if (y + lineH > pageH - marginB - 10) {
+        // Footer on current page
+        _nfPdfFooter(doc, pageW, pageH);
+        doc.addPage();
+        // Accent bar on new page
+        doc.setFillColor(61, 127, 212);
+        doc.rect(0, 0, pageW, 2, 'F');
+        y = marginT;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(50, 50, 50);
+      }
+      doc.text(bodyLines[i], marginL, y);
+      y += lineH;
+    }
+
+    // --- Footer on last page ---
+    _nfPdfFooter(doc, pageW, pageH);
+
+    // --- Save / Share ---
+    const pdfBlob = doc.output('blob');
+    const fileName = (data.title || 'note').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_') + '.pdf';
+
+    if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], fileName, { type: 'application/pdf' })] })) {
+      const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+      try {
+        await navigator.share({ title: data.title, files: [file] });
+        showToast('Shared successfully');
+      } catch(e) {
+        if (e.name !== 'AbortError') _nfDownloadPdfBlob(pdfBlob, fileName);
+      }
+    } else {
+      _nfDownloadPdfBlob(pdfBlob, fileName);
+    }
+  } catch(e) {
+    console.error('Share as PDF error:', e);
+    showToast('Could not create PDF');
+  }
+  _nfRemoveSpinner();
+}
+
+function _nfPdfFooter(doc, pageW, pageH) {
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.3);
+  doc.line(20, pageH - 15, pageW - 20, pageH - 15);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8);
+  doc.setTextColor(140, 140, 140);
+  doc.text('Bhakti Sakha', pageW / 2, pageH - 10, { align: 'center' });
+}
+
+function _nfDownloadPdfBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  showToast('PDF downloaded ✓');
 }
 
 // --- Auto-save on typing ---
