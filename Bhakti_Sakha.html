@@ -13822,6 +13822,8 @@ const SK_CATEGORIES = [
 
 // Data storage
 let skListings = JSON.parse(localStorage.getItem('skListings') || '[]');
+// Normalize status from localStorage (may have mixed case from server)
+skListings = skListings.map(l => { l.status = (l.status || 'pending').toString().trim().toLowerCase(); return l; });
 let skReviews = JSON.parse(localStorage.getItem('skReviews') || '[]');
 let skReports = JSON.parse(localStorage.getItem('skReports') || '[]');
 let _skFilter = {category:'', city:''};
@@ -13863,7 +13865,16 @@ async function _skFetchFromServer() {
     const resp = await fetch(SONGS_API_URL + '?type=sevakart');
     const data = await resp.json();
     if (data.success && data.listings) {
-      skListings = data.listings;
+      // Normalize status to lowercase — Google Sheets may return 'Pending', 'PENDING', etc.
+      skListings = data.listings.map(l => {
+        if (l.status) {
+          l.status = l.status.toString().trim().toLowerCase();
+        } else {
+          // Listings without a status field default to 'pending'
+          l.status = 'pending';
+        }
+        return l;
+      });
       if (data.reviews) skReviews = data.reviews;
       if (data.reports) skReports = data.reports;
       localStorage.setItem('skListings', JSON.stringify(skListings));
@@ -14863,6 +14874,8 @@ function admToggleSection(id) {
 // PRAYER CIRCLE
 // ===================================================================
 let pcRequests = JSON.parse(localStorage.getItem('pcRequests') || '[]');
+// Normalize status from localStorage (may have mixed case from server)
+pcRequests = pcRequests.map(r => { r.status = (r.status || 'pending').toString().trim().toLowerCase(); return r; });
 let pcPrayers = JSON.parse(localStorage.getItem('pcPrayers') || '[]');
 let pcReports = JSON.parse(localStorage.getItem('pcReports') || '[]');
 let _pcCatFilter = '';
@@ -14921,7 +14934,15 @@ async function _pcFetchFromServer() {
     const resp = await fetch(SONGS_API_URL + '?type=prayercircle');
     const data = await resp.json();
     if (data.success && data.requests) {
-      pcRequests = data.requests;
+      // Normalize status to lowercase — Google Sheets may return 'Pending', 'PENDING', etc.
+      pcRequests = data.requests.map(r => {
+        if (r.status) {
+          r.status = r.status.toString().trim().toLowerCase();
+        } else {
+          r.status = 'pending';
+        }
+        return r;
+      });
       if (data.prayers) pcPrayers = data.prayers;
       if (data.reports) pcReports = data.reports;
       localStorage.setItem('pcRequests', JSON.stringify(pcRequests));
