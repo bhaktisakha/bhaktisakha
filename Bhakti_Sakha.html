@@ -7982,6 +7982,7 @@ async function registerTokenWithServer(token) {
       custom: document.getElementById('n-custom')?.checked ?? true,
       gayatri: document.getElementById('n-gayatri')?.checked ?? false,
       rahu: document.getElementById('n-rahu')?.checked ?? false,
+      prayer: document.getElementById('n-prayer')?.checked ?? true,
       alertTime: document.getElementById('n-time')?.value || '07:00',
       advance: document.getElementById('n-advance')?.value || '1'
     };
@@ -8107,7 +8108,7 @@ setTimeout(initFirebase, 1500);
 
 // Hook notification toggles to re-register preferences
 setTimeout(() => {
-  ['n-ekadashi','n-festival','n-appearance','n-custom','n-gayatri','n-rahu','n-time','n-advance'].forEach(id => {
+  ['n-ekadashi','n-festival','n-appearance','n-custom','n-gayatri','n-rahu','n-prayer','n-time','n-advance'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', () => {
       if (_fcmToken) { registerTokenWithServer(_fcmToken); registerUpcomingEvents(); }
@@ -11195,11 +11196,53 @@ function pcSubmitRequest() {
 }
 
 function _pcNotifyNewRequest(req) {
-  // Check if prayer notifications are enabled
-  const s = JSON.parse(localStorage.getItem('settings') || '{}');
-  if (s['n-prayer'] === false) return;
-  // This would trigger push notification via server in production
-  // For now, just a toast for the submitter confirmation
+  // Only notify admins for pending requests
+  if (req.status !== 'pending') return;
+
+  // Build list of admin emails who have prayer permission
+  const adminEmails = [];
+  try {
+    const allAdmins = _getAdminList();
+    const perms = _getAdminPermissions();
+    allAdmins.forEach(email => {
+      const eLower = email.toLowerCase();
+      // Super admin always gets notified
+      if (eLower === SUPER_ADMIN_EMAIL.toLowerCase()) { adminEmails.push(eLower); return; }
+      const userPerms = perms[eLower];
+      // Legacy admins without specific perms, or admins with prayer perm
+      if (!userPerms || userPerms.includes('prayer')) adminEmails.push(eLower);
+    });
+  } catch(e) { adminEmails.push(SUPER_ADMIN_EMAIL.toLowerCase()); }
+
+  const displayName = req.anonymous ? 'A devotee' : req.name;
+  const truncTitle = req.title.length > 60 ? req.title.substring(0, 57) + '...' : req.title;
+
+  fetch(SONGS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: 'notifyPrayerPending',
+      adminEmails: adminEmails,
+      title: '🙏 New Prayer Request Pending',
+      body: displayName + ' has submitted a prayer request: "' + truncTitle + '". Please review and approve.',
+      tag: 'prayer-pending-' + req.id
+    })
+  }).catch(e => {});
+}
+
+function _pcNotifyApproved(req) {
+  const displayName = req.anonymous ? 'A devotee' : req.name;
+
+  fetch(SONGS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: 'notifyPrayerApproved',
+      title: '🙏 New Prayer Request — Please Pray',
+      body: displayName + ' is seeking prayers for ' + req.category + '. Open Prayer Circle to offer your support.',
+      tag: 'prayer-approved-' + req.id
+    })
+  }).catch(e => {});
 }
 
 function _pcGetApprovedPublic() {
@@ -11669,6 +11712,9 @@ function pcAdminApprove(reqId) {
   showToast('✅ Prayer request approved');
   pcRenderFeed();
   if (_pcCurrentDetailId === reqId) pcRenderDetail(reqId);
+
+  // Send push notification to all signed-in users
+  _pcNotifyApproved(req);
 }
 
 function pcAdminStartReject(reqId) {
