@@ -5333,12 +5333,11 @@ const D2R = Math.PI / 180;
 // ADMIN & ROLE SYSTEM
 // ===================================================================
 const SUPER_ADMIN_EMAIL = 'sajeev1478@gmail.com';
-const ADMIN_EMAILS = ['sajeev1478@gmail.com', 'bhaktisakhaapp@gmail.com', 'madan.murari.rns@iskcon.net'];
+const ADMIN_EMAILS = ['sajeev1478@gmail.com', 'bhaktisakhaapp@gmail.com'];
 
 // Hardcoded permissions for specific admins (overrides server/localStorage)
 const HARDCODED_PERMISSIONS = {
-  'madan.murari.rns@iskcon.net': ['dhamas', 'sevakart', 'prayer', 'users']
-  // Note: 'songs' intentionally excluded
+  // Add admin-specific permission overrides here if needed
 };
 
 function _getAdminList() {
