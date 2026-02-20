@@ -7877,14 +7877,20 @@ function exportEvts() {
 function importEvts() {
   const inp = document.createElement('input'); inp.type='file'; inp.accept='.json';
   inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
     const r = new FileReader();
-    r.onload = x => {
+    r.onload = function(evt) {
+      const content = evt.target.result || r.result;
+      if (!content) { showToast('Could not read file contents'); return; }
       let data;
-      try { data = JSON.parse(r.result); } catch(err) { showToast('Could not read file: ' + err.message); return; }
-      if (!data.events || !Array.isArray(data.events) || data.events.length === 0) { showToast('No events found in file'); return; }
+      try { data = JSON.parse(content); } catch(err) { showToast('Could not read file: ' + err.message); return; }
+      if (!data || typeof data !== 'object') { showToast('Invalid file format'); return; }
+      // Support both {events:[...]} and direct array [...]
+      let evtArray = data.events || (Array.isArray(data) ? data : null);
+      if (!evtArray || !Array.isArray(evtArray) || evtArray.length === 0) { showToast('No events found in file'); return; }
       try {
-        // Validate & normalize each event
-        const validated = data.events.filter(ev => ev && ev.name && ev.name.trim()).map(ev => ({
+        const validated = evtArray.filter(ev => ev && ev.name && String(ev.name).trim()).map(ev => ({
           id: ev.id || Date.now() + Math.floor(Math.random()*100000),
           name: String(ev.name).trim(),
           day: parseInt(ev.day) || 1,
@@ -7894,13 +7900,14 @@ function importEvts() {
           notes: ev.notes || '',
           reminder: ev.reminder !== false
         }));
+        if (validated.length === 0) { showToast('No valid events in file'); return; }
         customEvts = validated;
         localStorage.setItem('customEvts', JSON.stringify(customEvts));
         try { renderEvts(); } catch(re) { console.warn('renderEvts after import:', re); }
         showToast(`Imported ${validated.length} events ✅`);
       } catch(err) { showToast('Import error: ' + err.message); }
     };
-    r.readAsText(e.target.files[0]);
+    r.readAsText(file);
   };
   inp.click();
 }
