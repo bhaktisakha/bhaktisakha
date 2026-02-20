@@ -9070,7 +9070,7 @@ function updateHomeGoogleUI() {
     if (em) em.textContent = gUser.email || '';
     // Show admin icon for admins
     const admBtn = document.getElementById('homeAdminBtn');
-    if (admBtn) admBtn.style.display = isAdmin() ? '' : 'none';
+    if (admBtn) admBtn.style.display = isAdmin() ? 'flex' : 'none';
   } else {
     signedIn.style.display = 'none';
     signedOut.style.display = '';
