@@ -909,19 +909,228 @@ body {
   font-family:inherit; transition:all 0.15s; flex-shrink:0;
 }
 
-/* ===== MY EVENTS ===== */
-.events-screen { overflow-y:auto; padding:16px 16px 100px; }
-.events-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-.add-evt-btn {
-  background:var(--accent-blue); border:none; border-radius:10px;
-  padding:8px 16px; color:white; font-size:0.82rem;
-  cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px;
-  transition:opacity 0.2s;
+/* ===== MY EVENTS — REDESIGNED ===== */
+.events-screen { overflow-y:auto; padding:0 0 100px; display:flex; flex-direction:column; height:100%; }
+.events-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 18px 0; }
+.events-hdr .screen-title { font-size:1.15rem; font-weight:700; }
+
+/* Inner tab nav */
+.evt-tabs { display:flex; gap:2px; padding:10px 18px 0; flex-shrink:0; }
+.evt-tab-btn {
+  flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:10px; padding:9px 6px; text-align:center;
+  font-size:0.73rem; font-weight:600; color:var(--text3);
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+  letter-spacing:0.3px; position:relative;
 }
-.add-evt-btn:active { opacity:0.8; }
+.evt-tab-btn.active {
+  background:rgba(94,232,160,0.1); border-color:rgba(94,232,160,0.35);
+  color:#5ee8a0;
+}
+.evt-tab-btn .evt-tab-dot {
+  display:inline-block; width:5px; height:5px; border-radius:50%;
+  background:var(--accent-gold); margin-left:4px; vertical-align:middle;
+  opacity:0;
+}
+.evt-tab-btn .evt-tab-dot.has-items { opacity:1; }
+
+/* Tab content panels */
+.evt-tab-panel { display:none; flex:1; overflow-y:auto; padding:14px 18px; }
+.evt-tab-panel.active { display:block; }
+
+/* Today section */
+.evt-today-date {
+  font-size:0.78rem; color:var(--text3); margin-bottom:12px;
+  font-weight:500; letter-spacing:0.3px;
+  display:flex; align-items:center; gap:6px;
+}
+.evt-today-date::before {
+  content:''; display:inline-block; width:8px; height:8px;
+  border-radius:50%; background:#5ee8a0;
+  box-shadow:0 0 8px rgba(94,232,160,0.5);
+}
+.evt-section-label {
+  font-size:0.68rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:1.2px; color:var(--text3); margin:18px 0 10px;
+  display:flex; align-items:center; gap:8px;
+}
+.evt-section-label::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+
+/* Event cards */
+.evt-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:13px 14px; margin-bottom:10px;
+  display:flex; align-items:center; gap:12px;
+  transition:all 0.2s; position:relative; overflow:hidden;
+}
+.evt-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  border-radius:3px 0 0 3px;
+}
+.evt-card.cat-spiritual::before { background:#e8a020; }
+.evt-card.cat-health::before { background:#27ae60; }
+.evt-card.cat-work::before { background:#3d7fd4; }
+.evt-card.cat-personal::before { background:#f0c040; }
+.evt-card.cat-travel::before { background:#9b59b6; }
+.evt-card.cat-birthday::before { background:#e74c8b; }
+.evt-card.cat-anniversary::before { background:#e8a020; }
+.evt-card.cat-default::before { background:#5ee8a0; }
+.evt-card:active { transform:scale(0.985); }
+.evt-emoji { font-size:1.5rem; flex-shrink:0; width:38px; text-align:center; }
+.evt-info { flex:1; min-width:0; }
+.evt-name-text { font-size:0.92rem; color:var(--text); font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.evt-time-text { font-size:0.76rem; color:var(--accent-gold); font-weight:500; margin-bottom:2px; }
+.evt-date { font-size:0.76rem; color:var(--text3); }
+.evt-type-badge {
+  display:inline-block; font-size:0.62rem; font-weight:600;
+  border-radius:20px; padding:2px 8px; letter-spacing:0.3px;
+  text-transform:uppercase; margin-bottom:3px;
+}
+.evt-type-badge.badge-spiritual { background:rgba(232,160,32,0.15); color:#e8a020; border:1px solid rgba(232,160,32,0.25); }
+.evt-type-badge.badge-health { background:rgba(39,174,96,0.12); color:#27ae60; border:1px solid rgba(39,174,96,0.25); }
+.evt-type-badge.badge-work { background:rgba(61,127,212,0.12); color:#3d7fd4; border:1px solid rgba(61,127,212,0.25); }
+.evt-type-badge.badge-personal { background:rgba(240,192,64,0.12); color:#dab030; border:1px solid rgba(240,192,64,0.25); }
+.evt-type-badge.badge-travel { background:rgba(155,89,182,0.12); color:#9b59b6; border:1px solid rgba(155,89,182,0.25); }
+.evt-type-badge.badge-birthday { background:rgba(231,76,139,0.12); color:#e74c8b; border:1px solid rgba(231,76,139,0.2); }
+.evt-type-badge.badge-anniversary { background:rgba(232,160,32,0.12); color:#e8a020; border:1px solid rgba(232,160,32,0.2); }
+.evt-countdown {
+  font-size:0.68rem; color:var(--accent-gold); font-weight:600;
+  background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.2);
+  border-radius:8px; padding:3px 8px; white-space:nowrap; flex-shrink:0;
+}
+.evt-card-actions {
+  display:flex; flex-direction:column; gap:5px; flex-shrink:0;
+}
+.evt-del {
+  background:transparent; border:1px solid var(--border);
+  border-radius:8px; width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:0.85rem; color:var(--text2);
+  transition:all 0.15s;
+}
+.evt-del:active { background:rgba(255,255,255,0.06); }
+
+/* Floating add button */
+.evt-fab {
+  position:fixed; bottom:82px; right:max(calc((100vw - 430px)/2 + 18px), 18px);
+  width:52px; height:52px; border-radius:16px; border:none;
+  background:linear-gradient(135deg, #27ae60, #2ecc71);
+  color:white; font-size:1.5rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 20px rgba(39,174,96,0.4), 0 0 40px rgba(39,174,96,0.15);
+  z-index:100; transition:all 0.2s;
+  font-family:inherit;
+}
+.evt-fab:active { transform:scale(0.92); }
+.evt-fab-hidden { display:none; }
+
+/* Empty state */
+.evt-empty {
+  text-align:center; padding:40px 20px;
+  color:var(--text3);
+}
+.evt-empty-icon { font-size:2.4rem; margin-bottom:12px; opacity:0.7; }
+.evt-empty-text { font-size:0.88rem; line-height:1.6; }
+
+/* Calendar view */
+.evt-cal-month-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.evt-cal-month-nav button {
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:8px; width:32px; height:32px; color:var(--text2);
+  cursor:pointer; font-size:0.9rem; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s;
+}
+.evt-cal-month-nav button:active { background:rgba(255,255,255,0.12); }
+.evt-cal-month-label { font-size:0.95rem; font-weight:600; color:var(--text); }
+.evt-cal-grid {
+  display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:14px;
+}
+.evt-cal-hdr {
+  text-align:center; font-size:0.65rem; font-weight:600;
+  color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;
+  padding:6px 0;
+}
+.evt-cal-day {
+  aspect-ratio:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  border-radius:10px; cursor:pointer; position:relative;
+  font-size:0.82rem; color:var(--text);
+  transition:all 0.15s;
+}
+.evt-cal-day:active { background:rgba(255,255,255,0.06); }
+.evt-cal-day.other { opacity:0.2; }
+.evt-cal-day.today { background:rgba(94,232,160,0.12); font-weight:700; color:#5ee8a0; }
+.evt-cal-day.selected { background:rgba(192,57,43,0.2); border:1px solid rgba(192,57,43,0.4); }
+.evt-cal-day .cal-indicators {
+  display:flex; gap:2px; position:absolute; bottom:3px;
+}
+.evt-cal-day .cal-dot {
+  width:4px; height:4px; border-radius:50%;
+}
+.evt-cal-day .cal-dot.dot-birthday { background:#e74c8b; }
+.evt-cal-day .cal-dot.dot-anniversary { background:#e8a020; }
+.evt-cal-day .cal-dot.dot-appt { background:#3d7fd4; }
+.evt-cal-day .cal-dot.dot-spiritual { background:#e8a020; }
+.evt-cal-day .cal-dot.dot-reminder { background:#5ee8a0; }
+
+/* Calendar bottom sheet for selected day */
+.evt-cal-daysheet {
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:14px; padding:14px; margin-top:6px;
+  animation:evtSlideUp 0.2s ease;
+}
+@keyframes evtSlideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.evt-cal-daysheet-hdr {
+  font-size:0.78rem; font-weight:600; color:var(--text2); margin-bottom:10px;
+  display:flex; align-items:center; gap:6px;
+}
+
+/* Occasions tab reminder badge */
+.evt-reminder-options {
+  display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;
+}
+.evt-reminder-pill {
+  font-size:0.62rem; padding:2px 8px; border-radius:12px;
+  background:rgba(39,174,96,0.1); border:1px solid rgba(39,174,96,0.25);
+  color:#27ae60; cursor:pointer; font-family:inherit;
+  transition:all 0.15s;
+}
+.evt-reminder-pill.active { background:rgba(39,174,96,0.25); border-color:#27ae60; }
+.evt-reminder-pill:active { transform:scale(0.95); }
+
+/* Quick action buttons */
+.evt-quick-actions { display:flex; gap:6px; margin-top:8px; }
+.evt-quick-btn {
+  font-size:0.68rem; padding:4px 10px; border-radius:8px;
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  color:var(--text2); cursor:pointer; font-family:inherit;
+  transition:all 0.15s;
+}
+.evt-quick-btn:active { background:rgba(255,255,255,0.1); }
+
+/* Appointments sort tabs */
+.evt-appt-sort { display:flex; gap:4px; margin-bottom:12px; }
+.evt-appt-sort-btn {
+  font-size:0.7rem; padding:5px 12px; border-radius:8px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  color:var(--text3); cursor:pointer; font-family:inherit;
+  font-weight:500; transition:all 0.15s;
+}
+.evt-appt-sort-btn.active {
+  background:rgba(61,127,212,0.12); border-color:rgba(61,127,212,0.3);
+  color:var(--accent-blue);
+}
+
+/* Backup box */
 .backup-box {
   background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.3);
-  border-radius:12px; padding:12px 14px; margin-bottom:16px;
+  border-radius:12px; padding:12px 14px; margin:12px 18px 0;
+  flex-shrink:0;
 }
 .bk-text { font-size:0.78rem; color:var(--text2); line-height:1.5; }
 .bk-text strong { color:#27ae60; }
@@ -931,28 +1140,46 @@ body {
   border-radius:8px; padding:5px 12px; font-size:0.73rem;
   color:#27ae60; cursor:pointer; font-family:inherit; transition:all 0.2s;
 }
-.evt-card {
-  background:var(--card); border:1px solid var(--border);
-  border-left:3px solid #27ae60; border-radius:0 12px 12px 0;
-  padding:12px 14px; margin-bottom:10px;
-  display:flex; align-items:center; gap:12px;
+
+/* Add event type selector */
+.evt-type-selector { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.evt-type-option {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:12px; padding:14px 10px; text-align:center;
+  cursor:pointer; transition:all 0.2s; font-family:inherit;
 }
-.evt-emoji { font-size:1.46rem; }
-.evt-info { flex:1; }
-.evt-name-text { font-size:0.96rem; color:var(--text); margin-bottom:4px; font-weight:500; }
-.evt-type-badge {
-  display:inline-block; font-size:0.71rem; color:var(--accent-blue);
-  background:rgba(61,127,212,0.12); border:1px solid rgba(61,127,212,0.25);
-  border-radius:20px; padding:2px 8px; margin-bottom:4px; font-weight:500;
-  letter-spacing:0.3px;
+.evt-type-option:active { transform:scale(0.96); }
+.evt-type-option.selected {
+  border-color:rgba(94,232,160,0.5); background:rgba(94,232,160,0.08);
 }
-.evt-date { font-size:0.81rem; color:var(--text3); margin-top:2px; }
-.evt-del {
-  background:transparent; border:1px solid var(--border);
-  border-radius:8px; width:30px; height:30px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:0.91rem; color:var(--text2);
+.evt-type-option-icon { font-size:1.5rem; margin-bottom:6px; }
+.evt-type-option-label { font-size:0.76rem; font-weight:600; color:var(--text); }
+
+/* Dynamic form sections inside add modal */
+.evt-form-section { display:none; }
+.evt-form-section.visible { display:block; }
+.evt-appt-category-grid { display:flex; flex-wrap:wrap; gap:6px; }
+.evt-cat-chip {
+  font-size:0.72rem; padding:5px 12px; border-radius:20px;
+  border:1px solid var(--border); background:rgba(255,255,255,0.04);
+  color:var(--text2); cursor:pointer; font-family:inherit;
+  transition:all 0.15s;
 }
+.evt-cat-chip.selected { font-weight:600; }
+.evt-cat-chip.chip-spiritual.selected { background:rgba(232,160,32,0.15); border-color:rgba(232,160,32,0.4); color:#e8a020; }
+.evt-cat-chip.chip-health.selected { background:rgba(39,174,96,0.12); border-color:rgba(39,174,96,0.4); color:#27ae60; }
+.evt-cat-chip.chip-work.selected { background:rgba(61,127,212,0.12); border-color:rgba(61,127,212,0.4); color:#3d7fd4; }
+.evt-cat-chip.chip-personal.selected { background:rgba(240,192,64,0.12); border-color:rgba(240,192,64,0.4); color:#dab030; }
+.evt-cat-chip.chip-travel.selected { background:rgba(155,89,182,0.12); border-color:rgba(155,89,182,0.4); color:#9b59b6; }
+
+/* Add-event step indicator */
+.evt-add-step { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.evt-add-step-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:rgba(255,255,255,0.1); transition:all 0.2s;
+}
+.evt-add-step-dot.active { background:#5ee8a0; box-shadow:0 0 8px rgba(94,232,160,0.4); }
+.evt-add-step-line { flex:1; height:1px; background:var(--border); }
 
 /* ===== SETTINGS ===== */
 .settings-screen { overflow-y:auto; padding:20px 16px 100px; }
@@ -3759,7 +3986,7 @@ body {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div class="home-card-title">My Events</div>
-          <div class="home-card-desc">Personal reminders, custom events and alerts</div>
+          <div class="home-card-desc" id="homeEvtWidget">Personal reminders, custom events and alerts</div>
         </div>
 
         <div class="home-card home-card--prayer" onclick="switchScreen('prayer',document.querySelectorAll('.nav-btn')[7])">
@@ -3897,12 +4124,11 @@ body {
     </div>
   </div>
 
-  <!-- EVENTS -->
+  <!-- EVENTS (Redesigned) -->
   <div class="screen" id="screen-events">
     <div class="events-screen">
       <div class="events-hdr">
         <div class="screen-title" style="margin:0;border:none;padding:0">My Events</div>
-        <button class="add-evt-btn" onclick="openAddEvt()">+ Add Event</button>
       </div>
       <div class="backup-box" id="evtBackupBox">
         <div class="bk-text" id="evtBackupMsg"><strong>Sign in with Google</strong> to sync events across devices.</div>
@@ -3912,8 +4138,47 @@ body {
           <button class="bk-btn" onclick="importEvts()">📥 Import</button>
         </div>
       </div>
-      <div id="evtList"></div>
+
+      <!-- Inner Tab Navigation -->
+      <div class="evt-tabs">
+        <button class="evt-tab-btn active" data-evttab="today" onclick="evtSwitchTab('today',this)">Today</button>
+        <button class="evt-tab-btn" data-evttab="calendar" onclick="evtSwitchTab('calendar',this)">Calendar</button>
+        <button class="evt-tab-btn" data-evttab="occasions" onclick="evtSwitchTab('occasions',this)">Occasions</button>
+        <button class="evt-tab-btn" data-evttab="appointments" onclick="evtSwitchTab('appointments',this)">Appts</button>
+      </div>
+
+      <!-- Today Panel -->
+      <div class="evt-tab-panel active" id="evtPanelToday">
+        <div class="evt-today-date" id="evtTodayDate"></div>
+        <div id="evtTodayList"></div>
+        <div class="evt-section-label">Upcoming — Next 7 Days</div>
+        <div id="evtUpcomingList"></div>
+      </div>
+
+      <!-- Calendar Panel -->
+      <div class="evt-tab-panel" id="evtPanelCalendar">
+        <div id="evtCalendarView"></div>
+      </div>
+
+      <!-- Occasions Panel (Birthdays & Anniversaries) -->
+      <div class="evt-tab-panel" id="evtPanelOccasions">
+        <div id="evtOccasionsList"></div>
+      </div>
+
+      <!-- Appointments Panel -->
+      <div class="evt-tab-panel" id="evtPanelAppointments">
+        <div class="evt-appt-sort">
+          <button class="evt-appt-sort-btn active" onclick="evtApptSort('today',this)">Today</button>
+          <button class="evt-appt-sort-btn" onclick="evtApptSort('upcoming',this)">Upcoming</button>
+          <button class="evt-appt-sort-btn" onclick="evtApptSort('past',this)">Past</button>
+        </div>
+        <div id="evtApptList"></div>
+      </div>
+
     </div>
+
+    <!-- Floating Action Button -->
+    <button class="evt-fab" id="evtFab" onclick="openAddEvt()">＋</button>
   </div>
 
   <!-- NOTES -->
@@ -4801,54 +5066,186 @@ body {
 
 <!-- Add Event Modal -->
 <div class="modal-overlay" id="addEvtModal">
-  <div class="modal-sheet">
+  <div class="modal-sheet" style="max-height:88vh;overflow-y:auto;">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="addEvtModalTitle">✨ Add Custom Event</div>
-    <div class="f-grp">
-      <label class="f-lbl">Event Name *</label>
-      <input class="f-inp" id="evtName" placeholder="e.g. Radha's Birthday Puja">
-    </div>
-    <div class="f-row">
-      <div class="f-grp">
-        <label class="f-lbl">Day *</label>
-        <select class="f-sel" id="evtDay"></select>
+    <div class="modal-title" id="addEvtModalTitle">✨ Add Event</div>
+
+    <!-- Step 1: Event Type Selector -->
+    <div id="evtAddStep1">
+      <div class="evt-type-selector">
+        <div class="evt-type-option" onclick="evtSelectType('birthday',this)">
+          <div class="evt-type-option-icon">🎂</div>
+          <div class="evt-type-option-label">Birthday</div>
+        </div>
+        <div class="evt-type-option" onclick="evtSelectType('anniversary',this)">
+          <div class="evt-type-option-icon">💍</div>
+          <div class="evt-type-option-label">Anniversary</div>
+        </div>
+        <div class="evt-type-option" onclick="evtSelectType('appointment',this)">
+          <div class="evt-type-option-icon">📅</div>
+          <div class="evt-type-option-label">Appointment</div>
+        </div>
+        <div class="evt-type-option" onclick="evtSelectType('spiritual',this)">
+          <div class="evt-type-option-icon">🙏</div>
+          <div class="evt-type-option-label">Spiritual</div>
+        </div>
       </div>
-      <div class="f-grp">
-        <label class="f-lbl">Month *</label>
-        <select class="f-sel" id="evtMonth">
-          <option value="0">January</option><option value="1">February</option>
-          <option value="2">March</option><option value="3">April</option>
-          <option value="4">May</option><option value="5">June</option>
-          <option value="6">July</option><option value="7">August</option>
-          <option value="8">September</option><option value="9">October</option>
-          <option value="10">November</option><option value="11">December</option>
-        </select>
+    </div>
+
+    <!-- Step 2: Dynamic Form -->
+    <div id="evtAddStep2" style="display:none;">
+      <div style="margin-bottom:12px;">
+        <button class="evt-quick-btn" onclick="evtBackToStep1()" style="font-size:0.72rem;">← Change type</button>
       </div>
+
+      <!-- Birthday / Anniversary Form -->
+      <div class="evt-form-section" id="evtFormOccasion">
+        <div class="f-grp">
+          <label class="f-lbl">Name *</label>
+          <input class="f-inp" id="evtName" placeholder="e.g. Ramesh Prabhu">
+        </div>
+        <div class="f-row">
+          <div class="f-grp">
+            <label class="f-lbl">Day *</label>
+            <select class="f-sel" id="evtDay"></select>
+          </div>
+          <div class="f-grp">
+            <label class="f-lbl">Month *</label>
+            <select class="f-sel" id="evtMonth">
+              <option value="">—</option>
+              <option value="0">January</option><option value="1">February</option>
+              <option value="2">March</option><option value="3">April</option>
+              <option value="4">May</option><option value="5">June</option>
+              <option value="6">July</option><option value="7">August</option>
+              <option value="8">September</option><option value="9">October</option>
+              <option value="10">November</option><option value="11">December</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Year (optional)</label>
+          <input class="f-inp" id="evtYear" type="number" placeholder="e.g. 1990" min="1900" max="2100">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Relationship</label>
+          <select class="f-sel" id="evtRelation">
+            <option value="">— Select —</option>
+            <option value="family">Family</option>
+            <option value="friend">Friend</option>
+            <option value="guru">Guru / Spiritual Teacher</option>
+            <option value="devotee">Devotee / Sangha</option>
+            <option value="colleague">Colleague</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Reminder</label>
+          <select class="f-sel" id="evtReminderTiming">
+            <option value="0">Same day</option>
+            <option value="1" selected>1 day before</option>
+            <option value="3">3 days before</option>
+            <option value="7">7 days before</option>
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Notes (optional)</label>
+          <textarea class="f-area" id="evtNotes" placeholder="Any notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- Appointment Form -->
+      <div class="evt-form-section" id="evtFormAppointment">
+        <div class="f-grp">
+          <label class="f-lbl">Title *</label>
+          <input class="f-inp" id="evtApptTitle" placeholder="e.g. Doctor Appointment">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Date *</label>
+          <input class="f-inp" id="evtApptDate" type="date">
+        </div>
+        <div class="f-row">
+          <div class="f-grp">
+            <label class="f-lbl">Start Time *</label>
+            <input class="f-inp" id="evtApptStart" type="time">
+          </div>
+          <div class="f-grp">
+            <label class="f-lbl">End Time</label>
+            <input class="f-inp" id="evtApptEnd" type="time">
+          </div>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Category</label>
+          <div class="evt-appt-category-grid" id="evtApptCatGrid">
+            <button type="button" class="evt-cat-chip chip-spiritual" onclick="evtPickCat('spiritual',this)">🙏 Spiritual</button>
+            <button type="button" class="evt-cat-chip chip-health" onclick="evtPickCat('health',this)">💚 Health</button>
+            <button type="button" class="evt-cat-chip chip-work" onclick="evtPickCat('work',this)">💼 Work</button>
+            <button type="button" class="evt-cat-chip chip-personal" onclick="evtPickCat('personal',this)">🏠 Personal</button>
+            <button type="button" class="evt-cat-chip chip-travel" onclick="evtPickCat('travel',this)">✈️ Travel</button>
+          </div>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Repeat</label>
+          <select class="f-sel" id="evtApptRepeat">
+            <option value="none">Does not repeat</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Reminder</label>
+          <select class="f-sel" id="evtApptReminder">
+            <option value="15">15 minutes before</option>
+            <option value="30" selected>30 minutes before</option>
+            <option value="60">1 hour before</option>
+            <option value="1440">1 day before</option>
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Location (optional)</label>
+          <input class="f-inp" id="evtApptLocation" placeholder="e.g. ISKCON Temple, New York">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Notes (optional)</label>
+          <textarea class="f-area" id="evtApptNotes" placeholder="Any notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- Spiritual Reminder Form -->
+      <div class="evt-form-section" id="evtFormSpiritual">
+        <div class="f-grp">
+          <label class="f-lbl">Title *</label>
+          <input class="f-inp" id="evtSpiritTitle" placeholder="e.g. Chant extra rounds">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Date *</label>
+          <input class="f-inp" id="evtSpiritDate" type="date">
+        </div>
+        <div class="f-row">
+          <div class="f-grp">
+            <label class="f-lbl">Time (optional)</label>
+            <input class="f-inp" id="evtSpiritTime" type="time">
+          </div>
+          <div class="f-grp">
+            <label class="f-lbl">Repeat</label>
+            <select class="f-sel" id="evtSpiritRepeat">
+              <option value="none">Does not repeat</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">Notes (optional)</label>
+          <textarea class="f-area" id="evtSpiritNotes" placeholder="e.g. Offer special prayers for…"></textarea>
+        </div>
+      </div>
+
+      <button class="f-submit" id="evtSaveBtn" onclick="saveEvt()">Save Event</button>
+      <button class="f-cancel" onclick="closeModal('addEvtModal')">Cancel</button>
     </div>
-    <div class="f-grp">
-      <label class="f-lbl">Year (optional — leave blank for annual)</label>
-      <input class="f-inp" id="evtYear" type="number" placeholder="e.g. 1990" min="1900" max="2100">
-    </div>
-    <div class="f-grp">
-      <label class="f-lbl">Event Type</label>
-      <select class="f-sel" id="evtType">
-        <option value="birthday">🎂 Birthday</option>
-        <option value="marriage">💍 Marriage Anniversary</option>
-        <option value="puja">🪷 Puja / Ceremony</option>
-        <option value="initiation">🌺 Initiation Day</option>
-        <option value="other">📌 Other</option>
-      </select>
-    </div>
-    <div class="f-grp">
-      <label class="f-lbl">Notes (optional)</label>
-      <textarea class="f-area" id="evtNotes" placeholder="Any notes..."></textarea>
-    </div>
-    <div class="sett-row" style="padding:8px 0;">
-      <div class="sett-info"><div class="sett-name">Enable Reminder</div></div>
-      <label class="toggle"><input type="checkbox" id="evtReminder" checked></label>
-    </div>
-    <button class="f-submit" id="evtSaveBtn" onclick="saveEvt()">Save Event</button>
-    <button class="f-cancel" onclick="closeModal('addEvtModal')">Cancel</button>
   </div>
 </div>
 
@@ -6422,11 +6819,10 @@ function getEventsForDate(dateStr) {
 }
 
 function evtIcon(type) {
-  return {birthday:'🎂', marriage:'💍', puja:'🪷', initiation:'🌺', other:'📌'}[type] || '📌';
+  return _evtIcon(type);
 }
 function evtTypeLabel(type) {
-  return {birthday:'Birthday', marriage:'Marriage Anniversary', puja:'Puja / Ceremony',
-          initiation:'Initiation Day', disappearance:'Disappearance Day', other:'Event'}[type] || 'Event';
+  return _evtTypeLabel(type);
 }
 
 function renderCalendar() {
@@ -7782,23 +8178,412 @@ function toggleEvtMore(uid) {
   lbl.textContent = open ? 'Show less' : `+ ${count} more`;
 }
 // ===================================================================
-// EVENTS
+// EVENTS — REDESIGNED MODULE
 // ===================================================================
-let editingEvtId = null; // Track if we're editing an event
+let editingEvtId = null;
+let _evtSelectedType = null;
+let _evtSelectedCat = 'spiritual';
+let _evtApptSortMode = 'today';
+let _evtCalMonth = new Date().getMonth();
+let _evtCalYear = new Date().getFullYear();
+let _evtCalSelectedDate = null;
+
+// ── Helpers ──
+function _evtIcon(type) {
+  return {birthday:'🎂',anniversary:'💍',marriage:'💍',appointment:'📅',spiritual:'🙏',puja:'🪷',initiation:'🌺',other:'📌'}[type]||'📌';
+}
+function _evtTypeLabel(type) {
+  return {birthday:'Birthday',anniversary:'Anniversary',marriage:'Anniversary',appointment:'Appointment',spiritual:'Spiritual Reminder',puja:'Puja / Ceremony',initiation:'Initiation Day',other:'Event'}[type]||'Event';
+}
+function _evtCatClass(e) {
+  if (e.type==='birthday') return 'cat-birthday';
+  if (e.type==='anniversary'||e.type==='marriage') return 'cat-anniversary';
+  if (e.type==='appointment'||e.type==='spiritual') {
+    const cat = e.category||'spiritual';
+    return 'cat-'+cat;
+  }
+  return 'cat-default';
+}
+function _evtBadgeClass(e) {
+  if (e.type==='birthday') return 'badge-birthday';
+  if (e.type==='anniversary'||e.type==='marriage') return 'badge-anniversary';
+  if (e.category) return 'badge-'+e.category;
+  return 'badge-spiritual';
+}
+function _evtGetNextOccurrence(e) {
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  if (e.type==='appointment'||e.type==='spiritual') {
+    if (e.apptDate) return new Date(e.apptDate + (e.startTime?'T'+e.startTime:''));
+    if (e.spiritDate) return new Date(e.spiritDate + (e.spiritTime?'T'+e.spiritTime:''));
+  }
+  // Occasion: recurring yearly
+  const m = parseInt(e.month), d = parseInt(e.day);
+  let next = new Date(thisYear, m, d);
+  if (next < new Date(thisYear, now.getMonth(), now.getDate())) {
+    next = new Date(thisYear+1, m, d);
+  }
+  return next;
+}
+function _evtDaysUntil(e) {
+  const next = _evtGetNextOccurrence(e);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.ceil((next - now) / 86400000);
+  return diff;
+}
+function _evtCountdownText(days) {
+  if (days === 0) return 'Today!';
+  if (days === 1) return 'Tomorrow';
+  if (days < 0) return Math.abs(days)+' days ago';
+  return days + ' days left';
+}
+function _evtFormatTime(t) {
+  if (!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const ampm = h>=12?'PM':'AM';
+  const h12 = h%12||12;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+function _evtIsToday(e) {
+  const now = new Date();
+  if (e.type==='appointment') {
+    return e.apptDate===now.toISOString().slice(0,10);
+  }
+  if (e.type==='spiritual') {
+    if (e.spiritDate===now.toISOString().slice(0,10)) return true;
+    if (e.repeat_type==='daily') return true;
+    return false;
+  }
+  return parseInt(e.month)===now.getMonth() && parseInt(e.day)===now.getDate();
+}
+function _evtIsUpcoming7(e) {
+  const days = _evtDaysUntil(e);
+  return days > 0 && days <= 7;
+}
+function _evtIsOccasion(e) {
+  return e.type==='birthday'||e.type==='anniversary'||e.type==='marriage'||e.type==='puja'||e.type==='initiation';
+}
+function _evtIsAppointment(e) {
+  return e.type==='appointment';
+}
+
+// ── Tab Navigation ──
+function evtSwitchTab(tab, btn) {
+  document.querySelectorAll('.evt-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.evt-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('evtPanel'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+  // Show/hide FAB
+  const fab = document.getElementById('evtFab');
+  if (fab) fab.classList.remove('evt-fab-hidden');
+  // Render the correct panel
+  if (tab==='today') evtRenderToday();
+  else if (tab==='calendar') evtRenderCalendar();
+  else if (tab==='occasions') evtRenderOccasions();
+  else if (tab==='appointments') evtRenderAppointments();
+}
+
+// ── Today Panel ──
+function evtRenderToday() {
+  const now = new Date();
+  const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('evtTodayDate').textContent = now.toLocaleDateString('en-IN',opts);
+
+  // Today's events
+  const todayEvts = customEvts.filter(_evtIsToday);
+  const todayC = document.getElementById('evtTodayList');
+  if (!todayEvts.length) {
+    todayC.innerHTML = '<div class="evt-empty"><div class="evt-empty-icon">🙏</div><div class="evt-empty-text">No events today.<br>Have a peaceful day.</div></div>';
+  } else {
+    // Sort by time if applicable
+    todayEvts.sort((a,b) => {
+      const ta = a.startTime||a.spiritTime||'';
+      const tb = b.startTime||b.spiritTime||'';
+      return ta.localeCompare(tb);
+    });
+    todayC.innerHTML = todayEvts.map(e => _evtCardHTML(e, true)).join('');
+  }
+
+  // Upcoming 7 days
+  const upcoming = customEvts.filter(_evtIsUpcoming7);
+  upcoming.sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b));
+  const upC = document.getElementById('evtUpcomingList');
+  if (!upcoming.length) {
+    upC.innerHTML = '<div style="font-size:0.8rem;color:var(--text3);padding:10px 0;">No upcoming events in the next 7 days.</div>';
+  } else {
+    upC.innerHTML = upcoming.map(e => _evtCardHTML(e, false, true)).join('');
+  }
+}
+
+// ── Card HTML Generator ──
+function _evtCardHTML(e, showTime, showCountdown) {
+  const icon = _evtIcon(e.type);
+  const catClass = _evtCatClass(e);
+  const badgeClass = _evtBadgeClass(e);
+  const label = _evtTypeLabel(e.type);
+  const name = e.name || e.apptTitle || e.spiritTitle || 'Event';
+  let timeStr = '';
+  if (showTime) {
+    if (e.startTime) timeStr = _evtFormatTime(e.startTime) + (e.endTime ? ' – ' + _evtFormatTime(e.endTime) : '');
+    else if (e.spiritTime) timeStr = _evtFormatTime(e.spiritTime);
+  }
+  let dateStr = '';
+  if (e.apptDate) dateStr = new Date(e.apptDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  else if (e.spiritDate) dateStr = new Date(e.spiritDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  else dateStr = MONTHS_SHORT[e.month]+' '+e.day+(e.year?', '+e.year:'');
+
+  const days = _evtDaysUntil(e);
+  const countdown = showCountdown ? `<div class="evt-countdown">${_evtCountdownText(days)}</div>` : '';
+
+  return `<div class="evt-card ${catClass}">
+    <div class="evt-emoji">${icon}</div>
+    <div class="evt-info">
+      <div class="evt-name-text">${name}</div>
+      ${timeStr?'<div class="evt-time-text">'+timeStr+'</div>':''}
+      <span class="evt-type-badge ${badgeClass}">${label}</span>
+      <div class="evt-date">${dateStr}${e.location?' · 📍'+e.location:''}</div>
+    </div>
+    ${countdown}
+    <div class="evt-card-actions">
+      <button class="evt-del" onclick="editEvt(${e.id})" title="Edit">✏️</button>
+      <button class="evt-del" onclick="delEvt(${e.id})" title="Delete">🗑</button>
+    </div>
+  </div>`;
+}
+
+// ── Occasions Panel ──
+function evtRenderOccasions() {
+  const occasions = customEvts.filter(_evtIsOccasion);
+  const c = document.getElementById('evtOccasionsList');
+  if (!occasions.length) {
+    c.innerHTML = '<div class="evt-empty"><div class="evt-empty-icon">🎂</div><div class="evt-empty-text">No birthdays or anniversaries yet.<br>Tap ＋ to add one.</div></div>';
+    return;
+  }
+  // Sort by next occurrence
+  occasions.sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b));
+  c.innerHTML = occasions.map(e => {
+    const icon = _evtIcon(e.type);
+    const catClass = _evtCatClass(e);
+    const days = _evtDaysUntil(e);
+    const name = e.name||'Event';
+    const dateStr = MONTHS_SHORT[e.month]+' '+e.day+(e.year?', '+e.year:'');
+    const reminder = e.reminderDays!=null ? e.reminderDays : 1;
+    const reminderLabel = reminder===0?'Same day':reminder===1?'1 day before':reminder+' days before';
+    return `<div class="evt-card ${catClass}">
+      <div class="evt-emoji">${icon}</div>
+      <div class="evt-info">
+        <div class="evt-name-text">${name}</div>
+        <div class="evt-date">${dateStr}${e.relation?' · '+e.relation:''}</div>
+        <div style="font-size:0.65rem;color:#27ae60;margin-top:3px;">🔔 ${reminderLabel}</div>
+        <div class="evt-quick-actions">
+          <button class="evt-quick-btn" onclick="evtWish('${name}')">💌 Wish</button>
+          <button class="evt-quick-btn" onclick="editEvt(${e.id})">✏️ Edit</button>
+        </div>
+      </div>
+      <div class="evt-countdown">${_evtCountdownText(days)}</div>
+    </div>`;
+  }).join('');
+}
+
+function evtWish(name) {
+  if (navigator.share) {
+    navigator.share({title:'Happy wishes!',text:'Wishing you a wonderful day, '+name+'! 🎉🎂'}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText('Wishing you a wonderful day, '+name+'! 🎉🎂').then(()=>showToast('Message copied!')).catch(()=>{});
+  }
+}
+
+// ── Appointments Panel ──
+function evtApptSort(mode, btn) {
+  _evtApptSortMode = mode;
+  document.querySelectorAll('.evt-appt-sort-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  evtRenderAppointments();
+}
+function evtRenderAppointments() {
+  const appts = customEvts.filter(e => e.type==='appointment'||e.type==='spiritual');
+  const now = new Date(); const todayStr = now.toISOString().slice(0,10);
+  let filtered;
+  if (_evtApptSortMode==='today') {
+    filtered = appts.filter(e => {
+      if (e.apptDate===todayStr) return true;
+      if (e.spiritDate===todayStr) return true;
+      if (e.repeat_type==='daily') return true;
+      return false;
+    });
+  } else if (_evtApptSortMode==='upcoming') {
+    filtered = appts.filter(e => {
+      const d = e.apptDate||e.spiritDate||'';
+      return d > todayStr;
+    });
+  } else {
+    filtered = appts.filter(e => {
+      const d = e.apptDate||e.spiritDate||'';
+      return d < todayStr && d;
+    });
+  }
+  // Sort by date/time
+  filtered.sort((a,b) => {
+    const da = a.apptDate||a.spiritDate||'';
+    const db = b.apptDate||b.spiritDate||'';
+    if (da!==db) return da.localeCompare(db);
+    const ta = a.startTime||a.spiritTime||'';
+    const tb = b.startTime||b.spiritTime||'';
+    return ta.localeCompare(tb);
+  });
+  const c = document.getElementById('evtApptList');
+  if (!filtered.length) {
+    const msg = _evtApptSortMode==='today'?'No appointments today.':_evtApptSortMode==='upcoming'?'No upcoming appointments.':'No past appointments.';
+    c.innerHTML = `<div class="evt-empty"><div class="evt-empty-icon">📅</div><div class="evt-empty-text">${msg}</div></div>`;
+    return;
+  }
+  c.innerHTML = filtered.map(e => _evtCardHTML(e, true, false)).join('');
+}
+
+// ── Calendar Panel ──
+function evtRenderCalendar() {
+  const c = document.getElementById('evtCalendarView');
+  const yr = _evtCalYear, mo = _evtCalMonth;
+  const firstDay = new Date(yr,mo,1).getDay();
+  const daysInMo = new Date(yr,mo+1,0).getDate();
+  const prevDays = new Date(yr,mo,0).getDate();
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0,10);
+
+  const DAY_NAMES = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html = `<div class="evt-cal-month-nav">
+    <button onclick="evtCalPrev()">‹</button>
+    <div class="evt-cal-month-label">${MONTHS_SHORT[mo]} ${yr}</div>
+    <button onclick="evtCalNext()">›</button>
+  </div>`;
+  html += '<div class="evt-cal-grid">';
+  DAY_NAMES.forEach(d => html += `<div class="evt-cal-hdr">${d}</div>`);
+
+  // Previous month days
+  for (let i=firstDay-1;i>=0;i--) {
+    html += `<div class="evt-cal-day other">${prevDays-i}</div>`;
+  }
+  // Current month days
+  for (let d=1;d<=daysInMo;d++) {
+    const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = yr===today.getFullYear()&&mo===today.getMonth()&&d===today.getDate();
+    const isSelected = _evtCalSelectedDate===dateStr;
+    // Find events on this date
+    const dayEvts = customEvts.filter(e => {
+      if (e.apptDate===dateStr) return true;
+      if (e.spiritDate===dateStr) return true;
+      if (parseInt(e.month)===mo && parseInt(e.day)===d) return true;
+      return false;
+    });
+    let dots = '';
+    if (dayEvts.length) {
+      const types = new Set(dayEvts.map(e => e.type==='birthday'?'birthday':e.type==='anniversary'||e.type==='marriage'?'anniversary':e.type==='appointment'?'appt':'spiritual'));
+      dots = '<div class="cal-indicators">';
+      types.forEach(t => dots += `<div class="cal-dot dot-${t}"></div>`);
+      dots += '</div>';
+    }
+    html += `<div class="evt-cal-day${isToday?' today':''}${isSelected?' selected':''}" onclick="evtCalSelectDate('${dateStr}',${d})">${d}${dots}</div>`;
+  }
+  // Next month days
+  const totalCells = firstDay + daysInMo;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i=1;i<=remaining;i++) {
+    html += `<div class="evt-cal-day other">${i}</div>`;
+  }
+  html += '</div>';
+  html += '<div id="evtCalDaySheet"></div>';
+  c.innerHTML = html;
+
+  // If a date is already selected, show its events
+  if (_evtCalSelectedDate) {
+    const parts = _evtCalSelectedDate.split('-').map(Number);
+    evtCalShowDayEvents(parts[2], parts[1]-1, parts[0]);
+  }
+}
+function evtCalPrev() { _evtCalMonth--; if(_evtCalMonth<0){_evtCalMonth=11;_evtCalYear--;} _evtCalSelectedDate=null; evtRenderCalendar(); }
+function evtCalNext() { _evtCalMonth++; if(_evtCalMonth>11){_evtCalMonth=0;_evtCalYear++;} _evtCalSelectedDate=null; evtRenderCalendar(); }
+function evtCalSelectDate(dateStr, day) {
+  _evtCalSelectedDate = dateStr;
+  evtRenderCalendar();
+  const parts = dateStr.split('-').map(Number);
+  evtCalShowDayEvents(parts[2], parts[1]-1, parts[0]);
+}
+function evtCalShowDayEvents(day, month, year) {
+  const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const dayEvts = customEvts.filter(e => {
+    if (e.apptDate===dateStr) return true;
+    if (e.spiritDate===dateStr) return true;
+    if (parseInt(e.month)===month && parseInt(e.day)===day) return true;
+    return false;
+  });
+  const sheet = document.getElementById('evtCalDaySheet');
+  if (!dayEvts.length) {
+    sheet.innerHTML = `<div class="evt-cal-daysheet"><div class="evt-cal-daysheet-hdr">${MONTHS_SHORT[month]} ${day}, ${year}</div><div style="font-size:0.8rem;color:var(--text3);">No events on this day.</div></div>`;
+    return;
+  }
+  let html = `<div class="evt-cal-daysheet"><div class="evt-cal-daysheet-hdr">📅 ${MONTHS_SHORT[month]} ${day}, ${year} — ${dayEvts.length} event${dayEvts.length>1?'s':''}</div>`;
+  dayEvts.forEach(e => {
+    html += _evtCardHTML(e, true, false);
+  });
+  html += '</div>';
+  sheet.innerHTML = html;
+}
+
+// ── Add Event Flow ──
+function evtSelectType(type, el) {
+  _evtSelectedType = type;
+  document.querySelectorAll('.evt-type-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  // Show step 2
+  setTimeout(()=>{
+    document.getElementById('evtAddStep1').style.display='none';
+    document.getElementById('evtAddStep2').style.display='block';
+    // Show correct form
+    document.querySelectorAll('.evt-form-section').forEach(s=>s.classList.remove('visible'));
+    if (type==='birthday'||type==='anniversary') {
+      document.getElementById('evtFormOccasion').classList.add('visible');
+    } else if (type==='appointment') {
+      document.getElementById('evtFormAppointment').classList.add('visible');
+    } else if (type==='spiritual') {
+      document.getElementById('evtFormSpiritual').classList.add('visible');
+    }
+  }, 150);
+}
+function evtBackToStep1() {
+  document.getElementById('evtAddStep1').style.display='block';
+  document.getElementById('evtAddStep2').style.display='none';
+}
+function evtPickCat(cat, el) {
+  _evtSelectedCat = cat;
+  document.querySelectorAll('.evt-cat-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
 
 function openAddEvt() {
   if (!isSignedIn()) { requireSignIn('My Events'); return; }
-  editingEvtId = null; // Reset edit mode
+  editingEvtId = null;
+  _evtSelectedType = null;
+  _evtSelectedCat = 'spiritual';
+  // Populate day dropdown
   const el = document.getElementById('evtDay');
-  if (el.options.length<=1) for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`;
-  // Reset form fields
-  ['evtName','evtYear','evtNotes'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('evtDay').selectedIndex = 0;
-  document.getElementById('evtMonth').selectedIndex = 0;
-  document.getElementById('evtType').value = 'birthday';
-  document.getElementById('evtReminder').checked = true;
-  // Set modal title & button for Add mode
-  document.getElementById('addEvtModalTitle').textContent = '✨ Add Custom Event';
+  if (el.options.length<=1) { el.innerHTML='<option value="">—</option>'; for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`; }
+  // Reset all forms
+  ['evtName','evtYear','evtNotes','evtApptTitle','evtApptLocation','evtApptNotes','evtSpiritTitle','evtSpiritNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['evtApptDate','evtApptStart','evtApptEnd','evtSpiritDate','evtSpiritTime'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const md = document.getElementById('evtMonth'); if(md)md.selectedIndex=0;
+  const dd = document.getElementById('evtDay'); if(dd)dd.selectedIndex=0;
+  document.getElementById('evtRelation').selectedIndex=0;
+  document.getElementById('evtReminderTiming').value='1';
+  document.getElementById('evtApptRepeat').value='none';
+  document.getElementById('evtApptReminder').value='30';
+  document.getElementById('evtSpiritRepeat').value='none';
+  document.querySelectorAll('.evt-type-option').forEach(o=>o.classList.remove('selected'));
+  document.querySelectorAll('.evt-cat-chip').forEach(c=>c.classList.remove('selected'));
+  // Reset to step 1
+  document.getElementById('evtAddStep1').style.display='block';
+  document.getElementById('evtAddStep2').style.display='none';
+  document.querySelectorAll('.evt-form-section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('addEvtModalTitle').textContent = '✨ Add Event';
   document.getElementById('evtSaveBtn').textContent = 'Save Event';
   document.getElementById('addEvtModal').classList.add('open');
 }
@@ -7808,52 +8593,130 @@ function editEvt(id) {
   const evt = customEvts.find(e => e.id === id);
   if (!evt) { showToast('Event not found'); return; }
   editingEvtId = id;
-  // Ensure day dropdown is populated
+  // Populate day dropdown
   const el = document.getElementById('evtDay');
-  if (el.options.length<=1) for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`;
-  // Pre-fill form with event data
-  document.getElementById('evtName').value = evt.name || '';
-  document.getElementById('evtDay').value = evt.day;
-  document.getElementById('evtMonth').value = evt.month;
-  document.getElementById('evtYear').value = evt.year || '';
-  document.getElementById('evtType').value = evt.type || 'birthday';
-  document.getElementById('evtNotes').value = evt.notes || '';
-  document.getElementById('evtReminder').checked = evt.reminder !== false;
-  // Set modal title & button for Edit mode
+  if (el.options.length<=1) { el.innerHTML='<option value="">—</option>'; for(let d=1;d<=31;d++) el.innerHTML+=`<option value="${d}">${d}</option>`; }
+
+  // Determine type and skip to step 2
+  _evtSelectedType = evt.type;
+  if (evt.type==='marriage') _evtSelectedType = 'anniversary';
+  if (evt.type==='puja'||evt.type==='initiation'||evt.type==='other') _evtSelectedType = 'birthday'; // treat as occasion for editing
+  if (!['birthday','anniversary','appointment','spiritual'].includes(_evtSelectedType)) _evtSelectedType = 'birthday';
+
+  document.getElementById('evtAddStep1').style.display='none';
+  document.getElementById('evtAddStep2').style.display='block';
+  document.querySelectorAll('.evt-form-section').forEach(s=>s.classList.remove('visible'));
+
+  if (_evtSelectedType==='birthday'||_evtSelectedType==='anniversary') {
+    document.getElementById('evtFormOccasion').classList.add('visible');
+    document.getElementById('evtName').value = evt.name||'';
+    document.getElementById('evtDay').value = evt.day||'';
+    document.getElementById('evtMonth').value = evt.month!=null?evt.month:'';
+    document.getElementById('evtYear').value = evt.year||'';
+    document.getElementById('evtRelation').value = evt.relation||'';
+    document.getElementById('evtReminderTiming').value = evt.reminderDays!=null?evt.reminderDays:'1';
+    document.getElementById('evtNotes').value = evt.notes||'';
+  } else if (_evtSelectedType==='appointment') {
+    document.getElementById('evtFormAppointment').classList.add('visible');
+    document.getElementById('evtApptTitle').value = evt.apptTitle||evt.name||'';
+    document.getElementById('evtApptDate').value = evt.apptDate||'';
+    document.getElementById('evtApptStart').value = evt.startTime||'';
+    document.getElementById('evtApptEnd').value = evt.endTime||'';
+    _evtSelectedCat = evt.category||'spiritual';
+    document.querySelectorAll('.evt-cat-chip').forEach(c=>{c.classList.remove('selected');if(c.classList.contains('chip-'+_evtSelectedCat))c.classList.add('selected');});
+    document.getElementById('evtApptRepeat').value = evt.repeat_type||'none';
+    document.getElementById('evtApptReminder').value = evt.reminderMinutes||'30';
+    document.getElementById('evtApptLocation').value = evt.location||'';
+    document.getElementById('evtApptNotes').value = evt.notes||'';
+  } else if (_evtSelectedType==='spiritual') {
+    document.getElementById('evtFormSpiritual').classList.add('visible');
+    document.getElementById('evtSpiritTitle').value = evt.spiritTitle||evt.name||'';
+    document.getElementById('evtSpiritDate').value = evt.spiritDate||'';
+    document.getElementById('evtSpiritTime').value = evt.spiritTime||'';
+    document.getElementById('evtSpiritRepeat').value = evt.repeat_type||'none';
+    document.getElementById('evtSpiritNotes').value = evt.notes||'';
+  }
+
   document.getElementById('addEvtModalTitle').textContent = '✏️ Edit Event';
   document.getElementById('evtSaveBtn').textContent = 'Update Event';
   document.getElementById('addEvtModal').classList.add('open');
 }
 
 function saveEvt() {
-  const name = document.getElementById('evtName').value.trim();
-  const day = document.getElementById('evtDay').value;
-  const month = document.getElementById('evtMonth').value;
-  if (!name||!day||month==='') { showToast('Fill required fields'); return; }
-  if (editingEvtId !== null) {
-    // Edit mode — update existing event
-    const idx = customEvts.findIndex(e => e.id === editingEvtId);
-    if (idx === -1) { showToast('Event not found'); return; }
-    customEvts[idx] = {
-      ...customEvts[idx],
+  let evtData = { id: editingEvtId || Date.now(), reminder: true };
+
+  if (_evtSelectedType==='birthday'||_evtSelectedType==='anniversary') {
+    const name = document.getElementById('evtName').value.trim();
+    const day = document.getElementById('evtDay').value;
+    const month = document.getElementById('evtMonth').value;
+    if (!name||!day||month==='') { showToast('Fill required fields'); return; }
+    // Duplicate check (for new events only)
+    if (!editingEvtId) {
+      const dup = customEvts.find(e=>e.name===name && e.day==day && e.month==month && (e.type===_evtSelectedType||e.type==='marriage'));
+      if (dup) { showToast('This event already exists!'); return; }
+    }
+    evtData = {
+      ...evtData,
+      type: _evtSelectedType==='anniversary'?'marriage':_evtSelectedType,
       name, day:parseInt(day), month:parseInt(month),
       year: document.getElementById('evtYear').value||null,
-      type: document.getElementById('evtType').value,
+      relation: document.getElementById('evtRelation').value||null,
+      reminderDays: parseInt(document.getElementById('evtReminderTiming').value),
       notes: document.getElementById('evtNotes').value.trim(),
-      reminder: document.getElementById('evtReminder').checked
+      repeat_type: 'yearly'
     };
-    showToast('Event updated! ✏️');
+  } else if (_evtSelectedType==='appointment') {
+    const title = document.getElementById('evtApptTitle').value.trim();
+    const date = document.getElementById('evtApptDate').value;
+    const start = document.getElementById('evtApptStart').value;
+    if (!title||!date||!start) { showToast('Fill required fields (title, date, start time)'); return; }
+    evtData = {
+      ...evtData,
+      type:'appointment',
+      apptTitle: title,
+      name: title,
+      apptDate: date,
+      day: parseInt(date.split('-')[2]),
+      month: parseInt(date.split('-')[1])-1,
+      startTime: start,
+      endTime: document.getElementById('evtApptEnd').value||null,
+      category: _evtSelectedCat,
+      repeat_type: document.getElementById('evtApptRepeat').value,
+      reminderMinutes: parseInt(document.getElementById('evtApptReminder').value),
+      location: document.getElementById('evtApptLocation').value.trim()||null,
+      notes: document.getElementById('evtApptNotes').value.trim()
+    };
+  } else if (_evtSelectedType==='spiritual') {
+    const title = document.getElementById('evtSpiritTitle').value.trim();
+    const date = document.getElementById('evtSpiritDate').value;
+    if (!title||!date) { showToast('Fill required fields (title, date)'); return; }
+    evtData = {
+      ...evtData,
+      type:'spiritual',
+      spiritTitle: title,
+      name: title,
+      spiritDate: date,
+      day: parseInt(date.split('-')[2]),
+      month: parseInt(date.split('-')[1])-1,
+      spiritTime: document.getElementById('evtSpiritTime').value||null,
+      startTime: document.getElementById('evtSpiritTime').value||null,
+      category: 'spiritual',
+      repeat_type: document.getElementById('evtSpiritRepeat').value,
+      notes: document.getElementById('evtSpiritNotes').value.trim()
+    };
+  } else {
+    showToast('Please select an event type first'); return;
+  }
+
+  if (editingEvtId) {
+    const idx = customEvts.findIndex(e => e.id === editingEvtId);
+    if (idx!==-1) {
+      customEvts[idx] = { ...customEvts[idx], ...evtData };
+      showToast('Event updated! ✏️');
+    }
     editingEvtId = null;
   } else {
-    // Add mode — create new event
-    const evt = {
-      id: Date.now(), name, day:parseInt(day), month:parseInt(month),
-      year: document.getElementById('evtYear').value||null,
-      type: document.getElementById('evtType').value,
-      notes: document.getElementById('evtNotes').value.trim(),
-      reminder: document.getElementById('evtReminder').checked
-    };
-    customEvts.push(evt);
+    customEvts.push(evtData);
     showToast('Event saved! ✨');
   }
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
@@ -7861,35 +8724,34 @@ function saveEvt() {
   renderEvts();
   renderCalendar();
   if (selDate) renderDayDetail(selDate);
-  ['evtName','evtYear','evtNotes'].forEach(id => document.getElementById(id).value='');
 }
 
+// ── Main render (called by switchScreen) ──
 function renderEvts() {
-  const c = document.getElementById('evtList');
-  if (!customEvts.length) {
-    c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌸</div>No events yet.<br>Add birthdays, ceremonies and more.</div>';
-    return;
+  evtRenderToday();
+  // Update backup box visibility
+  const bb = document.getElementById('evtBackupBox');
+  if (bb && gUser && gUser.email) {
+    bb.querySelector('#evtBackupMsg').innerHTML = '☁️ Signed in as <strong>' + gUser.email + '</strong>';
+    const gb = document.getElementById('evtGoogleBtn');
+    if(gb) gb.style.display='none';
   }
-  c.innerHTML = customEvts.map(e => `
-    <div class="evt-card">
-      <div class="evt-emoji">${evtIcon(e.type)}</div>
-      <div class="evt-info">
-        <div class="evt-name-text">${e.name}</div>
-        <div class="evt-type-badge">${evtTypeLabel(e.type)}</div>
-        <div class="evt-date">${MONTHS_SHORT[e.month]} ${e.day}${e.year?', '+e.year:''}</div>
-        ${e.reminder?'<span style="font-size:0.65rem;color:#27ae60;">🔔 Reminder</span>':''}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <button class="evt-del" onclick="editEvt(${e.id})" title="Edit" style="font-size:0.85rem;">✏️</button>
-        <button class="evt-del" onclick="delEvt(${e.id})" title="Delete">🗑</button>
-      </div>
-    </div>`).join('');
 }
 
+// ── Delete ──
 function delEvt(id) {
+  if (!confirm('Delete this event?')) return;
   customEvts = customEvts.filter(e => e.id!==id);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
   renderEvts();
+  // Re-render active tab
+  const activeTab = document.querySelector('.evt-tab-btn.active');
+  if (activeTab) {
+    const tab = activeTab.getAttribute('data-evttab');
+    if (tab==='occasions') evtRenderOccasions();
+    else if (tab==='appointments') evtRenderAppointments();
+    else if (tab==='calendar') evtRenderCalendar();
+  }
   renderCalendar();
 }
 
@@ -10653,7 +11515,25 @@ function updateHomeScreen() {
 
   // Today's events
   updateHomeTodayCard();
+
+  // Upcoming events widget on home
+  _updateHomeEvtWidget();
 }
+
+function _updateHomeEvtWidget() {
+  const w = document.getElementById('homeEvtWidget');
+  if (!w) return;
+  if (!customEvts.length) { w.textContent = 'Personal reminders, custom events and alerts'; return; }
+  // Get next 3 events sorted chronologically
+  const sorted = [...customEvts].sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b)).filter(e => _evtDaysUntil(e)>=0).slice(0,3);
+  if (!sorted.length) { w.textContent = 'No upcoming events'; return; }
+  w.innerHTML = sorted.map(e => {
+    const icon = _evtIcon(e.type);
+    const name = e.name||e.apptTitle||e.spiritTitle||'Event';
+    const days = _evtDaysUntil(e);
+    const label = days===0?'Today':days===1?'Tomorrow':days+' days';
+    return `<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;margin-top:3px;"><span>${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span style="color:var(--accent-gold);font-weight:600;font-size:0.65rem;">${label}</span></div>`;
+  }).join('');
 
 function updateHomeGoogleUI() {
   const signedIn = document.getElementById('homeGSignedIn');
