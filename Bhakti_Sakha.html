@@ -11598,8 +11598,43 @@ async function nfShareAsPdf() {
     doc.line(mL, y, mL + 30, y);
     y += 10;
 
-    // --- Convert HTML to plain text with paragraph structure ---
+    // --- Convert HTML to mixed blocks (text + images) ---
     function htmlToPdfBlocks(html) {
+      if (!html) return [];
+      const blocks = [];
+
+      // Split HTML by <img> tags, preserving them as image blocks
+      // This regex captures <img ... src="data:image/..." ...> tags
+      const imgRegex = /<img[^>]*src="(data:image\/(png|jpeg|jpg|gif|webp|bmp)[^"]*)"[^>]*>/gi;
+      let lastIdx = 0;
+      let match;
+
+      while ((match = imgRegex.exec(html)) !== null) {
+        // Process text before this image
+        const textBefore = html.substring(lastIdx, match.index);
+        const textBlocks = _htmlTextToBlocks(textBefore);
+        blocks.push(...textBlocks);
+
+        // Add image block
+        const imgSrc = match[1];
+        let fmt = (match[2] || 'png').toUpperCase();
+        if (fmt === 'JPG') fmt = 'JPEG';
+        if (fmt === 'WEBP' || fmt === 'BMP' || fmt === 'GIF') fmt = 'PNG'; // jsPDF best supports PNG/JPEG
+        blocks.push({ type: 'image', src: imgSrc, format: fmt });
+
+        lastIdx = match.index + match[0].length;
+      }
+
+      // Process remaining text after last image
+      const remaining = html.substring(lastIdx);
+      const remainBlocks = _htmlTextToBlocks(remaining);
+      blocks.push(...remainBlocks);
+
+      return blocks;
+    }
+
+    // Helper: convert an HTML text fragment (no images) to text blocks
+    function _htmlTextToBlocks(html) {
       if (!html) return [];
       const blocks = [];
       let h = html;
@@ -11617,7 +11652,7 @@ async function nfShareAsPdf() {
       h = h.replace(/<p[^>]*>/gi, '');
       h = h.replace(/<div[^>]*>/gi, '');
       h = h.replace(/<blockquote[^>]*>/gi, '');
-      // Strip inline formatting tags (we handle bold at paragraph level)
+      // Strip remaining HTML tags
       h = h.replace(/<[^>]*>/g, '');
       // Decode entities
       h = h.replace(/&nbsp;/g, ' ');
@@ -11634,22 +11669,34 @@ async function nfShareAsPdf() {
       h = h.replace(/\n{3,}/g, '\n\n');
       h = h.trim();
 
+      if (!h) return [];
+
       // Split into paragraphs
       const paragraphs = h.split(/\n\n/);
       for (const para of paragraphs) {
         const trimmed = para.trim();
         if (!trimmed) continue;
-        // Keep single newlines within a paragraph as line breaks
         const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l);
         if (lines.length > 0) {
-          blocks.push(lines);
+          blocks.push({ type: 'text', lines: lines });
         }
       }
       return blocks;
     }
 
-    function checkPageBreak() {
-      if (y + bodyLineH > pageH - mB - 10) {
+    // Helper: load an image and get its natural dimensions
+    function _loadImageDims(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
+        img.onerror = () => resolve(null); // skip broken images
+        img.src = src;
+      });
+    }
+
+    function checkPageBreak(neededH) {
+      const need = neededH || bodyLineH;
+      if (y + need > pageH - mB - 10) {
         _nfPdfFooter(doc, pageW, pageH);
         doc.addPage();
         doc.setFillColor(61, 127, 212);
@@ -11663,11 +11710,14 @@ async function nfShareAsPdf() {
       return false;
     }
 
-    // Parse and render
+    // Parse and render mixed blocks
     const blocks = htmlToPdfBlocks(data.bodyHtml);
     doc.setFont('DejaVuSans', 'normal');
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
+
+    const maxImgW = cW;           // max image width = content width
+    const maxImgH = pageH - mT - mB - 20; // max image height per page
 
     for (let bi = 0; bi < blocks.length; bi++) {
       const block = blocks[bi];
@@ -11678,19 +11728,70 @@ async function nfShareAsPdf() {
         checkPageBreak();
       }
 
-      for (const lineText of block) {
-        doc.setFont('DejaVuSans', 'normal');
-        doc.setFontSize(11);
-
-        // Word-wrap this line
-        const wrappedLines = doc.splitTextToSize(lineText, cW);
-        for (const wl of wrappedLines) {
-          checkPageBreak();
+      if (block.type === 'text') {
+        // --- Render text block ---
+        for (const lineText of block.lines) {
           doc.setFont('DejaVuSans', 'normal');
           doc.setFontSize(11);
-          doc.setTextColor(50, 50, 50);
-          doc.text(wl, mL, y);
-          y += bodyLineH;
+
+          const wrappedLines = doc.splitTextToSize(lineText, cW);
+          for (const wl of wrappedLines) {
+            checkPageBreak();
+            doc.setFont('DejaVuSans', 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
+            doc.text(wl, mL, y);
+            y += bodyLineH;
+          }
+        }
+
+      } else if (block.type === 'image') {
+        // --- Render image block ---
+        try {
+          const dims = await _loadImageDims(block.src);
+          if (dims && dims.w > 0 && dims.h > 0) {
+            // Calculate scaled dimensions to fit within content area
+            let imgW = dims.w;
+            let imgH = dims.h;
+
+            // Convert pixels to mm (approx 3.78 px per mm at 96dpi)
+            const pxToMm = 0.264583;
+            imgW = imgW * pxToMm;
+            imgH = imgH * pxToMm;
+
+            // Scale down to fit content width
+            if (imgW > maxImgW) {
+              const scale = maxImgW / imgW;
+              imgW = maxImgW;
+              imgH = imgH * scale;
+            }
+
+            // Cap height to max page height
+            if (imgH > maxImgH) {
+              const scale = maxImgH / imgH;
+              imgH = maxImgH;
+              imgW = imgW * scale;
+            }
+
+            // Check if image fits on current page, else start new page
+            checkPageBreak(imgH + 4);
+
+            // Center image horizontally within content area
+            const imgX = mL + (cW - imgW) / 2;
+
+            // Draw a subtle border/background
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(imgX - 1, y - 1, imgW + 2, imgH + 2, 1, 1, 'S');
+
+            // Add the image
+            doc.addImage(block.src, block.format, imgX, y, imgW, imgH);
+
+            y += imgH + 4; // spacing after image
+          }
+        } catch (imgErr) {
+          // If image fails, skip silently
+          console.warn('PDF image render failed:', imgErr);
         }
       }
     }
