@@ -2669,6 +2669,108 @@ body {
 .home-card--prayer .home-card-icon { background:rgba(232,168,56,0.2); color:#f0c850; box-shadow:0 0 12px rgba(232,168,56,0.2); }
 .home-card--prayer .home-card-title { color:#f0c850; }
 
+/* ===== CENTRALIZED ADMIN DASHBOARD ===== */
+.adm-wrap { padding:18px 16px 80px; }
+.adm-header {
+  text-align:center; margin-bottom:20px; padding:20px 16px;
+  background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(232,168,56,0.06));
+  border:1px solid rgba(167,139,250,0.15); border-radius:18px;
+}
+.adm-header-icon { font-size:2rem; margin-bottom:6px; }
+.adm-header-title { font-size:1.15rem; font-weight:700; color:var(--lavender); letter-spacing:0.3px; }
+.adm-header-sub { font-size:0.72rem; color:var(--text3); margin-top:4px; }
+
+.adm-summary {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px;
+}
+.adm-summary-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:14px 10px; text-align:center;
+}
+.adm-summary-num { font-size:1.4rem; font-weight:700; color:var(--text); }
+.adm-summary-num.pending { color:#f39c12; }
+.adm-summary-num.ok { color:#2ecc71; }
+.adm-summary-lbl { font-size:0.6rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
+
+.adm-section {
+  background:var(--bg2); border:1px solid var(--border); border-radius:16px;
+  margin-bottom:14px; overflow:hidden; transition:all 0.25s;
+}
+.adm-section-header {
+  display:flex; align-items:center; gap:12px; padding:16px;
+  cursor:pointer; user-select:none;
+}
+.adm-section-icon {
+  width:40px; height:40px; border-radius:12px; display:flex; align-items:center;
+  justify-content:center; font-size:1.15rem; flex-shrink:0;
+}
+.adm-section-icon.sevakart { background:rgba(167,139,250,0.12); }
+.adm-section-icon.prayer { background:rgba(232,168,56,0.12); }
+.adm-section-info { flex:1; }
+.adm-section-name { font-size:0.88rem; font-weight:600; color:var(--text); }
+.adm-section-status { font-size:0.68rem; color:var(--text3); margin-top:2px; }
+.adm-section-badge {
+  background:#f39c12; color:#000; font-size:0.65rem; font-weight:700;
+  padding:3px 8px; border-radius:10px; min-width:22px; text-align:center;
+}
+.adm-section-badge.zero { background:rgba(46,204,113,0.15); color:#2ecc71; }
+.adm-section-arrow {
+  font-size:0.75rem; color:var(--text3); transition:transform 0.25s;
+}
+.adm-section.expanded .adm-section-arrow { transform:rotate(180deg); }
+
+.adm-section-body {
+  max-height:0; overflow:hidden; transition:max-height 0.3s ease;
+}
+.adm-section.expanded .adm-section-body { max-height:800px; }
+
+.adm-section-content { padding:0 16px 16px; }
+.adm-stats {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:12px;
+}
+.adm-stat {
+  background:var(--bg3); border-radius:10px; padding:10px 6px; text-align:center;
+}
+.adm-stat-num { font-size:1.1rem; font-weight:700; color:var(--text); }
+.adm-stat-lbl { font-size:0.55rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+
+.adm-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.adm-action-btn {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:11px 12px; border-radius:12px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text2); font-size:0.75rem; font-weight:500;
+  cursor:pointer; transition:all 0.2s;
+}
+.adm-action-btn:active { transform:scale(0.96); opacity:0.8; }
+.adm-action-btn.primary { border-color:rgba(167,139,250,0.3); background:rgba(167,139,250,0.08); color:var(--lavender); }
+
+.adm-pending-list { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.adm-pending-item {
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+  cursor:pointer; transition:all 0.2s;
+}
+.adm-pending-item:active { transform:scale(0.98); }
+.adm-pending-item-info { flex:1; overflow:hidden; }
+.adm-pending-item-name { font-size:0.78rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.adm-pending-item-meta { font-size:0.62rem; color:var(--text3); margin-top:2px; }
+.adm-pending-item-actions { display:flex; gap:6px; }
+.adm-pending-approve, .adm-pending-reject {
+  padding:6px 10px; border-radius:8px; font-size:0.65rem; font-weight:600;
+  cursor:pointer; border:none; transition:all 0.2s;
+}
+.adm-pending-approve { background:rgba(46,204,113,0.12); color:#2ecc71; }
+.adm-pending-reject { background:rgba(231,76,60,0.1); color:#e74c3c; }
+.adm-pending-approve:active, .adm-pending-reject:active { opacity:0.7; }
+
+.adm-empty { text-align:center; padding:20px; font-size:0.78rem; color:var(--text3); }
+
+/* Admin icon on home */
+.home-admin-btn {
+  display:none; /* Hidden by default, shown via JS for admins */
+  color:var(--lavender) !important;
+}
+
 /* ===== PRAYER CIRCLE ===== */
 .pc-screen { padding:14px 18px 100px; overflow-y:auto; height:100%; }
 .pc-header { text-align:center; padding:8px 0 16px; }
@@ -2974,6 +3076,9 @@ body {
             <div class="home-g-actions">
               <button class="home-g-action-btn" onclick="gSyncAll()" title="Sync Now">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/><path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"/></svg>
+              </button>
+              <button class="home-g-action-btn home-admin-btn" id="homeAdminBtn" onclick="switchScreen('admin',null)" title="Admin Dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </button>
               <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -3743,20 +3848,6 @@ body {
         <button class="sk-action-btn" onclick="skStartListing()">🪔 List Your Service</button>
         <button class="sk-action-btn secondary" onclick="skShowMyListings()">📋 My Listings</button>
       </div>
-      <!-- Admin Dashboard (visible to admins) -->
-      <div id="skAdminDashboard" style="display:none;">
-        <div class="sk-section-title">🛡️ Admin Dashboard</div>
-        <div class="sk-admin-dashboard">
-          <div class="sk-admin-stats">
-            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatTotal">0</div><div class="sk-admin-stat-lbl">Total</div></div>
-            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatPending">0</div><div class="sk-admin-stat-lbl">Pending</div></div>
-            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatVerified">0</div><div class="sk-admin-stat-lbl">Verified</div></div>
-            <div class="sk-admin-stat"><div class="sk-admin-stat-num" id="skStatReported">0</div><div class="sk-admin-stat-lbl">Reported</div></div>
-          </div>
-          <button class="sk-action-btn" onclick="skShowPendingListings()" style="width:100%;margin-bottom:8px;">📝 Review Pending Listings</button>
-          <button class="sk-action-btn secondary" onclick="skShowReportedListings()" style="width:100%;">🚩 View Reported</button>
-        </div>
-      </div>
       <div class="sk-section-title">Browse Categories</div>
       <div class="sk-categories" id="skCategoriesGrid"></div>
       <div class="sk-section-title" id="skListingsTitle">Featured Listings</div>
@@ -3815,21 +3906,6 @@ body {
         <div class="pc-stat-chip" onclick="pcSetCatFilter('Other')">📿 Other</div>
       </div>
       <!-- Admin Dashboard -->
-      <div id="pcAdminDashboard" style="display:none;">
-        <div class="pc-admin-section">
-          <div class="pc-admin-title">🛡️ Admin Dashboard</div>
-          <div class="pc-admin-stats">
-            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatTotal">0</div><div class="pc-admin-stat-lbl">Total</div></div>
-            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatPending">0</div><div class="pc-admin-stat-lbl">Pending</div></div>
-            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatAnswered">0</div><div class="pc-admin-stat-lbl">Answered</div></div>
-            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatReported">0</div><div class="pc-admin-stat-lbl">Reported</div></div>
-          </div>
-          <div class="pc-admin-btns" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button class="pc-admin-btn" onclick="pcShowPending()">📝 Pending Review</button>
-            <button class="pc-admin-btn" onclick="pcShowReported()">🚩 Reported</button>
-          </div>
-        </div>
-      </div>
       <div class="pc-feed" id="pcFeedContainer"></div>
       <div class="pc-empty" id="pcEmptyState" style="display:none;">
         <div class="pc-empty-icon">🙏</div>
@@ -3857,6 +3933,36 @@ body {
         <div class="pc-detail-htitle">My Prayer Requests</div>
       </div>
       <div style="padding:14px 18px 100px;" id="pcMyRequestsContainer"></div>
+    </div>
+  </div>
+
+  <!-- CENTRALIZED ADMIN DASHBOARD -->
+  <div class="screen" id="screen-admin">
+    <div class="adm-wrap">
+      <div class="adm-header">
+        <div class="adm-header-icon">🛡️</div>
+        <div class="adm-header-title">Admin Dashboard</div>
+        <div class="adm-header-sub">Manage approvals, reviews & moderation</div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="adm-summary" id="admSummary">
+        <div class="adm-summary-card">
+          <div class="adm-summary-num pending" id="admTotalPending">0</div>
+          <div class="adm-summary-lbl">Pending</div>
+        </div>
+        <div class="adm-summary-card">
+          <div class="adm-summary-num" id="admTotalReported">0</div>
+          <div class="adm-summary-lbl">Reported</div>
+        </div>
+        <div class="adm-summary-card">
+          <div class="adm-summary-num ok" id="admTotalApproved">0</div>
+          <div class="adm-summary-lbl">Approved</div>
+        </div>
+      </div>
+
+      <!-- Feature sections container -->
+      <div id="admSectionsContainer"></div>
     </div>
   </div>
 
@@ -8773,7 +8879,7 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard'};
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
@@ -8800,6 +8906,7 @@ function switchScreen(name, btn) {
   if (name==='dhamas') renderDhamas();
   if (name==='sevakart') skRenderHome();
   if (name==='prayer') pcRenderFeed();
+  if (name==='admin') renderAdminDashboard();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
 }
@@ -8861,6 +8968,9 @@ function updateHomeGoogleUI() {
     if (nm) nm.textContent = gUser.name || 'Devotee';
     const em = document.getElementById('homeGEmail');
     if (em) em.textContent = gUser.email || '';
+    // Show admin icon for admins
+    const admBtn = document.getElementById('homeAdminBtn');
+    if (admBtn) admBtn.style.display = isAdmin() ? '' : 'none';
   } else {
     signedIn.style.display = 'none';
     signedOut.style.display = '';
@@ -10455,18 +10565,6 @@ function skRenderHome() {
     </div>`
   ).join('');
 
-  // Admin dashboard
-  const dash = document.getElementById('skAdminDashboard');
-  if (hasPermission('sevakart')) {
-    dash.style.display = '';
-    document.getElementById('skStatTotal').textContent = skListings.length;
-    document.getElementById('skStatPending').textContent = skListings.filter(l=>l.status==='pending').length;
-    document.getElementById('skStatVerified').textContent = skListings.filter(l=>l.verified).length;
-    document.getElementById('skStatReported').textContent = skReports.filter(r=>!r.resolved).length;
-  } else {
-    dash.style.display = 'none';
-  }
-
   // Filter chips in modal
   const filterCats = document.getElementById('skFilterCats');
   filterCats.innerHTML = SK_CATEGORIES.map(c =>
@@ -11046,6 +11144,160 @@ function skSubmitReport() {
 setTimeout(_skFetchFromServer, 2000);
 
 // ===================================================================
+// ===== CENTRALIZED ADMIN DASHBOARD =====
+function renderAdminDashboard() {
+  if (!isAdmin()) return;
+
+  // Gather data from all features
+  const sections = [];
+
+  // --- SevaKart ---
+  if (hasPermission('sevakart') || isAdmin()) {
+    const skPending = (typeof skListings !== 'undefined') ? skListings.filter(l => l.status === 'pending') : [];
+    const skApproved = (typeof skListings !== 'undefined') ? skListings.filter(l => l.status === 'approved') : [];
+    const skVerified = (typeof skListings !== 'undefined') ? skListings.filter(l => l.verified) : [];
+    const skRep = (typeof skReports !== 'undefined') ? skReports.filter(r => !r.resolved) : [];
+    const skTotal = (typeof skListings !== 'undefined') ? skListings.length : 0;
+
+    sections.push({
+      id: 'sevakart',
+      icon: '🪔',
+      iconClass: 'sevakart',
+      name: 'SevaKart',
+      pendingCount: skPending.length,
+      stats: [
+        { num: skTotal, label: 'Total', cls: '' },
+        { num: skPending.length, label: 'Pending', cls: skPending.length ? 'pending' : '' },
+        { num: skVerified.length, label: 'Verified', cls: 'ok' },
+        { num: skRep.length, label: 'Reported', cls: skRep.length ? 'pending' : '' }
+      ],
+      actions: [
+        { label: '📝 Pending Listings', onclick: 'skShowPendingListings()', primary: true },
+        { label: '🚩 Reported', onclick: 'skShowReportedListings()', primary: false }
+      ],
+      pendingItems: skPending.slice(0, 5).map(l => ({
+        name: l.bizName || 'Untitled',
+        meta: l.category + ' · ' + l.city,
+        approveAction: `skOpenDetail('${l.id}')`,
+        isLink: true
+      }))
+    });
+  }
+
+  // --- Prayer Circle ---
+  if (hasPermission('prayer') || isAdmin()) {
+    const pcPending = pcRequests.filter(r => r.status === 'pending');
+    const pcApproved = pcRequests.filter(r => r.status === 'approved');
+    const pcAnswered = pcRequests.filter(r => r.answered);
+    const pcRep = pcReports.filter(r => !r.resolved);
+    const pcTotal = pcRequests.length;
+
+    sections.push({
+      id: 'prayer',
+      icon: '🙏',
+      iconClass: 'prayer',
+      name: 'Prayer Circle',
+      pendingCount: pcPending.length,
+      stats: [
+        { num: pcTotal, label: 'Total', cls: '' },
+        { num: pcPending.length, label: 'Pending', cls: pcPending.length ? 'pending' : '' },
+        { num: pcAnswered.length, label: 'Answered', cls: 'ok' },
+        { num: pcRep.length, label: 'Reported', cls: pcRep.length ? 'pending' : '' }
+      ],
+      actions: [
+        { label: '📝 Pending Prayers', onclick: 'pcShowPending()', primary: true },
+        { label: '🚩 Reported', onclick: 'pcShowReported()', primary: false }
+      ],
+      pendingItems: pcPending.slice(0, 5).map(r => ({
+        id: r.id,
+        name: r.title || 'Untitled',
+        meta: r.category + ' · by ' + (r.anonymous ? 'Anonymous' : r.name),
+        approveAction: `pcAdminApprove('${r.id}')`,
+        rejectAction: `pcAdminStartReject('${r.id}')`,
+        isLink: false
+      }))
+    });
+  }
+
+  // Update summary
+  const totalPending = sections.reduce((s, sec) => s + sec.pendingCount, 0);
+  const totalReported = sections.reduce((s, sec) => {
+    const repStat = sec.stats.find(st => st.label === 'Reported');
+    return s + (repStat ? repStat.num : 0);
+  }, 0);
+  const totalApproved = sections.reduce((s, sec) => {
+    const appStat = sec.stats.find(st => st.label === 'Total');
+    return s + (appStat ? appStat.num : 0);
+  }, 0);
+
+  document.getElementById('admTotalPending').textContent = totalPending;
+  document.getElementById('admTotalPending').className = 'adm-summary-num' + (totalPending > 0 ? ' pending' : ' ok');
+  document.getElementById('admTotalReported').textContent = totalReported;
+  document.getElementById('admTotalApproved').textContent = totalApproved;
+
+  // Render sections
+  const container = document.getElementById('admSectionsContainer');
+  if (!sections.length) {
+    container.innerHTML = '<div class="adm-empty">No features assigned to your admin role.</div>';
+    return;
+  }
+
+  container.innerHTML = sections.map(sec => `
+    <div class="adm-section${sec.pendingCount > 0 ? ' expanded' : ''}" id="admSec-${sec.id}">
+      <div class="adm-section-header" onclick="admToggleSection('${sec.id}')">
+        <div class="adm-section-icon ${sec.iconClass}">${sec.icon}</div>
+        <div class="adm-section-info">
+          <div class="adm-section-name">${sec.name}</div>
+          <div class="adm-section-status">${sec.pendingCount > 0 ? sec.pendingCount + ' pending approval' : 'All clear ✓'}</div>
+        </div>
+        <div class="adm-section-badge ${sec.pendingCount === 0 ? 'zero' : ''}">${sec.pendingCount}</div>
+        <div class="adm-section-arrow">▼</div>
+      </div>
+      <div class="adm-section-body">
+        <div class="adm-section-content">
+          <div class="adm-stats">
+            ${sec.stats.map(st => `
+              <div class="adm-stat">
+                <div class="adm-stat-num" ${st.cls ? 'style="color:' + (st.cls === 'pending' ? '#f39c12' : st.cls === 'ok' ? '#2ecc71' : 'var(--text)') + '"' : ''}>${st.num}</div>
+                <div class="adm-stat-lbl">${st.label}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="adm-actions">
+            ${sec.actions.map(a => `
+              <button class="adm-action-btn${a.primary ? ' primary' : ''}" onclick="${a.onclick}">${a.label}</button>
+            `).join('')}
+          </div>
+          ${sec.pendingItems.length > 0 ? `
+            <div class="adm-pending-list">
+              <div style="font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recent Pending</div>
+              ${sec.pendingItems.map(item => `
+                <div class="adm-pending-item" ${item.isLink ? `onclick="${item.approveAction}"` : ''}>
+                  <div class="adm-pending-item-info">
+                    <div class="adm-pending-item-name">${item.name}</div>
+                    <div class="adm-pending-item-meta">${item.meta}</div>
+                  </div>
+                  ${!item.isLink ? `
+                    <div class="adm-pending-item-actions">
+                      <button class="adm-pending-approve" onclick="event.stopPropagation();${item.approveAction};renderAdminDashboard()">✓</button>
+                      <button class="adm-pending-reject" onclick="event.stopPropagation();${item.rejectAction}">✕</button>
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function admToggleSection(id) {
+  const sec = document.getElementById('admSec-' + id);
+  if (sec) sec.classList.toggle('expanded');
+}
+
 // PRAYER CIRCLE
 // ===================================================================
 let pcRequests = JSON.parse(localStorage.getItem('pcRequests') || '[]');
@@ -11300,18 +11552,6 @@ function pcRenderFeed() {
     if (b.urgency === 'urgent' && a.urgency !== 'urgent' && !b.answered) return 1;
     return b.timestamp - a.timestamp;
   });
-
-  // Admin dashboard
-  const dash = document.getElementById('pcAdminDashboard');
-  if (hasPermission('prayer')) {
-    dash.style.display = '';
-    document.getElementById('pcStatTotal').textContent = pcRequests.length;
-    document.getElementById('pcStatPending').textContent = pcRequests.filter(r => r.status === 'pending').length;
-    document.getElementById('pcStatAnswered').textContent = pcRequests.filter(r => r.answered).length;
-    document.getElementById('pcStatReported').textContent = pcReports.filter(r => !r.resolved).length;
-  } else {
-    dash.style.display = 'none';
-  }
 
   if (!items.length) {
     container.innerHTML = '';
