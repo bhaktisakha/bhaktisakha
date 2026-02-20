@@ -13822,8 +13822,13 @@ const SK_CATEGORIES = [
 
 // Data storage
 let skListings = JSON.parse(localStorage.getItem('skListings') || '[]');
-// Normalize status from localStorage (may have mixed case from server)
-skListings = skListings.map(l => { l.status = (l.status || 'pending').toString().trim().toLowerCase(); return l; });
+// Normalize listings from localStorage (fix status, ownerEmail from server round-trips)
+skListings = skListings.map(l => {
+  l.status = (l.status || 'pending').toString().trim().toLowerCase();
+  if (!l.ownerEmail && l.email) l.ownerEmail = l.email.toLowerCase();
+  if (l.ownerEmail) l.ownerEmail = l.ownerEmail.toString().trim().toLowerCase();
+  return l;
+});
 let skReviews = JSON.parse(localStorage.getItem('skReviews') || '[]');
 let skReports = JSON.parse(localStorage.getItem('skReports') || '[]');
 let _skFilter = {category:'', city:''};
@@ -13842,18 +13847,60 @@ function _skSave() {
   _skSyncToServer();
 }
 
-// Merge listings: server data is primary, but keep local-only items (new submissions not yet on server)
-function _skMergeListings(serverList, localList) {
-  const merged = new Map();
-  // Server data is the source of truth for existing items
-  for (const l of serverList) {
-    if (l && l.id) merged.set(l.id, l);
-  }
-  // Keep local items that don't exist on server (newly submitted, not yet fetched back)
-  for (const l of localList) {
-    if (l && l.id && !merged.has(l.id)) {
-      merged.set(l.id, l);
+// All fields a complete listing should have
+const SK_LISTING_FIELDS = ['id','bizName','contactName','mobile','whatsapp','email','city','category',
+  'shortDesc','fullDesc','years','website','photos','ownerEmail','ownerName','status','verified','createdAt'];
+
+// Deep field-level merge of two listing objects
+// primary wins for non-empty fields; secondary fills in missing/empty fields
+function _skDeepMergeListing(primary, secondary) {
+  if (!secondary) return Object.assign({}, primary);
+  if (!primary) return Object.assign({}, secondary);
+  const merged = Object.assign({}, secondary, primary); // primary overwrites secondary
+  // But if primary has empty/undefined fields that secondary has, use secondary's value
+  for (const key of SK_LISTING_FIELDS) {
+    const pVal = primary[key];
+    const sVal = secondary[key];
+    if ((pVal === undefined || pVal === null || pVal === '') && sVal !== undefined && sVal !== null && sVal !== '') {
+      merged[key] = sVal;
     }
+  }
+  // Also copy any extra fields from either object
+  for (const key of Object.keys(secondary)) {
+    if (merged[key] === undefined || merged[key] === null) merged[key] = secondary[key];
+  }
+  return merged;
+}
+
+// Merge two arrays of listings with deep field-level merge
+// primaryList wins for field conflicts; secondaryList fills in missing fields and adds new items
+function _skMergeListings(primaryList, secondaryList) {
+  const merged = new Map();
+  // Start with secondary items
+  for (const l of secondaryList) {
+    if (l && l.id) merged.set(l.id, Object.assign({}, l));
+  }
+  // Deep merge primary items (primary wins for conflicts)
+  for (const l of primaryList) {
+    if (l && l.id) {
+      if (merged.has(l.id)) {
+        // Deep field-level merge: primary wins, secondary fills gaps
+        merged.set(l.id, _skDeepMergeListing(l, merged.get(l.id)));
+      } else {
+        merged.set(l.id, Object.assign({}, l));
+      }
+    }
+  }
+  // Normalize all merged listings
+  for (const [id, l] of merged) {
+    // Ensure status is always lowercase and never empty
+    l.status = (l.status || 'pending').toString().trim().toLowerCase();
+    // Fallback: if ownerEmail missing, try email field
+    if (!l.ownerEmail && l.email) {
+      l.ownerEmail = l.email.toLowerCase();
+    }
+    // Ensure ownerEmail is lowercase
+    if (l.ownerEmail) l.ownerEmail = l.ownerEmail.toString().trim().toLowerCase();
   }
   return Array.from(merged.values());
 }
@@ -13861,7 +13908,7 @@ function _skMergeListings(serverList, localList) {
 // Flag to prevent concurrent syncs
 let _skSyncing = false;
 
-// Sync to Google Sheets — fetch-merge-save to prevent overwriting other users' data
+// Sync to Google Sheets — fetch→deep-merge→push to prevent data loss
 async function _skSyncToServer() {
   if (_skSyncing) return;
   _skSyncing = true;
@@ -13872,31 +13919,18 @@ async function _skSyncToServer() {
       const fetchResp = await fetch(SONGS_API_URL + '?type=sevakart');
       const fetchData = await fetchResp.json();
       if (fetchData.success && fetchData.listings) {
-        serverListings = fetchData.listings.map(l => {
-          if (l.status) l.status = l.status.toString().trim().toLowerCase();
-          else l.status = 'pending';
-          return l;
-        });
+        serverListings = fetchData.listings;
       }
     } catch(e) { /* if fetch fails, proceed with local data only */ }
 
-    // Step 2: Merge — local changes take precedence, but server-only items are preserved
-    const mergedMap = new Map();
-    // Start with server data
-    for (const l of serverListings) {
-      if (l && l.id) mergedMap.set(l.id, l);
-    }
-    // Overlay local data (local wins — it has the latest user changes like approve/reject/new)
-    for (const l of skListings) {
-      if (l && l.id) mergedMap.set(l.id, l);
-    }
-    const mergedListings = Array.from(mergedMap.values());
+    // Step 2: Deep merge — local wins (has latest user changes), server fills missing fields
+    const mergedListings = _skMergeListings(skListings, serverListings);
 
     // Update local state with merged data
     skListings = mergedListings;
     localStorage.setItem('skListings', JSON.stringify(skListings));
 
-    // Step 3: Push merged data to server
+    // Step 3: Push complete merged data to server
     const userEmail = (gUser && gUser.email) ? gUser.email : '';
     await fetch(SONGS_API_URL, {
       method:'POST',
@@ -13913,7 +13947,7 @@ async function _skSyncToServer() {
   _skSyncing = false;
 }
 
-// Fetch and merge server data (never replaces — always merges)
+// Fetch and deep-merge server data (never replaces — always merges at field level)
 let _skFetching = false;
 async function _skFetchFromServer() {
   if (_skFetching) return;
@@ -13922,17 +13956,9 @@ async function _skFetchFromServer() {
     const resp = await fetch(SONGS_API_URL + '?type=sevakart');
     const data = await resp.json();
     if (data.success && data.listings) {
-      // Normalize status to lowercase
-      const serverListings = data.listings.map(l => {
-        if (l.status) {
-          l.status = l.status.toString().trim().toLowerCase();
-        } else {
-          l.status = 'pending';
-        }
-        return l;
-      });
-      // Merge: server is primary, keep local-only items
-      skListings = _skMergeListings(serverListings, skListings);
+      // Deep merge: server is primary (has latest admin actions like approve),
+      // but local fills in any fields server is missing (ownerEmail, bizName, etc.)
+      skListings = _skMergeListings(data.listings, skListings);
       if (data.reviews) skReviews = data.reviews;
       if (data.reports) skReports = data.reports;
       localStorage.setItem('skListings', JSON.stringify(skListings));
@@ -14021,7 +14047,7 @@ function skRenderListings() {
   }
   if (query) {
     listings = listings.filter(l =>
-      l.bizName.toLowerCase().includes(query) ||
+      (l.bizName||'').toLowerCase().includes(query) ||
       l.city.toLowerCase().includes(query) ||
       l.category.toLowerCase().includes(query) ||
       (l.shortDesc||'').toLowerCase().includes(query)
@@ -14044,7 +14070,7 @@ function skRenderListings() {
       <div class="sk-listing-img">${typeof img === 'string' && img.startsWith('<') ? img : img}</div>
       <div class="sk-listing-body">
         <div class="sk-listing-top">
-          <div class="sk-listing-name">${l.bizName}</div>
+          <div class="sk-listing-name">${l.bizName || l.contactName || 'Untitled'}</div>
           ${l.verified ? '<div class="sk-listing-verified">✓ Verified</div>' : ''}
         </div>
         <div class="sk-listing-desc">${l.shortDesc||''}</div>
@@ -14086,7 +14112,7 @@ function skOpenDetail(id, fromScreen) {
   if (!l) return;
   _skViewingId = id;
 
-  document.getElementById('skDetailHTitle').textContent = l.bizName;
+  document.getElementById('skDetailHTitle').textContent = l.bizName || l.contactName || 'Untitled';
   const content = document.getElementById('skDetailContent');
 
   const r = _skGetRating(id);
@@ -14113,7 +14139,7 @@ function skOpenDetail(id, fromScreen) {
   content.innerHTML = `
     ${galleryHTML}
     <div class="sk-detail-body">
-      <div class="sk-detail-name">${l.bizName}</div>
+      <div class="sk-detail-name">${l.bizName || l.contactName || 'Untitled'}</div>
       <div class="sk-detail-badges">
         <span class="sk-detail-cat">${l.category}</span>
         <span class="sk-detail-city-tag">📍 ${l.city}</span>
@@ -14208,7 +14234,10 @@ function skShowMyListings() {
 function _skRenderMyListings() {
   const container = document.getElementById('skMyListingsContainer');
   const email = gUser.email.toLowerCase();
-  const mine = skListings.filter(l => (l.ownerEmail||'').toLowerCase() === email);
+  // Match on ownerEmail OR email field (server may lose ownerEmail during serialization)
+  const mine = skListings.filter(l =>
+    (l.ownerEmail||'').toLowerCase() === email || (l.email||'').toLowerCase() === email
+  );
 
   if (!mine.length) {
     container.innerHTML = '<div class="sk-empty"><div class="sk-empty-icon">📋</div><div>You haven\'t listed any services yet.</div></div>';
@@ -14218,7 +14247,7 @@ function _skRenderMyListings() {
       return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}')">
         <div class="sk-listing-body">
           <div class="sk-listing-top">
-            <div class="sk-listing-name">${l.bizName}</div>
+            <div class="sk-listing-name">${l.bizName || l.contactName || 'Untitled'}</div>
             <div class="sk-listing-status ${statusCls}">${statusCls.toUpperCase()}</div>
           </div>
           <div class="sk-listing-desc">${l.shortDesc||''}</div>
@@ -14243,7 +14272,7 @@ function skShowPendingListings() {
   } else {
     container.innerHTML = pending.map(l => `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}','admin')">
       <div class="sk-listing-body">
-        <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
+        <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName || l.contactName || 'Untitled'}</div>
           <div class="sk-listing-status pending">PENDING</div></div>
         <div class="sk-listing-desc">${l.shortDesc||''}</div>
         <div class="sk-listing-meta"><span class="sk-listing-city">📍 ${l.city}</span>
@@ -14270,7 +14299,7 @@ function skShowReportedListings() {
       const rCount = unresolvedReports.filter(r=>r.listingId===l.id).length;
       return `<div class="sk-listing-card" onclick="skOpenDetail('${l.id}','admin')">
         <div class="sk-listing-body">
-          <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName}</div>
+          <div class="sk-listing-top"><div class="sk-listing-name">${l.bizName || l.contactName || 'Untitled'}</div>
             <div class="sk-listing-status rejected">🚩 ${rCount} report${rCount>1?'s':''}</div></div>
           <div class="sk-listing-desc">${l.shortDesc||''}</div>
         </div>
