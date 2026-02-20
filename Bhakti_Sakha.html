@@ -2296,18 +2296,19 @@ body {
 .nav-glow-track {
   position: relative;
   height: 3px;
-  margin: 0 12px;
+  margin: 0;
 }
 .nav-glow-indicator {
   position: absolute;
   top: 0; height: 3px;
-  width: 20%; /* 1/5 of the bar */
-  display: flex; justify-content: center;
+  width: 30px;
+  transform: translateX(-50%);
   transition: left 0.38s cubic-bezier(0.4, 0, 0.15, 1);
-  left: 0;
+  left: 10%;
 }
 .nav-glow-indicator::after {
   content: '';
+  display: block;
   width: 30px; height: 3px;
   border-radius: 2px;
   background: var(--nav-active-color, #a78bfa);
@@ -10663,8 +10664,14 @@ let _moreTrayOpen = false;
 
 function updateGlowIndicator(idx, color) {
   const glow = document.getElementById('navGlowIndicator');
-  if (!glow) return;
-  glow.style.left = (idx * 20) + '%';
+  const track = document.querySelector('.nav-glow-track');
+  const btns = document.querySelectorAll('.nav-tabs-row .nav-btn');
+  if (!glow || !track || !btns[idx]) return;
+  // Get the center of the tab button relative to the track
+  const trackRect = track.getBoundingClientRect();
+  const btnRect = btns[idx].getBoundingClientRect();
+  const centerX = (btnRect.left + btnRect.width / 2) - trackRect.left;
+  glow.style.left = centerX + 'px';
   glow.style.setProperty('--nav-active-color', color);
 }
 
@@ -10719,8 +10726,15 @@ function navToMore(screen) {
 function scrollNavForward() {}
 function updateNavArrow() {}
 
-// Init glow on load
-setTimeout(() => updateGlowIndicator(0, NAV_TAB_COLORS.home), 100);
+// Init glow on load (after layout is ready)
+setTimeout(() => updateGlowIndicator(0, NAV_TAB_COLORS.home), 200);
+window.addEventListener('resize', () => {
+  const activeBtn = document.querySelector('.nav-tabs-row .nav-btn.active');
+  if (activeBtn) {
+    const idx = parseInt(activeBtn.dataset.idx);
+    updateGlowIndicator(idx, NAV_TAB_COLORS[activeBtn.dataset.tab]);
+  }
+});
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
