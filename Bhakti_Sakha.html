@@ -4929,11 +4929,14 @@ async function _syncAdminConfigToServer() {
 }
 
 // Fetch admin config FROM server (called on app startup for all users)
-async function _fetchAdminConfigFromServer() {
+let _adminConfigFetched = false;
+async function _fetchAdminConfigFromServer(retryCount) {
+  retryCount = retryCount || 0;
   try {
     const resp = await fetch(SONGS_API_URL + '?type=adminConfig');
     const data = await resp.json();
     if (!data.success) return;
+    _adminConfigFetched = true;
     
     const serverEmails = data.adminEmails || [];
     const serverPerms = data.adminPermissions || {};
@@ -4955,9 +4958,16 @@ async function _fetchAdminConfigFromServer() {
       }
     }
     
-    // Update UI if on home screen
+    // Update UI everywhere
+    updateAdminUI();
     updateHomeGoogleUI();
-  } catch(e) { console.warn('Admin config fetch error:', e); }
+  } catch(e) {
+    console.warn('Admin config fetch error:', e);
+    // Retry up to 3 times with increasing delay
+    if (retryCount < 3) {
+      setTimeout(() => _fetchAdminConfigFromServer(retryCount + 1), (retryCount + 1) * 3000);
+    }
+  }
 }
 function hasPermission(perm) {
   if (!gUser || !gUser.email) return false;
@@ -7517,6 +7527,9 @@ function updateAdminUI() {
   } else {
     panel.style.display = 'none';
   }
+  // Update home admin button for all admins
+  const admBtn = document.getElementById('homeAdminBtn');
+  if (admBtn) admBtn.style.display = isAdmin() ? 'flex' : 'none';
   // Show/hide song add button and edit/delete buttons based on songs permission
   const songAddBtn = document.querySelector('.kirtan-add-btn');
   if (songAddBtn) songAddBtn.style.display = hasPermission('songs') ? '' : 'none';
@@ -7770,7 +7783,10 @@ async function gSyncAll() {
     if (statusEl) statusEl.textContent = `✓ Synced at ${now}`;
     if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${customFolders.length} folders · ${mergedEvents.length} events · ${songs.length} songs`;
     updateAdminUI();
+    if (typeof updateHomeGoogleUI === 'function') updateHomeGoogleUI();
     showToast('✓ Synced to Google Drive');
+    // Also refresh admin config from server (ensures non-hardcoded admins are recognized)
+    if (!_adminConfigFetched) _fetchAdminConfigFromServer();
     // Also sync admin config to central server (if super admin)
     if (isSuperAdmin()) _syncAdminConfigToServer();
 
