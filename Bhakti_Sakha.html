@@ -1737,6 +1737,45 @@ body {
 .ne-content-editable h2 { font-size:1.5rem; margin:6px 0; }
 .ne-content-editable ul, .ne-content-editable ol { padding-left:20px; margin:6px 0; }
 .ne-content-editable mark { background:rgba(241,196,15,0.3); color:inherit; border-radius:2px; padding:0 2px; }
+.ne-content-editable a { color:var(--accent-blue); text-decoration:underline; cursor:pointer; }
+.ne-content-editable img.ne-attached-img {
+  max-width:100%; height:auto; border-radius:10px; margin:10px 0;
+  display:block; box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+/* Background color picker */
+.ne-bg-picker-wrap { position:relative; display:inline-flex; }
+.ne-bg-palette {
+  display:none; position:absolute; top:38px; left:50%; transform:translateX(-50%);
+  background:var(--card); border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px; padding:8px; z-index:10;
+  box-shadow:0 8px 28px rgba(0,0,0,0.4);
+  flex-wrap:wrap; gap:6px; width:180px;
+}
+.ne-bg-palette.open { display:flex; }
+.ne-bg-swatch {
+  width:28px; height:28px; border-radius:8px; border:2px solid transparent;
+  cursor:pointer; transition:all 0.15s; flex-shrink:0;
+}
+.ne-bg-swatch:hover { transform:scale(1.15); }
+.ne-bg-swatch.active { border-color:#fff; box-shadow:0 0 0 2px var(--accent-blue); }
+.ne-bg-swatch[data-color="none"] {
+  background:var(--bg); border:2px dashed rgba(255,255,255,0.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.65rem; color:var(--text3);
+}
+/* Link insert modal */
+.ne-link-modal {
+  position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:300;
+  display:none; align-items:center; justify-content:center;
+}
+.ne-link-modal.open { display:flex; }
+.ne-link-box {
+  background:var(--card); border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px; padding:20px; width:90%; max-width:340px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
+}
+.ne-link-box .f-lbl { margin-bottom:4px; }
+.ne-link-box .f-inp { margin-bottom:10px; }
 .ne-autosave-indicator {
   font-size:0.82rem; color:var(--text3); padding:4px 16px;
   text-align:right; flex-shrink:0; border-top:1px solid rgba(255,255,255,0.06);
@@ -5584,6 +5623,11 @@ body {
     <button class="ne-fmt-btn" onclick="neExec('italic')" title="Italic"><i>I</i></button>
     <button class="ne-fmt-btn" onclick="neExec('underline')" title="Underline"><u>U</u></button>
     <div class="ne-fmt-sep"></div>
+    <button class="ne-fmt-btn" onclick="neExecAlign('left')" title="Align Left"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="10" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="10" y2="13"/></svg></button>
+    <button class="ne-fmt-btn" onclick="neExecAlign('center')" title="Align Center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="3.5" y1="6.3" x2="12.5" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="3.5" y1="13" x2="12.5" y2="13"/></svg></button>
+    <button class="ne-fmt-btn" onclick="neExecAlign('right')" title="Align Right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="6" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="6" y1="13" x2="15" y2="13"/></svg></button>
+    <button class="ne-fmt-btn" onclick="neExecAlign('justify')" title="Justify"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6.3" x2="15" y2="6.3"/><line x1="1" y1="9.7" x2="15" y2="9.7"/><line x1="1" y1="13" x2="15" y2="13"/></svg></button>
+    <div class="ne-fmt-sep"></div>
     <button class="ne-fmt-btn" onclick="neExec('insertUnorderedList')" title="Bullet list">•≡</button>
     <button class="ne-fmt-btn" onclick="neExec('insertOrderedList')" title="Numbered list">1.</button>
     <div class="ne-fmt-sep"></div>
@@ -5591,12 +5635,49 @@ body {
     <button class="ne-fmt-btn" onclick="neExecHeading('h2')" title="Heading 2" style="font-weight:700;font-size:0.82rem;">H2</button>
     <div class="ne-fmt-sep"></div>
     <button class="ne-fmt-btn" onclick="neExecHighlight()" title="Highlight" style="background:rgba(241,196,15,0.2);">🖍</button>
+    <button class="ne-fmt-btn" onclick="neOpenLinkModal()" title="Insert Link">🔗</button>
+    <button class="ne-fmt-btn" onclick="neAttachImage()" title="Attach Image">🖼️</button>
+    <div class="ne-fmt-sep"></div>
+    <div class="ne-bg-picker-wrap">
+      <button class="ne-fmt-btn" onclick="neToggleBgPicker()" title="Background Color" id="neBgBtn">🎨</button>
+      <div class="ne-bg-palette" id="neBgPalette">
+        <div class="ne-bg-swatch active" data-color="none" onclick="neSetBgColor('none',this)" title="No color">✕</div>
+        <div class="ne-bg-swatch" data-color="#1a1a2e" style="background:#1a1a2e;" onclick="neSetBgColor('#1a1a2e',this)" title="Night"></div>
+        <div class="ne-bg-swatch" data-color="#1b2a1b" style="background:#1b2a1b;" onclick="neSetBgColor('#1b2a1b',this)" title="Forest"></div>
+        <div class="ne-bg-swatch" data-color="#2a1b1b" style="background:#2a1b1b;" onclick="neSetBgColor('#2a1b1b',this)" title="Rose"></div>
+        <div class="ne-bg-swatch" data-color="#2a2518" style="background:#2a2518;" onclick="neSetBgColor('#2a2518',this)" title="Warm"></div>
+        <div class="ne-bg-swatch" data-color="#1b2230" style="background:#1b2230;" onclick="neSetBgColor('#1b2230',this)" title="Ocean"></div>
+        <div class="ne-bg-swatch" data-color="#261b2a" style="background:#261b2a;" onclick="neSetBgColor('#261b2a',this)" title="Lavender"></div>
+        <div class="ne-bg-swatch" data-color="#1e2a2a" style="background:#1e2a2a;" onclick="neSetBgColor('#1e2a2a',this)" title="Teal"></div>
+        <div class="ne-bg-swatch" data-color="#2d2010" style="background:#2d2010;" onclick="neSetBgColor('#2d2010',this)" title="Saffron"></div>
+        <div class="ne-bg-swatch" data-color="#232323" style="background:#232323;" onclick="neSetBgColor('#232323',this)" title="Charcoal"></div>
+      </div>
+    </div>
   </div>
   <div class="ne-content-area">
     <div class="ne-content-editable" id="neBody" contenteditable="true" data-placeholder="Write your note here…"></div>
   </div>
   <div class="ne-autosave-indicator" id="neAutosaveMsg">Ready</div>
   <input type="hidden" id="neEditId" value="">
+</div>
+
+<!-- Note Link Insert Modal -->
+<div class="ne-link-modal" id="neLinkModal">
+  <div class="ne-link-box">
+    <div class="modal-title" style="font-size:1rem;margin-bottom:12px;">🔗 Insert Link</div>
+    <div class="f-grp">
+      <label class="f-lbl">Display Text</label>
+      <input class="f-inp" id="neLinkText" placeholder="Link text">
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">URL</label>
+      <input class="f-inp" id="neLinkUrl" placeholder="https://example.com">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="f-submit" onclick="neInsertLink()" style="flex:1;">Insert</button>
+      <button class="f-cancel" onclick="neCloseLinkModal()" style="flex:1;">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- PIN Entry/Setup Modal -->
@@ -10579,12 +10660,23 @@ function nfRenderFolderNotes() {
       ? '<div class="note-preview" style="font-style:italic;color:var(--text3)">This note is locked</div>'
       : (n.body ? `<div class="note-preview">${escHtml(stripHtml(n.body))}</div>` : '');
     const pinnedCls = n.pinned ? ' pinned' : '';
-    return `<div class="note-card${pinnedCls}" onclick="nfOpenEditNote(${n.id})" style="${n.locked ? 'opacity:0.85' : ''}">
+    // Background color
+    const bgStyle = (n.bgColor && n.bgColor !== 'none') ? `background:${n.bgColor};` : '';
+    // Image thumbnail — find first base64 img in body
+    let imgThumb = '';
+    if (!n.locked && n.body) {
+      const imgMatch = n.body.match(/src="(data:image\/[^"]+)"/);
+      if (imgMatch) {
+        imgThumb = `<div style="margin-top:8px;"><img src="${imgMatch[1]}" style="width:100%;max-height:80px;object-fit:cover;border-radius:8px;opacity:0.85;"></div>`;
+      }
+    }
+    return `<div class="note-card${pinnedCls}" onclick="nfOpenEditNote(${n.id})" style="${bgStyle}${n.locked ? 'opacity:0.85' : ''}">
       <div class="note-card-top">
         ${pinIcon}${lockIcon}
         <div class="note-title">${escHtml(n.title||'Untitled')}</div>
       </div>
       ${preview}
+      ${imgThumb}
       <div class="note-footer">
         <span class="note-date">${date} ${time}</span>
         <div class="note-actions">
@@ -10624,6 +10716,10 @@ function nfOpenAddNote() {
   }
 
   updateEditorPinLockUI(false, false, _nfCurrentFolder === 'gratitude');
+  // Reset background color
+  _neCurrentBgColor = 'none';
+  document.querySelector('.ne-content-area').style.background = '';
+  document.querySelectorAll('.ne-bg-swatch').forEach(s => s.classList.toggle('active', s.dataset.color === 'none'));
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
   document.getElementById('neTitle').focus();
@@ -10671,6 +10767,11 @@ function nfOpenEditNote_unlocked(id) {
   }
 
   updateEditorPinLockUI(!!n.pinned, !!n.locked, n.folder === 'gratitude');
+  // Restore background color
+  _neCurrentBgColor = n.bgColor || 'none';
+  const area = document.querySelector('.ne-content-area');
+  area.style.background = (_neCurrentBgColor !== 'none') ? _neCurrentBgColor : '';
+  document.querySelectorAll('.ne-bg-swatch').forEach(s => s.classList.toggle('active', s.dataset.color === _neCurrentBgColor));
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
 }
@@ -10704,6 +10805,9 @@ function nfCloseNoteEditor() {
     nfSaveNote(true);
   }
   document.getElementById('noteEditorOverlay').classList.remove('open');
+  // Reset bg color
+  _neCurrentBgColor = 'none';
+  document.querySelector('.ne-content-area').style.background = '';
   _nfCurrentEditNoteId = null;
   if (_nfAutoSaveTimer) { clearTimeout(_nfAutoSaveTimer); _nfAutoSaveTimer = null; }
   nfRenderFolderNotes();
@@ -10723,7 +10827,7 @@ function nfSaveNote(silent) {
   if (_nfCurrentEditNoteId) {
     const idx = notes.findIndex(n => n.id === _nfCurrentEditNoteId);
     if (idx > -1) {
-      notes[idx] = { ...notes[idx], title: title||'Untitled', body, linkedDate, updatedAt: now };
+      notes[idx] = { ...notes[idx], title: title||'Untitled', body, linkedDate, updatedAt: now, bgColor: _neCurrentBgColor || 'none' };
     }
   } else {
     const newNote = {
@@ -10733,6 +10837,7 @@ function nfSaveNote(silent) {
       cat: folder, // backward compat
       body,
       linkedDate,
+      bgColor: _neCurrentBgColor || 'none',
       createdAt: now,
       updatedAt: now,
       pinned: false,
@@ -11316,6 +11421,128 @@ function neExecHighlight() {
   }
   document.getElementById('neBody').focus();
 }
+
+// ── Text Alignment ──
+function neExecAlign(align) {
+  document.execCommand('justify' + align.charAt(0).toUpperCase() + align.slice(1), false, null);
+  document.getElementById('neBody').focus();
+}
+
+// ── Hyperlink ──
+let _neLinkSavedRange = null;
+function neOpenLinkModal() {
+  const sel = window.getSelection();
+  if (sel.rangeCount) _neLinkSavedRange = sel.getRangeAt(0).cloneRange();
+  const selectedText = sel.toString().trim();
+  document.getElementById('neLinkText').value = selectedText || '';
+  document.getElementById('neLinkUrl').value = '';
+  // Check if cursor is inside existing link
+  let node = sel.anchorNode;
+  while (node && node !== document.getElementById('neBody')) {
+    if (node.tagName === 'A') {
+      document.getElementById('neLinkUrl').value = node.href || '';
+      document.getElementById('neLinkText').value = node.textContent || '';
+      break;
+    }
+    node = node.parentElement;
+  }
+  document.getElementById('neLinkModal').classList.add('open');
+  setTimeout(() => document.getElementById('neLinkUrl').focus(), 100);
+}
+function neCloseLinkModal() {
+  document.getElementById('neLinkModal').classList.remove('open');
+}
+function neInsertLink() {
+  let url = document.getElementById('neLinkUrl').value.trim();
+  const text = document.getElementById('neLinkText').value.trim() || url;
+  if (!url) { showToast('Please enter a URL'); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  neCloseLinkModal();
+  const body = document.getElementById('neBody');
+  body.focus();
+  // Restore selection
+  if (_neLinkSavedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_neLinkSavedRange);
+  }
+  // If there's selected text, wrap it; otherwise insert new
+  const sel = window.getSelection();
+  if (sel.rangeCount && !sel.isCollapsed) {
+    document.execCommand('createLink', false, url);
+    // Set target _blank on the new link
+    const links = body.querySelectorAll('a');
+    links.forEach(a => { if (a.href === url) a.setAttribute('target', '_blank'); });
+  } else {
+    const a = document.createElement('a');
+    a.href = url; a.textContent = text; a.target = '_blank';
+    if (sel.rangeCount) {
+      sel.getRangeAt(0).insertNode(a);
+      sel.collapseToEnd();
+    }
+  }
+  _neLinkSavedRange = null;
+}
+
+// ── Image Attachment ──
+function neAttachImage() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5MB'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const body = document.getElementById('neBody');
+      body.focus();
+      // Create image at the end of the content
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.className = 'ne-attached-img';
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      img.style.borderRadius = '10px';
+      img.style.marginTop = '10px';
+      img.style.display = 'block';
+      // Append to end
+      body.appendChild(document.createElement('br'));
+      body.appendChild(img);
+      body.appendChild(document.createElement('br'));
+      showToast('Image attached 🖼️');
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+// ── Background Color ──
+let _neCurrentBgColor = 'none';
+function neToggleBgPicker() {
+  const pal = document.getElementById('neBgPalette');
+  pal.classList.toggle('open');
+}
+function neSetBgColor(color, el) {
+  _neCurrentBgColor = color;
+  // Update swatches active state
+  document.querySelectorAll('.ne-bg-swatch').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // Apply to editor background
+  const area = document.querySelector('.ne-content-area');
+  if (color === 'none') {
+    area.style.background = '';
+  } else {
+    area.style.background = color;
+  }
+  // Close palette
+  document.getElementById('neBgPalette').classList.remove('open');
+}
+// Close bg picker on outside click
+document.addEventListener('click', function(e) {
+  const pal = document.getElementById('neBgPalette');
+  if (!pal) return;
+  if (!e.target.closest('.ne-bg-picker-wrap')) pal.classList.remove('open');
+});
 
 // --- EXPORT / IMPORT ---
 function exportNotes() {
