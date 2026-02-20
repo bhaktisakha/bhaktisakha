@@ -589,27 +589,60 @@ body {
   display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px;
 }
 .cat-folder-card {
-  position:relative; background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.08); border-radius:16px;
-  padding:20px 14px 16px; cursor:pointer; text-align:center;
-  transition: all 0.25s ease; overflow:hidden;
+  position:relative;
+  background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px;
+  padding:22px 14px 18px; cursor:pointer; text-align:center;
+  transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  overflow:hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+  /* Entry animation */
+  opacity:0; transform:translateY(24px) scale(0.95);
+  animation: catCardReveal 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
 }
+.cat-folder-card:nth-child(1) { animation-delay:0.04s; }
+.cat-folder-card:nth-child(2) { animation-delay:0.1s; }
+.cat-folder-card:nth-child(3) { animation-delay:0.16s; }
+.cat-folder-card:nth-child(4) { animation-delay:0.22s; }
+.cat-folder-card:nth-child(5) { animation-delay:0.28s; }
+.cat-folder-card:nth-child(6) { animation-delay:0.34s; }
+.cat-folder-card:nth-child(7) { animation-delay:0.40s; }
+.cat-folder-card:nth-child(8) { animation-delay:0.46s; }
+@keyframes catCardReveal {
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+/* Inner glow layer */
+.cat-folder-card::after {
+  content:''; position:absolute; inset:0; border-radius:18px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.07) 0%, transparent 65%);
+  pointer-events:none;
+}
+/* Top accent strip */
 .cat-folder-card::before {
   content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  border-radius:16px 16px 0 0; opacity:0.8;
+  border-radius:18px 18px 0 0; opacity:0.9; z-index:1;
 }
 .cat-folder-card[data-cat="vbhajan"]::before { background: linear-gradient(90deg, #f472b6, #ec4899); }
-.cat-folder-card[data-cat="hkkirtan"]::before { background: linear-gradient(90deg, #818cf8, #6366f1); }
 .cat-folder-card[data-cat="astakam"]::before { background: linear-gradient(90deg, #fb923c, #f97316); }
 .cat-folder-card[data-cat="stotram"]::before { background: linear-gradient(90deg, #34d399, #10b981); }
 .cat-folder-card[data-cat="gita"]::before { background: linear-gradient(90deg, #a3e635, #84cc16); }
 .cat-folder-card[data-cat="bhagavatam"]::before { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
 .cat-folder-card[data-cat="samhita"]::before { background: linear-gradient(90deg, #e879f9, #a855f7); }
-.cat-folder-card:active { transform:scale(0.97); background:rgba(255,255,255,0.08); }
-.cat-folder-icon { font-size:2.2rem; margin-bottom:10px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
-.cat-folder-name { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px; }
-.cat-folder-count { font-size:0.68rem; color:var(--text3); }
-.cat-folder-card:hover { border-color:rgba(255,255,255,0.15); box-shadow:0 4px 20px rgba(0,0,0,0.2); }
+.cat-folder-card:active { transform:scale(0.96); }
+.cat-folder-card:hover {
+  border-color:rgba(255,255,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+  transform:translateY(-2px);
+}
+.cat-folder-icon {
+  font-size:2.4rem; margin-bottom:10px;
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,0.35));
+  position:relative; z-index:1;
+}
+.cat-folder-name { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px; position:relative; z-index:1; }
+.cat-folder-count { font-size:0.68rem; color:var(--text3); position:relative; z-index:1; }
 /* Category detail header */
 .cat-detail-header {
   display:flex; align-items:center; gap:10px; padding:12px 16px;
@@ -5435,7 +5468,6 @@ body {
       <label class="f-lbl">Category</label>
       <select class="f-sel" id="aSongCat">
         <option value="vbhajan">Vaishnava Bhajans</option>
-        <option value="hkkirtan">Hare Krsna Kirtans</option>
         <option value="astakam">Astakams</option>
         <option value="stotram">Stotrams</option>
         <option value="gita">Bhagavad Gita Verses</option>
@@ -7449,7 +7481,7 @@ function showNextAudioField() {
 }
 
 function _catLabel(cat) {
-  return {vbhajan:'🌸 Vaishnava Bhajans', hkkirtan:'🎶 Hare Krsna Kirtans',
+  return {vbhajan:'🌸 Vaishnava Bhajans',
           astakam:'🙏 Astakams', stotram:'📿 Stotrams',
           gita:'📗 Bhagavad Gita Verses', bhagavatam:'🌊 Srimad Bhagavatam Prayers', samhita:'📜 Samhita'}[cat] || cat;
 }
@@ -7721,7 +7753,6 @@ let _openCatKey = null; // Track which category folder is open
 
 const CAT_FOLDER_INFO = {
   vbhajan:    { icon:'🌸', name:'Vaishnava Bhajans', gradient:'linear-gradient(135deg, rgba(244,114,182,0.15), rgba(236,72,153,0.05))' },
-  hkkirtan:   { icon:'🎶', name:'Hare Krsna Kirtans', gradient:'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(99,102,241,0.05))' },
   astakam:    { icon:'🙏', name:'Astakams', gradient:'linear-gradient(135deg, rgba(251,146,60,0.15), rgba(249,115,22,0.05))' },
   stotram:    { icon:'📿', name:'Stotrams', gradient:'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.05))' },
   gita:       { icon:'📗', name:'Bhagavad Gita Verses', gradient:'linear-gradient(135deg, rgba(163,230,53,0.15), rgba(132,204,22,0.05))' },
@@ -7785,7 +7816,7 @@ function renderSongs(filter) {
   } else if (q) {
     // When searching, show flat list grouped by cat (no folders)
     _openCatKey = null;
-    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
+    const CAT_ORDER = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
     const rendered = new Set();
     CAT_ORDER.forEach(key => {
       const cs = pool.filter(s => s.cat === key).sort(_naturalSongSort);
@@ -7801,7 +7832,7 @@ function renderSongs(filter) {
     document.getElementById('songsContent').innerHTML = `<div style="padding:8px 12px 100px;">${cards}</div>`;
   } else if (_openCatKey) {
     // Show songs inside the opened category folder
-    const CAT_ORDER_KEYS = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
+    const CAT_ORDER_KEYS = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
     const info = CAT_FOLDER_INFO[_openCatKey] || { icon:'📌', name:'Other' };
     const catSongs = _openCatKey === 'other'
       ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort(_naturalSongSort)
@@ -7822,7 +7853,7 @@ function renderSongs(filter) {
       <div style="padding:4px 12px 100px;">${innerCards}</div>`;
   } else {
     // Show category folder cards
-    const CAT_ORDER = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
+    const CAT_ORDER = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
     let folderCards = '';
     CAT_ORDER.forEach(key => {
       const count = pool.filter(s => s.cat === key).length;
@@ -7986,7 +8017,7 @@ function showCatChanger(songId) {
   if (!s) return;
   const changer = document.getElementById('sdCatChanger');
   if (changer.style.display !== 'none') { changer.style.display = 'none'; return; }
-  const cats = ['vbhajan','hkkirtan','astakam','stotram','gita','bhagavatam','samhita'];
+  const cats = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
   const html = cats.map(c => {
     const isCurrent = s.cat === c;
     return `<div class="sd-cat-opt${isCurrent ? ' current' : ''}" onclick="changeSongCat(${songId},'${c}')">${_catLabel(c)}</div>`;
@@ -9616,7 +9647,7 @@ function adminAddSong() {
     audios.push({ url, singer: singerEl ? singerEl.value.trim() : '' });
   });
   const catVal = document.getElementById('aSongCat').value;
-  const CAT_ICONS = {vbhajan:'🌸',hkkirtan:'🎶',astakam:'🙏',stotram:'📿',gita:'📗',bhagavatam:'🌊',samhita:'📜'};
+  const CAT_ICONS = {vbhajan:'🌸',astakam:'🙏',stotram:'📿',gita:'📗',bhagavatam:'🌊',samhita:'📜'};
   const s = {
     id: Date.now(),
     title: t,
