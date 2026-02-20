@@ -586,63 +586,99 @@ body {
 .cat-title:first-child { padding-top:4px; }
 /* Category folder cards */
 .cat-folders-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px;
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+  padding:16px 18px 100px;
 }
 .cat-folder-card {
   position:relative;
-  background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:18px;
-  padding:22px 14px 18px; cursor:pointer; text-align:center;
-  transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
-  overflow:hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
-  /* Entry animation */
-  opacity:0; transform:translateY(24px) scale(0.95);
-  animation: catCardReveal 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  border-radius:18px; padding:18px 16px 16px;
+  cursor:pointer; overflow:hidden;
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+  display:flex; flex-direction:column; gap:8px;
+  min-height:118px;
+  opacity:0; animation: homeIn 0.45s ease forwards;
 }
-.cat-folder-card:nth-child(1) { animation-delay:0.04s; }
-.cat-folder-card:nth-child(2) { animation-delay:0.1s; }
-.cat-folder-card:nth-child(3) { animation-delay:0.16s; }
-.cat-folder-card:nth-child(4) { animation-delay:0.22s; }
-.cat-folder-card:nth-child(5) { animation-delay:0.28s; }
-.cat-folder-card:nth-child(6) { animation-delay:0.34s; }
-.cat-folder-card:nth-child(7) { animation-delay:0.40s; }
-.cat-folder-card:nth-child(8) { animation-delay:0.46s; }
-@keyframes catCardReveal {
-  to { opacity:1; transform:translateY(0) scale(1); }
-}
-/* Inner glow layer */
+.cat-folder-card:nth-child(1) { animation-delay:0.08s; }
+.cat-folder-card:nth-child(2) { animation-delay:0.14s; }
+.cat-folder-card:nth-child(3) { animation-delay:0.20s; }
+.cat-folder-card:nth-child(4) { animation-delay:0.26s; }
+.cat-folder-card:nth-child(5) { animation-delay:0.32s; }
+.cat-folder-card:nth-child(6) { animation-delay:0.38s; }
+.cat-folder-card:nth-child(7) { animation-delay:0.44s; }
+.cat-folder-card:nth-child(8) { animation-delay:0.50s; }
+.cat-folder-card:active { transform:scale(0.95); }
+/* Corner glow orb */
 .cat-folder-card::after {
-  content:''; position:absolute; inset:0; border-radius:18px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.07) 0%, transparent 65%);
-  pointer-events:none;
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:110px; height:110px; border-radius:50%;
+  pointer-events:none; filter:blur(8px);
 }
-/* Top accent strip */
-.cat-folder-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  border-radius:18px 18px 0 0; opacity:0.9; z-index:1;
+/* Per-category gradients */
+.cat-folder-card[data-cat="vbhajan"] {
+  background:linear-gradient(145deg, rgba(244,114,182,0.18) 0%, rgba(60,22,40,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(244,114,182,0.3);
+  box-shadow:0 4px 20px rgba(244,114,182,0.1), inset 0 1px 0 rgba(244,114,182,0.15);
 }
-.cat-folder-card[data-cat="vbhajan"]::before { background: linear-gradient(90deg, #f472b6, #ec4899); }
-.cat-folder-card[data-cat="astakam"]::before { background: linear-gradient(90deg, #fb923c, #f97316); }
-.cat-folder-card[data-cat="stotram"]::before { background: linear-gradient(90deg, #34d399, #10b981); }
-.cat-folder-card[data-cat="gita"]::before { background: linear-gradient(90deg, #a3e635, #84cc16); }
-.cat-folder-card[data-cat="bhagavatam"]::before { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
-.cat-folder-card[data-cat="samhita"]::before { background: linear-gradient(90deg, #e879f9, #a855f7); }
-.cat-folder-card:active { transform:scale(0.96); }
-.cat-folder-card:hover {
-  border-color:rgba(255,255,255,0.2);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
-  transform:translateY(-2px);
+.cat-folder-card[data-cat="vbhajan"]::after { background:rgba(244,114,182,0.25); }
+.cat-folder-card[data-cat="astakam"] {
+  background:linear-gradient(145deg, rgba(251,146,60,0.18) 0%, rgba(60,30,12,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(251,146,60,0.3);
+  box-shadow:0 4px 20px rgba(251,146,60,0.1), inset 0 1px 0 rgba(251,146,60,0.15);
 }
+.cat-folder-card[data-cat="astakam"]::after { background:rgba(251,146,60,0.25); }
+.cat-folder-card[data-cat="stotram"] {
+  background:linear-gradient(145deg, rgba(52,211,153,0.18) 0%, rgba(12,50,35,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(52,211,153,0.3);
+  box-shadow:0 4px 20px rgba(52,211,153,0.1), inset 0 1px 0 rgba(52,211,153,0.15);
+}
+.cat-folder-card[data-cat="stotram"]::after { background:rgba(52,211,153,0.25); }
+.cat-folder-card[data-cat="gita"] {
+  background:linear-gradient(145deg, rgba(163,230,53,0.18) 0%, rgba(35,50,12,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(163,230,53,0.3);
+  box-shadow:0 4px 20px rgba(163,230,53,0.1), inset 0 1px 0 rgba(163,230,53,0.15);
+}
+.cat-folder-card[data-cat="gita"]::after { background:rgba(163,230,53,0.25); }
+.cat-folder-card[data-cat="bhagavatam"] {
+  background:linear-gradient(145deg, rgba(56,189,248,0.18) 0%, rgba(12,38,60,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(56,189,248,0.3);
+  box-shadow:0 4px 20px rgba(56,189,248,0.1), inset 0 1px 0 rgba(56,189,248,0.15);
+}
+.cat-folder-card[data-cat="bhagavatam"]::after { background:rgba(56,189,248,0.25); }
+.cat-folder-card[data-cat="samhita"] {
+  background:linear-gradient(145deg, rgba(232,121,249,0.18) 0%, rgba(45,22,55,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(232,121,249,0.3);
+  box-shadow:0 4px 20px rgba(232,121,249,0.1), inset 0 1px 0 rgba(232,121,249,0.15);
+}
+.cat-folder-card[data-cat="samhita"]::after { background:rgba(232,121,249,0.25); }
+.cat-folder-card[data-cat="other"] {
+  background:linear-gradient(145deg, rgba(180,180,180,0.12) 0%, rgba(40,40,40,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(180,180,180,0.2);
+  box-shadow:0 4px 20px rgba(180,180,180,0.06), inset 0 1px 0 rgba(180,180,180,0.1);
+}
+.cat-folder-card[data-cat="other"]::after { background:rgba(180,180,180,0.15); }
+/* Icon badge */
 .cat-folder-icon {
-  font-size:2.4rem; margin-bottom:10px;
-  filter:drop-shadow(0 2px 10px rgba(0,0,0,0.35));
-  position:relative; z-index:1;
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; position:relative; z-index:1;
 }
-.cat-folder-name { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px; position:relative; z-index:1; }
-.cat-folder-count { font-size:0.68rem; color:var(--text3); position:relative; z-index:1; }
+.cat-folder-card[data-cat="vbhajan"] .cat-folder-icon { background:rgba(244,114,182,0.2); box-shadow:0 0 12px rgba(244,114,182,0.2); }
+.cat-folder-card[data-cat="astakam"] .cat-folder-icon { background:rgba(251,146,60,0.2); box-shadow:0 0 12px rgba(251,146,60,0.2); }
+.cat-folder-card[data-cat="stotram"] .cat-folder-icon { background:rgba(52,211,153,0.2); box-shadow:0 0 12px rgba(52,211,153,0.2); }
+.cat-folder-card[data-cat="gita"] .cat-folder-icon { background:rgba(163,230,53,0.2); box-shadow:0 0 12px rgba(163,230,53,0.2); }
+.cat-folder-card[data-cat="bhagavatam"] .cat-folder-icon { background:rgba(56,189,248,0.2); box-shadow:0 0 12px rgba(56,189,248,0.2); }
+.cat-folder-card[data-cat="samhita"] .cat-folder-icon { background:rgba(232,121,249,0.2); box-shadow:0 0 12px rgba(232,121,249,0.2); }
+.cat-folder-card[data-cat="other"] .cat-folder-icon { background:rgba(180,180,180,0.15); box-shadow:0 0 12px rgba(180,180,180,0.1); }
+/* Title & count */
+.cat-folder-name { font-size:0.9rem; font-weight:600; line-height:1.3; letter-spacing:0.2px; position:relative; z-index:1; }
+.cat-folder-card[data-cat="vbhajan"] .cat-folder-name { color:#f9a8d4; }
+.cat-folder-card[data-cat="astakam"] .cat-folder-name { color:#fdba74; }
+.cat-folder-card[data-cat="stotram"] .cat-folder-name { color:#6ee7b7; }
+.cat-folder-card[data-cat="gita"] .cat-folder-name { color:#d9f99d; }
+.cat-folder-card[data-cat="bhagavatam"] .cat-folder-name { color:#7dd3fc; }
+.cat-folder-card[data-cat="samhita"] .cat-folder-name { color:#f0abfc; }
+.cat-folder-card[data-cat="other"] .cat-folder-name { color:var(--text2); }
+.cat-folder-count { font-size:0.67rem; color:var(--text2); line-height:1.45; position:relative; z-index:1; }
 /* Category detail header */
 .cat-detail-header {
   display:flex; align-items:center; gap:10px; padding:12px 16px;
@@ -8010,7 +8046,7 @@ function renderSongs(filter) {
     CAT_ORDER.forEach(key => {
       const count = pool.filter(s => s.cat === key).length;
       const info = CAT_FOLDER_INFO[key];
-      folderCards += `<div class="cat-folder-card" data-cat="${key}" onclick="openCatFolder('${key}')" style="background:${info.gradient};">
+      folderCards += `<div class="cat-folder-card" data-cat="${key}" onclick="openCatFolder('${key}')">
         <div class="cat-folder-icon">${info.icon}</div>
         <div class="cat-folder-name">${info.name}</div>
         <div class="cat-folder-count">${count} song${count!==1?'s':''}</div>
@@ -8019,7 +8055,7 @@ function renderSongs(filter) {
     // Check for uncategorized
     const rest = pool.filter(s => !CAT_ORDER.includes(s.cat));
     if (rest.length) {
-      folderCards += `<div class="cat-folder-card" data-cat="other" onclick="openCatFolder('other')" style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));">
+      folderCards += `<div class="cat-folder-card" data-cat="other" onclick="openCatFolder('other')">
         <div class="cat-folder-icon">📌</div>
         <div class="cat-folder-name">Other</div>
         <div class="cat-folder-count">${rest.length} song${rest.length!==1?'s':''}</div>
