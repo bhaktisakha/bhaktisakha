@@ -1782,13 +1782,13 @@ body {
 }
 .nav-btn {
   flex:1; display:flex; flex-direction:column; align-items:center;
-  padding:8px 2px; cursor:pointer; border:none; background:transparent;
-  color:var(--text3); gap:3px; transition:color 0.2s; min-width:0;
+  padding:7px 1px 6px; cursor:pointer; border:none; background:transparent;
+  color:var(--text3); gap:2px; transition:color 0.2s; min-width:0;
 }
 .nav-btn.active { color:var(--accent-blue); }
-.nav-btn svg { width:20px; height:20px; }
-.nav-icon-text { font-size:1.3rem; line-height:1; color:inherit; }
-.nav-lbl { font-size:0.52rem; letter-spacing:0.3px; text-transform:uppercase; }
+.nav-btn svg { width:18px; height:18px; }
+.nav-icon-text { font-size:1.2rem; line-height:1; color:inherit; }
+.nav-lbl { font-size:0.46rem; letter-spacing:0.2px; text-transform:uppercase; }
 
 /* ===== MODAL ===== */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200;
@@ -2374,6 +2374,215 @@ body {
   padding:6px 12px; font-size:0.75rem; color:var(--text2); cursor:pointer;
 }
 .sk-filter-chip.active { background:rgba(212,160,23,0.15); border-color:rgba(212,160,23,0.4); color:var(--accent-gold); }
+
+/* ===== HOME SCREEN ===== */
+.home-wrap {
+  padding:0 0 30px; overflow-y:auto; height:100%;
+  scrollbar-width:none; -ms-overflow-style:none;
+  background:linear-gradient(180deg, var(--bg) 0%, rgba(13,27,42,0.97) 100%);
+}
+.home-wrap::-webkit-scrollbar { display:none; }
+
+/* ── Google Account Bar ── */
+.home-gbar {
+  padding:14px 18px 12px;
+  display:flex; align-items:center; gap:12px;
+  position:relative;
+}
+.home-gbar::after {
+  content:''; position:absolute; bottom:0; left:20px; right:20px;
+  height:1px; background:linear-gradient(90deg, transparent, rgba(167,139,250,0.15), transparent);
+}
+
+/* Signed-in avatar */
+.home-g-avatar {
+  width:40px; height:40px; border-radius:50%; flex-shrink:0;
+  border:2.5px solid rgba(167,139,250,0.4);
+  object-fit:cover; background:var(--card);
+  box-shadow:0 0 16px rgba(167,139,250,0.2), 0 2px 8px rgba(0,0,0,0.3);
+  transition:border-color 0.3s;
+}
+
+/* Signed-out Google button */
+.home-g-btn-wrap {
+  width:40px; height:40px; border-radius:50%; flex-shrink:0;
+  background:var(--card); border:2px solid rgba(255,255,255,0.1);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.2s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  position:relative; overflow:hidden;
+}
+.home-g-btn-wrap:active { transform:scale(0.93); border-color:rgba(66,133,244,0.4); }
+.home-g-btn-wrap::after {
+  content:''; position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at center, rgba(66,133,244,0.06), transparent 70%);
+}
+/* Google "G" multi-color SVG */
+.home-g-logo { width:20px; height:20px; position:relative; z-index:1; }
+
+.home-g-info { flex:1; min-width:0; }
+.home-g-name {
+  font-family:'Philosopher', serif; font-size:0.9rem; font-weight:600;
+  color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  line-height:1.3;
+}
+.home-g-email {
+  font-size:0.65rem; color:var(--text3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;
+}
+.home-g-signin-cta {
+  font-size:0.72rem; color:rgba(66,133,244,0.9); cursor:pointer;
+  font-weight:500; letter-spacing:0.2px; margin-top:2px;
+  transition:color 0.2s;
+}
+.home-g-signin-cta:active { color:rgba(66,133,244,0.6); }
+.home-g-actions { flex-shrink:0; display:flex; gap:8px; align-items:center; }
+.home-g-action-btn {
+  width:32px; height:32px; border-radius:50%;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.2s; color:var(--text3);
+}
+.home-g-action-btn:active { background:rgba(255,255,255,0.08); color:var(--text); transform:scale(0.9); }
+.home-g-action-btn svg { width:15px; height:15px; }
+
+/* ── Greeting Section ── */
+.home-greeting {
+  padding:18px 22px 4px;
+  position:relative;
+}
+.home-greet-text {
+  font-family:'Playfair Display', 'Philosopher', serif;
+  font-size:1.55rem; font-weight:600;
+  color:var(--text); line-height:1.3;
+  letter-spacing:0.3px;
+}
+.home-greet-sub {
+  font-size:0.76rem; color:var(--text3); margin-top:7px;
+  line-height:1.55; letter-spacing:0.1px;
+}
+.home-greet-sub .hg-date { color:var(--text2); font-weight:500; }
+.home-greet-sub .hg-vaishnava {
+  font-family:'Playfair Display', serif; font-style:italic;
+  color:var(--lavender); opacity:0.75; font-size:0.72rem;
+}
+
+/* ── Today's Highlight ── */
+.home-today {
+  margin:12px 18px 2px; padding:14px 16px;
+  background:linear-gradient(135deg, rgba(61,127,212,0.07) 0%, rgba(167,139,250,0.05) 50%, rgba(212,160,23,0.04) 100%);
+  border:1px solid rgba(61,127,212,0.12); border-radius:14px;
+  cursor:pointer; transition:transform 0.15s;
+  position:relative; overflow:hidden;
+  opacity:0; animation:homeIn 0.5s ease 0.1s forwards;
+}
+.home-today::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg, var(--accent-blue), var(--lavender));
+  border-radius:3px 0 0 3px;
+}
+.home-today:active { transform:scale(0.98); }
+.home-today-label {
+  font-size:0.58rem; text-transform:uppercase; letter-spacing:1.5px;
+  color:var(--accent-blue); font-weight:600; margin-bottom:6px;
+}
+.home-today-text { font-size:0.8rem; color:var(--text); line-height:1.5; }
+.home-today-text .ht-event { color:var(--accent-gold); font-weight:500; }
+
+@keyframes homeIn {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Feature Grid ── */
+.home-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  padding:16px 18px 10px;
+}
+.home-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:18px 16px 16px;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+  display:flex; flex-direction:column; gap:8px;
+  min-height:118px;
+  opacity:0; animation:homeIn 0.45s ease forwards;
+}
+.home-card:nth-child(1) { animation-delay:0.08s; }
+.home-card:nth-child(2) { animation-delay:0.14s; }
+.home-card:nth-child(3) { animation-delay:0.20s; }
+.home-card:nth-child(4) { animation-delay:0.26s; }
+.home-card:nth-child(5) { animation-delay:0.32s; }
+.home-card:nth-child(6) { animation-delay:0.38s; }
+.home-card:nth-child(7) { animation-delay:0.44s; }
+.home-card:active { transform:scale(0.96); }
+
+/* Top accent stripe */
+.home-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  border-radius:16px 16px 0 0;
+}
+/* Corner glow */
+.home-card::after {
+  content:''; position:absolute; top:-30px; right:-30px;
+  width:80px; height:80px; border-radius:50%;
+  opacity:0.06; pointer-events:none;
+}
+
+/* Per-card theming */
+.home-card--calendar::before { background:linear-gradient(90deg, var(--accent-blue), #5a9de6); }
+.home-card--calendar::after  { background:var(--accent-blue); }
+.home-card--audio::before    { background:linear-gradient(90deg, #c9a84c, #f0d68a); }
+.home-card--audio::after     { background:#c9a84c; }
+.home-card--events::before   { background:linear-gradient(90deg, var(--accent-green), #4fd68a); }
+.home-card--events::after    { background:var(--accent-green); }
+.home-card--notes::before    { background:linear-gradient(90deg, var(--lavender), #c4b0fa); }
+.home-card--notes::after     { background:var(--lavender); }
+.home-card--dhamas::before   { background:linear-gradient(90deg, var(--accent-red), #e06050); }
+.home-card--dhamas::after    { background:var(--accent-red); }
+.home-card--sevakart::before { background:linear-gradient(90deg, var(--accent-gold), #e8c840); }
+.home-card--sevakart::after  { background:var(--accent-gold); }
+
+/* Icon badge */
+.home-card-icon {
+  width:38px; height:38px; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.home-card--calendar .home-card-icon { background:rgba(61,127,212,0.12); color:var(--accent-blue); }
+.home-card--audio    .home-card-icon { background:rgba(201,168,76,0.12); color:#d4a84c; }
+.home-card--events   .home-card-icon { background:rgba(39,174,96,0.12); color:var(--accent-green); }
+.home-card--notes    .home-card-icon { background:rgba(167,139,250,0.12); color:var(--lavender); }
+.home-card--dhamas   .home-card-icon { background:rgba(192,57,43,0.12); color:var(--accent-red); }
+.home-card--sevakart .home-card-icon { background:rgba(212,160,23,0.12); color:var(--accent-gold); }
+
+.home-card-title { font-size:0.88rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
+.home-card-desc  { font-size:0.67rem; color:var(--text3); line-height:1.45; flex:1; }
+
+/* Settings row (full width) */
+.home-card--settings {
+  grid-column:1 / -1;
+  flex-direction:row; align-items:center;
+  min-height:auto; padding:14px 16px; gap:12px;
+}
+.home-card--settings::before { background:linear-gradient(90deg, var(--text3), var(--text2)); }
+.home-card--settings::after  { background:var(--text2); }
+.home-card--settings .home-card-icon { background:rgba(255,255,255,0.06); color:var(--text2); }
+.home-card--settings .home-card-desc { margin:0; }
+
+/* ── Decorative quote ── */
+.home-quote {
+  margin:10px 22px 6px; padding:12px 16px;
+  position:relative;
+  opacity:0; animation:homeIn 0.5s ease 0.5s forwards;
+}
+.home-quote-text {
+  font-family:'Playfair Display', serif; font-style:italic;
+  font-size:0.74rem; color:var(--text3); line-height:1.6;
+  opacity:0.6;
+}
+.home-quote-text::before { content:'"'; color:var(--lavender); opacity:0.4; font-size:1.2rem; margin-right:2px; vertical-align:text-top; }
+.home-quote-text::after  { content:'"'; color:var(--lavender); opacity:0.4; font-size:1.2rem; margin-left:2px; vertical-align:text-top; }
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -2450,8 +2659,138 @@ body {
 <!-- Screens -->
 <div class="screens">
 
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="home-wrap">
+      <!-- ── Google Account Bar ── -->
+      <div class="home-gbar">
+        <!-- Signed-in state -->
+        <div id="homeGSignedIn" style="display:none;width:100%;">
+          <div style="display:flex;align-items:center;gap:12px;width:100%;">
+            <img id="homeGAvatar" class="home-g-avatar" src="" alt="">
+            <div class="home-g-info">
+              <div id="homeGName" class="home-g-name"></div>
+              <div id="homeGEmail" class="home-g-email"></div>
+            </div>
+            <div class="home-g-actions">
+              <button class="home-g-action-btn" onclick="gSyncAll()" title="Sync Now">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/><path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"/></svg>
+              </button>
+              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Signed-out state with Google logo -->
+        <div id="homeGSignedOut" style="width:100%;">
+          <div style="display:flex;align-items:center;gap:12px;width:100%;">
+            <div class="home-g-btn-wrap" onclick="switchScreen('settings',null)">
+              <svg class="home-g-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 0 0 1 12c0 1.94.46 3.77 1.18 5.07l3.66-2.98z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+            </div>
+            <div class="home-g-info">
+              <div class="home-g-name" style="color:var(--text2);">Welcome, Devotee</div>
+              <div class="home-g-signin-cta" onclick="switchScreen('settings',null)">Sign in with Google →</div>
+            </div>
+            <div class="home-g-actions">
+              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Greeting ── -->
+      <div class="home-greeting">
+        <div class="home-greet-text" id="homeGreeting">Hare Krishna!</div>
+        <div class="home-greet-sub">
+          <span class="hg-date" id="homeDate"></span><br>
+          <span class="hg-vaishnava" id="homeVDate"></span>
+        </div>
+      </div>
+
+      <!-- ── Today's highlight ── -->
+      <div class="home-today" id="homeTodayCard" onclick="switchScreen('calendar',document.querySelectorAll('.nav-btn')[1])" style="display:none;">
+        <div class="home-today-label">✦ Today</div>
+        <div class="home-today-text" id="homeTodayText"></div>
+      </div>
+
+      <!-- ── Feature Grid ── -->
+      <div class="home-grid">
+        <div class="home-card home-card--calendar" onclick="switchScreen('calendar',document.querySelectorAll('.nav-btn')[1])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="home-card-title">Calendar</div>
+          <div class="home-card-desc">Vaishnava calendar with Ekadashis, festivals & tithis</div>
+        </div>
+
+        <div class="home-card home-card--audio" onclick="switchScreen('songs',document.querySelectorAll('.nav-btn')[2])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <div class="home-card-title">Kirtans</div>
+          <div class="home-card-desc">Transcendental vibrations — songs, bhajans & prayers</div>
+        </div>
+
+        <div class="home-card home-card--notes" onclick="switchScreen('notes',document.querySelectorAll('.nav-btn')[4])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="home-card-title">Notes</div>
+          <div class="home-card-desc">Spiritual journal — notes synced via Google Drive</div>
+        </div>
+
+        <div class="home-card home-card--sevakart" onclick="switchScreen('sevakart',document.querySelectorAll('.nav-btn')[6])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12 2C8 2 4 6 4 10c0 5.33 8 12 8 12s8-6.67 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="home-card-title">SevaKart</div>
+          <div class="home-card-desc">Community services — find & offer seva opportunities</div>
+        </div>
+
+        <div class="home-card home-card--dhamas" onclick="switchScreen('dhamas',document.querySelectorAll('.nav-btn')[5])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+          </div>
+          <div class="home-card-title">Holy Dhamas</div>
+          <div class="home-card-desc">Sacred places of pilgrimage — temples & holy sites</div>
+        </div>
+
+        <div class="home-card home-card--events" onclick="switchScreen('events',document.querySelectorAll('.nav-btn')[3])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="home-card-title">My Events</div>
+          <div class="home-card-desc">Personal reminders, fasting alerts & custom events</div>
+        </div>
+
+        <div class="home-card home-card--settings" onclick="switchScreen('settings',null)">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div class="home-card-title">Settings</div>
+            <div class="home-card-desc">Location, notifications, Google sync & preferences</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative quote -->
+      <div class="home-quote">
+        <div class="home-quote-text" id="homeQuote">In the material world, the spirit soul is always on the verge of danger.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- CALENDAR -->
-  <div class="screen active" id="screen-calendar">
+  <div class="screen" id="screen-calendar">
     <div class="cal-wrapper">
       <div class="month-nav">
         <button class="month-nav-btn" onclick="changeMonth(-1)">‹</button>
@@ -2825,7 +3164,7 @@ body {
   <div class="screen" id="screen-info">
     <div class="info-screen">
 
-      <button class="info-back-btn" onclick="switchScreen('calendar',document.querySelector('.nav-btn'))">← Back to Calendar</button>
+      <button class="info-back-btn" onclick="switchScreen('home',document.querySelectorAll('.nav-btn')[0])">← Back to Home</button>
 
       <!-- Hero Section -->
       <div class="info-hero">
@@ -3143,7 +3482,11 @@ body {
   </div>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" onclick="switchScreen('calendar',this)">
+  <button class="nav-btn active" onclick="switchScreen('home',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-lbl">Home</span>
+  </button>
+  <button class="nav-btn" onclick="switchScreen('calendar',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span class="nav-lbl">Calendar</span>
   </button>
@@ -5158,7 +5501,7 @@ function doSearch() {
 function gotoDate(y,m,d) {
   curYear=y; curMonth=m;
   selDate = new Date(y,m,d);
-  switchScreen('calendar', document.querySelectorAll('.nav-btn')[0]);
+  switchScreen('calendar', document.querySelectorAll('.nav-btn')[1]);
   renderCalendar();
   renderDayDetail(selDate);
   updateHeaderDate();
@@ -6232,6 +6575,8 @@ function updateGoogleUI(signedIn) {
   }
   // Update admin panel visibility and song button visibility
   updateAdminUI();
+  // Also update home screen Google UI
+  if (typeof updateHomeGoogleUI === 'function') updateHomeGoogleUI();
 }
 
 function gSignOut() {
@@ -7840,6 +8185,9 @@ function updateNoteCharCount() {}
 // ===================================================================
 // NAVIGATION
 // ===================================================================
+let _navHistory = ['home'];
+let _currentScreen = 'home';
+
 function switchScreen(name, btn) {
   // Persist playing audio if leaving song detail
   if (_playingSongId && _persistentAudio && !_persistentAudio.paused) {
@@ -7852,27 +8200,52 @@ function switchScreen(name, btn) {
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
-  // Update header: show date on calendar, screen title on others; hide icons except on calendar
-  const headerDate = document.getElementById('headerDate');
-  const headerMasa = document.getElementById('headerMasa');
-  const headerIcons = document.getElementById('headerIcons');
-  const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings'};
-  if (name === 'calendar') {
-    updateHeaderDate();
-    headerIcons.style.display = '';
-    headerMasa.style.display = '';
-    headerDate.classList.remove('songs-title');
-    document.querySelector('.header').classList.remove('header-songs');
+  // Push history state for back button (only if navigating forward, not going back)
+  if (name !== _currentScreen) {
+    if (_currentScreen !== 'home' && name === 'home') {
+      // Going back to home - don't push, we'll handle via popstate
+    } else if (name !== 'home') {
+      history.pushState({screen: name}, '', '');
+    }
+    _currentScreen = name;
+  }
+
+  // Show/hide brand bar and header based on screen
+  const brandBar = document.querySelector('.app-brand');
+  const header = document.querySelector('.header');
+  if (name === 'home') {
+    if (brandBar) brandBar.style.display = 'flex';
+    if (header) header.style.display = 'none';
+    updateHomeScreen();
+    // Highlight home nav button
+    const homeBtn = document.querySelectorAll('.nav-btn')[0];
+    if (homeBtn) homeBtn.classList.add('active');
   } else {
-    headerDate.textContent = TITLES[name] || name;
-    headerIcons.style.display = 'none';
-    headerMasa.style.display = 'none';
-    if (name === 'songs') {
-      headerDate.classList.add('songs-title');
-      document.querySelector('.header').classList.add('header-songs');
-    } else {
+    if (brandBar) brandBar.style.display = 'none';
+    if (header) header.style.display = '';
+
+    // Update header: show date on calendar, screen title on others; hide icons except on calendar
+    const headerDate = document.getElementById('headerDate');
+    const headerMasa = document.getElementById('headerMasa');
+    const headerIcons = document.getElementById('headerIcons');
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings'};
+    if (name === 'calendar') {
+      updateHeaderDate();
+      headerIcons.style.display = '';
+      headerMasa.style.display = '';
       headerDate.classList.remove('songs-title');
       document.querySelector('.header').classList.remove('header-songs');
+    } else {
+      headerDate.textContent = TITLES[name] || name;
+      headerIcons.style.display = 'none';
+      headerMasa.style.display = 'none';
+      if (name === 'songs') {
+        headerDate.classList.add('songs-title');
+        document.querySelector('.header').classList.add('header-songs');
+      } else {
+        headerDate.classList.remove('songs-title');
+        document.querySelector('.header').classList.remove('header-songs');
+      }
     }
   }
 
@@ -7883,6 +8256,139 @@ function switchScreen(name, btn) {
   if (name==='sevakart') skRenderHome();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
+}
+
+// Back button handler - navigate to home instead of exiting
+window.addEventListener('popstate', function(e) {
+  if (_currentScreen !== 'home') {
+    switchScreen('home', document.querySelectorAll('.nav-btn')[0]);
+  }
+});
+// Push initial state
+history.replaceState({screen: 'home'}, '', '');
+
+// Update home screen content
+function updateHomeScreen() {
+  // Greeting based on time of day with user name if available
+  const hr = new Date().getHours();
+  const userName = gUser ? gUser.name.split(' ')[0] : '';
+  let greet = '';
+  if (hr >= 3 && hr < 12) greet = 'Hare Krishna' + (userName ? ', ' + userName : '') + '!';
+  else if (hr >= 12 && hr < 17) greet = 'Hare Krishna' + (userName ? ', ' + userName : '') + '!';
+  else if (hr >= 17 && hr < 21) greet = 'Hare Krishna' + (userName ? ', ' + userName : '') + '!';
+  else greet = 'Hare Krishna' + (userName ? ', ' + userName : '') + '!';
+  const greetEl = document.getElementById('homeGreeting');
+  if (greetEl) greetEl.textContent = greet;
+
+  // Date
+  const now = new Date();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dateEl = document.getElementById('homeDate');
+  if (dateEl) dateEl.textContent = `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+
+  // Vaishnava date — use header masa if available
+  const vdEl = document.getElementById('homeVDate');
+  const headerMasa = document.getElementById('headerMasa');
+  if (vdEl && headerMasa && headerMasa.textContent) {
+    vdEl.textContent = headerMasa.textContent;
+  }
+
+  // Update Google account UI on home
+  updateHomeGoogleUI();
+
+  // Today's events
+  updateHomeTodayCard();
+
+  // Rotating spiritual quote
+  updateHomeQuote();
+}
+
+function updateHomeGoogleUI() {
+  const signedIn = document.getElementById('homeGSignedIn');
+  const signedOut = document.getElementById('homeGSignedOut');
+  if (!signedIn || !signedOut) return;
+
+  if (gUser) {
+    signedIn.style.display = '';
+    signedOut.style.display = 'none';
+    const av = document.getElementById('homeGAvatar');
+    if (av && gUser.picture) av.src = gUser.picture;
+    const nm = document.getElementById('homeGName');
+    if (nm) nm.textContent = gUser.name || 'Devotee';
+    const em = document.getElementById('homeGEmail');
+    if (em) em.textContent = gUser.email || '';
+  } else {
+    signedIn.style.display = 'none';
+    signedOut.style.display = '';
+  }
+}
+
+const _homeQuotes = [
+  "For one who has conquered the mind, the mind is the best of friends.",
+  "You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions.",
+  "The soul is neither born, and nor does it die.",
+  "Whatever happened, happened for the good. Whatever is happening, is happening for the good.",
+  "Change is the law of the universe. You can be a millionaire or a pauper in an instant.",
+  "In the material world, the spirit soul is always on the verge of danger.",
+  "A person can rise through the efforts of his own mind; he can also degrade himself.",
+  "One who sees inaction in action, and action in inaction, is intelligent among men.",
+  "The mind acts like an enemy for those who do not control it.",
+  "There is neither this world, nor the world beyond, nor happiness for the one who doubts.",
+  "Set thy heart upon thy work, but never on its reward.",
+  "When meditation is mastered, the mind is unwavering like the flame of a lamp in a windless place."
+];
+
+function updateHomeQuote() {
+  const el = document.getElementById('homeQuote');
+  if (!el) return;
+  // Pick quote based on day of year for daily rotation
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  el.textContent = _homeQuotes[dayOfYear % _homeQuotes.length];
+}
+
+function updateHomeTodayCard() {
+  try {
+    const card = document.getElementById('homeTodayCard');
+    const text = document.getElementById('homeTodayText');
+    if (!card || !text) return;
+
+    const now = new Date();
+    const key = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const todayEvents = [];
+
+    // Check calendarData for today
+    if (typeof calendarData !== 'undefined' && calendarData[key]) {
+      const d = calendarData[key];
+      if (d.tithi) todayEvents.push(d.tithi);
+      if (d.events && d.events.length) {
+        d.events.forEach(e => {
+          if (e.name) todayEvents.push(e.name);
+        });
+      }
+      if (d.ekadashi) todayEvents.push(d.ekadashi);
+    }
+
+    // Also check custom events
+    if (typeof events !== 'undefined' && events.length) {
+      events.forEach(e => {
+        if (e.date === key) todayEvents.push(e.title || e.name);
+      });
+    }
+
+    if (todayEvents.length > 0) {
+      card.style.display = '';
+      const evStr = todayEvents.slice(0,3).map(e => `<span class="ht-event">${e}</span>`).join(' · ');
+      text.innerHTML = evStr;
+    } else {
+      card.style.display = 'none';
+    }
+  } catch(e) {
+    // Silently handle if calendar data not ready
+  }
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -9975,6 +10481,11 @@ function init() {
   curYear=td.getFullYear(); curMonth=td.getMonth();
   selectDay(td);
   startAlertTicker();
+
+  // Start on home screen — hide header, show brand bar
+  const header = document.querySelector('.header');
+  if (header) header.style.display = 'none';
+  updateHomeScreen();
 
   // Check if app was updated since last visit
   checkForAppUpdate();
