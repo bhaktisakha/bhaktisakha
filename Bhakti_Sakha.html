@@ -12119,7 +12119,7 @@ function switchScreen(name, btn) {
   if (name==='dhamas') renderDhamas();
   if (name==='sevakart') skRenderHome();
   if (name==='prayer') pcRenderFeed();
-  if (name==='admin') renderAdminDashboard();
+  if (name==='admin') { renderAdminDashboard(); _skFetchFromServer(); _pcFetchFromServer(); }
   if (name==='userlist') ulFetchAndRender();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
@@ -13768,6 +13768,16 @@ async function _skFetchFromServer() {
       localStorage.setItem('skListings', JSON.stringify(skListings));
       localStorage.setItem('skReviews', JSON.stringify(skReviews));
       localStorage.setItem('skReports', JSON.stringify(skReports));
+      // Re-render admin dashboard if currently visible
+      const admScreen = document.getElementById('screen-admin');
+      if (admScreen && admScreen.classList.contains('active')) {
+        renderAdminDashboard();
+      }
+      // Re-render SevaKart home if currently visible
+      const skScreen = document.getElementById('screen-sevakart');
+      if (skScreen && skScreen.classList.contains('active')) {
+        skRenderHome();
+      }
     }
   } catch(e) { /* offline - use localStorage */ }
 }
@@ -14816,6 +14826,16 @@ async function _pcFetchFromServer() {
       localStorage.setItem('pcRequests', JSON.stringify(pcRequests));
       localStorage.setItem('pcPrayers', JSON.stringify(pcPrayers));
       localStorage.setItem('pcReports', JSON.stringify(pcReports));
+      // Re-render admin dashboard if currently visible
+      const admScreen = document.getElementById('screen-admin');
+      if (admScreen && admScreen.classList.contains('active')) {
+        renderAdminDashboard();
+      }
+      // Re-render prayer feed if currently visible
+      const pcScreen = document.getElementById('screen-prayer');
+      if (pcScreen && pcScreen.classList.contains('active')) {
+        pcRenderFeed();
+      }
     }
   } catch(e) { /* offline - use localStorage */ }
 }
