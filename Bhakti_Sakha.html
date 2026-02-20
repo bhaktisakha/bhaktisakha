@@ -4723,6 +4723,7 @@ body {
       <button class="songs-font-btn" onclick="changeNoteFont(-1)" style="width:28px;height:28px;">A−</button>
       <button class="songs-font-btn" onclick="changeNoteFont(1)" style="width:28px;height:28px;">A+</button>
       <button class="ne-action-btn" onclick="nfToggleNotePin()" id="nePinBtn" title="Pin note">📌</button>
+      <button class="ne-action-btn" onclick="nfToggleNoteLock()" id="neLockBtn" title="Lock note" style="display:none;">🔒</button>
       <button class="ne-action-btn" onclick="nfDeleteCurrentNote()" title="Delete note">🗑️</button>
       <button class="ne-save-btn" onclick="nfSaveNote()" title="Save">💾</button>
     </div>
@@ -8675,8 +8676,8 @@ let _pendingPinNoteId = null;
 let customFolders = JSON.parse(localStorage.getItem('customFolders') || '[]');
 const DEFAULT_FOLDERS = [
   { id:'gratitude', name:'Gratitude Journal', icon:'🙏', type:'gratitude', locked:true },
-  { id:'spiritual', name:'Spiritual Notes', icon:'📿', type:'spiritual', locked:true },
-  { id:'personal', name:'Personal Notes', icon:'📝', type:'personal', locked:true }
+  { id:'spiritual', name:'Spiritual Notes', icon:'📿', type:'spiritual', locked:false },
+  { id:'personal', name:'Personal Notes', icon:'📝', type:'personal', locked:false }
 ];
 
 // State
@@ -8684,8 +8685,8 @@ let _nfCurrentFolder = null; // folder id currently open
 let _nfSortMode = 'date';
 let _nfCurrentEditNoteId = null;
 let _nfAutoSaveTimer = null;
-let _nfUnlockedFolders = new Set(); // session-based unlock per folder
-let _nfUnlockTimes = {};            // last activity time per folder
+let _nfGratitudeUnlocked = false; // session-based unlock for gratitude folder
+let _nfGratitudeUnlockTime = 0;
 const NF_LOCK_TIMEOUT = 5 * 60 * 1000; // auto-lock after 5 min inactivity
 
 // --- NOTE FONT SIZE ---
@@ -8745,34 +8746,28 @@ async function verifyPin(pin) {
   return (await hashPin(pin)) === stored;
 }
 
-function nfIsFolderUnlocked(folderId) {
-  if (!_nfUnlockedFolders.has(folderId)) return false;
-  if (Date.now() - (_nfUnlockTimes[folderId] || 0) > NF_LOCK_TIMEOUT) {
-    _nfUnlockedFolders.delete(folderId);
-    delete _nfUnlockTimes[folderId];
+function nfIsGratitudeUnlocked() {
+  if (!_nfGratitudeUnlocked) return false;
+  if (Date.now() - _nfGratitudeUnlockTime > NF_LOCK_TIMEOUT) {
+    _nfGratitudeUnlocked = false;
     return false;
   }
   return true;
 }
 
-function nfUnlockFolder(folderId) {
-  _nfUnlockedFolders.add(folderId);
-  _nfUnlockTimes[folderId] = Date.now();
-}
-
-function nfRefreshFolderTimer(folderId) {
-  if (_nfUnlockedFolders.has(folderId)) _nfUnlockTimes[folderId] = Date.now();
+function nfRefreshGratitudeTimer() {
+  if (_nfGratitudeUnlocked) _nfGratitudeUnlockTime = Date.now();
 }
 
 let _pinMode = null;
 let _pinBuffer = '';
 let _pinSetupFirst = '';
-let _pinCallback = null; // function to call on successful PIN entry
-let _pinFolderName = ''; // folder name for display
+let _pinCallback = null;
+let _pinContextLabel = ''; // e.g. 'Gratitude Journal' or 'locked note'
 
-function openPinOverlay(mode, callback, folderName) {
+function openPinOverlay(mode, callback, contextLabel) {
   _pinMode = mode; _pinBuffer = ''; _pinCallback = callback || null;
-  _pinFolderName = folderName || 'this folder';
+  _pinContextLabel = contextLabel || '';
   const dots = document.querySelectorAll('#pinDots .pin-dot');
   dots.forEach(d=>{ d.classList.remove('filled','error'); });
   document.getElementById('pinErrorMsg').textContent = '';
@@ -8787,7 +8782,7 @@ function openPinOverlay(mode, callback, folderName) {
     forgot.style.display = 'none';
   } else {
     document.getElementById('pinTitle').textContent = '🔐 Enter PIN';
-    document.getElementById('pinSubtitle').textContent = 'Unlock ' + _pinFolderName;
+    document.getElementById('pinSubtitle').textContent = _pinContextLabel ? 'Unlock ' + _pinContextLabel : 'Enter your 4-digit PIN';
     forgot.style.display = 'block';
   }
   document.getElementById('pinOverlay').classList.add('open');
@@ -8817,9 +8812,10 @@ function pinDelete() {
 
 async function processPinEntry() {
   const cb = _pinCallback;
+  const ctx = _pinContextLabel;
   if (_pinMode === 'setup') {
     _pinSetupFirst = _pinBuffer;
-    openPinOverlay('confirm-setup', cb, _pinFolderName);
+    openPinOverlay('confirm-setup', cb, ctx);
   } else if (_pinMode === 'confirm-setup') {
     if (_pinBuffer === _pinSetupFirst) {
       const hash = await hashPin(_pinBuffer);
@@ -8830,7 +8826,7 @@ async function processPinEntry() {
     } else {
       showPinError('PINs do not match. Try again.');
       _pinSetupFirst = '';
-      setTimeout(()=>openPinOverlay('setup', cb, _pinFolderName), 800);
+      setTimeout(()=>openPinOverlay('setup', cb, ctx), 800);
     }
   } else if (_pinMode === 'unlock') {
     if (await verifyPin(_pinBuffer)) {
@@ -8851,14 +8847,17 @@ function showPinError(msg) {
 }
 
 function forgotPin() {
-  if (confirm('Reset your PIN?\n\nThis will remove PIN protection. You will need to set a new PIN next time you open any notes folder.\n\nTo verify your identity, you must be signed in with Google.')) {
+  if (confirm('Reset your PIN?\n\nThis will remove PIN protection from Gratitude Journal and unlock all locked notes. You will need to set a new PIN.\n\nTo verify your identity, you must be signed in with Google.')) {
     if (!isSignedIn()) { showToast('Please sign in with Google first to reset PIN'); return; }
     localStorage.removeItem('notesPinHash');
-    _nfUnlockedFolders.clear();
-    _nfUnlockTimes = {};
+    _nfGratitudeUnlocked = false;
+    // Unlock all individually locked notes
+    notes.forEach(n => { n.locked = false; });
+    localStorage.setItem('notes', JSON.stringify(notes));
     closePinOverlay();
     nfRenderFolders();
-    showToast('PIN removed. Set a new one next time you open a folder.');
+    if (_nfCurrentFolder) nfRenderFolderNotes();
+    showToast('PIN removed. All notes unlocked.');
   }
 }
 
@@ -8873,7 +8872,7 @@ function nfRenderFolders() {
   // Default folders
   DEFAULT_FOLDERS.forEach(f => {
     const count = notes.filter(n => n.folder === f.id).length;
-    const lockBadge = '<span class="nf-folder-lock">🔒</span>';
+    const lockBadge = f.locked ? '<span class="nf-folder-lock">🔒</span>' : '';
     html += `<div class="nf-folder-card nf-folder-card--${f.type}" onclick="nfOpenFolder('${f.id}')">
       ${lockBadge}
       <div>
@@ -8889,7 +8888,6 @@ function nfRenderFolders() {
     const count = notes.filter(n => n.folder === f.id).length;
     html += `<div class="nf-folder-card nf-folder-card--custom" onclick="nfOpenFolder('${f.id}')">
       <div class="nf-folder-actions">
-        <span class="nf-folder-lock" style="position:static;margin-right:2px;">🔒</span>
         <button class="nf-folder-act-btn" onclick="event.stopPropagation();nfRenameFolder('${f.id}')" title="Rename">✏️</button>
         <button class="nf-folder-act-btn" onclick="event.stopPropagation();nfDeleteFolder('${f.id}')" title="Delete">🗑</button>
       </div>
@@ -8974,33 +8972,31 @@ function nfDeleteFolder(folderId) {
 function nfOpenFolder(folderId) {
   if (!isSignedIn()) { requireSignIn('My Notes'); return; }
 
-  // Get folder name for PIN prompt
-  const def = DEFAULT_FOLDERS.find(f => f.id === folderId);
-  const cust = customFolders.find(f => f.id === folderId);
-  const folderName = def ? def.name : (cust ? cust.name : 'this folder');
-
-  // All folders require PIN
-  if (!isPinSetup()) {
-    // First time — setup PIN, then open
-    openPinOverlay('setup', () => {
-      nfUnlockFolder(folderId);
-      nfActuallyOpenFolder(folderId);
-    }, folderName);
-    return;
-  }
-  if (!nfIsFolderUnlocked(folderId)) {
-    openPinOverlay('unlock', () => {
-      nfUnlockFolder(folderId);
-      nfActuallyOpenFolder(folderId);
-    }, folderName);
-    return;
+  // Only Gratitude Journal requires PIN to open the folder
+  if (folderId === 'gratitude') {
+    if (!isPinSetup()) {
+      openPinOverlay('setup', () => {
+        _nfGratitudeUnlocked = true;
+        _nfGratitudeUnlockTime = Date.now();
+        nfActuallyOpenFolder('gratitude');
+      }, 'Gratitude Journal');
+      return;
+    }
+    if (!nfIsGratitudeUnlocked()) {
+      openPinOverlay('unlock', () => {
+        _nfGratitudeUnlocked = true;
+        _nfGratitudeUnlockTime = Date.now();
+        nfActuallyOpenFolder('gratitude');
+      }, 'Gratitude Journal');
+      return;
+    }
   }
   nfActuallyOpenFolder(folderId);
 }
 
 function nfActuallyOpenFolder(folderId) {
   _nfCurrentFolder = folderId;
-  nfRefreshFolderTimer(_nfCurrentFolder);
+  nfRefreshGratitudeTimer();
 
   // Get folder info
   let folderName = '', badgeClass = '', badgeLabel = '';
@@ -9059,7 +9055,7 @@ function nfSetSort(mode, btn) {
 
 function nfRenderFolderNotes() {
   if (!_nfCurrentFolder) return;
-  nfRefreshFolderTimer(_nfCurrentFolder);
+  nfRefreshGratitudeTimer();
 
   const container = document.getElementById('nfNotesList');
   const searchVal = (document.getElementById('nfSearchInp')?.value || '').toLowerCase().trim();
@@ -9121,11 +9117,14 @@ function nfRenderFolderNotes() {
     const date = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
     const time = d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
     const pinIcon = n.pinned ? '<span class="note-pin-icon">📌</span>' : '';
-    const preview = n.body ? `<div class="note-preview">${escHtml(stripHtml(n.body))}</div>` : '';
+    const lockIcon = n.locked ? '<span class="note-pin-icon">🔒</span>' : '';
+    const preview = n.locked
+      ? '<div class="note-preview" style="font-style:italic;color:var(--text3)">This note is locked</div>'
+      : (n.body ? `<div class="note-preview">${escHtml(stripHtml(n.body))}</div>` : '');
     const pinnedCls = n.pinned ? ' pinned' : '';
-    return `<div class="note-card${pinnedCls}" onclick="nfOpenEditNote(${n.id})">
+    return `<div class="note-card${pinnedCls}" onclick="nfOpenEditNote(${n.id})" style="${n.locked ? 'opacity:0.85' : ''}">
       <div class="note-card-top">
-        ${pinIcon}
+        ${pinIcon}${lockIcon}
         <div class="note-title">${escHtml(n.title||'Untitled')}</div>
       </div>
       ${preview}
@@ -9146,7 +9145,7 @@ function nfRenderFolderNotes() {
 function nfOpenAddNote() {
   if (!isSignedIn()) { requireSignIn('My Notes'); return; }
   if (!_nfCurrentFolder) return;
-  nfRefreshFolderTimer(_nfCurrentFolder);
+  nfRefreshGratitudeTimer();
 
   _nfCurrentEditNoteId = null;
   document.getElementById('neTitle').value = '';
@@ -9167,7 +9166,7 @@ function nfOpenAddNote() {
     datePicker.value = '';
   }
 
-  updateEditorPinLockUI(false);
+  updateEditorPinLockUI(false, false, _nfCurrentFolder === 'gratitude');
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
   document.getElementById('neTitle').focus();
@@ -9176,7 +9175,23 @@ function nfOpenAddNote() {
 function nfOpenEditNote(id) {
   const n = notes.find(x => x.id === id);
   if (!n) return;
-  nfRefreshFolderTimer(_nfCurrentFolder);
+
+  // If note is individually locked (non-gratitude), require PIN
+  if (n.locked && n.folder !== 'gratitude') {
+    if (!isPinSetup()) {
+      openPinOverlay('setup', () => nfOpenEditNote_unlocked(id), 'locked note');
+    } else {
+      openPinOverlay('unlock', () => nfOpenEditNote_unlocked(id), 'locked note');
+    }
+    return;
+  }
+  nfOpenEditNote_unlocked(id);
+}
+
+function nfOpenEditNote_unlocked(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) return;
+  nfRefreshGratitudeTimer();
 
   _nfCurrentEditNoteId = id;
   document.getElementById('neTitle').value = n.title || '';
@@ -9198,7 +9213,7 @@ function nfOpenEditNote(id) {
     datePicker.style.display = 'none';
   }
 
-  updateEditorPinLockUI(!!n.pinned);
+  updateEditorPinLockUI(!!n.pinned, !!n.locked, n.folder === 'gratitude');
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
 }
@@ -9211,8 +9226,17 @@ function nfGetFolderInfo(folderId) {
   return { id: folderId, name: 'Unknown', icon:'📁', type:'custom' };
 }
 
-function updateEditorPinLockUI(pinned) {
+function updateEditorPinLockUI(pinned, locked, isGratitudeFolder) {
   document.getElementById('nePinBtn').style.opacity = pinned ? 1 : 0.4;
+  const lockBtn = document.getElementById('neLockBtn');
+  if (isGratitudeFolder) {
+    // Gratitude folder: entire folder is locked, no per-note lock
+    lockBtn.style.display = 'none';
+  } else {
+    // Other folders: show per-note lock toggle
+    lockBtn.style.display = '';
+    lockBtn.style.opacity = locked ? 1 : 0.4;
+  }
 }
 
 function nfCloseNoteEditor() {
@@ -9294,8 +9318,52 @@ function nfToggleNotePin() {
   if (idx < 0) return;
   notes[idx].pinned = !notes[idx].pinned;
   localStorage.setItem('notes', JSON.stringify(notes));
-  updateEditorPinLockUI(notes[idx].pinned);
+  updateEditorPinLockUI(notes[idx].pinned, !!notes[idx].locked, notes[idx].folder === 'gratitude');
   showToast(notes[idx].pinned ? 'Note pinned 📌' : 'Note unpinned');
+}
+
+function nfToggleNoteLock() {
+  if (!_nfCurrentEditNoteId) return;
+  // Save current edits first
+  nfSaveNote(true);
+  const n = notes.find(x => x.id === _nfCurrentEditNoteId);
+  if (!n || n.folder === 'gratitude') return; // gratitude notes don't need individual lock
+
+  if (!isPinSetup()) {
+    // Need to setup PIN first
+    openPinOverlay('setup', () => {
+      nfActualToggleLock(_nfCurrentEditNoteId);
+    });
+    return;
+  }
+
+  // If currently locked, require PIN to unlock
+  if (n.locked) {
+    openPinOverlay('unlock', () => {
+      nfActualToggleLock(_nfCurrentEditNoteId);
+    }, 'this note');
+  } else {
+    // Locking doesn't require PIN verification (user is already in the note)
+    nfActualToggleLock(_nfCurrentEditNoteId);
+  }
+}
+
+function nfActualToggleLock(id) {
+  const idx = notes.findIndex(n => n.id === id);
+  if (idx < 0) return;
+  notes[idx].locked = !notes[idx].locked;
+  localStorage.setItem('notes', JSON.stringify(notes));
+  if (notes[idx].locked) {
+    // Close editor so content is hidden
+    document.getElementById('noteEditorOverlay').classList.remove('open');
+    _nfCurrentEditNoteId = null;
+    nfRenderFolderNotes();
+    showToast('Note locked 🔒');
+  } else {
+    updateEditorPinLockUI(notes[idx].pinned, false, false);
+    showToast('Note unlocked 🔓');
+  }
+  nfTriggerSync();
 }
 
 function nfToggleNotePinList(id) {
@@ -9324,7 +9392,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bodyEl) {
     bodyEl.addEventListener('input', function() {
       document.getElementById('neAutosaveMsg').textContent = 'Editing…';
-      nfRefreshFolderTimer(_nfCurrentFolder);
+      nfRefreshGratitudeTimer();
       if (_nfAutoSaveTimer) clearTimeout(_nfAutoSaveTimer);
       _nfAutoSaveTimer = setTimeout(()=>{
         const t = document.getElementById('neTitle').value.trim();
@@ -9336,7 +9404,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const titleEl = document.getElementById('neTitle');
   if (titleEl) {
     titleEl.addEventListener('input', function() {
-      nfRefreshFolderTimer(_nfCurrentFolder);
+      nfRefreshGratitudeTimer();
       if (_nfAutoSaveTimer) clearTimeout(_nfAutoSaveTimer);
       _nfAutoSaveTimer = setTimeout(()=>{
         const t = document.getElementById('neTitle').value.trim();
@@ -9442,8 +9510,8 @@ function deleteCurrentNote() { nfDeleteCurrentNote(); }
 function onNoteCardClick(id) { nfOpenEditNote(id); }
 function toggleNotePin() { nfToggleNotePin(); }
 function toggleNotePin_list(id) { nfToggleNotePinList(id); }
-function toggleNoteLock() {} // No longer used per-note
-function actualToggleLock() {}
+function toggleNoteLock() { nfToggleNoteLock(); }
+function actualToggleLock(id) { nfActualToggleLock(id); }
 function delNote(id) { nfDelNote(id); }
 function updateNoteCharCount() {}
 
