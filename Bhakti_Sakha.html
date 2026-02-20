@@ -1628,7 +1628,7 @@ body {
 
 /* ═══ Share Image Card (rendered by html2canvas) ═══ */
 .nf-share-card {
-  width:400px; min-height:280px; position:relative;
+  width:420px; position:relative;
   background:#0d1b2a; border-radius:0; overflow:hidden;
   font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   display:flex; flex-direction:column;
@@ -1641,7 +1641,7 @@ body {
 .nf-share-card-accent.acc-personal { background:linear-gradient(90deg, #9b59b6, #8e44ad, #c39bd3); }
 .nf-share-card-accent.acc-custom { background:linear-gradient(90deg, #27ae60, #2ecc71, #58d68d); }
 .nf-share-card-body {
-  flex:1; padding:24px 28px 18px;
+  flex:1; padding:24px 28px 22px;
 }
 .nf-share-card-folder {
   font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
@@ -1663,7 +1663,6 @@ body {
 .nf-share-card-divider.div-custom { background:#27ae60; }
 .nf-share-card-content {
   font-size:14px; color:#a8bfd0; line-height:1.65;
-  overflow:hidden; max-height:260px;
   word-break:break-word;
 }
 .nf-share-card-content h1 { font-size:18px; color:#e8edf2; margin:6px 0; }
@@ -9805,9 +9804,7 @@ async function nfShareAsImage() {
       backgroundColor: '#0d1b2a',
       scale: 2,
       useCORS: true,
-      logging: false,
-      width: 400,
-      windowWidth: 400
+      logging: false
     });
 
     // Hide card again
