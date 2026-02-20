@@ -3908,16 +3908,9 @@ body {
         <option value="urgent">Urgent</option>
       </select>
     </div>
-    <div class="f-grp">
-      <label class="f-lbl">Visibility</label>
-      <select class="f-sel" id="pcReqPublic">
-        <option value="yes">Public — visible in Prayer Feed</option>
-        <option value="no">Private — only admins can see</option>
-      </select>
-    </div>
     <div class="f-grp" style="display:flex;align-items:flex-start;gap:8px;">
       <input type="checkbox" id="pcReqConsent" style="margin-top:3px;">
-      <label for="pcReqConsent" style="font-size:0.72rem;color:var(--text2);line-height:1.5;">I consent to sharing this prayer request with the community. I understand it will be visible to other devotees (if public) and may be moderated by admins.</label>
+      <label for="pcReqConsent" style="font-size:0.72rem;color:var(--text2);line-height:1.5;">I consent to sharing this prayer request with the community. I understand it will be visible to other devotees once approved and may be moderated by admins.</label>
     </div>
     <div style="display:flex;gap:10px;margin-top:10px;">
       <button class="f-cancel" onclick="closeModal('pcSubmitModal')" style="flex:0.4;">Cancel</button>
@@ -11146,7 +11139,6 @@ function pcOpenSubmitModal() {
   document.getElementById('pcReqTitle').value = '';
   document.getElementById('pcReqDesc').value = '';
   document.getElementById('pcReqUrgency').value = 'normal';
-  document.getElementById('pcReqPublic').value = 'yes';
   document.getElementById('pcReqConsent').checked = false;
   document.getElementById('pcSubmitModal').classList.add('open');
 }
@@ -11159,12 +11151,15 @@ function pcSubmitRequest() {
   const title = document.getElementById('pcReqTitle').value.trim();
   const desc = document.getElementById('pcReqDesc').value.trim();
   const urgency = document.getElementById('pcReqUrgency').value;
-  const isPublic = document.getElementById('pcReqPublic').value === 'yes';
   const consent = document.getElementById('pcReqConsent').checked;
 
   if (!consent) { showToast('Please provide your consent to continue'); return; }
   if (!title) { showToast('Please enter a title for your prayer'); return; }
   if (!desc) { showToast('Please describe your prayer request'); return; }
+
+  // Admins get auto-approved; non-admins need admin approval
+  const isAdminUser = hasPermission('prayer') || isAdmin();
+  const autoApprove = isAdminUser;
 
   const req = {
     id: _pcGenId(),
@@ -11176,8 +11171,8 @@ function pcSubmitRequest() {
     title: _pcModerateContent(title),
     description: _pcModerateContent(desc),
     urgency,
-    public: isPublic,
-    status: 'approved', // Auto-approve; admins can reject later
+    public: true,
+    status: autoApprove ? 'approved' : 'pending',
     prayedBy: [],
     timestamp: Date.now(),
     answered: false,
@@ -11187,7 +11182,12 @@ function pcSubmitRequest() {
   pcRequests.unshift(req);
   _pcSave();
   closeModal('pcSubmitModal');
-  showToast('🙏 Prayer request submitted! Prayer ID: ' + req.id);
+
+  if (autoApprove) {
+    showToast('🙏 Prayer request published! ID: ' + req.id);
+  } else {
+    showToast('🙏 Submitted! Your prayer will appear once approved by an admin. ID: ' + req.id);
+  }
   pcRenderFeed();
 
   // In-app notification to signed-in users (simulated — real push via server)
@@ -11203,7 +11203,7 @@ function _pcNotifyNewRequest(req) {
 }
 
 function _pcGetApprovedPublic() {
-  return pcRequests.filter(r => r.status === 'approved' && r.public !== false);
+  return pcRequests.filter(r => r.status === 'approved');
 }
 
 function pcSetCatFilter(cat) {
