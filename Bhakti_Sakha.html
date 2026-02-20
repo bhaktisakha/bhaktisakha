@@ -2696,10 +2696,9 @@ body {
   background:var(--card); color:var(--text2); font-size:0.78rem; cursor:pointer;
 }
 .pc-stats-bar {
-  display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px;
-  scrollbar-width:none;
+  display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;
+  justify-content:center;
 }
-.pc-stats-bar::-webkit-scrollbar { display:none; }
 .pc-stat-chip {
   flex:0 0 auto; padding:6px 12px; border-radius:20px; font-size:0.68rem;
   font-weight:500; white-space:nowrap; cursor:pointer; transition:all 0.2s;
