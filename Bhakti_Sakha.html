@@ -2497,12 +2497,11 @@ body {
 
 /* ── Feature Grid ── */
 .home-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
   padding:16px 18px 10px;
 }
 .home-card {
-  background:var(--card); border:1px solid var(--border);
-  border-radius:16px; padding:18px 16px 16px;
+  border-radius:18px; padding:18px 16px 16px;
   cursor:pointer; position:relative; overflow:hidden;
   transition:transform 0.15s ease, box-shadow 0.15s ease;
   display:flex; flex-direction:column; gap:8px;
@@ -2516,59 +2515,96 @@ body {
 .home-card:nth-child(5) { animation-delay:0.32s; }
 .home-card:nth-child(6) { animation-delay:0.38s; }
 .home-card:nth-child(7) { animation-delay:0.44s; }
-.home-card:active { transform:scale(0.96); }
+.home-card:active { transform:scale(0.95); }
 
-/* Top accent stripe */
-.home-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  border-radius:16px 16px 0 0;
-}
-/* Corner glow */
+/* Corner glow orb */
 .home-card::after {
-  content:''; position:absolute; top:-30px; right:-30px;
-  width:80px; height:80px; border-radius:50%;
-  opacity:0.06; pointer-events:none;
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:110px; height:110px; border-radius:50%;
+  pointer-events:none; filter:blur(8px);
 }
 
-/* Per-card theming */
-.home-card--calendar::before { background:linear-gradient(90deg, var(--accent-blue), #5a9de6); }
-.home-card--calendar::after  { background:var(--accent-blue); }
-.home-card--audio::before    { background:linear-gradient(90deg, #c9a84c, #f0d68a); }
-.home-card--audio::after     { background:#c9a84c; }
-.home-card--events::before   { background:linear-gradient(90deg, var(--accent-green), #4fd68a); }
-.home-card--events::after    { background:var(--accent-green); }
-.home-card--notes::before    { background:linear-gradient(90deg, var(--lavender), #c4b0fa); }
-.home-card--notes::after     { background:var(--lavender); }
-.home-card--dhamas::before   { background:linear-gradient(90deg, var(--accent-red), #e06050); }
-.home-card--dhamas::after    { background:var(--accent-red); }
-.home-card--sevakart::before { background:linear-gradient(90deg, var(--accent-gold), #e8c840); }
-.home-card--sevakart::after  { background:var(--accent-gold); }
+/* ── Calendar ── */
+.home-card--calendar {
+  background:linear-gradient(145deg, rgba(61,127,212,0.18) 0%, rgba(26,48,80,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(61,127,212,0.3);
+  box-shadow:0 4px 20px rgba(61,127,212,0.12), inset 0 1px 0 rgba(61,127,212,0.15);
+}
+.home-card--calendar::after { background:rgba(61,127,212,0.25); }
+
+/* ── Kirtans / Audio ── */
+.home-card--audio {
+  background:linear-gradient(145deg, rgba(212,168,76,0.18) 0%, rgba(50,40,20,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(212,168,76,0.3);
+  box-shadow:0 4px 20px rgba(212,168,76,0.1), inset 0 1px 0 rgba(212,168,76,0.15);
+}
+.home-card--audio::after { background:rgba(212,168,76,0.25); }
+
+/* ── Notes ── */
+.home-card--notes {
+  background:linear-gradient(145deg, rgba(167,139,250,0.18) 0%, rgba(40,30,60,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(167,139,250,0.3);
+  box-shadow:0 4px 20px rgba(167,139,250,0.1), inset 0 1px 0 rgba(167,139,250,0.15);
+}
+.home-card--notes::after { background:rgba(167,139,250,0.25); }
+
+/* ── SevaKart ── */
+.home-card--sevakart {
+  background:linear-gradient(145deg, rgba(232,200,64,0.16) 0%, rgba(50,42,15,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(212,160,23,0.3);
+  box-shadow:0 4px 20px rgba(212,160,23,0.1), inset 0 1px 0 rgba(212,160,23,0.15);
+}
+.home-card--sevakart::after { background:rgba(212,160,23,0.25); }
+
+/* ── Dhamas ── */
+.home-card--dhamas {
+  background:linear-gradient(145deg, rgba(192,57,43,0.18) 0%, rgba(50,20,20,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(192,57,43,0.3);
+  box-shadow:0 4px 20px rgba(192,57,43,0.1), inset 0 1px 0 rgba(192,57,43,0.15);
+}
+.home-card--dhamas::after { background:rgba(192,57,43,0.25); }
+
+/* ── My Events ── */
+.home-card--events {
+  background:linear-gradient(145deg, rgba(39,174,96,0.18) 0%, rgba(15,45,28,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(39,174,96,0.3);
+  box-shadow:0 4px 20px rgba(39,174,96,0.1), inset 0 1px 0 rgba(39,174,96,0.15);
+}
+.home-card--events::after { background:rgba(39,174,96,0.25); }
 
 /* Icon badge */
 .home-card-icon {
-  width:38px; height:38px; border-radius:11px;
+  width:40px; height:40px; border-radius:12px;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
-.home-card--calendar .home-card-icon { background:rgba(61,127,212,0.12); color:var(--accent-blue); }
-.home-card--audio    .home-card-icon { background:rgba(201,168,76,0.12); color:#d4a84c; }
-.home-card--events   .home-card-icon { background:rgba(39,174,96,0.12); color:var(--accent-green); }
-.home-card--notes    .home-card-icon { background:rgba(167,139,250,0.12); color:var(--lavender); }
-.home-card--dhamas   .home-card-icon { background:rgba(192,57,43,0.12); color:var(--accent-red); }
-.home-card--sevakart .home-card-icon { background:rgba(212,160,23,0.12); color:var(--accent-gold); }
+.home-card--calendar .home-card-icon { background:rgba(61,127,212,0.2); color:#6ab0ff; box-shadow:0 0 12px rgba(61,127,212,0.2); }
+.home-card--audio    .home-card-icon { background:rgba(212,168,76,0.2); color:#f0d068; box-shadow:0 0 12px rgba(212,168,76,0.2); }
+.home-card--notes    .home-card-icon { background:rgba(167,139,250,0.2); color:#c4b0ff; box-shadow:0 0 12px rgba(167,139,250,0.2); }
+.home-card--sevakart .home-card-icon { background:rgba(212,160,23,0.2); color:#f0c830; box-shadow:0 0 12px rgba(212,160,23,0.2); }
+.home-card--dhamas   .home-card-icon { background:rgba(192,57,43,0.2); color:#f06858; box-shadow:0 0 12px rgba(192,57,43,0.2); }
+.home-card--events   .home-card-icon { background:rgba(39,174,96,0.2); color:#5ee8a0; box-shadow:0 0 12px rgba(39,174,96,0.2); }
 
-.home-card-title { font-size:0.88rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
-.home-card-desc  { font-size:0.67rem; color:var(--text3); line-height:1.45; flex:1; }
+.home-card-title { font-size:0.9rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
+.home-card--calendar .home-card-title { color:#8ac4ff; }
+.home-card--audio    .home-card-title { color:#f0d878; }
+.home-card--notes    .home-card-title { color:#cec0ff; }
+.home-card--sevakart .home-card-title { color:#f5d040; }
+.home-card--dhamas   .home-card-title { color:#f08070; }
+.home-card--events   .home-card-title { color:#70eaaa; }
+.home-card-desc  { font-size:0.67rem; color:var(--text2); line-height:1.45; flex:1; }
 
 /* Settings row (full width) */
 .home-card--settings {
   grid-column:1 / -1;
   flex-direction:row; align-items:center;
   min-height:auto; padding:14px 16px; gap:12px;
+  background:linear-gradient(145deg, rgba(143,168,192,0.1) 0%, var(--card) 50%);
+  border:1px solid rgba(143,168,192,0.15);
+  box-shadow:0 2px 12px rgba(0,0,0,0.1);
 }
-.home-card--settings::before { background:linear-gradient(90deg, var(--text3), var(--text2)); }
-.home-card--settings::after  { background:var(--text2); }
-.home-card--settings .home-card-icon { background:rgba(255,255,255,0.06); color:var(--text2); }
+.home-card--settings::after { background:rgba(143,168,192,0.15); }
+.home-card--settings .home-card-icon { background:rgba(255,255,255,0.08); color:var(--text2); box-shadow:0 0 10px rgba(143,168,192,0.1); }
 .home-card--settings .home-card-desc { margin:0; }
 
 /* ── Decorative quote ── */
