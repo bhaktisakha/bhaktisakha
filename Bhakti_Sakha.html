@@ -749,6 +749,24 @@ body {
 .song-title-text { font-size:0.88rem; color:var(--text); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
 .song-by { font-size:0.68rem; color:var(--text3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:nowrap; overflow:hidden; }
 .song-official { display:none; } /* shown in detail page only */
+.song-lyric-snippet {
+  font-size:0.68rem; color:var(--text3); margin-top:2px;
+  font-style:italic; line-height:1.4;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  max-width:100%;
+}
+.song-lyric-snippet mark {
+  background:rgba(167,139,250,0.25); color:#c4b5fd;
+  border-radius:2px; padding:0 2px; font-style:italic;
+}
+.kd-lyric-snippet {
+  font-size:0.68rem; color:var(--text3); margin-top:1px;
+  font-style:italic; line-height:1.3;
+}
+.kd-lyric-snippet mark {
+  background:rgba(167,139,250,0.25); color:#c4b5fd;
+  border-radius:2px; padding:0 2px; font-style:italic;
+}
 .song-row-arrow { color:var(--text3); font-size:0.85rem; flex-shrink:0; }
 
 /* ===== NOW PLAYING ICON IN SONG LIST ===== */
@@ -4210,8 +4228,8 @@ body {
           <div class="home-card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
           </div>
-          <div class="home-card-title">Song Book</div>
-          <div class="home-card-desc">Vaishnava Bhajans, Astakams and more</div>
+          <div class="home-card-title">Audio</div>
+          <div class="home-card-desc">Transcendental vibrations — Vaishnava bhajans, and more</div>
         </div>
 
         <div class="home-card home-card--notes" onclick="switchScreen('notes',document.querySelectorAll('.nav-btn')[4])">
@@ -5280,7 +5298,7 @@ body {
       </button>
       <button class="nav-btn" data-tab="songs" data-idx="2" onclick="navTo('songs',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        <span class="nav-lbl">Song Book</span>
+        <span class="nav-lbl">Audio</span>
       </button>
       <button class="nav-btn" data-tab="events" data-idx="3" onclick="navTo('events',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -7731,6 +7749,35 @@ function _songTitle(s) {
   return s.title_dev || iastToDev(s.title || '');
 }
 
+// Extract a snippet from lyrics around the search query (2 words before & after)
+function _getLyricSnippet(text, query) {
+  if (!text || !query) return '';
+  const lower = text.toLowerCase();
+  const ql = query.toLowerCase();
+  const idx = lower.indexOf(ql);
+  if (idx === -1) return '';
+  // Get surrounding text: find word boundaries
+  const before = text.substring(0, idx);
+  const after = text.substring(idx + query.length);
+  // Get 2 words before
+  const wordsBefore = before.replace(/\n/g,' ').trimEnd().split(/\s+/);
+  const pre = wordsBefore.slice(-2).join(' ');
+  // Get 2 words after
+  const wordsAfter = after.replace(/\n/g,' ').trimStart().split(/\s+/);
+  const post = wordsAfter.slice(0, 2).join(' ');
+  // The matched text (preserve original case)
+  const matched = text.substring(idx, idx + query.length);
+  return (pre ? '…' + pre + ' ' : '') + '**' + matched + '**' + (post ? ' ' + post + '…' : '');
+}
+
+function _lyricSnippetHtml(text, query, cssClass) {
+  const snippet = _getLyricSnippet(text, query);
+  if (!snippet) return '';
+  // Convert **matched** to <mark>
+  const html = snippet.replace(/\*\*(.+?)\*\*/g, '<mark>$1</mark>');
+  return `<div class="${cssClass}">🎶 "${html}"</div>`;
+}
+
 // Apply script to lyrics
 function _songLyrics(s) {
   if (songLang === 'en') return s.lyrics || '';
@@ -7787,6 +7834,9 @@ function _catLabel(cat) {
   return {vbhajan:'🌸 Vaishnava Bhajans',
           astakam:'🙏 Astakams', stotram:'📿 Stotrams',
           gita:'📗 Bhagavad Gita Verses', bhagavatam:'🌊 Srimad Bhagavatam Prayers', samhita:'📜 Samhita'}[cat] || cat;
+}
+function _getCatIcon(cat) {
+  return {vbhajan:'🌸', astakam:'🙏', stotram:'📿', gita:'📗', bhagavatam:'🌊', samhita:'📜'}[cat] || '🎵';
 }
 
 function _getAudioEmbed(url, singer) {
@@ -8040,7 +8090,7 @@ function _decodeUrlMatch(a, b) {
   try { return decodeURIComponent(a) === decodeURIComponent(b); } catch(e) { return false; }
 }
 
-function _buildSongCard(s, idx) {
+function _buildSongCard(s, idx, searchQuery) {
   const isPlaying = _playingSongId === s.id;
   const npIcon = isPlaying
     ? `<div class="now-playing-icon" onclick="event.stopPropagation();openSongDetail(${s.id})">${_nowPlayingBarsHtml()}</div>`
@@ -8051,11 +8101,25 @@ function _buildSongCard(s, idx) {
   const authorText = s.author ? s.author : '';
   const subLine = (authorText || hasAudio)
     ? `<div class="song-by">${authorText}${authorText && hasAudio ? ' ' : ''}${audioBadge}</div>` : '';
+  // Lyrics snippet: show only if search query matches lyrics but NOT title
+  let snippetHtml = '';
+  if (searchQuery) {
+    const ql = searchQuery.toLowerCase();
+    const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
+    if (!titleMatch) {
+      if ((s.lyrics||'').toLowerCase().includes(ql)) {
+        snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'song-lyric-snippet');
+      } else if ((s.trans||'').toLowerCase().includes(ql)) {
+        snippetHtml = _lyricSnippetHtml(s.trans, ql, 'song-lyric-snippet');
+      }
+    }
+  }
   return `<div class="song-card${isPlaying ? ' now-playing' : ''}" id="sc-${s.id}" onclick="openSongDetail(${s.id})">
     <div class="song-num-badge">${isPlaying ? _nowPlayingBarsHtml() : num}</div>
     <div class="song-info">
       <div class="song-title-text">${_songTitle(s)}</div>
       ${subLine}
+      ${snippetHtml}
     </div>
     ${npIcon}
     <span class="song-row-arrow">›</span>
@@ -8123,7 +8187,7 @@ function renderSongs(filter) {
     authors.forEach(author => {
       pool.filter(s => s.author === author).forEach((s,i) => {
         if (i===0) cards += `<div class="cat-title">✍️ ${author}</div>`;
-        cards += _buildSongCard(s, i);
+        cards += _buildSongCard(s, i, q || undefined);
       });
     });
     document.getElementById('songsContent').innerHTML = `<div style="padding:8px 0 100px;">${cards}</div>`;
@@ -8136,12 +8200,12 @@ function renderSongs(filter) {
       const cs = pool.filter(s => s.cat === key).sort(_naturalSongSort);
       if (!cs.length) return;
       cards += `<div class="cat-title">${_catLabel(key)}</div>`;
-      cs.forEach((s, idx) => { cards += _buildSongCard(s, idx); rendered.add(s.id); });
+      cs.forEach((s, idx) => { cards += _buildSongCard(s, idx, q); rendered.add(s.id); });
     });
     const rest = pool.filter(s => !rendered.has(s.id));
     if (rest.length) {
       cards += `<div class="cat-title">📌 Other</div>`;
-      rest.forEach((s, idx) => { cards += _buildSongCard(s, idx); });
+      rest.forEach((s, idx) => { cards += _buildSongCard(s, idx, q); });
     }
     document.getElementById('songsContent').innerHTML = `<div style="padding:8px 0 100px;">${cards}</div>`;
   } else if (_openCatKey) {
@@ -8431,12 +8495,24 @@ function kirtanSearch(q) {
       const hl = t => (t||'').replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
       const displayTitle = _songTitle(s);
+      // Show lyrics snippet only if match is NOT in title/officialName but IS in lyrics/trans
+      const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
+      let snippetHtml = '';
+      if (!titleMatch) {
+        if ((s.lyrics||'').toLowerCase().includes(ql)) {
+          snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'kd-lyric-snippet');
+        } else if ((s.trans||'').toLowerCase().includes(ql)) {
+          snippetHtml = _lyricSnippetHtml(s.trans, ql, 'kd-lyric-snippet');
+        }
+      }
+      const icon = s.i || (_getCatIcon(s.cat));
       return `<div class="kd-item" onmousedown="kirtanSelectFromDropdown(${s.id})">
-        <div class="kd-icon">${s.i}</div>
+        <div class="kd-icon">${icon}</div>
         <div class="kd-info">
           <div class="kd-title">${hl(displayTitle)}</div>
           ${s.officialName ? `<div class="kd-meta" style="color:var(--accent-gold)">${hl(s.officialName)}</div>` : ''}
           <div class="kd-meta">${meta}</div>
+          ${snippetHtml}
         </div>
       </div>`;
     }).join('');
@@ -12226,7 +12302,7 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', userlist:'App Users'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', userlist:'App Users'};
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
