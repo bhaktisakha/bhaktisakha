@@ -1131,65 +1131,136 @@ body {
   cursor:pointer; font-family:inherit; margin-right:8px; margin-bottom:8px; }
 
 
-/* ===== NOTES ===== */
+/* ===== NOTES MODULE — FOLDER-BASED ===== */
 .notes-screen { display:flex; flex-direction:column; height:100%; overflow:hidden; }
 .notes-top-bar { padding:12px 16px 0; flex-shrink:0; }
-.notes-search-wrap {
-  display:flex; align-items:center; gap:8px; background:var(--card);
-  border:1px solid var(--border); border-radius:12px; padding:0 12px; margin-bottom:10px;
-}
-.notes-search-wrap svg { flex-shrink:0; color:var(--text3); width:16px; height:16px; }
-.notes-search-inp {
-  flex:1; background:transparent; border:none; outline:none; color:var(--text);
-  font-size:0.82rem; padding:10px 0; font-family:inherit;
-}
-.notes-search-inp::placeholder { color:var(--text3); }
-.notes-sort-row {
-  display:flex; align-items:center; gap:6px; margin-bottom:10px; flex-wrap:wrap;
-}
-.notes-sort-btn {
-  background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px;
-  padding:4px 10px; font-size:0.68rem; color:var(--text3); cursor:pointer; font-family:inherit;
-  transition: all 0.2s;
-}
-.notes-sort-btn.active { background:rgba(61,127,212,0.15); color:var(--accent-blue); border-color:rgba(61,127,212,0.3); }
-.notes-count { font-size:0.68rem; color:var(--text3); margin-left:auto; }
-.notes-list-wrap { flex:1; overflow-y:auto; padding:0 16px 100px; min-height:0; }
+/* Backup / sign-in banner */
 .notes-backup-box {
   background:rgba(61,127,212,0.06); border:1px solid rgba(61,127,212,0.2);
-  border-radius:12px; padding:10px 14px; margin-bottom:12px;
+  border-radius:12px; padding:10px 14px; margin:0 16px 12px;
   font-size:0.75rem; color:var(--text2); line-height:1.5;
 }
 .notes-backup-box strong { color:var(--accent-blue); }
 .notes-backup-btns { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+
+/* ── Folder Grid View ── */
+.nf-header { padding:16px 16px 8px; flex-shrink:0; }
+.nf-header-title { font-size:1.3rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+.nf-header-sub { font-size:0.75rem; color:var(--text3); margin-top:4px; }
+.nf-folder-scroll { flex:1; overflow-y:auto; padding:0 16px 100px; min-height:0; }
+.nf-folder-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.nf-folder-card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:18px 14px 14px; cursor:pointer; transition:all 0.22s;
+  position:relative; overflow:hidden; min-height:120px;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.nf-folder-card:active { transform:scale(0.97); }
+.nf-folder-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0;
+}
+.nf-folder-card--gratitude::before { background:linear-gradient(90deg, #f39c12, #e67e22); }
+.nf-folder-card--spiritual::before { background:linear-gradient(90deg, #3d7fd4, #5b9bd5); }
+.nf-folder-card--personal::before { background:linear-gradient(90deg, #9b59b6, #8e44ad); }
+.nf-folder-card--custom::before { background:linear-gradient(90deg, #27ae60, #2ecc71); }
+.nf-folder-card:hover { border-color:rgba(255,255,255,0.15); }
+.nf-folder-icon { font-size:1.6rem; margin-bottom:6px; }
+.nf-folder-name { font-size:0.92rem; font-weight:600; color:var(--text); line-height:1.3; }
+.nf-folder-count { font-size:0.7rem; color:var(--text3); margin-top:4px; }
+.nf-folder-lock { position:absolute; top:10px; right:10px; font-size:0.8rem; opacity:0.7; }
+.nf-folder-actions { position:absolute; top:8px; right:8px; display:flex; gap:4px; }
+.nf-folder-act-btn {
+  background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:6px;
+  width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:0.65rem; color:var(--text3); transition:all 0.15s;
+}
+.nf-folder-act-btn:active { background:rgba(255,255,255,0.12); }
+/* Add folder card */
+.nf-add-folder {
+  border:2px dashed rgba(255,255,255,0.1); background:transparent;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; cursor:pointer; transition:all 0.2s; min-height:120px;
+  border-radius:16px;
+}
+.nf-add-folder:hover { border-color:rgba(61,127,212,0.4); background:rgba(61,127,212,0.04); }
+.nf-add-folder-icon { font-size:1.5rem; color:var(--text3); }
+.nf-add-folder-label { font-size:0.75rem; color:var(--text3); font-weight:500; }
+
+/* ── Inside-Folder View (note list) ── */
+.nf-inside-folder { display:none; flex-direction:column; height:100%; overflow:hidden; }
+.nf-inside-folder.open { display:flex; }
+.nf-inside-topbar {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
+  background:var(--bg2);
+}
+.nf-back-btn { background:none; border:none; color:var(--text2); font-size:1.1rem; cursor:pointer; padding:4px; font-family:inherit; }
+.nf-folder-title-bar {
+  flex:1; display:flex; align-items:center; gap:8px; min-width:0;
+}
+.nf-folder-title-text { font-size:1rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nf-folder-badge {
+  font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
+  padding:2px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0;
+}
+.nf-badge-gratitude { background:rgba(243,156,18,0.15); color:#f39c12; border:1px solid rgba(243,156,18,0.3); }
+.nf-badge-spiritual { background:rgba(61,127,212,0.15); color:var(--accent-blue); border:1px solid rgba(61,127,212,0.3); }
+.nf-badge-personal { background:rgba(155,89,182,0.15); color:#9b59b6; border:1px solid rgba(155,89,182,0.3); }
+.nf-badge-custom { background:rgba(39,174,96,0.15); color:#27ae60; border:1px solid rgba(39,174,96,0.3); }
+/* Search inside folder */
+.nf-search-wrap {
+  display:flex; align-items:center; gap:8px; background:var(--card);
+  border:1px solid var(--border); border-radius:12px; padding:0 12px;
+  margin:10px 16px 6px;
+}
+.nf-search-wrap svg { flex-shrink:0; color:var(--text3); width:15px; height:15px; }
+.nf-search-inp {
+  flex:1; background:transparent; border:none; outline:none; color:var(--text);
+  font-size:0.8rem; padding:9px 0; font-family:inherit;
+}
+.nf-search-inp::placeholder { color:var(--text3); }
+.nf-sort-row { display:flex; align-items:center; gap:6px; padding:0 16px 8px; flex-wrap:wrap; }
+.nf-sort-btn {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px;
+  padding:3px 10px; font-size:0.66rem; color:var(--text3); cursor:pointer; font-family:inherit;
+  transition:all 0.2s;
+}
+.nf-sort-btn.active { background:rgba(61,127,212,0.15); color:var(--accent-blue); border-color:rgba(61,127,212,0.3); }
+.nf-notes-count { font-size:0.66rem; color:var(--text3); margin-left:auto; }
+.nf-notes-list { flex:1; overflow-y:auto; padding:0 16px 100px; min-height:0; }
+
+/* Gratitude date entry card */
+.nf-gratitude-date-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all 0.2s;
+  display:flex; align-items:center; gap:12px;
+}
+.nf-gratitude-date-card:active { transform:scale(0.98); }
+.nf-gratitude-date-icon { font-size:1.4rem; flex-shrink:0; }
+.nf-gratitude-date-info { flex:1; min-width:0; }
+.nf-gratitude-date-label { font-size:0.95rem; font-weight:600; color:var(--text); }
+.nf-gratitude-date-preview { font-size:0.78rem; color:var(--text2); margin-top:2px; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.nf-gratitude-date-time { font-size:0.68rem; color:var(--text3); flex-shrink:0; }
+
+/* General note card (inside folder) */
 .note-card {
   background:var(--card); border:1px solid var(--border);
   border-radius:14px; padding:14px 16px; margin-bottom:10px;
   cursor:pointer; transition:all 0.2s; position:relative;
 }
-.note-card:hover { border-color:rgba(61,127,212,0.4); }
+.note-card:active { transform:scale(0.98); }
+.note-card:hover { border-color:rgba(255,255,255,0.12); }
 .note-card.pinned { border-left:3px solid var(--accent-gold); }
-.note-card.locked { opacity:0.85; }
 .note-card-top { display:flex; align-items:center; gap:8px; }
 .note-pin-icon { font-size:0.72rem; flex-shrink:0; }
-.note-lock-icon { font-size:0.72rem; flex-shrink:0; }
-.note-tag {
-  font-size:0.6rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
-  border-radius:20px; padding:2px 8px; white-space:nowrap; flex-shrink:0;
-}
-.note-tag-personal { background:rgba(155,89,182,0.15); color:#9b59b6; border:1px solid rgba(155,89,182,0.3); }
-.note-tag-spiritual { background:rgba(61,127,212,0.15); color:var(--accent-blue); border:1px solid rgba(61,127,212,0.3); }
-.note-tag-prayer { background:rgba(241,196,15,0.15); color:#f1c40f; border:1px solid rgba(241,196,15,0.3); }
-.note-tag-reminder { background:rgba(39,174,96,0.15); color:#27ae60; border:1px solid rgba(39,174,96,0.3); }
-.note-tag-other { background:rgba(255,255,255,0.06); color:var(--text3); border:1px solid var(--border); }
-.note-title { font-size:1.26rem; font-weight:600; color:var(--text); flex:1; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.note-title { font-size:1.05rem; font-weight:600; color:var(--text); flex:1; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .note-preview {
-  font-size:1.1rem; color:var(--text2); margin-top:6px;
+  font-size:0.85rem; color:var(--text2); margin-top:6px;
   line-height:1.5; display:-webkit-box; -webkit-line-clamp:2;
   -webkit-box-orient:vertical; overflow:hidden;
 }
 .note-footer { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
-.note-date { font-size:0.94rem; color:var(--text3); }
+.note-date { font-size:0.72rem; color:var(--text3); }
 .note-actions { display:flex; gap:4px; align-items:center; }
 .note-act-btn {
   background:transparent; border:1px solid var(--border);
@@ -1198,6 +1269,7 @@ body {
   cursor:pointer; font-size:0.75rem; color:var(--text2); transition:all 0.15s;
 }
 .note-act-btn:active { background:rgba(255,255,255,0.1); }
+
 /* Floating Action Button */
 .notes-fab {
   position:fixed; bottom:76px; right:calc(50% - 195px);
@@ -1209,6 +1281,7 @@ body {
 }
 .notes-fab:active { transform:scale(0.92); }
 @media(max-width:430px){ .notes-fab { right:20px; } }
+
 /* Note Editor Full Screen */
 .note-editor-overlay {
   position:fixed; inset:0; background:var(--bg); z-index:200;
@@ -1220,7 +1293,7 @@ body {
   padding:10px 14px; border-bottom:1px solid var(--border); flex-shrink:0;
   background:var(--bg2);
 }
-.ne-back-btn { background:none; border:none; color:var(--text2); font-size:1.2rem; cursor:pointer; padding:4px; }
+.ne-back-btn { background:none; border:none; color:var(--text2); font-size:1.2rem; cursor:pointer; padding:4px; font-family:inherit; }
 .ne-save-btn {
   background:rgba(61,127,212,0.15); border:1px solid rgba(61,127,212,0.3);
   color:var(--accent-blue); border-radius:8px; padding:6px 14px;
@@ -1235,7 +1308,7 @@ body {
 .ne-action-btn:active { background:rgba(255,255,255,0.08); }
 .ne-title-input {
   width:100%; background:transparent; border:none; outline:none;
-  color:var(--text); font-size:1.5rem; font-weight:600; padding:14px 16px 6px;
+  color:var(--text); font-size:1.3rem; font-weight:600; padding:14px 16px 6px;
   font-family:inherit;
 }
 .ne-title-input::placeholder { color:var(--text3); }
@@ -1243,14 +1316,17 @@ body {
   display:flex; gap:8px; padding:4px 16px 10px; align-items:center; flex-wrap:wrap;
   border-bottom:1px solid var(--border);
 }
+.ne-meta-info {
+  font-size:0.72rem; color:var(--text3); display:flex; align-items:center; gap:6px;
+}
 .ne-meta-sel {
   background:rgba(255,255,255,0.04); border:1px solid var(--border);
-  border-radius:8px; color:var(--text2); font-size:1.04rem; padding:4px 8px;
+  border-radius:8px; color:var(--text2); font-size:0.8rem; padding:4px 8px;
   font-family:inherit; outline:none; cursor:pointer;
 }
 .ne-meta-date {
   background:rgba(255,255,255,0.04); border:1px solid var(--border);
-  border-radius:8px; color:var(--text2); font-size:1.04rem; padding:4px 8px;
+  border-radius:8px; color:var(--text2); font-size:0.8rem; padding:4px 8px;
   font-family:inherit; outline:none;
 }
 /* Formatting Toolbar */
@@ -1269,16 +1345,12 @@ body {
 .ne-fmt-btn:active, .ne-fmt-btn.active { background:rgba(61,127,212,0.15); color:var(--accent-blue); border-color:rgba(61,127,212,0.3); }
 .ne-fmt-sep { width:1px; height:20px; background:var(--border); margin:0 4px; flex-shrink:0; }
 /* Content editable area */
-.ne-content-area {
-  flex:1; overflow-y:auto; padding:14px 16px; min-height:0;
-}
+.ne-content-area { flex:1; overflow-y:auto; padding:14px 16px; min-height:0; }
 .ne-content-editable {
   width:100%; min-height:200px; outline:none; color:var(--text);
   font-size:1.26rem; line-height:1.7; font-family:inherit;
 }
-.ne-content-editable:empty::before {
-  content:attr(data-placeholder); color:var(--text3); pointer-events:none;
-}
+.ne-content-editable:empty::before { content:attr(data-placeholder); color:var(--text3); pointer-events:none; }
 .ne-content-editable h1 { font-size:1.7rem; margin:8px 0; }
 .ne-content-editable h2 { font-size:1.5rem; margin:6px 0; }
 .ne-content-editable ul, .ne-content-editable ol { padding-left:20px; margin:6px 0; }
@@ -1288,9 +1360,43 @@ body {
   text-align:right; flex-shrink:0; border-top:1px solid var(--border);
   background:var(--bg2);
 }
+
+/* Create Folder Modal */
+.nf-create-modal {
+  position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:250;
+  display:none; align-items:center; justify-content:center;
+  max-width:430px; margin:0 auto;
+}
+.nf-create-modal.open { display:flex; }
+.nf-create-box {
+  background:var(--bg2); border:1px solid var(--border); border-radius:20px;
+  padding:24px 20px; width:calc(100% - 48px); max-width:320px;
+}
+.nf-create-title { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:14px; text-align:center; }
+.nf-create-input {
+  width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-size:0.9rem; padding:10px 14px;
+  font-family:inherit; outline:none; margin-bottom:16px;
+}
+.nf-create-input:focus { border-color:rgba(61,127,212,0.5); }
+.nf-create-input::placeholder { color:var(--text3); }
+.nf-create-btns { display:flex; gap:8px; }
+.nf-create-cancel {
+  flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:10px; color:var(--text2); padding:10px; font-size:0.82rem;
+  cursor:pointer; font-family:inherit;
+}
+.nf-create-confirm {
+  flex:1; background:rgba(61,127,212,0.15); border:1px solid rgba(61,127,212,0.3);
+  border-radius:10px; color:var(--accent-blue); padding:10px; font-size:0.82rem;
+  font-weight:600; cursor:pointer; font-family:inherit;
+}
+.nf-create-cancel:active { background:rgba(255,255,255,0.1); }
+.nf-create-confirm:active { opacity:0.8; }
+
 /* PIN Modal */
 .pin-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:250;
+  position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:260;
   display:none; align-items:center; justify-content:center;
   max-width:430px; margin:0 auto;
 }
@@ -1322,6 +1428,14 @@ body {
   color:var(--accent-blue); cursor:pointer; text-decoration:underline;
 }
 .pin-error-msg { font-size:0.75rem; color:#e74c3c; margin-top:8px; min-height:18px; }
+
+/* Empty state inside folder */
+.nf-empty {
+  text-align:center; padding:40px 20px; color:var(--text3);
+}
+.nf-empty-icon { font-size:2.2rem; margin-bottom:10px; opacity:0.6; }
+.nf-empty-text { font-size:0.82rem; line-height:1.5; }
+
 /* Note editor modal (legacy compat) */
 .note-editor-body { display:flex; flex-direction:column; gap:12px; }
 .note-char-count { font-size:0.65rem; color:var(--text3); text-align:right; margin-top:-8px; }
@@ -3216,7 +3330,7 @@ body {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
           <div class="home-card-title">Notes</div>
-          <div class="home-card-desc">Spiritual journal — notes synced via Google Drive</div>
+          <div class="home-card-desc">Gratitude, spiritual & personal notes — synced via Google Drive</div>
         </div>
 
         <div class="home-card home-card--sevakart" onclick="switchScreen('sevakart',document.querySelectorAll('.nav-btn')[6])">
@@ -3400,30 +3514,50 @@ body {
   <!-- NOTES -->
   <div class="screen" id="screen-notes">
     <div class="notes-screen">
-      <div class="notes-top-bar">
-        <div class="notes-search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="notes-search-inp" id="notesSearchInp" placeholder="Search notes…" oninput="renderNotes()">
-        </div>
-        <div class="notes-sort-row">
-          <button class="notes-sort-btn active" data-sort="date" onclick="setNoteSort('date',this)">📅 Date</button>
-          <button class="notes-sort-btn" data-sort="title" onclick="setNoteSort('title',this)">🔤 Title</button>
-          <button class="notes-sort-btn" data-sort="cat" onclick="setNoteSort('cat',this)">🏷️ Category</button>
-          <span class="notes-count" id="notesCount"></span>
+      <!-- Backup/Sign-in banner -->
+      <div class="notes-backup-box" id="notesBackupBox">
+        <span id="notesBackupMsg"><strong>Sign in with Google</strong> to backup & sync notes across devices.</span>
+        <div class="notes-backup-btns">
+          <button class="bk-btn" id="notesGoogleBtn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="switchScreen('settings')">🔑 Sign In</button>
+          <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="exportNotes()">📤 Export</button>
+          <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="importNotes()">📥 Import</button>
         </div>
       </div>
-      <div class="notes-list-wrap">
-        <div class="notes-backup-box" id="notesBackupBox">
-          <span id="notesBackupMsg"><strong>Sign in with Google</strong> to sync notes across devices.</span>
-          <div class="notes-backup-btns">
-            <button class="bk-btn" id="notesGoogleBtn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="switchScreen('settings')">🔑 Sign In</button>
-            <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="exportNotes()">📤 Export</button>
-            <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="importNotes()">📥 Import</button>
+
+      <!-- FOLDER VIEW (default) -->
+      <div id="nfFolderView">
+        <div class="nf-header">
+          <div class="nf-header-title">📒 My Notes</div>
+          <div class="nf-header-sub">Organize your spiritual journey</div>
+        </div>
+        <div class="nf-folder-scroll">
+          <div class="nf-folder-grid" id="nfFolderGrid">
+            <!-- rendered by JS -->
           </div>
         </div>
-        <div id="notesList"></div>
       </div>
-      <button class="notes-fab" onclick="openAddNote()" title="New Note">+</button>
+
+      <!-- INSIDE FOLDER VIEW (notes list) -->
+      <div class="nf-inside-folder" id="nfInsideFolder">
+        <div class="nf-inside-topbar">
+          <button class="nf-back-btn" onclick="nfGoBackToFolders()">← </button>
+          <div class="nf-folder-title-bar">
+            <span class="nf-folder-title-text" id="nfInsideFolderName">Folder</span>
+            <span class="nf-folder-badge" id="nfInsideFolderBadge"></span>
+          </div>
+        </div>
+        <div class="nf-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="nf-search-inp" id="nfSearchInp" placeholder="Search in folder…" oninput="nfRenderFolderNotes()">
+        </div>
+        <div class="nf-sort-row">
+          <button class="nf-sort-btn active" data-sort="date" onclick="nfSetSort('date',this)">📅 Date</button>
+          <button class="nf-sort-btn" data-sort="title" onclick="nfSetSort('title',this)">🔤 Title</button>
+          <span class="nf-notes-count" id="nfNotesCount"></span>
+        </div>
+        <div class="nf-notes-list" id="nfNotesList"></div>
+        <button class="notes-fab" id="nfAddNoteBtn" onclick="nfOpenAddNote()" title="New Note">+</button>
+      </div>
     </div>
   </div>
 
@@ -4584,26 +4718,19 @@ body {
 <!-- Note Editor Overlay (Full-screen) -->
 <div class="note-editor-overlay" id="noteEditorOverlay">
   <div class="note-editor-topbar">
-    <button class="ne-back-btn" onclick="closeNoteEditor()">← Back</button>
+    <button class="ne-back-btn" onclick="nfCloseNoteEditor()">← Back</button>
     <div class="ne-topbar-actions">
       <button class="songs-font-btn" onclick="changeNoteFont(-1)" style="width:28px;height:28px;">A−</button>
       <button class="songs-font-btn" onclick="changeNoteFont(1)" style="width:28px;height:28px;">A+</button>
-      <button class="ne-action-btn" onclick="toggleNotePin()" id="nePinBtn" title="Pin note">📌</button>
-      <button class="ne-action-btn" onclick="toggleNoteLock()" id="neLockBtn" title="Lock note">🔒</button>
-      <button class="ne-action-btn" onclick="deleteCurrentNote()" title="Delete note">🗑️</button>
-      <button class="ne-save-btn" onclick="saveNote()">💾 Save</button>
+      <button class="ne-action-btn" onclick="nfToggleNotePin()" id="nePinBtn" title="Pin note">📌</button>
+      <button class="ne-action-btn" onclick="nfDeleteCurrentNote()" title="Delete note">🗑️</button>
+      <button class="ne-save-btn" onclick="nfSaveNote()">💾 Save</button>
     </div>
   </div>
   <input class="ne-title-input" id="neTitle" placeholder="Note title…" maxlength="120">
   <div class="ne-meta-row">
-    <select class="ne-meta-sel" id="neCat">
-      <option value="spiritual">🔵 Spiritual</option>
-      <option value="personal">🟣 Personal</option>
-      <option value="prayer">🟡 Prayer</option>
-      <option value="reminder">🟢 Reminder</option>
-      <option value="other">⚪ Other</option>
-    </select>
-    <input class="ne-meta-date" id="neLinkedDate" type="date" title="Link to date" style="display:none;">
+    <span class="ne-meta-info" id="neMetaFolderLabel"></span>
+    <input class="ne-meta-date" id="neGratitudeDate" type="date" title="Entry date" style="display:none;">
   </div>
   <div class="ne-toolbar">
     <button class="ne-fmt-btn" onclick="neExec('bold')" title="Bold"><b>B</b></button>
@@ -4629,7 +4756,7 @@ body {
 <div class="pin-overlay" id="pinOverlay">
   <div class="pin-box">
     <div class="pin-box-title" id="pinTitle">🔐 Enter PIN</div>
-    <div class="pin-box-sub" id="pinSubtitle">Enter your 4-digit PIN to unlock this note</div>
+    <div class="pin-box-sub" id="pinSubtitle">Enter your 4-digit PIN to unlock</div>
     <div class="pin-dots" id="pinDots">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -4655,9 +4782,16 @@ body {
   </div>
 </div>
 
-<!-- Legacy note modal (hidden, kept for compat) -->
-<div class="modal-overlay" id="noteModal" style="display:none!important;">
-  <div class="modal-sheet"><div class="modal-handle"></div></div>
+<!-- Create Folder Modal -->
+<div class="nf-create-modal" id="nfCreateFolderModal">
+  <div class="nf-create-box">
+    <div class="nf-create-title">📁 Create New Folder</div>
+    <input class="nf-create-input" id="nfNewFolderName" placeholder="Folder name…" maxlength="40" onkeydown="if(event.key==='Enter')nfConfirmCreateFolder()">
+    <div class="nf-create-btns">
+      <button class="nf-create-cancel" onclick="nfCloseCreateFolder()">Cancel</button>
+      <button class="nf-create-confirm" onclick="nfConfirmCreateFolder()">Create</button>
+    </div>
+  </div>
 </div>
 
 <!-- Date Picker Modal -->
@@ -7582,11 +7716,20 @@ async function gSyncAll() {
     const mergedNotes  = mergeById(notes,       remote.notes  || []);
     const mergedEvents = mergeById(customEvts,   remote.events || []);
 
+    // Merge custom folders
+    const remoteCustomFolders = remote.customFolders || [];
+    const localFolderMap = new Map(customFolders.map(f => [f.id, f]));
+    remoteCustomFolders.forEach(rf => {
+      if (!localFolderMap.has(rf.id)) { localFolderMap.set(rf.id, rf); }
+    });
+    customFolders = Array.from(localFolderMap.values());
+
     // Save merged back to local
     notes      = mergedNotes;
     customEvts = mergedEvents;
     localStorage.setItem('notes',      JSON.stringify(notes));
     localStorage.setItem('customEvts', JSON.stringify(customEvts));
+    localStorage.setItem('customFolders', JSON.stringify(customFolders));
 
     // Merge admin list from remote (so admins added on one device appear on others)
     if (remote.adminEmails && Array.isArray(remote.adminEmails)) {
@@ -7603,6 +7746,7 @@ async function gSyncAll() {
 
     // Re-render whatever is visible
     renderNotes();
+    nfRenderFolders();
     renderEvts();
     // Songs are managed via Google Sheets — refresh them
     fetchSharedSongs();
@@ -7610,6 +7754,7 @@ async function gSyncAll() {
     // Upload merged data to Drive (notes & events only)
     const payload = JSON.stringify({
       notes: mergedNotes, events: mergedEvents,
+      customFolders: customFolders,
       adminEmails: _getAdminList(),
       adminPermissions: _getAdminPermissions(),
       lastSync: new Date().toISOString(), device: navigator.userAgent.split(' ').slice(-2).join(' ')
@@ -7623,7 +7768,7 @@ async function gSyncAll() {
 
     const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     if (statusEl) statusEl.textContent = `✓ Synced at ${now}`;
-    if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${mergedEvents.length} events · ${songs.length} songs`;
+    if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${customFolders.length} folders · ${mergedEvents.length} events · ${songs.length} songs`;
     updateAdminUI();
     showToast('✓ Synced to Google Drive');
     // Also sync admin config to central server (if super admin)
@@ -8501,18 +8646,36 @@ function dpGo() {
 // ===================================================================
 // NOTES - COMPREHENSIVE FEATURE SET
 // ===================================================================
-let _noteSortMode = 'date';
-let _noteAutoSaveTimer = null;
-let _currentEditNoteId = null;
-let _pinBuffer = '';
-let _pinMode = null; // 'setup', 'confirm-setup', 'unlock', 'lock-toggle'
-let _pinSetupFirst = '';
+// (Notes state variables moved to Notes module below)
 let _pendingPinNoteId = null;
+
+// ============================
+// NOTES MODULE — FOLDER-BASED
+// ============================
+
+// --- Data structures ---
+// notes[] - same array, each note now has a `folder` property
+// customFolders[] - user-created folder objects {id, name, createdAt}
+let customFolders = JSON.parse(localStorage.getItem('customFolders') || '[]');
+const DEFAULT_FOLDERS = [
+  { id:'gratitude', name:'Gratitude Journal', icon:'🙏', type:'gratitude', locked:true },
+  { id:'spiritual', name:'Spiritual Notes', icon:'📿', type:'spiritual', locked:false },
+  { id:'personal', name:'Personal Notes', icon:'📝', type:'personal', locked:false }
+];
+
+// State
+let _nfCurrentFolder = null; // folder id currently open
+let _nfSortMode = 'date';
+let _nfCurrentEditNoteId = null;
+let _nfAutoSaveTimer = null;
+let _nfGratitudeUnlocked = false; // session-based unlock
+let _nfGratitudeUnlockTime = 0;
+const NF_LOCK_TIMEOUT = 5 * 60 * 1000; // auto-lock after 5 min inactivity
 
 // --- NOTE FONT SIZE ---
 const NOTE_FONT_SIZES = [0.82, 0.88, 0.96, 1.04, 1.14, 1.26, 1.4, 1.56, 1.74];
 const NOTE_FONT_LABELS = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
-let noteFontIdx = parseInt(localStorage.getItem('noteFontIdx')) || 5; // default 2XL (1.26rem)
+let noteFontIdx = parseInt(localStorage.getItem('noteFontIdx')) || 5;
 
 function changeNoteFont(delta) {
   noteFontIdx = Math.max(0, Math.min(NOTE_FONT_SIZES.length - 1, noteFontIdx + delta));
@@ -8533,6 +8696,24 @@ function applyNoteFont() {
   if (titleEl) titleEl.style.fontSize = (sz * 1.2) + 'rem';
 }
 
+// --- Migrate old notes: add folder property if missing ---
+function nfMigrateNotes() {
+  let changed = false;
+  notes.forEach(n => {
+    if (!n.folder) {
+      // Map old categories to folders
+      if (n.cat === 'personal') n.folder = 'personal';
+      else if (n.cat === 'prayer' || n.cat === 'spiritual') n.folder = 'spiritual';
+      else n.folder = 'spiritual'; // default
+      changed = true;
+    }
+    if (n.pinned === undefined) { n.pinned = false; changed = true; }
+    if (n.locked === undefined) { n.locked = false; changed = true; }
+  });
+  if (changed) localStorage.setItem('notes', JSON.stringify(notes));
+}
+nfMigrateNotes();
+
 // --- PIN SECURITY ---
 async function hashPin(pin) {
   const enc = new TextEncoder().encode(pin + '_bhaktisakha_salt_v1');
@@ -8548,15 +8729,33 @@ async function verifyPin(pin) {
   return (await hashPin(pin)) === stored;
 }
 
-function openPinOverlay(mode, noteId) {
-  _pinMode = mode; _pinBuffer = ''; _pendingPinNoteId = noteId || null;
+function nfIsGratitudeUnlocked() {
+  if (!_nfGratitudeUnlocked) return false;
+  if (Date.now() - _nfGratitudeUnlockTime > NF_LOCK_TIMEOUT) {
+    _nfGratitudeUnlocked = false;
+    return false;
+  }
+  return true;
+}
+
+function nfRefreshGratitudeTimer() {
+  if (_nfGratitudeUnlocked) _nfGratitudeUnlockTime = Date.now();
+}
+
+let _pinMode = null;
+let _pinBuffer = '';
+let _pinSetupFirst = '';
+let _pinCallback = null; // function to call on successful PIN entry
+
+function openPinOverlay(mode, callback) {
+  _pinMode = mode; _pinBuffer = ''; _pinCallback = callback || null;
   const dots = document.querySelectorAll('#pinDots .pin-dot');
   dots.forEach(d=>{ d.classList.remove('filled','error'); });
   document.getElementById('pinErrorMsg').textContent = '';
   const forgot = document.getElementById('pinForgotLink');
   if (mode === 'setup') {
     document.getElementById('pinTitle').textContent = '🔐 Set Master PIN';
-    document.getElementById('pinSubtitle').textContent = 'Choose a 4-digit PIN to lock your notes';
+    document.getElementById('pinSubtitle').textContent = 'Choose a 4-digit PIN to protect your Gratitude Journal';
     forgot.style.display = 'none';
   } else if (mode === 'confirm-setup') {
     document.getElementById('pinTitle').textContent = '🔐 Confirm PIN';
@@ -8564,7 +8763,7 @@ function openPinOverlay(mode, noteId) {
     forgot.style.display = 'none';
   } else {
     document.getElementById('pinTitle').textContent = '🔐 Enter PIN';
-    document.getElementById('pinSubtitle').textContent = 'Enter your 4-digit PIN to continue';
+    document.getElementById('pinSubtitle').textContent = 'Enter your 4-digit PIN to unlock Gratitude Journal';
     forgot.style.display = 'block';
   }
   document.getElementById('pinOverlay').classList.add('open');
@@ -8572,7 +8771,7 @@ function openPinOverlay(mode, noteId) {
 
 function closePinOverlay() {
   document.getElementById('pinOverlay').classList.remove('open');
-  _pinMode = null; _pinBuffer = ''; _pendingPinNoteId = null; _pinSetupFirst = '';
+  _pinMode = null; _pinBuffer = ''; _pinSetupFirst = ''; _pinCallback = null;
 }
 
 function pinInput(digit) {
@@ -8593,31 +8792,30 @@ function pinDelete() {
 }
 
 async function processPinEntry() {
-  const noteId = _pendingPinNoteId; // Save before closePinOverlay resets it
+  const cb = _pinCallback;
   if (_pinMode === 'setup') {
     _pinSetupFirst = _pinBuffer;
-    openPinOverlay('confirm-setup', noteId);
+    openPinOverlay('confirm-setup', cb);
   } else if (_pinMode === 'confirm-setup') {
     if (_pinBuffer === _pinSetupFirst) {
       const hash = await hashPin(_pinBuffer);
       localStorage.setItem('notesPinHash', hash);
       showToast('PIN set successfully 🔐');
+      _nfGratitudeUnlocked = true;
+      _nfGratitudeUnlockTime = Date.now();
       closePinOverlay();
-      if (noteId) { actualToggleLock(noteId); }
+      if (cb) cb();
     } else {
       showPinError('PINs do not match. Try again.');
       _pinSetupFirst = '';
-      setTimeout(()=>openPinOverlay('setup', noteId), 800);
+      setTimeout(()=>openPinOverlay('setup', cb), 800);
     }
   } else if (_pinMode === 'unlock') {
     if (await verifyPin(_pinBuffer)) {
+      _nfGratitudeUnlocked = true;
+      _nfGratitudeUnlockTime = Date.now();
       closePinOverlay();
-      if (noteId) openEditNote(noteId, true);
-    } else { showPinError('Incorrect PIN'); }
-  } else if (_pinMode === 'lock-toggle') {
-    if (await verifyPin(_pinBuffer)) {
-      closePinOverlay();
-      if (noteId) actualToggleLock(noteId);
+      if (cb) cb();
     } else { showPinError('Incorrect PIN'); }
   }
 }
@@ -8633,149 +8831,373 @@ function showPinError(msg) {
 }
 
 function forgotPin() {
-  if (confirm('Reset your PIN?\n\nThis will UNLOCK all locked notes and remove the PIN. You will need to set a new one.\n\nTo verify your identity, you must be signed in with Google.')) {
+  if (confirm('Reset your PIN?\n\nThis will remove the PIN protection. You will need to set a new one next time you open the Gratitude Journal.\n\nTo verify your identity, you must be signed in with Google.')) {
     if (!isSignedIn()) { showToast('Please sign in with Google first to reset PIN'); return; }
     localStorage.removeItem('notesPinHash');
-    notes.forEach(n => { n.locked = false; });
-    localStorage.setItem('notes', JSON.stringify(notes));
+    _nfGratitudeUnlocked = false;
     closePinOverlay();
-    renderNotes();
-    showToast('PIN removed. All notes unlocked.');
+    nfRenderFolders();
+    showToast('PIN removed. Set a new one next time you open Gratitude Journal.');
   }
 }
 
-// --- SORT ---
-function setNoteSort(mode, btn) {
-  _noteSortMode = mode;
-  document.querySelectorAll('.notes-sort-btn').forEach(b=>b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderNotes();
+// ═══════════════════════════════
+// FOLDER VIEW — grid of folders
+// ═══════════════════════════════
+function nfRenderFolders() {
+  const grid = document.getElementById('nfFolderGrid');
+  if (!grid) return;
+  let html = '';
+
+  // Default folders
+  DEFAULT_FOLDERS.forEach(f => {
+    const count = notes.filter(n => n.folder === f.id).length;
+    const lockBadge = f.locked ? '<span class="nf-folder-lock">🔒</span>' : '';
+    html += `<div class="nf-folder-card nf-folder-card--${f.type}" onclick="nfOpenFolder('${f.id}')">
+      ${lockBadge}
+      <div>
+        <div class="nf-folder-icon">${f.icon}</div>
+        <div class="nf-folder-name">${f.name}</div>
+      </div>
+      <div class="nf-folder-count">${count} note${count!==1?'s':''}</div>
+    </div>`;
+  });
+
+  // Custom folders
+  customFolders.forEach(f => {
+    const count = notes.filter(n => n.folder === f.id).length;
+    html += `<div class="nf-folder-card nf-folder-card--custom" onclick="nfOpenFolder('${f.id}')">
+      <div class="nf-folder-actions">
+        <button class="nf-folder-act-btn" onclick="event.stopPropagation();nfRenameFolder('${f.id}')" title="Rename">✏️</button>
+        <button class="nf-folder-act-btn" onclick="event.stopPropagation();nfDeleteFolder('${f.id}')" title="Delete">🗑</button>
+      </div>
+      <div>
+        <div class="nf-folder-icon">📁</div>
+        <div class="nf-folder-name">${escHtml(f.name)}</div>
+      </div>
+      <div class="nf-folder-count">${count} note${count!==1?'s':''}</div>
+    </div>`;
+  });
+
+  // Add folder card
+  html += `<div class="nf-add-folder" onclick="nfOpenCreateFolder()">
+    <div class="nf-add-folder-icon">＋</div>
+    <div class="nf-add-folder-label">New Folder</div>
+  </div>`;
+
+  grid.innerHTML = html;
 }
 
-// --- RENDER NOTES LIST ---
-function renderNotes() {
-  const c = document.getElementById('notesList');
-  const searchVal = (document.getElementById('notesSearchInp')?.value || '').toLowerCase().trim();
-  let filtered = [...notes];
+// ═══════════════════════════════
+// CUSTOM FOLDER CRUD
+// ═══════════════════════════════
+function nfOpenCreateFolder() {
+  if (!isSignedIn()) { requireSignIn('Custom Folders'); return; }
+  document.getElementById('nfNewFolderName').value = '';
+  document.getElementById('nfCreateFolderModal').classList.add('open');
+  setTimeout(()=>document.getElementById('nfNewFolderName').focus(), 100);
+}
+
+function nfCloseCreateFolder() {
+  document.getElementById('nfCreateFolderModal').classList.remove('open');
+}
+
+function nfConfirmCreateFolder() {
+  const name = document.getElementById('nfNewFolderName').value.trim();
+  if (!name) { showToast('Please enter a folder name'); return; }
+  if (name.length > 40) { showToast('Name too long (max 40 chars)'); return; }
+  const id = 'custom_' + Date.now();
+  customFolders.push({ id, name, createdAt: Date.now() });
+  localStorage.setItem('customFolders', JSON.stringify(customFolders));
+  nfCloseCreateFolder();
+  nfRenderFolders();
+  showToast('Folder created 📁');
+  nfTriggerSync();
+}
+
+function nfRenameFolder(folderId) {
+  const f = customFolders.find(x => x.id === folderId);
+  if (!f) return;
+  const newName = prompt('Rename folder:', f.name);
+  if (!newName || !newName.trim()) return;
+  f.name = newName.trim().substring(0, 40);
+  localStorage.setItem('customFolders', JSON.stringify(customFolders));
+  nfRenderFolders();
+  showToast('Folder renamed');
+  nfTriggerSync();
+}
+
+function nfDeleteFolder(folderId) {
+  const f = customFolders.find(x => x.id === folderId);
+  if (!f) return;
+  const count = notes.filter(n => n.folder === folderId).length;
+  const msg = count > 0
+    ? `Delete folder "${f.name}"?\n\nThis will also delete ${count} note${count!==1?'s':''} inside it.`
+    : `Delete folder "${f.name}"?`;
+  if (!confirm(msg)) return;
+  // Remove notes in this folder
+  notes = notes.filter(n => n.folder !== folderId);
+  localStorage.setItem('notes', JSON.stringify(notes));
+  // Remove folder
+  customFolders = customFolders.filter(x => x.id !== folderId);
+  localStorage.setItem('customFolders', JSON.stringify(customFolders));
+  nfRenderFolders();
+  showToast('Folder deleted');
+  nfTriggerSync();
+}
+
+// ═══════════════════════════════
+// OPEN FOLDER → show notes list
+// ═══════════════════════════════
+function nfOpenFolder(folderId) {
+  if (!isSignedIn()) { requireSignIn('My Notes'); return; }
+
+  // If gratitude folder, require PIN
+  if (folderId === 'gratitude') {
+    if (!isPinSetup()) {
+      // First time — setup PIN
+      openPinOverlay('setup', () => nfActuallyOpenFolder('gratitude'));
+      return;
+    }
+    if (!nfIsGratitudeUnlocked()) {
+      openPinOverlay('unlock', () => nfActuallyOpenFolder('gratitude'));
+      return;
+    }
+  }
+  nfActuallyOpenFolder(folderId);
+}
+
+function nfActuallyOpenFolder(folderId) {
+  _nfCurrentFolder = folderId;
+  nfRefreshGratitudeTimer();
+
+  // Get folder info
+  let folderName = '', badgeClass = '', badgeLabel = '';
+  const def = DEFAULT_FOLDERS.find(f => f.id === folderId);
+  if (def) {
+    folderName = def.name;
+    badgeClass = 'nf-badge-' + def.type;
+    badgeLabel = def.type.charAt(0).toUpperCase() + def.type.slice(1);
+  } else {
+    const cust = customFolders.find(f => f.id === folderId);
+    folderName = cust ? cust.name : 'Unknown';
+    badgeClass = 'nf-badge-custom';
+    badgeLabel = 'Custom';
+  }
+
+  // Update UI
+  document.getElementById('nfInsideFolderName').textContent = folderName;
+  const badge = document.getElementById('nfInsideFolderBadge');
+  badge.textContent = badgeLabel;
+  badge.className = 'nf-folder-badge ' + badgeClass;
+
+  // Show gratitude date picker in editor for gratitude folder
+  // Reset search
+  const searchInp = document.getElementById('nfSearchInp');
+  if (searchInp) searchInp.value = '';
+
+  // Show inside-folder view, hide folder grid
+  document.getElementById('nfFolderView').style.display = 'none';
+  document.getElementById('nfInsideFolder').classList.add('open');
+  document.getElementById('nfAddNoteBtn').style.display = 'flex';
+
+  // Reset sort
+  _nfSortMode = 'date';
+  document.querySelectorAll('.nf-sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === 'date'));
+
+  nfRenderFolderNotes();
+}
+
+function nfGoBackToFolders() {
+  _nfCurrentFolder = null;
+  document.getElementById('nfInsideFolder').classList.remove('open');
+  document.getElementById('nfFolderView').style.display = '';
+  document.getElementById('nfAddNoteBtn').style.display = 'none';
+  nfRenderFolders();
+}
+
+// ═══════════════════════════════
+// RENDER NOTES INSIDE FOLDER
+// ═══════════════════════════════
+function nfSetSort(mode, btn) {
+  _nfSortMode = mode;
+  document.querySelectorAll('.nf-sort-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  nfRenderFolderNotes();
+}
+
+function nfRenderFolderNotes() {
+  if (!_nfCurrentFolder) return;
+  nfRefreshGratitudeTimer();
+
+  const container = document.getElementById('nfNotesList');
+  const searchVal = (document.getElementById('nfSearchInp')?.value || '').toLowerCase().trim();
+
+  let filtered = notes.filter(n => n.folder === _nfCurrentFolder);
+
   if (searchVal) {
     filtered = filtered.filter(n =>
       (n.title||'').toLowerCase().includes(searchVal) ||
-      (n.body||'').toLowerCase().replace(/<[^>]*>/g,'').includes(searchVal) ||
-      (n.cat||'').toLowerCase().includes(searchVal)
+      (n.body||'').toLowerCase().replace(/<[^>]*>/g,'').includes(searchVal)
     );
   }
-  // Sort: pinned always first
+
+  // Sort: pinned first, then by mode
   filtered.sort((a,b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
-    if (_noteSortMode === 'title') return (a.title||'').localeCompare(b.title||'');
-    if (_noteSortMode === 'cat') return (a.cat||'').localeCompare(b.cat||'');
+    if (_nfSortMode === 'title') return (a.title||'').localeCompare(b.title||'');
     return (b.updatedAt||0) - (a.updatedAt||0);
   });
-  const countEl = document.getElementById('notesCount');
+
+  // Update count
+  const countEl = document.getElementById('nfNotesCount');
   if (countEl) countEl.textContent = `${filtered.length} note${filtered.length!==1?'s':''}`;
+
   if (!filtered.length) {
-    c.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div>${searchVal ? 'No notes matching your search.' : 'No notes yet.<br>Tap the + button to begin.'}</div>`;
+    const isGratitude = _nfCurrentFolder === 'gratitude';
+    container.innerHTML = `<div class="nf-empty">
+      <div class="nf-empty-icon">${isGratitude ? '🙏' : '📝'}</div>
+      <div class="nf-empty-text">${searchVal ? 'No notes matching your search.' : (isGratitude ? 'No gratitude entries yet.<br>Tap + to write what you\'re grateful for today.' : 'No notes yet.<br>Tap + to create your first note.')}</div>
+    </div>`;
     return;
   }
-  c.innerHTML = filtered.map(n => {
-    const tagClass = 'note-tag-' + (n.cat||'other');
-    const tagLabels = {spiritual:'Spiritual', personal:'Personal', prayer:'Prayer', reminder:'Reminder', other:'Other'};
-    const tagLabel = tagLabels[n.cat] || n.cat || 'Other';
-    const d = new Date(n.updatedAt||n.createdAt);
-    const date = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-    const time = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
-    const linked = n.linkedDate ? ` · 📅 ${n.linkedDate}` : '';
+
+  // For Gratitude folder, show date-based cards
+  if (_nfCurrentFolder === 'gratitude') {
+    container.innerHTML = filtered.map(n => {
+      const d = new Date(n.updatedAt || n.createdAt);
+      const entryDate = n.linkedDate || d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+      const time = d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
+      const preview = n.body ? stripHtml(n.body).substring(0, 80) : '';
+      const pinIcon = n.pinned ? '📌 ' : '';
+      return `<div class="nf-gratitude-date-card" onclick="nfOpenEditNote(${n.id})">
+        <div class="nf-gratitude-date-icon">🙏</div>
+        <div class="nf-gratitude-date-info">
+          <div class="nf-gratitude-date-label">${pinIcon}${entryDate}</div>
+          ${n.title ? `<div class="nf-gratitude-date-preview" style="font-weight:600;">${escHtml(n.title)}</div>` : ''}
+          ${preview ? `<div class="nf-gratitude-date-preview">${escHtml(preview)}</div>` : ''}
+        </div>
+        <div class="nf-gratitude-date-time">${time}</div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // General note cards
+  container.innerHTML = filtered.map(n => {
+    const d = new Date(n.updatedAt || n.createdAt);
+    const date = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+    const time = d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
     const pinIcon = n.pinned ? '<span class="note-pin-icon">📌</span>' : '';
-    const lockIcon = n.locked ? '<span class="note-lock-icon">🔒</span>' : '';
-    const preview = n.locked ? '<div class="note-preview" style="font-style:italic;color:var(--text3)">This note is locked</div>' :
-      (n.body ? `<div class="note-preview">${escHtml(stripHtml(n.body))}</div>` : '');
+    const preview = n.body ? `<div class="note-preview">${escHtml(stripHtml(n.body))}</div>` : '';
     const pinnedCls = n.pinned ? ' pinned' : '';
-    const lockedCls = n.locked ? ' locked' : '';
-    return `<div class="note-card${pinnedCls}${lockedCls}" onclick="onNoteCardClick(${n.id})">
+    return `<div class="note-card${pinnedCls}" onclick="nfOpenEditNote(${n.id})">
       <div class="note-card-top">
-        ${pinIcon}${lockIcon}
-        <span class="note-tag ${tagClass}">${tagLabel}</span>
+        ${pinIcon}
         <div class="note-title">${escHtml(n.title||'Untitled')}</div>
       </div>
       ${preview}
       <div class="note-footer">
-        <span class="note-date">${date} ${time}${linked}</span>
+        <span class="note-date">${date} ${time}</span>
         <div class="note-actions">
-          <button class="note-act-btn" onclick="event.stopPropagation();toggleNotePin_list(${n.id})" title="${n.pinned?'Unpin':'Pin'}">${n.pinned?'📌':'📍'}</button>
-          <button class="note-act-btn" onclick="event.stopPropagation();delNote(${n.id})" title="Delete">🗑</button>
+          <button class="note-act-btn" onclick="event.stopPropagation();nfToggleNotePinList(${n.id})" title="${n.pinned?'Unpin':'Pin'}">${n.pinned?'📌':'📍'}</button>
+          <button class="note-act-btn" onclick="event.stopPropagation();nfDelNote(${n.id})" title="Delete">🗑</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function stripHtml(s) { return (s||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
-
-function escHtml(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function onNoteCardClick(id) {
-  const n = notes.find(x=>x.id===id);
-  if (!n) return;
-  if (n.locked) {
-    openPinOverlay('unlock', id);
-  } else {
-    openEditNote(id);
-  }
-}
-
-// --- NOTE EDITOR ---
-function openAddNote() {
+// ═══════════════════════════════
+// NOTE EDITOR
+// ═══════════════════════════════
+function nfOpenAddNote() {
   if (!isSignedIn()) { requireSignIn('My Notes'); return; }
-  _currentEditNoteId = null;
+  if (!_nfCurrentFolder) return;
+  nfRefreshGratitudeTimer();
+
+  _nfCurrentEditNoteId = null;
   document.getElementById('neTitle').value = '';
-  document.getElementById('neCat').value = 'spiritual';
-  document.getElementById('neLinkedDate').value = '';
   document.getElementById('neBody').innerHTML = '';
   document.getElementById('neAutosaveMsg').textContent = 'New note';
-  updateEditorPinLockUI(false, false);
+
+  // Folder label
+  const folderInfo = nfGetFolderInfo(_nfCurrentFolder);
+  document.getElementById('neMetaFolderLabel').textContent = '📂 ' + folderInfo.name;
+
+  // Gratitude date picker
+  const datePicker = document.getElementById('neGratitudeDate');
+  if (_nfCurrentFolder === 'gratitude') {
+    datePicker.style.display = '';
+    datePicker.value = new Date().toISOString().split('T')[0]; // today
+  } else {
+    datePicker.style.display = 'none';
+    datePicker.value = '';
+  }
+
+  updateEditorPinLockUI(false);
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
   document.getElementById('neTitle').focus();
 }
 
-function openEditNote(id, bypassLock) {
-  const n = notes.find(x=>x.id===id);
+function nfOpenEditNote(id) {
+  const n = notes.find(x => x.id === id);
   if (!n) return;
-  if (n.locked && !bypassLock) { openPinOverlay('unlock', id); return; }
-  _currentEditNoteId = id;
+  nfRefreshGratitudeTimer();
+
+  _nfCurrentEditNoteId = id;
   document.getElementById('neTitle').value = n.title || '';
-  document.getElementById('neCat').value = n.cat || 'spiritual';
-  document.getElementById('neLinkedDate').value = n.linkedDate || '';
   document.getElementById('neBody').innerHTML = n.body || '';
-  const d = new Date(n.updatedAt||n.createdAt);
-  document.getElementById('neAutosaveMsg').textContent = 'Last saved ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  updateEditorPinLockUI(!!n.pinned, !!n.locked);
+
+  const d = new Date(n.updatedAt || n.createdAt);
+  document.getElementById('neAutosaveMsg').textContent = 'Last saved ' + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+
+  // Folder label
+  const folderInfo = nfGetFolderInfo(n.folder);
+  document.getElementById('neMetaFolderLabel').textContent = '📂 ' + folderInfo.name;
+
+  // Gratitude date
+  const datePicker = document.getElementById('neGratitudeDate');
+  if (n.folder === 'gratitude') {
+    datePicker.style.display = '';
+    datePicker.value = n.linkedDate || '';
+  } else {
+    datePicker.style.display = 'none';
+  }
+
+  updateEditorPinLockUI(!!n.pinned);
   document.getElementById('noteEditorOverlay').classList.add('open');
   applyNoteFont();
 }
 
-function updateEditorPinLockUI(pinned, locked) {
-  document.getElementById('nePinBtn').style.opacity = pinned ? 1 : 0.4;
-  document.getElementById('neLockBtn').style.opacity = locked ? 1 : 0.4;
+function nfGetFolderInfo(folderId) {
+  const def = DEFAULT_FOLDERS.find(f => f.id === folderId);
+  if (def) return def;
+  const cust = customFolders.find(f => f.id === folderId);
+  if (cust) return { ...cust, icon:'📁', type:'custom' };
+  return { id: folderId, name: 'Unknown', icon:'📁', type:'custom' };
 }
 
-function closeNoteEditor() {
+function updateEditorPinLockUI(pinned) {
+  document.getElementById('nePinBtn').style.opacity = pinned ? 1 : 0.4;
+}
+
+function nfCloseNoteEditor() {
   // Auto-save on close if there's content
   const title = document.getElementById('neTitle').value.trim();
   const body = document.getElementById('neBody').innerHTML.trim();
   if (title || (body && body !== '<br>')) {
-    saveNote(true); // silent save
+    nfSaveNote(true);
   }
   document.getElementById('noteEditorOverlay').classList.remove('open');
-  _currentEditNoteId = null;
-  if (_noteAutoSaveTimer) { clearTimeout(_noteAutoSaveTimer); _noteAutoSaveTimer = null; }
-  renderNotes();
+  _nfCurrentEditNoteId = null;
+  if (_nfAutoSaveTimer) { clearTimeout(_nfAutoSaveTimer); _nfAutoSaveTimer = null; }
+  nfRenderFolderNotes();
 }
 
-function saveNote(silent) {
+function nfSaveNote(silent) {
   const title = document.getElementById('neTitle').value.trim();
   const body = document.getElementById('neBody').innerHTML.trim();
   if (!title && (!body || body === '<br>')) {
@@ -8783,29 +9205,78 @@ function saveNote(silent) {
     return;
   }
   const now = Date.now();
-  const cat = document.getElementById('neCat').value;
-  const linkedDate = document.getElementById('neLinkedDate').value || '';
-  if (_currentEditNoteId) {
-    const idx = notes.findIndex(n=>n.id===_currentEditNoteId);
+  const linkedDate = document.getElementById('neGratitudeDate')?.value || '';
+  const folder = _nfCurrentFolder || 'spiritual';
+
+  if (_nfCurrentEditNoteId) {
+    const idx = notes.findIndex(n => n.id === _nfCurrentEditNoteId);
     if (idx > -1) {
-      notes[idx] = { ...notes[idx], title: title||'Untitled', cat, body, linkedDate, updatedAt: now };
+      notes[idx] = { ...notes[idx], title: title||'Untitled', body, linkedDate, updatedAt: now };
     }
   } else {
-    const newNote = { id: now, title: title||'Untitled', cat, body, linkedDate, createdAt: now, updatedAt: now, pinned:false, locked:false };
+    const newNote = {
+      id: now,
+      title: title||'Untitled',
+      folder: folder,
+      cat: folder, // backward compat
+      body,
+      linkedDate,
+      createdAt: now,
+      updatedAt: now,
+      pinned: false,
+      locked: false
+    };
     notes.push(newNote);
-    _currentEditNoteId = now;
+    _nfCurrentEditNoteId = now;
   }
+
   localStorage.setItem('notes', JSON.stringify(notes));
-  document.getElementById('neAutosaveMsg').textContent = '✓ Saved at ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('neAutosaveMsg').textContent = '✓ Saved at ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
   if (!silent) showToast('Note saved 📝');
-  // Trigger Drive sync if signed in
-  if (typeof gAccessToken !== 'undefined' && gAccessToken) {
-    clearTimeout(window._noteSyncDebounce);
-    window._noteSyncDebounce = setTimeout(()=>{ try { gSyncAll(); } catch(e){} }, 5000);
-  }
+  nfTriggerSync();
 }
 
-// Auto-save on typing
+function nfDeleteCurrentNote() {
+  if (!_nfCurrentEditNoteId) { nfCloseNoteEditor(); return; }
+  if (!confirm('Delete this note?')) return;
+  notes = notes.filter(n => n.id !== _nfCurrentEditNoteId);
+  localStorage.setItem('notes', JSON.stringify(notes));
+  showToast('Note deleted');
+  document.getElementById('noteEditorOverlay').classList.remove('open');
+  _nfCurrentEditNoteId = null;
+  nfRenderFolderNotes();
+  nfTriggerSync();
+}
+
+function nfDelNote(id) {
+  if (!confirm('Delete this note?')) return;
+  notes = notes.filter(n => n.id !== id);
+  localStorage.setItem('notes', JSON.stringify(notes));
+  nfRenderFolderNotes();
+  showToast('Note deleted');
+  nfTriggerSync();
+}
+
+function nfToggleNotePin() {
+  if (!_nfCurrentEditNoteId) return;
+  const idx = notes.findIndex(n => n.id === _nfCurrentEditNoteId);
+  if (idx < 0) return;
+  notes[idx].pinned = !notes[idx].pinned;
+  localStorage.setItem('notes', JSON.stringify(notes));
+  updateEditorPinLockUI(notes[idx].pinned);
+  showToast(notes[idx].pinned ? 'Note pinned 📌' : 'Note unpinned');
+}
+
+function nfToggleNotePinList(id) {
+  const idx = notes.findIndex(n => n.id === id);
+  if (idx < 0) return;
+  notes[idx].pinned = !notes[idx].pinned;
+  localStorage.setItem('notes', JSON.stringify(notes));
+  nfRenderFolderNotes();
+  showToast(notes[idx].pinned ? 'Pinned 📌' : 'Unpinned');
+}
+
+// --- Auto-save on typing ---
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize Google Sign-In after GSI library loads
   function tryInitGoogle() {
@@ -8822,91 +9293,31 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bodyEl) {
     bodyEl.addEventListener('input', function() {
       document.getElementById('neAutosaveMsg').textContent = 'Editing…';
-      if (_noteAutoSaveTimer) clearTimeout(_noteAutoSaveTimer);
-      _noteAutoSaveTimer = setTimeout(()=>{
+      nfRefreshGratitudeTimer();
+      if (_nfAutoSaveTimer) clearTimeout(_nfAutoSaveTimer);
+      _nfAutoSaveTimer = setTimeout(()=>{
         const t = document.getElementById('neTitle').value.trim();
         const b = document.getElementById('neBody').innerHTML.trim();
-        if (t || (b && b !== '<br>')) saveNote(true);
+        if (t || (b && b !== '<br>')) nfSaveNote(true);
       }, 3000);
     });
   }
   const titleEl = document.getElementById('neTitle');
   if (titleEl) {
     titleEl.addEventListener('input', function() {
-      if (_noteAutoSaveTimer) clearTimeout(_noteAutoSaveTimer);
-      _noteAutoSaveTimer = setTimeout(()=>{
+      nfRefreshGratitudeTimer();
+      if (_nfAutoSaveTimer) clearTimeout(_nfAutoSaveTimer);
+      _nfAutoSaveTimer = setTimeout(()=>{
         const t = document.getElementById('neTitle').value.trim();
         const b = document.getElementById('neBody').innerHTML.trim();
-        if (t || (b && b !== '<br>')) saveNote(true);
+        if (t || (b && b !== '<br>')) nfSaveNote(true);
       }, 3000);
     });
   }
+
+  // Initial render of folder grid
+  nfRenderFolders();
 });
-
-function deleteCurrentNote() {
-  if (!_currentEditNoteId) { closeNoteEditor(); return; }
-  if (!confirm('Delete this note?')) return;
-  notes = notes.filter(n=>n.id!==_currentEditNoteId);
-  localStorage.setItem('notes', JSON.stringify(notes));
-  showToast('Note deleted');
-  document.getElementById('noteEditorOverlay').classList.remove('open');
-  _currentEditNoteId = null;
-  renderNotes();
-}
-
-function delNote(id) {
-  if (!confirm('Delete this note?')) return;
-  notes = notes.filter(n=>n.id!==id);
-  localStorage.setItem('notes', JSON.stringify(notes));
-  renderNotes();
-  showToast('Note deleted');
-}
-
-// --- PIN / LOCK from editor ---
-function toggleNotePin() {
-  if (!_currentEditNoteId) return;
-  const idx = notes.findIndex(n=>n.id===_currentEditNoteId);
-  if (idx<0) return;
-  notes[idx].pinned = !notes[idx].pinned;
-  localStorage.setItem('notes', JSON.stringify(notes));
-  updateEditorPinLockUI(notes[idx].pinned, notes[idx].locked);
-  showToast(notes[idx].pinned ? 'Note pinned 📌' : 'Note unpinned');
-}
-
-function toggleNotePin_list(id) {
-  const idx = notes.findIndex(n=>n.id===id);
-  if (idx<0) return;
-  notes[idx].pinned = !notes[idx].pinned;
-  localStorage.setItem('notes', JSON.stringify(notes));
-  renderNotes();
-  showToast(notes[idx].pinned ? 'Pinned 📌' : 'Unpinned');
-}
-
-function toggleNoteLock() {
-  if (!_currentEditNoteId) return;
-  // First save current edits
-  saveNote(true);
-  if (!isPinSetup()) {
-    openPinOverlay('setup', _currentEditNoteId);
-  } else {
-    openPinOverlay('lock-toggle', _currentEditNoteId);
-  }
-}
-
-function actualToggleLock(id) {
-  const idx = notes.findIndex(n=>n.id===id);
-  if (idx<0) return;
-  notes[idx].locked = !notes[idx].locked;
-  localStorage.setItem('notes', JSON.stringify(notes));
-  if (notes[idx].locked) {
-    // Close editor so content is hidden immediately
-    document.getElementById('noteEditorOverlay').classList.remove('open');
-    _currentEditNoteId = null;
-  }
-  if (_currentEditNoteId === id) updateEditorPinLockUI(notes[idx].pinned, notes[idx].locked);
-  renderNotes();
-  showToast(notes[idx].locked ? 'Note locked 🔒' : 'Note unlocked 🔓');
-}
 
 // --- FORMATTING TOOLBAR ---
 function neExec(cmd) {
@@ -8923,18 +9334,13 @@ function neExecHighlight() {
   const sel = window.getSelection();
   if (!sel.rangeCount || sel.isCollapsed) return;
   const range = sel.getRangeAt(0);
-  // Check if already highlighted
   let parent = sel.anchorNode.parentElement;
   if (parent && parent.tagName === 'MARK') {
-    // Remove highlight
     const text = document.createTextNode(parent.textContent);
     parent.parentNode.replaceChild(text, parent);
   } else {
     const mark = document.createElement('mark');
-    try {
-      range.surroundContents(mark);
-    } catch(e) {
-      // Fallback for complex selections
+    try { range.surroundContents(mark); } catch(e) {
       document.execCommand('hiliteColor', false, 'rgba(241,196,15,0.3)');
     }
   }
@@ -8943,7 +9349,7 @@ function neExecHighlight() {
 
 // --- EXPORT / IMPORT ---
 function exportNotes() {
-  const blob = new Blob([JSON.stringify({notes, exported: new Date().toISOString()}, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify({notes, customFolders, exported: new Date().toISOString()}, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'bhakti-sakha-notes.json'; a.click();
   showToast('Notes exported 📤');
@@ -8957,14 +9363,19 @@ function importNotes() {
       try {
         const data = JSON.parse(x.result);
         if (data.notes && Array.isArray(data.notes)) {
-          // Migrate old notes to new format
           data.notes.forEach(n => {
+            if (!n.folder) n.folder = n.cat || 'spiritual';
             if (n.pinned === undefined) n.pinned = false;
             if (n.locked === undefined) n.locked = false;
           });
           notes = data.notes;
           localStorage.setItem('notes', JSON.stringify(notes));
-          renderNotes();
+          if (data.customFolders && Array.isArray(data.customFolders)) {
+            customFolders = data.customFolders;
+            localStorage.setItem('customFolders', JSON.stringify(customFolders));
+          }
+          nfRenderFolders();
+          if (_nfCurrentFolder) nfRenderFolderNotes();
           showToast('Imported ' + data.notes.length + ' notes ✅');
         } else { showToast('Invalid file format'); }
       } catch { showToast('Could not read file'); }
@@ -8974,8 +9385,35 @@ function importNotes() {
   inp.click();
 }
 
-// Legacy compat - keep old function names working
+// --- Google Drive Sync helper ---
+function nfTriggerSync() {
+  if (typeof gAccessToken !== 'undefined' && gAccessToken) {
+    clearTimeout(window._noteSyncDebounce);
+    window._noteSyncDebounce = setTimeout(()=>{ try { gSyncAll(); } catch(e){} }, 5000);
+  }
+}
+
+// --- UTILITY ---
+function stripHtml(s) { return (s||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Legacy compatibility ──
+function renderNotes() { nfRenderFolders(); if (_nfCurrentFolder) nfRenderFolderNotes(); }
+function openAddNote() { switchScreen('notes', document.querySelectorAll('.nav-btn')[4]); }
 function openAddNote_legacy() { openAddNote(); }
+function setNoteSort(m,b) { nfSetSort(m,b); }
+function closeNoteEditor() { nfCloseNoteEditor(); }
+function saveNote(s) { nfSaveNote(s); }
+function deleteCurrentNote() { nfDeleteCurrentNote(); }
+function onNoteCardClick(id) { nfOpenEditNote(id); }
+function toggleNotePin() { nfToggleNotePin(); }
+function toggleNotePin_list(id) { nfToggleNotePinList(id); }
+function toggleNoteLock() {} // No longer used per-note
+function actualToggleLock() {}
+function delNote(id) { nfDelNote(id); }
 function updateNoteCharCount() {}
 
 // ===================================================================
@@ -9054,7 +9492,7 @@ function switchScreen(name, btn) {
 
   if (name==='songs') { renderSongs(); setTimeout(() => _updateSongListIndicator(), 50); }
   if (name==='events') renderEvts();
-  if (name==='notes') renderNotes();
+  if (name==='notes') { nfRenderFolders(); if (_nfCurrentFolder) nfRenderFolderNotes(); }
   if (name==='dhamas') renderDhamas();
   if (name==='sevakart') skRenderHome();
   if (name==='prayer') pcRenderFeed();
