@@ -1221,6 +1221,12 @@ body {
   border:1px solid rgba(94,232,160,0.25); border-radius:6px;
   padding:1px 6px; margin-left:4px; vertical-align:middle;
 }
+.evt-repeat-badge {
+  display:inline-block; font-size:0.58rem; font-weight:500;
+  color:#a78bfa; background:rgba(167,139,250,0.1);
+  border:1px solid rgba(167,139,250,0.25); border-radius:6px;
+  padding:1px 6px; margin-left:4px; vertical-align:middle;
+}
 /* All Day toggle */
 .evt-allday-row {
   display:flex; align-items:center; gap:10px; margin:6px 0 4px;
@@ -5401,6 +5407,15 @@ body {
           </select>
         </div>
         <div class="f-grp">
+          <label class="f-lbl">Repeat</label>
+          <select class="f-sel" id="evtOccasionRepeat">
+            <option value="yearly" selected>Every Year</option>
+            <option value="monthly">Every Month</option>
+            <option value="weekly">Every Week</option>
+            <option value="none">Does not repeat</option>
+          </select>
+        </div>
+        <div class="f-grp">
           <label class="f-lbl">Reminder</label>
           <select class="f-sel" id="evtReminderTiming">
             <option value="0">Same day</option>
@@ -5516,6 +5531,7 @@ body {
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
             </select>
           </div>
         </div>
@@ -8593,14 +8609,7 @@ function _evtFormatTime(t) {
 function _evtIsToday(e) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0,10);
-  if (e.type==='appointment'||e.type==='spiritual') {
-    // Multi-day range check
-    const {start, end} = _evtDateRange(e);
-    if (start && todayStr >= start && todayStr <= (end||start)) return true;
-    if (e.repeat_type==='daily') return true;
-    return false;
-  }
-  return parseInt(e.month)===now.getMonth() && parseInt(e.day)===now.getDate();
+  return _evtMatchesDate(e, todayStr);
 }
 function _evtIsUpcoming7(e) {
   if (_evtIsOccasion(e)) {
@@ -8647,17 +8656,58 @@ function _evtDayIndex(e, dateStr) {
   return Math.round((new Date(dateStr) - new Date(start)) / 86400000) + 1;
 }
 function _evtMatchesDate(e, dateStr) {
-  // Check if event covers this date (single or multi-day)
+  // Check if event covers this date (single, multi-day, or recurring)
+  const [cy, cm, cd] = dateStr.split('-').map(Number);
+
   if (_evtIsOccasion(e)) {
-    const [y,m,d] = dateStr.split('-').map(Number);
-    return parseInt(e.month)===(m-1) && parseInt(e.day)===d;
+    // Occasions: check repeat_type
+    const rt = e.repeat_type || 'yearly';
+    if (rt === 'yearly' || rt === 'none') {
+      return parseInt(e.month)===(cm-1) && parseInt(e.day)===cd;
+    }
+    if (rt === 'monthly') {
+      return parseInt(e.day)===cd;
+    }
+    if (rt === 'weekly') {
+      // Match same day-of-week as the original date
+      const origDate = new Date(cy, parseInt(e.month), parseInt(e.day));
+      const checkDate = new Date(cy, cm-1, cd);
+      return origDate.getDay() === checkDate.getDay();
+    }
+    return parseInt(e.month)===(cm-1) && parseInt(e.day)===cd;
   }
+
   const {start, end} = _evtDateRange(e);
   if (!start) return false;
-  // Multi-day range check
+
+  // Multi-day range check (original occurrence)
   if (dateStr >= start && dateStr <= (end||start)) return true;
-  // Daily repeat
-  if (e.repeat_type==='daily' && dateStr >= start) return true;
+
+  // Repeat logic for appointments/spiritual
+  const rt = e.repeat_type || 'none';
+  if (rt === 'none') return false;
+  if (dateStr < start) return false; // No repeats before original date
+
+  const startD = new Date(start + 'T00:00:00');
+  const checkD = new Date(dateStr + 'T00:00:00');
+
+  if (rt === 'daily') return true;
+
+  if (rt === 'weekly') {
+    const diffDays = Math.round((checkD - startD) / 86400000);
+    return diffDays >= 0 && diffDays % 7 === 0;
+  }
+
+  if (rt === 'monthly') {
+    const [sy, sm, sd] = start.split('-').map(Number);
+    return cd === sd && (cy > sy || (cy === sy && cm-1 >= sm));
+  }
+
+  if (rt === 'yearly') {
+    const [sy, sm, sd] = start.split('-').map(Number);
+    return (cm-1) === (sm-1) && cd === sd && cy >= sy;
+  }
+
   return false;
 }
 function _evtBarColor(e) {
@@ -8797,12 +8847,20 @@ function _evtCardHTML(e, showTime, showCountdown, contextDateStr) {
   const days = _evtDaysUntil(e);
   const countdown = showCountdown ? `<div class="evt-countdown">${_evtCountdownText(days)}</div>` : '';
 
+  // Repeat badge
+  let repeatBadge = '';
+  const rt = e.repeat_type || 'none';
+  if (rt !== 'none') {
+    const repeatLabels = {daily:'🔁 Daily',weekly:'🔁 Weekly',monthly:'🔁 Monthly',yearly:'🔁 Yearly'};
+    repeatBadge = `<span class="evt-repeat-badge">${repeatLabels[rt]||''}</span>`;
+  }
+
   return `<div class="evt-card ${catClass}">
     <div class="evt-emoji">${icon}</div>
     <div class="evt-info">
       <div class="evt-name-text">${name}${multiBadge}</div>
       ${timeStr?'<div class="evt-time-text">'+timeStr+'</div>':''}
-      <span class="evt-type-badge ${badgeClass}">${label}</span>
+      <span class="evt-type-badge ${badgeClass}">${label}</span>${repeatBadge}
       <div class="evt-date">${dateStr}${e.location?' · 📍'+e.location:''}</div>
     </div>
     ${countdown}
@@ -8867,11 +8925,7 @@ function evtRenderAppointments() {
   let filtered;
   if (_evtApptSortMode==='today') {
     filtered = appts.filter(e => {
-      // Multi-day: check if today falls within range
-      const {start, end} = _evtDateRange(e);
-      if (start && todayStr >= start && todayStr <= (end||start)) return true;
-      if (e.repeat_type==='daily') return true;
-      return false;
+      return _evtMatchesDate(e, todayStr);
     });
   } else if (_evtApptSortMode==='upcoming') {
     filtered = appts.filter(e => {
@@ -9061,6 +9115,7 @@ function openAddEvt() {
   const dd = document.getElementById('evtDay'); if(dd)dd.selectedIndex=0;
   document.getElementById('evtRelation').selectedIndex=0;
   document.getElementById('evtReminderTiming').value='1';
+  document.getElementById('evtOccasionRepeat').value='yearly';
   document.getElementById('evtApptRepeat').value='none';
   document.getElementById('evtApptReminder').value='30';
   document.getElementById('evtSpiritRepeat').value='none';
@@ -9103,6 +9158,7 @@ function editEvt(id) {
     document.getElementById('evtYear').value = evt.year||'';
     document.getElementById('evtRelation').value = evt.relation||'';
     document.getElementById('evtReminderTiming').value = evt.reminderDays!=null?evt.reminderDays:'1';
+    document.getElementById('evtOccasionRepeat').value = evt.repeat_type||'yearly';
     document.getElementById('evtNotes').value = evt.notes||'';
   } else if (_evtSelectedType==='appointment') {
     document.getElementById('evtFormAppointment').classList.add('visible');
@@ -9168,7 +9224,7 @@ function saveEvt() {
       relation: document.getElementById('evtRelation').value||null,
       reminderDays: parseInt(document.getElementById('evtReminderTiming').value),
       notes: document.getElementById('evtNotes').value.trim(),
-      repeat_type: 'yearly'
+      repeat_type: document.getElementById('evtOccasionRepeat').value
     };
   } else if (_evtSelectedType==='appointment') {
     const title = document.getElementById('evtApptTitle').value.trim();
