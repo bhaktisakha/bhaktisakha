@@ -3604,14 +3604,14 @@ body {
 .home-card--dhamas   .home-card-icon { background:rgba(192,57,43,0.2); color:#f06858; box-shadow:0 0 12px rgba(192,57,43,0.2); }
 .home-card--events   .home-card-icon { background:rgba(39,174,96,0.2); color:#5ee8a0; box-shadow:0 0 12px rgba(39,174,96,0.2); }
 
-.home-card-title { font-size:0.9rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
+.home-card-title { font-size:1.0rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
 .home-card--calendar .home-card-title { color:#8ac4ff; }
 .home-card--audio    .home-card-title { color:#f0a848; }
 .home-card--notes    .home-card-title { color:#cec0ff; }
 .home-card--sevakart .home-card-title { color:#5ce0f0; }
 .home-card--dhamas   .home-card-title { color:#f08070; }
 .home-card--events   .home-card-title { color:#70eaaa; }
-.home-card-desc  { font-size:0.67rem; color:var(--text2); line-height:1.45; flex:1; }
+.home-card-desc  { font-size:0.75rem; color:var(--text2); line-height:1.45; flex:1; }
 
 /* ── Prayer Circle ── */
 .home-card--prayer {
@@ -3622,6 +3622,34 @@ body {
 .home-card--prayer::after { background:rgba(232,168,56,0.25); }
 .home-card--prayer .home-card-icon { background:rgba(232,168,56,0.2); color:#f0c850; box-shadow:0 0 12px rgba(232,168,56,0.2); }
 .home-card--prayer .home-card-title { color:#f0c850; }
+
+/* ── My Events full-width bottom card ── */
+.home-card--events.home-card--fullwidth {
+  grid-column: 1 / -1;
+  min-height:auto;
+  padding:16px 18px 14px;
+}
+.home-card--fullwidth .home-evt-top {
+  display:flex; align-items:center; gap:10px; margin-bottom:2px;
+}
+.home-evt-upcoming { margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+.home-evt-row {
+  display:flex; align-items:center; gap:8px; padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.home-evt-row:last-child { border-bottom:none; }
+.home-evt-row-icon { font-size:1.1rem; width:28px; text-align:center; flex-shrink:0; }
+.home-evt-row-info { flex:1; min-width:0; }
+.home-evt-row-name { font-size:0.78rem; color:var(--text); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.home-evt-row-meta { font-size:0.67rem; color:var(--text3); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.home-evt-row-badge {
+  flex-shrink:0; font-size:0.62rem; font-weight:700; padding:2px 8px; border-radius:10px;
+  letter-spacing:0.3px;
+}
+.home-evt-badge-today { background:rgba(39,174,96,0.2); color:#5ee8a0; }
+.home-evt-badge-soon { background:rgba(232,168,56,0.15); color:#f0c850; }
+.home-evt-badge-later { background:rgba(100,120,150,0.15); color:var(--text2); }
+.home-evt-empty { font-size:0.75rem; color:var(--text3); padding:6px 0; text-align:center; }
 
 /* ===== CENTRALIZED ADMIN DASHBOARD ===== */
 .adm-wrap { padding:18px 16px 80px; overflow-y:auto; height:100%; }
@@ -4210,20 +4238,25 @@ body {
           <div class="home-card-desc">Sacred places of pilgrimage — temples & holy sites</div>
         </div>
 
-        <div class="home-card home-card--events" onclick="switchScreen('events',document.querySelectorAll('.nav-btn')[3])">
-          <div class="home-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="home-card-title">My Events</div>
-          <div class="home-card-desc" id="homeEvtWidget">Personal reminders, custom events and alerts</div>
-        </div>
-
         <div class="home-card home-card--prayer" onclick="switchScreen('prayer',document.querySelectorAll('.nav-btn')[7])">
           <div class="home-card-icon">
             <svg viewBox="0 0 48 48" width="20" height="20" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5" fill="none" opacity="0.5"/><g transform="translate(24,25)" fill="currentColor"><path d="M-1,-14 C-1,-11 -1.5,-8 -3,-5 C-4.5,-2 -6,1 -7,3.5 C-7.5,5 -7.5,6.5 -6.5,7.5 C-5.5,8.5 -4,8.5 -3,7.5 C-1.5,6 -0.5,3 -0.3,0 L-0.3,-14Z"/><path d="M1,-14 C1,-11 1.5,-8 3,-5 C4.5,-2 6,1 7,3.5 C7.5,5 7.5,6.5 6.5,7.5 C5.5,8.5 4,8.5 3,7.5 C1.5,6 0.5,3 0.3,0 L0.3,-14Z"/><rect x="-9.5" y="7" width="5" height="6" rx="1.2" transform="rotate(-25,-7,10)"/><rect x="4.5" y="7" width="5" height="6" rx="1.2" transform="rotate(25,7,10)"/></g></svg>
           </div>
           <div class="home-card-title">Prayer Circle</div>
           <div class="home-card-desc">Support fellow devotees — request & offer prayers</div>
+        </div>
+
+        <div class="home-card home-card--events home-card--fullwidth" onclick="switchScreen('events',document.querySelectorAll('.nav-btn')[3])">
+          <div class="home-evt-top">
+            <div class="home-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="home-card-title">My Events</div>
+              <div class="home-card-desc" style="margin-top:2px;">Personal reminders, custom events and alerts</div>
+            </div>
+          </div>
+          <div class="home-evt-upcoming" id="homeEvtWidget"></div>
         </div>
 
       </div>
@@ -12275,9 +12308,12 @@ function updateHomeScreen() {
 function _updateHomeEvtWidget() {
   const w = document.getElementById('homeEvtWidget');
   if (!w) return;
-  if (!customEvts.length) { w.textContent = 'Personal reminders, custom events and alerts'; return; }
+  if (!customEvts.length) {
+    w.innerHTML = '<div class="home-evt-empty">No events added yet. Tap to create reminders, birthdays & more.</div>';
+    return;
+  }
   const todayStr = new Date().toISOString().slice(0,10);
-  // Get next 3 events: upcoming + ongoing multi-day
+  // Get next 3 events: today + upcoming + ongoing multi-day
   const sorted = [...customEvts].filter(e => {
     if (_evtDaysUntil(e) >= 0) return true;
     // Include ongoing multi-day events
@@ -12287,18 +12323,57 @@ function _updateHomeEvtWidget() {
     }
     return false;
   }).sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b)).slice(0,3);
-  if (!sorted.length) { w.textContent = 'No upcoming events'; return; }
+
+  if (!sorted.length) {
+    w.innerHTML = '<div class="home-evt-empty">No upcoming events. Tap to add one.</div>';
+    return;
+  }
+
   w.innerHTML = sorted.map(e => {
     const icon = _evtIcon(e.type);
-    const name = e.name||e.apptTitle||e.spiritTitle||'Event';
+    const name = e.name || e.apptTitle || e.spiritTitle || 'Event';
     const days = _evtDaysUntil(e);
-    let label;
-    if (_evtIsMultiDay(e) && days < 0) {
-      label = 'Ongoing';
+    const label = _evtTypeLabel(e.type);
+
+    // Date/time meta line
+    let meta = '';
+    if (e.apptDate || e.spiritDate) {
+      const sd = e.apptDate || e.spiritDate;
+      const d = new Date(sd);
+      meta = d.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short'});
+      const time = e.startTime || e.spiritTime;
+      if (time) meta += ' · ' + _evtFormatTime(time);
     } else {
-      label = days===0?'Today':days===1?'Tomorrow':days+' days';
+      meta = typeof MONTHS_SHORT !== 'undefined' ? MONTHS_SHORT[e.month] + ' ' + e.day : label;
     }
-    return `<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;margin-top:3px;"><span>${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span style="color:var(--accent-gold);font-weight:600;font-size:0.65rem;">${label}</span></div>`;
+
+    // Badge
+    let badgeLabel, badgeClass;
+    if (_evtIsMultiDay(e) && days < 0) {
+      badgeLabel = 'ONGOING';
+      badgeClass = 'home-evt-badge-today';
+    } else if (days === 0) {
+      badgeLabel = 'TODAY';
+      badgeClass = 'home-evt-badge-today';
+    } else if (days === 1) {
+      badgeLabel = 'TOMORROW';
+      badgeClass = 'home-evt-badge-soon';
+    } else if (days <= 3) {
+      badgeLabel = days + ' DAYS';
+      badgeClass = 'home-evt-badge-soon';
+    } else {
+      badgeLabel = days + ' DAYS';
+      badgeClass = 'home-evt-badge-later';
+    }
+
+    return `<div class="home-evt-row">
+      <div class="home-evt-row-icon">${icon}</div>
+      <div class="home-evt-row-info">
+        <div class="home-evt-row-name">${name}</div>
+        <div class="home-evt-row-meta">${meta}</div>
+      </div>
+      <div class="home-evt-row-badge ${badgeClass}">${badgeLabel}</div>
+    </div>`;
   }).join('');
 }
 
