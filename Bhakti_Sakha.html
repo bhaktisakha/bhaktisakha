@@ -4778,6 +4778,53 @@ function _getAdminPermissions() {
 function _saveAdminPermissions(perms) {
   localStorage.setItem('adminPermissions', JSON.stringify(perms));
 }
+
+// Sync admin config TO server (called after any admin change by super admin)
+async function _syncAdminConfigToServer() {
+  try {
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveAdminConfig',
+        adminEmails: _getAdminList(),
+        adminPermissions: _getAdminPermissions()
+      })
+    });
+  } catch(e) { console.warn('Admin config sync error:', e); }
+}
+
+// Fetch admin config FROM server (called on app startup for all users)
+async function _fetchAdminConfigFromServer() {
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=adminConfig');
+    const data = await resp.json();
+    if (!data.success) return;
+    
+    const serverEmails = data.adminEmails || [];
+    const serverPerms = data.adminPermissions || {};
+    
+    if (serverEmails.length) {
+      // Merge: hardcoded + server (server is authoritative)
+      const merged = [...new Set([...ADMIN_EMAILS.map(e => e.toLowerCase()), ...serverEmails.map(e => e.toLowerCase())])];
+      _saveAdminList(merged);
+      // Server permissions are authoritative — overwrite local
+      if (Object.keys(serverPerms).length) {
+        _saveAdminPermissions(serverPerms);
+      }
+    } else if (isSuperAdmin()) {
+      // Server is empty — push local config (first-time migration)
+      const localList = _getAdminList();
+      const localPerms = _getAdminPermissions();
+      if (localList.length > 1 || Object.keys(localPerms).length) {
+        _syncAdminConfigToServer();
+      }
+    }
+    
+    // Update UI if on home screen
+    updateHomeGoogleUI();
+  } catch(e) { console.warn('Admin config fetch error:', e); }
+}
 function hasPermission(perm) {
   if (!gUser || !gUser.email) return false;
   const email = gUser.email.toLowerCase();
@@ -7403,6 +7450,7 @@ function addAdmin() {
   input.value = '';
   renderAdminList();
   showToast(alreadyExists ? 'Permissions updated ✓' : 'Admin added ✓');
+  _syncAdminConfigToServer();
 }
 
 function removeAdmin(email) {
@@ -7417,6 +7465,7 @@ function removeAdmin(email) {
   _saveAdminPermissions(perms);
   renderAdminList();
   showToast('Admin removed');
+  _syncAdminConfigToServer();
 }
 
 function exportSharedEvtInfo() {
@@ -7577,6 +7626,8 @@ async function gSyncAll() {
     if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${mergedEvents.length} events · ${songs.length} songs`;
     updateAdminUI();
     showToast('✓ Synced to Google Drive');
+    // Also sync admin config to central server (if super admin)
+    if (isSuperAdmin()) _syncAdminConfigToServer();
 
   } catch(e) {
     console.error('Sync error:', e);
@@ -12278,6 +12329,7 @@ function pcAdminRemove(reqId) {
 
 // Fetch prayer circle data on load
 setTimeout(_pcFetchFromServer, 2500);
+setTimeout(_fetchAdminConfigFromServer, 1500);
 
 function init() {
   // Load settings
