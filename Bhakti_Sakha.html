@@ -2278,80 +2278,145 @@ body {
 /* ===== BOTTOM NAV ===== */
 .bottom-nav {
   position:fixed; bottom:0; left:0; right:0; max-width:430px; margin:0 auto;
-  background:var(--bg2); border-top:1px solid var(--border);
-  z-index:100; display:flex; align-items:stretch;
-  padding-bottom:env(safe-area-inset-bottom,0);
+  z-index:100;
+  padding: 0 0 env(safe-area-inset-bottom,0) 0;
 }
-.nav-scroll-area {
-  flex:1; overflow-x:auto; overflow-y:hidden;
-  display:flex; scroll-behavior:smooth;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none; -ms-overflow-style:none;
-  min-width:0;
+.nav-glass-bar {
+  background: rgba(10,18,38,0.65);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 -6px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset;
+  position: relative;
+  overflow: visible;
+  padding: 0 6px 10px;
 }
-.nav-scroll-area::-webkit-scrollbar { display:none; }
+/* Animated glow indicator track */
+.nav-glow-track {
+  position: relative;
+  height: 3px;
+  margin: 0 12px;
+}
+.nav-glow-indicator {
+  position: absolute;
+  top: 0; height: 3px;
+  width: 20%; /* 1/5 of the bar */
+  display: flex; justify-content: center;
+  transition: left 0.38s cubic-bezier(0.4, 0, 0.15, 1);
+  left: 0;
+}
+.nav-glow-indicator::after {
+  content: '';
+  width: 30px; height: 3px;
+  border-radius: 2px;
+  background: var(--nav-active-color, #a78bfa);
+  box-shadow: 0 0 10px var(--nav-active-color, #a78bfa),
+              0 0 25px color-mix(in srgb, var(--nav-active-color, #a78bfa) 40%, transparent),
+              0 2px 8px var(--nav-active-color, #a78bfa);
+  transition: background 0.35s, box-shadow 0.35s;
+}
+.nav-tabs-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 5px;
+}
 .nav-btn {
-  flex:0 0 auto; width:80px;
-  display:flex; flex-direction:column; align-items:center;
-  padding:8px 2px 7px; cursor:pointer; border:none; background:transparent;
-  color:var(--text3); gap:3px; transition:color 0.2s, transform 0.15s;
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 6px 2px 4px; cursor: pointer; border: none; background: transparent;
+  gap: 3px;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.15, 1), color 0.3s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
-.nav-btn:active { transform:scale(0.9); }
-.nav-btn svg { width:21px; height:21px; }
-.nav-icon-text { font-size:1.3rem; line-height:1; color:inherit; }
-.nav-lbl { font-size:0.5rem; letter-spacing:0.3px; text-transform:uppercase; white-space:nowrap; font-weight:500; }
+.nav-btn:active { transform: scale(0.88); }
+.nav-btn svg { width: 22px; height: 22px; transition: all 0.3s; }
+.nav-lbl {
+  font-size: 0.55rem; letter-spacing: 0.4px; text-transform: uppercase;
+  white-space: nowrap; font-weight: 600; transition: color 0.3s, opacity 0.3s;
+}
 
-/* ── Per-tab unique colors (inactive = muted, active = bright) ── */
-/* Home — lavender */
-.nav-scroll-area .nav-btn:nth-child(1) { color:rgba(167,139,250,0.4); }
-.nav-scroll-area .nav-btn:nth-child(1).active { color:#c4b0ff; }
-/* Calendar — blue */
-.nav-scroll-area .nav-btn:nth-child(2) { color:rgba(106,176,255,0.4); }
-.nav-scroll-area .nav-btn:nth-child(2).active { color:#6ab0ff; }
-/* Audio — amber/orange */
-.nav-scroll-area .nav-btn:nth-child(3) { color:rgba(240,168,72,0.4); }
-.nav-scroll-area .nav-btn:nth-child(3).active { color:#f0a848; }
-/* Events — green */
-.nav-scroll-area .nav-btn:nth-child(4) { color:rgba(94,232,160,0.4); }
-.nav-scroll-area .nav-btn:nth-child(4).active { color:#5ee8a0; }
-/* Notes — purple */
-.nav-scroll-area .nav-btn:nth-child(5) { color:rgba(206,192,255,0.4); }
-.nav-scroll-area .nav-btn:nth-child(5).active { color:#cec0ff; }
-/* Dhamas — red/coral */
-.nav-scroll-area .nav-btn:nth-child(6) { color:rgba(240,128,112,0.4); }
-.nav-scroll-area .nav-btn:nth-child(6).active { color:#f08070; }
-/* SevaKart — teal/cyan */
-.nav-scroll-area .nav-btn:nth-child(7) { color:rgba(92,224,240,0.4); }
-.nav-scroll-area .nav-btn:nth-child(7).active { color:#5ce0f0; }
-/* Prayer Circle — warm gold */
-.nav-scroll-area .nav-btn:nth-child(8) { color:rgba(232,168,56,0.4); }
-.nav-scroll-area .nav-btn:nth-child(8).active { color:#f0c850; }
+/* ── Tab Colors ── */
+.nav-btn[data-tab="home"]     { color: rgba(167,139,250,0.3); --tab-color: #c4b0ff; }
+.nav-btn[data-tab="calendar"] { color: rgba(106,176,255,0.3); --tab-color: #6ab0ff; }
+.nav-btn[data-tab="songs"]    { color: rgba(240,168,72,0.3);  --tab-color: #f0a848; }
+.nav-btn[data-tab="events"]   { color: rgba(94,232,160,0.3);  --tab-color: #5ee8a0; }
+.nav-btn[data-tab="more"]     { color: rgba(220,200,255,0.3); --tab-color: #dcc8ff; }
 
-/* Scroll arrow hint */
-.nav-arrow-hint {
-  flex:0 0 30px; display:flex; align-items:center; justify-content:center;
-  position:relative; cursor:pointer; border:none; background:transparent;
-  z-index:2;
+.nav-btn.active {
+  transform: scale(1.08) translateY(-1px);
 }
-.nav-arrow-hint::before {
-  content:''; position:absolute; left:-22px; top:0; bottom:0; width:30px;
-  background:linear-gradient(90deg, transparent, var(--bg2) 90%);
-  pointer-events:none;
+.nav-btn.active[data-tab="home"]     { color: #c4b0ff; }
+.nav-btn.active[data-tab="calendar"] { color: #6ab0ff; }
+.nav-btn.active[data-tab="songs"]    { color: #f0a848; }
+.nav-btn.active[data-tab="events"]   { color: #5ee8a0; }
+.nav-btn.active[data-tab="more"]     { color: #dcc8ff; }
+
+.nav-btn.active svg {
+  filter: drop-shadow(0 0 6px currentColor);
 }
-.nav-arrow-icon {
-  width:22px; height:22px; border-radius:50%;
-  background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.35);
-  display:flex; align-items:center; justify-content:center;
-  animation:navArrowPulse 1.8s ease-in-out infinite;
-  box-shadow:0 0 10px rgba(167,139,250,0.25);
+
+/* ── More Tray ── */
+.more-tray-overlay {
+  position: fixed; inset: 0; z-index: 99;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  max-width: 430px; margin: 0 auto;
 }
-.nav-arrow-icon svg { width:12px; height:12px; stroke:var(--lavender); }
-.nav-arrow-hint.at-end .nav-arrow-icon svg { transform:rotate(180deg); }
-@keyframes navArrowPulse {
-  0%, 100% { transform:translateX(0); opacity:0.9; }
-  50% { transform:translateX(2px); opacity:1; box-shadow:0 0 14px rgba(167,139,250,0.4); }
+.more-tray-overlay.open {
+  opacity: 1; pointer-events: auto;
 }
-.nav-arrow-hint.hidden { opacity:0; pointer-events:none; }
+.more-tray {
+  position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%) translateY(16px);
+  max-width: 400px; width: calc(100% - 32px);
+  z-index: 101;
+  background: rgba(14,22,48,0.92);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5),
+              0 0 0 1px rgba(255,255,255,0.04) inset;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.15,1);
+}
+.more-tray.open {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.more-tray-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border: none; border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.more-tray-btn:active { transform: scale(0.96); }
+.more-tray-btn:hover { background: rgba(255,255,255,0.08); }
+.more-tray-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+.more-tray-btn .more-tray-lbl {
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.2px;
+}
+/* More tray item colors */
+.more-tray-btn[data-screen="notes"]    { color: #cec0ff; }
+.more-tray-btn[data-screen="dhamas"]   { color: #f08070; }
+.more-tray-btn[data-screen="sevakart"] { color: #5ce0f0; }
+.more-tray-btn[data-screen="prayer"]   { color: #f0c850; }
+
+/* Remove old scroll area and arrow styles */
+.nav-scroll-area { display:none; }
+.nav-arrow-hint { display:none; }
 
 /* ===== MODAL ===== */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200;
@@ -4721,46 +4786,55 @@ body {
 </div>
 
 <nav class="bottom-nav" id="bottomNav">
-  <div class="nav-scroll-area" id="navScrollArea">
-    <button class="nav-btn active" onclick="switchScreen('home',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span class="nav-lbl">Home</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('calendar',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span class="nav-lbl">Calendar</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('songs',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      <span class="nav-lbl">Audio</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('events',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="nav-lbl">Events</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('notes',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      <span class="nav-lbl">Notes</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('dhamas',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 10h.01"/><path d="M14 10h.01"/></svg>
-      <span class="nav-lbl">Dhamas</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('sevakart',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 4 6 4 10c0 5.33 8 12 8 12s8-6.67 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-      <span class="nav-lbl">SevaKart</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('prayer',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
-      <span class="nav-lbl">Prayers</span>
-    </button>
-  </div>
-  <button class="nav-arrow-hint" id="navArrowHint" onclick="scrollNavForward()">
-    <div class="nav-arrow-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  <div class="nav-glass-bar">
+    <div class="nav-glow-track">
+      <div class="nav-glow-indicator" id="navGlowIndicator"></div>
     </div>
-  </button>
+    <div class="nav-tabs-row">
+      <button class="nav-btn active" data-tab="home" data-idx="0" onclick="navTo('home',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-lbl">Home</span>
+      </button>
+      <button class="nav-btn" data-tab="calendar" data-idx="1" onclick="navTo('calendar',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-lbl">Calendar</span>
+      </button>
+      <button class="nav-btn" data-tab="songs" data-idx="2" onclick="navTo('songs',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span class="nav-lbl">Audio</span>
+      </button>
+      <button class="nav-btn" data-tab="events" data-idx="3" onclick="navTo('events',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-lbl">Events</span>
+      </button>
+      <button class="nav-btn" data-tab="more" data-idx="4" onclick="toggleMoreTray()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg>
+        <span class="nav-lbl">More</span>
+      </button>
+    </div>
+  </div>
 </nav>
+
+<!-- More Tray Overlay -->
+<div class="more-tray-overlay" id="moreTrayOverlay" onclick="closeMoreTray()"></div>
+<div class="more-tray" id="moreTray">
+  <button class="more-tray-btn" data-screen="notes" onclick="navToMore('notes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span class="more-tray-lbl">Notes</span>
+  </button>
+  <button class="more-tray-btn" data-screen="dhamas" onclick="navToMore('dhamas')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 10h.01"/><path d="M14 10h.01"/></svg>
+    <span class="more-tray-lbl">Holy Dhamas</span>
+  </button>
+  <button class="more-tray-btn" data-screen="sevakart" onclick="navToMore('sevakart')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 4 6 4 10c0 5.33 8 12 8 12s8-6.67 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span class="more-tray-lbl">SevaKart</span>
+  </button>
+  <button class="more-tray-btn" data-screen="prayer" onclick="navToMore('prayer')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
+    <span class="more-tray-lbl">Prayer Circle</span>
+  </button>
+</div>
 
 <!-- Location Modal -->
 <div class="modal-overlay" id="locModal">
@@ -10323,7 +10397,7 @@ function importNotes() {
     const r = new FileReader();
     r.onload = x => {
       try {
-        const data = JSON.parse(x.result);
+        const data = JSON.parse(r.result);
         if (data.notes && Array.isArray(data.notes)) {
           data.notes.forEach(n => {
             if (!n.folder) n.folder = n.cat || 'spiritual';
@@ -10364,7 +10438,7 @@ function escHtml(s) {
 
 // ── Legacy compatibility ──
 function renderNotes() { nfRenderFolders(); if (_nfCurrentFolder) nfRenderFolderNotes(); }
-function openAddNote() { switchScreen('notes', document.querySelectorAll('.nav-btn')[4]); }
+function openAddNote() { switchScreen('notes', null); }
 function openAddNote_legacy() { openAddNote(); }
 function setNoteSort(m,b) { nfSetSort(m,b); }
 function closeNoteEditor() { nfCloseNoteEditor(); }
@@ -10393,14 +10467,20 @@ function switchScreen(name, btn) {
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(`screen-${name}`).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  if (btn) {
-    btn.classList.add('active');
-    // Auto-scroll nav to show active button
-    if (btn.closest('.nav-scroll-area')) {
-      btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-      setTimeout(()=>{ if(typeof updateNavArrow==='function') updateNavArrow(); }, 350);
-    }
+
+  // Sync bottom nav state
+  const mainTabs = ['home','calendar','songs','events'];
+  const navBtns = document.querySelectorAll('.nav-tabs-row .nav-btn');
+  navBtns.forEach(b => b.classList.remove('active'));
+  if (mainTabs.includes(name)) {
+    const idx = mainTabs.indexOf(name);
+    if (navBtns[idx]) navBtns[idx].classList.add('active');
+    updateGlowIndicator(idx, NAV_TAB_COLORS[name === 'songs' ? 'songs' : name]);
+  } else {
+    // It's a "More" screen
+    const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
+    if (moreBtn) moreBtn.classList.add('active');
+    updateGlowIndicator(4, NAV_TAB_COLORS.more);
   }
 
   // Push history state for back button (only if navigating forward, not going back)
@@ -10574,46 +10654,73 @@ function updateHomeTodayCard() {
 // ===================================================================
 // SCROLLABLE NAV ARROW
 // ===================================================================
-function scrollNavForward() {
-  const area = document.getElementById('navScrollArea');
-  const hint = document.getElementById('navArrowHint');
-  if (!area) return;
-  const maxScroll = area.scrollWidth - area.clientWidth;
-  const atEnd = area.scrollLeft >= maxScroll - 5;
-  if (atEnd) {
-    area.scrollTo({left: 0, behavior: 'smooth'});
+// ── New Glassmorphic Nav System ──
+const NAV_TAB_COLORS = {
+  home: '#c4b0ff', calendar: '#6ab0ff', songs: '#f0a848', events: '#5ee8a0', more: '#dcc8ff'
+};
+const MORE_SCREENS = ['notes','dhamas','sevakart','prayer'];
+let _moreTrayOpen = false;
+
+function updateGlowIndicator(idx, color) {
+  const glow = document.getElementById('navGlowIndicator');
+  if (!glow) return;
+  glow.style.left = (idx * 20) + '%';
+  glow.style.setProperty('--nav-active-color', color);
+}
+
+function navTo(screen, btn) {
+  closeMoreTray();
+  // Update button states
+  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Move glow
+  const idx = parseInt(btn.dataset.idx);
+  updateGlowIndicator(idx, NAV_TAB_COLORS[btn.dataset.tab]);
+  // Switch screen
+  switchScreen(screen, btn);
+}
+
+function toggleMoreTray() {
+  if (_moreTrayOpen) {
+    closeMoreTray();
   } else {
-    area.scrollBy({left: 140, behavior: 'smooth'});
+    openMoreTray();
   }
 }
 
-function updateNavArrow() {
-  const area = document.getElementById('navScrollArea');
-  const hint = document.getElementById('navArrowHint');
-  if (!area || !hint) return;
-  const maxScroll = area.scrollWidth - area.clientWidth;
-  if (maxScroll <= 2) {
-    hint.classList.add('hidden');
-    return;
-  }
-  hint.classList.remove('hidden');
-  if (area.scrollLeft >= maxScroll - 5) {
-    hint.classList.add('at-end');
-  } else {
-    hint.classList.remove('at-end');
-  }
+function openMoreTray() {
+  _moreTrayOpen = true;
+  document.getElementById('moreTray').classList.add('open');
+  document.getElementById('moreTrayOverlay').classList.add('open');
+  // Highlight More button
+  const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
+  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
+  moreBtn.classList.add('active');
+  updateGlowIndicator(4, NAV_TAB_COLORS.more);
 }
 
-// Attach scroll listener
-setTimeout(() => {
-  const area = document.getElementById('navScrollArea');
-  if (area) {
-    area.addEventListener('scroll', updateNavArrow, {passive: true});
-    updateNavArrow();
-    // Also update on resize
-    window.addEventListener('resize', updateNavArrow);
-  }
-}, 100);
+function closeMoreTray() {
+  _moreTrayOpen = false;
+  document.getElementById('moreTray').classList.remove('open');
+  document.getElementById('moreTrayOverlay').classList.remove('open');
+}
+
+function navToMore(screen) {
+  closeMoreTray();
+  // Keep More button highlighted for screens in More tray
+  const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
+  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
+  moreBtn.classList.add('active');
+  updateGlowIndicator(4, NAV_TAB_COLORS.more);
+  switchScreen(screen, moreBtn);
+}
+
+// Legacy stubs (keep so old calls don't error)
+function scrollNavForward() {}
+function updateNavArrow() {}
+
+// Init glow on load
+setTimeout(() => updateGlowIndicator(0, NAV_TAB_COLORS.home), 100);
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
