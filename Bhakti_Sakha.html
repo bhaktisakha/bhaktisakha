@@ -426,6 +426,8 @@ body {
   justify-items: center;
 }
 .gayatri-item { text-align:center; }
+.g-sandhya-icon { width:32px; height:32px; border-radius:50%; margin:0 auto 6px; box-shadow:0 2px 8px rgba(0,0,0,0.3); overflow:hidden; }
+.g-sandhya-icon svg { width:32px; height:32px; display:block; }
 .g-sandhya { font-size:0.88rem; display:block; margin-bottom:5px; letter-spacing:0.2px; font-weight:700; text-transform:none; }
 .g-time { font-size:1.05rem; font-weight:600; }
 /* Pratah — dark saffron */
@@ -2692,7 +2694,8 @@ body {
   border-bottom:2px solid #2db84d;box-shadow:0 4px 20px rgba(0,0,0,0.6);
   animation:slideDown 0.35s ease;">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-    <div>
+    <div id="alertBannerIcon" style="width:42px;height:42px;border-radius:50%;flex-shrink:0;overflow:hidden;display:none;box-shadow:0 2px 10px rgba(0,0,0,0.4);"></div>
+    <div style="flex:1;min-width:0;">
       <div id="alertBannerTitle" style="font-size:0.88rem;font-weight:700;color:#4ddb6e;margin-bottom:2px;"></div>
       <div id="alertBannerBody"  style="font-size:0.78rem;color:rgba(255,255,255,0.8);"></div>
     </div>
@@ -5369,14 +5372,17 @@ function renderDayDetail(date) {
         <div class="gayatri-title">Gayatri / Sandhya Times</div>
         <div class="gayatri-grid">
           <div class="gayatri-item g-pratah">
+            <div class="g-sandhya-icon">${_sandhyaIcons.pratah.replace(/width="42" height="42"/g,'width="32" height="32"')}</div>
             <span class="g-sandhya">Prātaḥ</span>
             <div class="g-time">${st.sunrise}</div>
           </div>
           <div class="gayatri-item g-madhya">
+            <div class="g-sandhya-icon">${_sandhyaIcons.madhya.replace(/width="42" height="42"/g,'width="32" height="32"')}</div>
             <span class="g-sandhya">Mādhyāhnika</span>
             <div class="g-time">${st.noon}</div>
           </div>
           <div class="gayatri-item g-sayam">
+            <div class="g-sandhya-icon">${_sandhyaIcons.sayam.replace(/width="42" height="42"/g,'width="32" height="32"')}</div>
             <span class="g-sandhya">Sāyaṃ</span>
             <div class="g-time">${st.sunset}</div>
           </div>
@@ -7422,7 +7428,12 @@ function initFirebase() {
       console.log('[FCM] Foreground message:', payload);
       const title = payload.notification?.title || payload.data?.title || '🙏 Bhakti Sakha';
       const body = payload.notification?.body || payload.data?.body || '';
-      showAlertBanner(title, body, '#a78bfa');
+      const sandhyaType = payload.data?.sandhyaType || '';
+      const icon = sandhyaType && _sandhyaIcons[sandhyaType] ? _sandhyaIcons[sandhyaType] : null;
+      // Pick color based on sandhya type
+      const colorMap = {pratah:'#ff9940', madhya:'#e8c800', sayam:'#d04830'};
+      const color = colorMap[sandhyaType] || '#a78bfa';
+      showAlertBanner(title, body, color, icon);
     });
 
     // Check if already subscribed
@@ -7592,7 +7603,7 @@ async function registerUpcomingEvents() {
           const pratahTime = `${String(Math.floor(srMins/60)).padStart(2,'0')}:${String(srMins%60).padStart(2,'0')}`;
           upcoming.push({
             date: dateStr, name: `Prātaḥ Sandhyā (sunrise ${st.sunrise})`,
-            type: 'gayatri', icon: '🔱', time: pratahTime
+            type: 'gayatri', sandhyaType: 'pratah', icon: '🌅', time: pratahTime
           });
 
           // 10 min before noon
@@ -7601,7 +7612,7 @@ async function registerUpcomingEvents() {
           const madhyaTime = `${String(Math.floor(nMins/60)).padStart(2,'0')}:${String(nMins%60).padStart(2,'0')}`;
           upcoming.push({
             date: dateStr, name: `Mādhyāhnika Sandhyā (noon ${st.noon})`,
-            type: 'gayatri', icon: '☀️', time: madhyaTime
+            type: 'gayatri', sandhyaType: 'madhya', icon: '☀️', time: madhyaTime
           });
 
           // 10 min before sunset
@@ -7610,7 +7621,7 @@ async function registerUpcomingEvents() {
           const sayamTime = `${String(Math.floor(ssMins/60)).padStart(2,'0')}:${String(ssMins%60).padStart(2,'0')}`;
           upcoming.push({
             date: dateStr, name: `Sāyam Sandhyā (sunset ${st.sunset})`,
-            type: 'gayatri', icon: '🌅', time: sayamTime
+            type: 'gayatri', sandhyaType: 'sayam', icon: '🌇', time: sayamTime
           });
         }
       }
@@ -8552,18 +8563,29 @@ function dismissAlertBanner() {
   document.getElementById('alertBanner').style.display = 'none';
 }
 
-function showAlertBanner(title, body, color) {
+function showAlertBanner(title, body, color, iconHtml) {
   const banner = document.getElementById('alertBanner');
   const tc = color || '#4ddb6e';
   banner.style.borderBottomColor = tc;
-  banner.style.background = color === '#f08c1a'
-    ? 'linear-gradient(135deg,#2a1a0a,#1a0d00)'
-    : color === '#e74c3c'
-    ? 'linear-gradient(135deg,#2a0a0a,#1a0000)'
-    : 'linear-gradient(135deg,#1a3a1a,#0d2010)';
+  // Pick background gradient based on color
+  if (tc === '#ff9940') banner.style.background = 'linear-gradient(135deg,#2a1808,#1a0e00)';       // pratah - warm dawn
+  else if (tc === '#e8c800') banner.style.background = 'linear-gradient(135deg,#2a2008,#1a1400)';  // madhya - golden
+  else if (tc === '#d04830') banner.style.background = 'linear-gradient(135deg,#2a0c10,#1a0508)';  // sayam - dusk red
+  else if (tc === '#ffe94d') banner.style.background = 'linear-gradient(135deg,#2a2008,#1a1400)';  // generic gayatri
+  else if (tc === '#f08c1a') banner.style.background = 'linear-gradient(135deg,#2a1a0a,#1a0d00)';
+  else if (tc === '#e74c3c') banner.style.background = 'linear-gradient(135deg,#2a0a0a,#1a0000)';
+  else banner.style.background = 'linear-gradient(135deg,#1a1a30,#0d0d20)';
   document.getElementById('alertBannerTitle').style.color = tc;
   document.getElementById('alertBannerTitle').textContent = title;
   document.getElementById('alertBannerBody').textContent = body;
+  // Icon
+  const iconEl = document.getElementById('alertBannerIcon');
+  if (iconHtml) {
+    iconEl.innerHTML = iconHtml;
+    iconEl.style.display = '';
+  } else {
+    iconEl.style.display = 'none';
+  }
   banner.style.display = '';
   banner.style.animation = 'none';
   banner.offsetHeight; // reflow
@@ -8571,6 +8593,15 @@ function showAlertBanner(title, body, color) {
   // Auto-dismiss after 30 seconds
   setTimeout(() => { if (banner.style.display !== 'none') dismissAlertBanner(); }, 30000);
 }
+
+// ── Sandhya notification icons (inline SVGs) ──
+const _sandhyaIcons = {
+  pratah: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="42" height="42"><defs><linearGradient id="psky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1a1a3e"/><stop offset="60%" stop-color="#3a2060"/><stop offset="100%" stop-color="#f08040"/></linearGradient><linearGradient id="psun" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#ff8c30"/></linearGradient><radialGradient id="pgl" cx="50%" cy="70%" r="40%"><stop offset="0%" stop-color="#ff9940" stop-opacity="0.6"/><stop offset="100%" stop-color="#ff9940" stop-opacity="0"/></radialGradient></defs><circle cx="48" cy="48" r="46" fill="url(#psky)"/><ellipse cx="48" cy="62" rx="40" ry="20" fill="url(#pgl)"/><line x1="48" y1="42" x2="48" y2="32" stroke="#ffe066" stroke-width="2" stroke-linecap="round" opacity="0.7"/><line x1="58" y1="46" x2="65" y2="38" stroke="#ffe066" stroke-width="2" stroke-linecap="round" opacity="0.6"/><line x1="38" y1="46" x2="31" y2="38" stroke="#ffe066" stroke-width="2" stroke-linecap="round" opacity="0.6"/><line x1="63" y1="54" x2="72" y2="50" stroke="#ffe066" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><line x1="33" y1="54" x2="24" y2="50" stroke="#ffe066" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><clipPath id="ph"><rect x="0" y="0" width="96" height="60"/></clipPath><circle cx="48" cy="60" r="14" fill="url(#psun)" clip-path="url(#ph)"/><line x1="10" y1="60" x2="86" y2="60" stroke="#f0c070" stroke-width="1.5" opacity="0.5"/><rect x="0" y="60" width="96" height="36" fill="#1a1020" opacity="0.7"/><path d="M0 64 Q24 56,48 62 Q72 56,96 64 L96 96 L0 96Z" fill="#1a1020" opacity="0.5"/></svg>`,
+
+  madhya: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="42" height="42"><defs><linearGradient id="msky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#c89020"/><stop offset="40%" stop-color="#e8b830"/><stop offset="70%" stop-color="#f0d050"/><stop offset="100%" stop-color="#fff0a0"/></linearGradient><linearGradient id="msun" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#fff8c0"/><stop offset="100%" stop-color="#ffe040"/></linearGradient><radialGradient id="mgl" cx="50%" cy="38%" r="40%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/><stop offset="40%" stop-color="#fff8c0" stop-opacity="0.3"/><stop offset="100%" stop-color="#f0d050" stop-opacity="0"/></radialGradient></defs><circle cx="48" cy="48" r="46" fill="url(#msky)"/><circle cx="48" cy="36" r="30" fill="url(#mgl)"/><line x1="48" y1="12" x2="48" y2="4" stroke="#fff0a0" stroke-width="3" stroke-linecap="round" opacity="0.9"/><line x1="48" y1="60" x2="48" y2="68" stroke="#e8b830" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/><line x1="24" y1="36" x2="16" y2="36" stroke="#fff0a0" stroke-width="3" stroke-linecap="round" opacity="0.9"/><line x1="72" y1="36" x2="80" y2="36" stroke="#fff0a0" stroke-width="3" stroke-linecap="round" opacity="0.9"/><line x1="32" y1="20" x2="26" y2="14" stroke="#fff0a0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/><line x1="64" y1="20" x2="70" y2="14" stroke="#fff0a0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/><line x1="32" y1="52" x2="26" y2="58" stroke="#e8b830" stroke-width="2" stroke-linecap="round" opacity="0.4"/><line x1="64" y1="52" x2="70" y2="58" stroke="#e8b830" stroke-width="2" stroke-linecap="round" opacity="0.4"/><circle cx="48" cy="36" r="15" fill="url(#msun)"/><circle cx="43" cy="31" r="5" fill="white" opacity="0.4"/><rect x="0" y="74" width="96" height="22" fill="#a07818" opacity="0.2"/></svg>`,
+
+  sayam: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="42" height="42"><defs><linearGradient id="ssky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1a1040"/><stop offset="30%" stop-color="#602060"/><stop offset="60%" stop-color="#d04830"/><stop offset="100%" stop-color="#f08830"/></linearGradient><linearGradient id="ssun" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff6030"/><stop offset="100%" stop-color="#d03020"/></linearGradient><radialGradient id="sgl" cx="50%" cy="68%" r="40%"><stop offset="0%" stop-color="#ff6830" stop-opacity="0.7"/><stop offset="50%" stop-color="#ff4020" stop-opacity="0.3"/><stop offset="100%" stop-color="#ff4020" stop-opacity="0"/></radialGradient></defs><circle cx="48" cy="48" r="46" fill="url(#ssky)"/><ellipse cx="48" cy="62" rx="42" ry="22" fill="url(#sgl)"/><line x1="48" y1="48" x2="48" y2="38" stroke="#ff8040" stroke-width="2" stroke-linecap="round" opacity="0.5"/><line x1="58" y1="52" x2="66" y2="44" stroke="#ff8040" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><line x1="38" y1="52" x2="30" y2="44" stroke="#ff8040" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><clipPath id="sh"><rect x="0" y="0" width="96" height="64"/></clipPath><circle cx="48" cy="64" r="14" fill="url(#ssun)" clip-path="url(#sh)"/><line x1="8" y1="64" x2="88" y2="64" stroke="#f08040" stroke-width="1.5" opacity="0.4"/><rect x="0" y="64" width="96" height="32" fill="#1a0c20" opacity="0.7"/><ellipse cx="48" cy="70" rx="18" ry="3" fill="#ff6030" opacity="0.15"/><circle cx="20" cy="18" r="1" fill="white" opacity="0.5"/><circle cx="72" cy="14" r="1.2" fill="white" opacity="0.6"/><circle cx="78" cy="28" r="0.8" fill="white" opacity="0.4"/></svg>`
+};
 
 function checkGayatriAlerts() {
   const s = JSON.parse(localStorage.getItem('settings') || '{}');
@@ -8585,9 +8616,9 @@ function checkGayatriAlerts() {
   if (!st) return;
 
   const targets = [
-    { key:'pratah',  time: st.sunrise, label:'🌅 Prātaḥ Sandhyā',   msg:'Sunrise in 10 minutes — time to prepare for Prātaḥ Gāyatrī.' },
-    { key:'madhya',  time: st.noon,    label:'☀️ Mādhyāhnika Sandhyā', msg:'Noon in 10 minutes — time to prepare for Mādhyāhnika Gāyatrī.' },
-    { key:'sayam',   time: st.sunset,  label:'🌇 Sāyaṃ Sandhyā',     msg:'Sunset in 10 minutes — time to prepare for Sāyaṃ Gāyatrī.' },
+    { key:'pratah',  time: st.sunrise, label:'Prātaḥ Sandhyā',   msg:'Sunrise in 10 minutes — time to prepare for Prātaḥ Gāyatrī.', icon: _sandhyaIcons.pratah, color:'#ff9940' },
+    { key:'madhya',  time: st.noon,    label:'Mādhyāhnika Sandhyā', msg:'Noon in 10 minutes — time to prepare for Mādhyāhnika Gāyatrī.', icon: _sandhyaIcons.madhya, color:'#e8c800' },
+    { key:'sayam',   time: st.sunset,  label:'Sāyaṃ Sandhyā',     msg:'Sunset in 10 minutes — time to prepare for Sāyaṃ Gāyatrī.', icon: _sandhyaIcons.sayam, color:'#d04830' },
   ];
 
   for (const t of targets) {
@@ -8597,7 +8628,7 @@ function checkGayatriAlerts() {
     // Fire if we're within the same minute as the alert time
     if (nowMins === alertMins && !_alertDismissed[alertKey]) {
       _alertDismissed[alertKey] = true;
-      showAlertBanner(t.label, t.msg, '#ffe94d');
+      showAlertBanner(t.label, t.msg, t.color, t.icon);
     }
   }
 }
