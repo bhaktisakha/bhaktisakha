@@ -10022,10 +10022,11 @@ function _nfGetCurrentNoteForShare() {
   if (!n) return null;
   const folderInfo = nfGetFolderInfo(n.folder);
   const title = n.title || 'Untitled';
-  const bodyText = n.body ? stripHtml(n.body) : '';
+  const bodyText = n.body ? htmlToPlainText(n.body) : '';
+  const bodyHtml = n.body || '';
   const d = new Date(n.updatedAt || n.createdAt);
   const dateStr = d.toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
-  return { note: n, folderInfo, title, bodyText, dateStr };
+  return { note: n, folderInfo, title, bodyText, bodyHtml, dateStr };
 }
 
 // --- Share as Text ---
@@ -10034,7 +10035,7 @@ async function nfShareAsText() {
   const data = _nfGetCurrentNoteForShare();
   if (!data) return;
 
-  const shareText = `${data.title}\n\n${data.bodyText}\n\n— Bhakti Sakha 🙏`;
+  const shareText = `${data.title}\n\n${data.bodyText}`;
 
   if (navigator.share) {
     try {
@@ -10206,7 +10207,6 @@ async function nfShareAsPdf() {
     return;
   }
 
-  // Show spinner
   const spinner = document.createElement('div');
   spinner.className = 'nf-share-generating';
   spinner.id = 'nfShareSpinner';
@@ -10219,10 +10219,11 @@ async function nfShareAsPdf() {
 
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
-    const marginL = 20, marginR = 20, marginT = 25, marginB = 25;
-    const contentW = pageW - marginL - marginR;
+    const mL = 20, mR = 20, mT = 25, mB = 25;
+    const cW = pageW - mL - mR;
+    const lineH = 5.5;
 
-    // --- Accent bar at top ---
+    // --- Accent bar ---
     doc.setFillColor(61, 127, 212);
     doc.rect(0, 0, pageW, 4, 'F');
 
@@ -10230,43 +10231,176 @@ async function nfShareAsPdf() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.setTextColor(30, 30, 30);
-    let y = marginT + 6;
-    const titleLines = doc.splitTextToSize(data.title, contentW);
-    doc.text(titleLines, marginL, y);
+    let y = mT + 6;
+    const titleLines = doc.splitTextToSize(data.title, cW);
+    doc.text(titleLines, mL, y);
     y += titleLines.length * 8 + 4;
 
     // --- Divider ---
     doc.setDrawColor(61, 127, 212);
     doc.setLineWidth(0.5);
-    doc.line(marginL, y, marginL + 30, y);
+    doc.line(mL, y, mL + 30, y);
     y += 10;
 
-    // --- Body text ---
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(50, 50, 50);
-    const bodyText = data.bodyText || '';
-    const bodyLines = doc.splitTextToSize(bodyText, contentW);
-    const lineH = 5.5;
+    // --- Parse HTML body into styled segments ---
+    function parseHtmlToSegments(html) {
+      const segments = []; // each: { text, bold, italic, newPara, listItem }
+      if (!html) return segments;
+      // Normalize whitespace within tags but preserve structure
+      let h = html;
+      // Handle list items
+      h = h.replace(/<li[^>]*>/gi, '<LI_START>');
+      h = h.replace(/<\/li>/gi, '<NEWLINE>');
+      // Block elements to double newline
+      h = h.replace(/<\/p>/gi, '<PARA_BREAK>');
+      h = h.replace(/<\/div>/gi, '<NEWLINE>');
+      h = h.replace(/<\/h[1-6]>/gi, '<PARA_BREAK>');
+      h = h.replace(/<\/blockquote>/gi, '<PARA_BREAK>');
+      h = h.replace(/<br\s*\/?>/gi, '<NEWLINE>');
+      h = h.replace(/<p[^>]*>/gi, '');
+      h = h.replace(/<div[^>]*>/gi, '');
+      h = h.replace(/<h[1-6][^>]*>/gi, '<BOLD_ON>');
+      h = h.replace(/<blockquote[^>]*>/gi, '');
+      // Inline formatting markers
+      h = h.replace(/<(strong|b)(\s[^>]*)?>/gi, '<BOLD_ON>');
+      h = h.replace(/<\/(strong|b)>/gi, '<BOLD_OFF>');
+      h = h.replace(/<(em|i)(\s[^>]*)?>/gi, '<ITALIC_ON>');
+      h = h.replace(/<\/(em|i)>/gi, '<ITALIC_OFF>');
+      h = h.replace(/<(u)(\s[^>]*)?>/gi, '<UNDERLINE_ON>');
+      h = h.replace(/<\/(u)>/gi, '<UNDERLINE_OFF>');
+      // Strip remaining HTML tags
+      h = h.replace(/<[^>]*>/g, '');
+      // Decode entities
+      h = h.replace(/&nbsp;/g, ' ');
+      h = h.replace(/&amp;/g, '&');
+      h = h.replace(/&lt;/g, '<');
+      h = h.replace(/&gt;/g, '>');
+      h = h.replace(/&quot;/g, '"');
+      h = h.replace(/&#39;/g, "'");
+      h = h.replace(/&[a-zA-Z]+;/g, ' ');
 
-    for (let i = 0; i < bodyLines.length; i++) {
-      if (y + lineH > pageH - marginB - 10) {
-        // Footer on current page
-        _nfPdfFooter(doc, pageW, pageH);
-        doc.addPage();
-        // Accent bar on new page
-        doc.setFillColor(61, 127, 212);
-        doc.rect(0, 0, pageW, 2, 'F');
-        y = marginT;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(11);
-        doc.setTextColor(50, 50, 50);
+      // Now parse markers into segments
+      let bold = false, italic = false;
+      const tokens = h.split(/(<BOLD_ON>|<BOLD_OFF>|<ITALIC_ON>|<ITALIC_OFF>|<UNDERLINE_ON>|<UNDERLINE_OFF>|<NEWLINE>|<PARA_BREAK>|<LI_START>)/);
+      for (const tok of tokens) {
+        if (tok === '<BOLD_ON>') { bold = true; continue; }
+        if (tok === '<BOLD_OFF>') { bold = false; continue; }
+        if (tok === '<ITALIC_ON>') { italic = true; continue; }
+        if (tok === '<ITALIC_OFF>') { italic = false; continue; }
+        if (tok === '<UNDERLINE_ON>' || tok === '<UNDERLINE_OFF>') continue;
+        if (tok === '<NEWLINE>') { segments.push({ text: '', bold, italic, newLine: true }); continue; }
+        if (tok === '<PARA_BREAK>') { segments.push({ text: '', bold, italic, paraBreak: true }); continue; }
+        if (tok === '<LI_START>') { segments.push({ text: '', bold, italic, listItem: true }); continue; }
+        if (tok.trim() || tok.includes(' ')) {
+          segments.push({ text: tok, bold, italic });
+        }
       }
-      doc.text(bodyLines[i], marginL, y);
-      y += lineH;
+      return segments;
     }
 
-    // --- Footer on last page ---
+    function setFontStyle(doc, bold, italic) {
+      if (bold && italic) doc.setFont('helvetica', 'bolditalic');
+      else if (bold) doc.setFont('helvetica', 'bold');
+      else if (italic) doc.setFont('helvetica', 'italic');
+      else doc.setFont('helvetica', 'normal');
+    }
+
+    function checkPageBreak() {
+      if (y + lineH > pageH - mB - 10) {
+        _nfPdfFooter(doc, pageW, pageH);
+        doc.addPage();
+        doc.setFillColor(61, 127, 212);
+        doc.rect(0, 0, pageW, 2, 'F');
+        y = mT;
+        doc.setFontSize(11);
+        doc.setTextColor(50, 50, 50);
+        return true;
+      }
+      return false;
+    }
+
+    const segments = parseHtmlToSegments(data.bodyHtml);
+    doc.setFontSize(11);
+    doc.setTextColor(50, 50, 50);
+
+    // Render segments: collect inline text, flush on breaks
+    let currentLine = []; // array of { text, bold, italic }
+
+    function flushLine(lineSegments) {
+      if (!lineSegments.length) return;
+      // Concatenate all text in this logical line
+      let fullText = lineSegments.map(s => s.text).join('');
+      fullText = fullText.replace(/[ \t]+/g, ' ').trim();
+      if (!fullText) return;
+
+      // Split into physical lines that fit page width
+      // For simplicity with mixed formatting, measure the full text first
+      doc.setFont('helvetica', 'normal');
+      const wrappedLines = doc.splitTextToSize(fullText, cW);
+
+      // For each wrapped line, find which segments cover it and render with formatting
+      let charPos = 0;
+      for (const wLine of wrappedLines) {
+        checkPageBreak();
+        // Find formatting for chars in this line
+        let x = mL;
+        let lineCharStart = charPos;
+        let lineCharEnd = charPos + wLine.length;
+
+        // Walk through segments to find formatting spans for this line
+        let segCharPos = 0;
+        for (const seg of lineSegments) {
+          const segText = seg.text;
+          const segStart = segCharPos;
+          const segEnd = segCharPos + segText.length;
+
+          // Find overlap with current line
+          const overlapStart = Math.max(segStart, lineCharStart);
+          const overlapEnd = Math.min(segEnd, lineCharEnd);
+
+          if (overlapStart < overlapEnd) {
+            const piece = fullText.substring(overlapStart, overlapEnd);
+            if (piece) {
+              setFontStyle(doc, seg.bold, seg.italic);
+              doc.text(piece, x, y);
+              x += doc.getTextWidth(piece);
+            }
+          }
+          segCharPos += segText.length;
+        }
+
+        y += lineH;
+        charPos = lineCharEnd;
+        // Skip space at line break
+        while (charPos < fullText.length && fullText[charPos] === ' ') charPos++;
+      }
+    }
+
+    for (const seg of segments) {
+      if (seg.paraBreak) {
+        flushLine(currentLine);
+        currentLine = [];
+        y += lineH * 0.6; // paragraph spacing
+        continue;
+      }
+      if (seg.newLine) {
+        flushLine(currentLine);
+        currentLine = [];
+        continue;
+      }
+      if (seg.listItem) {
+        flushLine(currentLine);
+        currentLine = [];
+        currentLine.push({ text: '•  ', bold: false, italic: false });
+        continue;
+      }
+      if (seg.text) {
+        currentLine.push(seg);
+      }
+    }
+    flushLine(currentLine);
+
+    // --- Footer ---
     _nfPdfFooter(doc, pageW, pageH);
 
     // --- Save / Share ---
@@ -10432,6 +10566,35 @@ function nfTriggerSync() {
 
 // --- UTILITY ---
 function stripHtml(s) { return (s||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
+
+// Convert HTML to clean plain text preserving paragraphs
+function htmlToPlainText(html) {
+  if (!html) return '';
+  let text = html;
+  // Convert block-level closings and <br> to newlines
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  text = text.replace(/<\/p>/gi, '\n\n');
+  text = text.replace(/<\/div>/gi, '\n');
+  text = text.replace(/<\/li>/gi, '\n');
+  text = text.replace(/<\/h[1-6]>/gi, '\n\n');
+  text = text.replace(/<\/blockquote>/gi, '\n\n');
+  text = text.replace(/<li[^>]*>/gi, '• ');
+  // Strip remaining HTML tags
+  text = text.replace(/<[^>]*>/g, '');
+  // Decode HTML entities
+  text = text.replace(/&nbsp;/g, ' ');
+  text = text.replace(/&amp;/g, '&');
+  text = text.replace(/&lt;/g, '<');
+  text = text.replace(/&gt;/g, '>');
+  text = text.replace(/&quot;/g, '"');
+  text = text.replace(/&#39;/g, "'");
+  text = text.replace(/&[a-zA-Z]+;/g, ' ');
+  // Clean up excessive newlines/spaces
+  text = text.replace(/[ \t]+/g, ' ');
+  text = text.replace(/ *\n */g, '\n');
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
+}
 
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
