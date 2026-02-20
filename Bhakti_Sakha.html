@@ -3824,10 +3824,9 @@ body {
             <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatAnswered">0</div><div class="pc-admin-stat-lbl">Answered</div></div>
             <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatReported">0</div><div class="pc-admin-stat-lbl">Reported</div></div>
           </div>
-          <div class="pc-admin-btns">
+          <div class="pc-admin-btns" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <button class="pc-admin-btn" onclick="pcShowPending()">📝 Pending Review</button>
             <button class="pc-admin-btn" onclick="pcShowReported()">🚩 Reported</button>
-            <button class="pc-admin-btn" onclick="pcExportData()">📊 Export</button>
           </div>
         </div>
       </div>
@@ -11750,25 +11749,6 @@ function pcAdminRemove(reqId) {
   _pcSave();
   showToast('Prayer request removed');
   pcCloseDetail();
-}
-
-function pcExportData() {
-  const data = {
-    exportDate: new Date().toISOString(),
-    totalRequests: pcRequests.length,
-    totalPrayers: pcPrayers.length,
-    totalReports: pcReports.length,
-    requests: pcRequests,
-    prayers: pcPrayers,
-    reports: pcReports
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'prayer_circle_export_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('📊 Data exported');
 }
 
 // Fetch prayer circle data on load
