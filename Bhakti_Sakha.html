@@ -1789,39 +1789,62 @@ body {
 }
 .nav-scroll-area::-webkit-scrollbar { display:none; }
 .nav-btn {
-  flex:0 0 auto; width:64px;
+  flex:0 0 auto; width:80px;
   display:flex; flex-direction:column; align-items:center;
-  padding:7px 2px 6px; cursor:pointer; border:none; background:transparent;
-  color:var(--text3); gap:2px; transition:color 0.2s;
+  padding:8px 2px 7px; cursor:pointer; border:none; background:transparent;
+  color:var(--text3); gap:3px; transition:color 0.2s, transform 0.15s;
 }
-.nav-btn.active { color:var(--accent-blue); }
-.nav-btn svg { width:18px; height:18px; }
-.nav-icon-text { font-size:1.2rem; line-height:1; color:inherit; }
-.nav-lbl { font-size:0.46rem; letter-spacing:0.2px; text-transform:uppercase; white-space:nowrap; }
+.nav-btn:active { transform:scale(0.9); }
+.nav-btn svg { width:21px; height:21px; }
+.nav-icon-text { font-size:1.3rem; line-height:1; color:inherit; }
+.nav-lbl { font-size:0.5rem; letter-spacing:0.3px; text-transform:uppercase; white-space:nowrap; font-weight:500; }
+
+/* ── Per-tab unique colors (inactive = muted, active = bright) ── */
+/* Home — lavender */
+.nav-scroll-area .nav-btn:nth-child(1) { color:rgba(167,139,250,0.4); }
+.nav-scroll-area .nav-btn:nth-child(1).active { color:#c4b0ff; }
+/* Calendar — blue */
+.nav-scroll-area .nav-btn:nth-child(2) { color:rgba(106,176,255,0.4); }
+.nav-scroll-area .nav-btn:nth-child(2).active { color:#6ab0ff; }
+/* Audio — amber/orange */
+.nav-scroll-area .nav-btn:nth-child(3) { color:rgba(240,168,72,0.4); }
+.nav-scroll-area .nav-btn:nth-child(3).active { color:#f0a848; }
+/* Events — green */
+.nav-scroll-area .nav-btn:nth-child(4) { color:rgba(94,232,160,0.4); }
+.nav-scroll-area .nav-btn:nth-child(4).active { color:#5ee8a0; }
+/* Notes — purple */
+.nav-scroll-area .nav-btn:nth-child(5) { color:rgba(206,192,255,0.4); }
+.nav-scroll-area .nav-btn:nth-child(5).active { color:#cec0ff; }
+/* Dhamas — red/coral */
+.nav-scroll-area .nav-btn:nth-child(6) { color:rgba(240,128,112,0.4); }
+.nav-scroll-area .nav-btn:nth-child(6).active { color:#f08070; }
+/* SevaKart — teal/cyan */
+.nav-scroll-area .nav-btn:nth-child(7) { color:rgba(92,224,240,0.4); }
+.nav-scroll-area .nav-btn:nth-child(7).active { color:#5ce0f0; }
 
 /* Scroll arrow hint */
 .nav-arrow-hint {
-  flex:0 0 28px; display:flex; align-items:center; justify-content:center;
+  flex:0 0 30px; display:flex; align-items:center; justify-content:center;
   position:relative; cursor:pointer; border:none; background:transparent;
   z-index:2;
 }
 .nav-arrow-hint::before {
-  content:''; position:absolute; left:-20px; top:0; bottom:0; width:28px;
+  content:''; position:absolute; left:-22px; top:0; bottom:0; width:30px;
   background:linear-gradient(90deg, transparent, var(--bg2) 90%);
   pointer-events:none;
 }
 .nav-arrow-icon {
-  width:20px; height:20px; border-radius:50%;
-  background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3);
+  width:22px; height:22px; border-radius:50%;
+  background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.35);
   display:flex; align-items:center; justify-content:center;
   animation:navArrowPulse 1.8s ease-in-out infinite;
-  box-shadow:0 0 8px rgba(167,139,250,0.2);
+  box-shadow:0 0 10px rgba(167,139,250,0.25);
 }
-.nav-arrow-icon svg { width:11px; height:11px; stroke:var(--lavender); }
+.nav-arrow-icon svg { width:12px; height:12px; stroke:var(--lavender); }
 .nav-arrow-hint.at-end .nav-arrow-icon svg { transform:rotate(180deg); }
 @keyframes navArrowPulse {
   0%, 100% { transform:translateX(0); opacity:0.9; }
-  50% { transform:translateX(2px); opacity:1; box-shadow:0 0 12px rgba(167,139,250,0.35); }
+  50% { transform:translateX(2px); opacity:1; box-shadow:0 0 14px rgba(167,139,250,0.4); }
 }
 .nav-arrow-hint.hidden { opacity:0; pointer-events:none; }
 
