@@ -1823,6 +1823,9 @@ body {
 /* SevaKart — teal/cyan */
 .nav-scroll-area .nav-btn:nth-child(7) { color:rgba(92,224,240,0.4); }
 .nav-scroll-area .nav-btn:nth-child(7).active { color:#5ce0f0; }
+/* Prayer Circle — warm gold */
+.nav-scroll-area .nav-btn:nth-child(8) { color:rgba(232,168,56,0.4); }
+.nav-scroll-area .nav-btn:nth-child(8).active { color:#f0c850; }
 
 /* Scroll arrow hint */
 .nav-arrow-hint {
@@ -2142,6 +2145,7 @@ body {
 .admin-perm-tag.perm-songs { background: rgba(167,139,250,0.12); color: var(--lavender); }
 .admin-perm-tag.perm-dhamas { background: rgba(212,175,55,0.12); color: var(--accent-gold); }
 .admin-perm-tag.perm-sevakart { background: rgba(180,120,40,0.12); color: #d4a017; }
+.admin-perm-tag.perm-prayer { background: rgba(232,168,56,0.12); color: #f0c850; }
 .evt-modal-icon {
   padding: 18px 20px 0;
   font-size: 2.4rem; text-align: center;
@@ -2575,6 +2579,7 @@ body {
 .home-card:nth-child(5) { animation-delay:0.32s; }
 .home-card:nth-child(6) { animation-delay:0.38s; }
 .home-card:nth-child(7) { animation-delay:0.44s; }
+.home-card:nth-child(8) { animation-delay:0.50s; }
 .home-card:active { transform:scale(0.95); }
 
 /* Corner glow orb */
@@ -2654,7 +2659,205 @@ body {
 .home-card--events   .home-card-title { color:#70eaaa; }
 .home-card-desc  { font-size:0.67rem; color:var(--text2); line-height:1.45; flex:1; }
 
-/* ── Quote ── */
+/* ── Prayer Circle ── */
+.home-card--prayer {
+  background:linear-gradient(145deg, rgba(232,168,56,0.18) 0%, rgba(55,38,12,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(232,168,56,0.3);
+  box-shadow:0 4px 20px rgba(232,168,56,0.1), inset 0 1px 0 rgba(232,168,56,0.15);
+}
+.home-card--prayer::after { background:rgba(232,168,56,0.25); }
+.home-card--prayer .home-card-icon { background:rgba(232,168,56,0.2); color:#f0c850; box-shadow:0 0 12px rgba(232,168,56,0.2); }
+.home-card--prayer .home-card-title { color:#f0c850; }
+
+/* ===== PRAYER CIRCLE ===== */
+.pc-screen { padding:14px 18px 100px; overflow-y:auto; height:100%; }
+.pc-header { text-align:center; padding:8px 0 16px; }
+.pc-title { font-family:'Philosopher',serif; font-size:1.3rem; font-weight:700;
+  background:linear-gradient(135deg,#e8c800,#f0d860,#d4a84c);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.pc-subtitle { font-size:0.72rem; color:var(--text3); margin-top:2px; letter-spacing:0.3px; }
+.pc-actions { display:flex; gap:10px; margin-bottom:16px; }
+.pc-action-btn {
+  flex:1; padding:10px; border-radius:12px; border:1px solid rgba(232,168,56,0.3);
+  background:linear-gradient(135deg,rgba(232,168,56,0.12),rgba(232,168,56,0.06));
+  color:#f0c850; font-size:0.78rem; font-weight:600; cursor:pointer;
+  transition:all 0.2s; text-align:center;
+}
+.pc-action-btn:active { transform:scale(0.96); }
+.pc-action-btn.secondary { border-color:var(--border); background:var(--card); color:var(--text2); }
+.pc-search-bar { display:flex; gap:8px; margin-bottom:14px; }
+.pc-search-inp {
+  flex:1; padding:9px 14px; border-radius:10px; border:1px solid var(--border);
+  background:var(--card); color:var(--text); font-size:0.82rem; outline:none;
+}
+.pc-search-inp:focus { border-color:rgba(232,168,56,0.4); }
+.pc-filter-btn {
+  padding:8px 14px; border-radius:10px; border:1px solid var(--border);
+  background:var(--card); color:var(--text2); font-size:0.78rem; cursor:pointer;
+}
+.pc-stats-bar {
+  display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px;
+  scrollbar-width:none;
+}
+.pc-stats-bar::-webkit-scrollbar { display:none; }
+.pc-stat-chip {
+  flex:0 0 auto; padding:6px 12px; border-radius:20px; font-size:0.68rem;
+  font-weight:500; white-space:nowrap; cursor:pointer; transition:all 0.2s;
+  border:1px solid var(--border); background:var(--card); color:var(--text2);
+}
+.pc-stat-chip.active { border-color:rgba(232,168,56,0.4); background:rgba(232,168,56,0.12); color:#f0c850; }
+
+/* Prayer cards */
+.pc-feed { display:flex; flex-direction:column; gap:12px; }
+.pc-card {
+  background:var(--card); border-radius:16px; padding:16px;
+  border:1px solid var(--border); position:relative; overflow:hidden;
+  transition:transform 0.15s;
+}
+.pc-card:active { transform:scale(0.98); }
+.pc-card.urgent { border-color:rgba(192,57,43,0.4); }
+.pc-card.urgent::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#c0392b,#e74c3c,#c0392b);
+}
+.pc-card.answered { border-color:rgba(39,174,96,0.3); opacity:0.85; }
+.pc-card.answered::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#27ae60,#2ecc71,#27ae60);
+}
+.pc-card-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.pc-card-avatar {
+  width:32px; height:32px; border-radius:50%; background:rgba(232,168,56,0.15);
+  display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+  flex-shrink:0; color:#f0c850;
+}
+.pc-card-meta { flex:1; min-width:0; }
+.pc-card-author { font-size:0.75rem; font-weight:600; color:var(--text); }
+.pc-card-time { font-size:0.62rem; color:var(--text3); }
+.pc-card-badges { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+.pc-badge {
+  font-size:0.58rem; padding:3px 8px; border-radius:8px; font-weight:600;
+  letter-spacing:0.3px; text-transform:uppercase;
+}
+.pc-badge.cat-health { background:rgba(46,204,113,0.12); color:#2ecc71; }
+.pc-badge.cat-family { background:rgba(142,68,173,0.12); color:#bb8fce; }
+.pc-badge.cat-career { background:rgba(52,152,219,0.12); color:#5dade2; }
+.pc-badge.cat-spiritual { background:rgba(232,168,56,0.12); color:#f0c850; }
+.pc-badge.cat-crisis { background:rgba(192,57,43,0.12); color:#e74c3c; }
+.pc-badge.cat-other { background:rgba(127,140,141,0.12); color:#95a5a6; }
+.pc-badge.urgent-tag { background:rgba(192,57,43,0.18); color:#e74c3c; }
+.pc-badge.answered-tag { background:rgba(39,174,96,0.18); color:#2ecc71; }
+.pc-badge.needs-tag { background:rgba(230,126,34,0.18); color:#e67e22; }
+.pc-card-title { font-size:0.88rem; font-weight:600; color:var(--text); margin-bottom:4px; line-height:1.35; }
+.pc-card-desc { font-size:0.75rem; color:var(--text2); line-height:1.5; margin-bottom:10px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pc-card-footer { display:flex; align-items:center; gap:8px; }
+.pc-pray-btn {
+  display:flex; align-items:center; gap:5px; padding:7px 14px; border-radius:10px;
+  border:1px solid rgba(232,168,56,0.3); background:rgba(232,168,56,0.08);
+  color:#f0c850; font-size:0.72rem; font-weight:600; cursor:pointer;
+  transition:all 0.2s;
+}
+.pc-pray-btn:active { transform:scale(0.93); }
+.pc-pray-btn.prayed { border-color:rgba(39,174,96,0.4); background:rgba(39,174,96,0.12); color:#2ecc71; }
+.pc-write-btn {
+  padding:7px 12px; border-radius:10px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text2); font-size:0.72rem; cursor:pointer;
+  transition:all 0.2s;
+}
+.pc-write-btn:active { transform:scale(0.93); }
+.pc-pray-count { font-size:0.65rem; color:var(--text3); margin-left:auto; }
+.pc-empty { text-align:center; padding:40px 20px; color:var(--text3); }
+.pc-empty-icon { font-size:2.5rem; margin-bottom:12px; opacity:0.6; }
+.pc-empty-text { font-size:0.82rem; line-height:1.5; }
+
+/* Prayer detail */
+.pc-detail { padding:0 0 100px; overflow-y:auto; height:100%; }
+.pc-detail-header {
+  display:flex; align-items:center; gap:12px; padding:14px 18px;
+  background:var(--bg2); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5;
+}
+.pc-detail-back { background:none; border:none; color:var(--text2); font-size:1.2rem; cursor:pointer; padding:4px; }
+.pc-detail-htitle { font-size:0.9rem; font-weight:600; color:var(--text); flex:1; }
+.pc-detail-body { padding:18px; }
+.pc-detail-card {
+  background:var(--card); border-radius:16px; padding:18px; border:1px solid var(--border);
+  margin-bottom:16px;
+}
+.pc-detail-title { font-size:1.05rem; font-weight:600; color:var(--text); margin-bottom:6px; line-height:1.4; }
+.pc-detail-desc { font-size:0.82rem; color:var(--text2); line-height:1.65; margin-bottom:14px; white-space:pre-wrap; }
+.pc-detail-info { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.pc-detail-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.pc-detail-pray-btn {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:12px; border-radius:12px; border:1px solid rgba(232,168,56,0.3);
+  background:linear-gradient(135deg,rgba(232,168,56,0.12),rgba(232,168,56,0.06));
+  color:#f0c850; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s;
+}
+.pc-detail-pray-btn:active { transform:scale(0.96); }
+.pc-detail-pray-btn.prayed { border-color:rgba(39,174,96,0.4); background:rgba(39,174,96,0.12); color:#2ecc71; }
+
+/* Written prayers section */
+.pc-prayers-section { margin-top:16px; }
+.pc-prayers-title { font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:10px; }
+.pc-prayer-item {
+  background:rgba(232,168,56,0.04); border:1px solid rgba(232,168,56,0.1);
+  border-radius:12px; padding:12px; margin-bottom:8px;
+}
+.pc-prayer-author { font-size:0.68rem; font-weight:600; color:#f0c850; margin-bottom:4px; }
+.pc-prayer-text { font-size:0.78rem; color:var(--text2); line-height:1.5; font-style:italic; }
+.pc-prayer-time { font-size:0.6rem; color:var(--text3); margin-top:4px; }
+
+/* Updates / gratitude section */
+.pc-updates-section { margin-top:16px; }
+.pc-update-item {
+  background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.15);
+  border-radius:12px; padding:12px; margin-bottom:8px;
+}
+.pc-update-type { font-size:0.65rem; font-weight:600; color:#2ecc71; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+.pc-update-text { font-size:0.78rem; color:var(--text2); line-height:1.5; }
+.pc-update-time { font-size:0.6rem; color:var(--text3); margin-top:4px; }
+
+/* Owner actions */
+.pc-owner-actions {
+  margin-top:16px; padding:14px; background:rgba(232,168,56,0.04);
+  border:1px solid rgba(232,168,56,0.12); border-radius:14px;
+}
+.pc-owner-title { font-size:0.75rem; font-weight:600; color:#f0c850; margin-bottom:10px; }
+.pc-owner-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.pc-owner-btn {
+  padding:8px 14px; border-radius:10px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text2); font-size:0.72rem; cursor:pointer;
+  transition:all 0.2s;
+}
+.pc-owner-btn:active { transform:scale(0.95); }
+.pc-owner-btn.answered { border-color:rgba(39,174,96,0.3); color:#2ecc71; }
+
+/* Admin dashboard */
+.pc-admin-section {
+  background:rgba(167,139,250,0.04); border:1px solid rgba(167,139,250,0.15);
+  border-radius:14px; padding:14px; margin-bottom:16px;
+}
+.pc-admin-title { font-size:0.78rem; font-weight:600; color:#c4b0ff; margin-bottom:10px; }
+.pc-admin-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px; }
+.pc-admin-stat { text-align:center; padding:8px 4px; background:var(--card); border-radius:10px; border:1px solid var(--border); }
+.pc-admin-stat-num { font-size:1rem; font-weight:700; color:var(--text); }
+.pc-admin-stat-lbl { font-size:0.55rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.3px; margin-top:2px; }
+.pc-admin-btns { display:flex; gap:8px; }
+.pc-admin-btn {
+  flex:1; padding:8px; border-radius:10px; border:1px solid var(--border);
+  background:var(--card); color:var(--text2); font-size:0.7rem; cursor:pointer;
+  text-align:center; transition:all 0.2s;
+}
+.pc-admin-btn:active { transform:scale(0.95); }
+
+/* Report button */
+.pc-report-btn {
+  margin-top:14px; padding:8px 14px; border-radius:10px; border:1px solid rgba(192,57,43,0.2);
+  background:transparent; color:var(--text3); font-size:0.68rem; cursor:pointer;
+  transition:all 0.2s; width:100%; text-align:center;
+}
+.pc-report-btn:active { color:#e74c3c; }
 .home-quote {
   margin:16px 22px 24px; padding:16px 18px;
   position:relative; text-align:center;
@@ -2866,6 +3069,14 @@ body {
           </div>
           <div class="home-card-title">My Events</div>
           <div class="home-card-desc">Personal reminders, custom events and alerts</div>
+        </div>
+
+        <div class="home-card home-card--prayer" onclick="switchScreen('prayer',document.querySelectorAll('.nav-btn')[7])">
+          <div class="home-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="home-card-title">Prayer Circle</div>
+          <div class="home-card-desc">Support fellow devotees — request & offer prayers</div>
         </div>
 
       </div>
@@ -3095,6 +3306,9 @@ body {
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permSevakart" checked> 🪔 SevaKart Admin</label>
           </div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="permPrayer" checked> 🙏 Prayer Circle Admin</label>
+          </div>
         </div>
       </div>
 
@@ -3218,6 +3432,14 @@ body {
             <div class="sett-desc" id="desc-rahu">Alert on the day, at start of Rahu Kalam</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-rahu" onchange="saveS()"></label>
+        </div>
+        <div class="notif-divider"></div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-name">🙏 Prayer Circle Alerts</div>
+            <div class="sett-desc">Get notified about new prayer requests from devotees</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="n-prayer" checked onchange="saveS()"></label>
         </div>
       </div>
     </div>
@@ -3569,6 +3791,221 @@ body {
     </div>
   </div>
 
+  <!-- PRAYER CIRCLE -->
+  <div class="screen" id="screen-prayer">
+    <div class="pc-screen">
+      <div class="pc-header">
+        <div class="pc-title">🙏 Prayer Circle</div>
+        <div class="pc-subtitle">Supporting One Another Through Prayer</div>
+      </div>
+      <div class="pc-actions">
+        <button class="pc-action-btn" onclick="pcOpenSubmitModal()">🙏 Request Prayer</button>
+        <button class="pc-action-btn secondary" onclick="pcShowMyRequests()">📋 My Requests</button>
+      </div>
+      <div class="pc-search-bar">
+        <input class="pc-search-inp" id="pcSearchInp" placeholder="🔍 Search prayers..." oninput="pcFilterFeed()">
+        <button class="pc-filter-btn" onclick="pcCycleFilter()">All ▾</button>
+      </div>
+      <div class="pc-stats-bar" id="pcStatsBar">
+        <div class="pc-stat-chip active" onclick="pcSetCatFilter('')">All</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Health')">💚 Health</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Family')">👨‍👩‍👧 Family</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Career')">💼 Career</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Spiritual Growth')">🙏 Spiritual</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Crisis')">🆘 Crisis</div>
+        <div class="pc-stat-chip" onclick="pcSetCatFilter('Other')">📿 Other</div>
+      </div>
+      <!-- Admin Dashboard -->
+      <div id="pcAdminDashboard" style="display:none;">
+        <div class="pc-admin-section">
+          <div class="pc-admin-title">🛡️ Admin Dashboard</div>
+          <div class="pc-admin-stats">
+            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatTotal">0</div><div class="pc-admin-stat-lbl">Total</div></div>
+            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatPending">0</div><div class="pc-admin-stat-lbl">Pending</div></div>
+            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatAnswered">0</div><div class="pc-admin-stat-lbl">Answered</div></div>
+            <div class="pc-admin-stat"><div class="pc-admin-stat-num" id="pcStatReported">0</div><div class="pc-admin-stat-lbl">Reported</div></div>
+          </div>
+          <div class="pc-admin-btns">
+            <button class="pc-admin-btn" onclick="pcShowPending()">📝 Pending Review</button>
+            <button class="pc-admin-btn" onclick="pcShowReported()">🚩 Reported</button>
+            <button class="pc-admin-btn" onclick="pcExportData()">📊 Export</button>
+          </div>
+        </div>
+      </div>
+      <div class="pc-feed" id="pcFeedContainer"></div>
+      <div class="pc-empty" id="pcEmptyState" style="display:none;">
+        <div class="pc-empty-icon">🙏</div>
+        <div class="pc-empty-text">No prayer requests yet.<br>Be the first to request or share a prayer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRAYER CIRCLE DETAIL -->
+  <div class="screen" id="screen-prayer-detail">
+    <div class="pc-detail">
+      <div class="pc-detail-header">
+        <button class="pc-detail-back" onclick="pcCloseDetail()">←</button>
+        <div class="pc-detail-htitle">Prayer Request</div>
+      </div>
+      <div class="pc-detail-body" id="pcDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- PRAYER CIRCLE MY REQUESTS -->
+  <div class="screen" id="screen-prayer-my">
+    <div class="pc-detail">
+      <div class="pc-detail-header">
+        <button class="pc-detail-back" onclick="pcBackToMain()">←</button>
+        <div class="pc-detail-htitle">My Prayer Requests</div>
+      </div>
+      <div style="padding:14px 18px 100px;" id="pcMyRequestsContainer"></div>
+    </div>
+  </div>
+
+<!-- Prayer Circle: Submit Request Modal -->
+<div class="modal-overlay" id="pcSubmitModal">
+  <div class="modal-sheet" style="max-height:92vh;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🙏 Submit Prayer Request</div>
+    <div class="f-grp">
+      <label class="f-lbl">Your Name</label>
+      <input class="f-inp" id="pcReqName" placeholder="Enter your name...">
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+        <label class="toggle" style="transform:scale(0.8);"><input type="checkbox" id="pcReqAnon" onchange="document.getElementById('pcReqName').disabled=this.checked; if(this.checked)document.getElementById('pcReqName').value='Anonymous';"></label>
+        <span style="font-size:0.72rem;color:var(--text3);">Submit Anonymously</span>
+      </div>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Prayer For</label>
+      <select class="f-sel" id="pcReqFor">
+        <option value="self">Myself</option>
+        <option value="other">Someone Else</option>
+      </select>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Category</label>
+      <select class="f-sel" id="pcReqCategory">
+        <option value="Health">💚 Health</option>
+        <option value="Family">👨‍👩‍👧 Family</option>
+        <option value="Career">💼 Career</option>
+        <option value="Spiritual Growth">🙏 Spiritual Growth</option>
+        <option value="Crisis">🆘 Crisis</option>
+        <option value="Other">📿 Other</option>
+      </select>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Short Title</label>
+      <input class="f-inp" id="pcReqTitle" placeholder="e.g., Prayer for speedy recovery..." maxlength="100">
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Detailed Description</label>
+      <textarea class="f-area" id="pcReqDesc" rows="4" placeholder="Share more details about your prayer request..."></textarea>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Urgency</label>
+      <select class="f-sel" id="pcReqUrgency">
+        <option value="normal">Normal</option>
+        <option value="urgent">Urgent</option>
+      </select>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Visibility</label>
+      <select class="f-sel" id="pcReqPublic">
+        <option value="yes">Public — visible in Prayer Feed</option>
+        <option value="no">Private — only admins can see</option>
+      </select>
+    </div>
+    <div class="f-grp" style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="checkbox" id="pcReqConsent" style="margin-top:3px;">
+      <label for="pcReqConsent" style="font-size:0.72rem;color:var(--text2);line-height:1.5;">I consent to sharing this prayer request with the community. I understand it will be visible to other devotees (if public) and may be moderated by admins.</label>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="f-cancel" onclick="closeModal('pcSubmitModal')" style="flex:0.4;">Cancel</button>
+      <button class="f-submit" onclick="pcSubmitRequest()" style="flex:1;">Submit Prayer Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Circle: Write Prayer Modal -->
+<div class="modal-overlay" id="pcWritePrayerModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✍️ Write a Prayer</div>
+    <div class="f-grp">
+      <label class="f-lbl">Your Prayer</label>
+      <textarea class="f-area" id="pcWritePrayerText" rows="4" placeholder="Write your heartfelt prayer..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="f-cancel" onclick="closeModal('pcWritePrayerModal')" style="flex:0.4;">Cancel</button>
+      <button class="f-submit" onclick="pcSubmitWrittenPrayer()" style="flex:1;">Offer Prayer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Circle: Update/Gratitude Modal -->
+<div class="modal-overlay" id="pcUpdateModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💬 Post Update</div>
+    <div class="f-grp">
+      <label class="f-lbl">Update Type</label>
+      <select class="f-sel" id="pcUpdateType">
+        <option value="update">General Update</option>
+        <option value="gratitude">Gratitude Message</option>
+      </select>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Message</label>
+      <textarea class="f-area" id="pcUpdateText" rows="3" placeholder="Share your update or gratitude..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="f-cancel" onclick="closeModal('pcUpdateModal')" style="flex:0.4;">Cancel</button>
+      <button class="f-submit" onclick="pcSubmitUpdate()" style="flex:1;">Post Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Circle: Report Modal -->
+<div class="modal-overlay" id="pcReportModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚩 Report Content</div>
+    <div class="f-grp">
+      <label class="f-lbl">Reason</label>
+      <select class="f-sel" id="pcReportReason">
+        <option value="inappropriate">Inappropriate Content</option>
+        <option value="spam">Spam</option>
+        <option value="offensive">Offensive Language</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">Details (optional)</label>
+      <textarea class="f-area" id="pcReportDetails" rows="2" placeholder="Provide more details..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="f-cancel" onclick="closeModal('pcReportModal')" style="flex:0.4;">Cancel</button>
+      <button class="f-submit" onclick="pcSubmitReport()" style="flex:1;">Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prayer Circle: Admin Reject Modal -->
+<div class="modal-overlay" id="pcAdminRejectModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">❌ Reject Prayer Request</div>
+    <div class="f-grp">
+      <label class="f-lbl">Reason for Rejection</label>
+      <textarea class="f-area" id="pcRejectReason" rows="2" placeholder="Reason..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="f-cancel" onclick="closeModal('pcAdminRejectModal')" style="flex:0.4;">Cancel</button>
+      <button class="f-submit" onclick="pcAdminReject()" style="flex:1;background:var(--accent-red);">Reject</button>
+    </div>
+  </div>
+</div>
+
 <nav class="bottom-nav" id="bottomNav">
   <div class="nav-scroll-area" id="navScrollArea">
     <button class="nav-btn active" onclick="switchScreen('home',this)">
@@ -3598,6 +4035,10 @@ body {
     <button class="nav-btn" onclick="switchScreen('sevakart',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 4 6 4 10c0 5.33 8 12 8 12s8-6.67 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
       <span class="nav-lbl">SevaKart</span>
+    </button>
+    <button class="nav-btn" onclick="switchScreen('prayer',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
+      <span class="nav-lbl">Prayers</span>
     </button>
   </div>
   <button class="nav-arrow-hint" id="navArrowHint" onclick="scrollNavForward()">
@@ -6727,6 +7168,7 @@ function renderAdminList() {
       if (!userPerms || userPerms.includes('songs')) permTags += '<span class="admin-perm-tag perm-songs">Songs</span>';
       if (!userPerms || userPerms.includes('dhamas')) permTags += '<span class="admin-perm-tag perm-dhamas">Dhamas</span>';
       if (!userPerms || userPerms.includes('sevakart')) permTags += '<span class="admin-perm-tag perm-sevakart">SevaKart</span>';
+      if (!userPerms || userPerms.includes('prayer')) permTags += '<span class="admin-perm-tag perm-prayer">Prayer</span>';
     }
     return `<div class="admin-email-row">
       <div style="flex:1;min-width:0;">
@@ -6753,6 +7195,7 @@ function addAdmin() {
   if (document.getElementById('permSongs').checked) selectedPerms.push('songs');
   if (document.getElementById('permDhamas').checked) selectedPerms.push('dhamas');
   if (document.getElementById('permSevakart').checked) selectedPerms.push('sevakart');
+  if (document.getElementById('permPrayer').checked) selectedPerms.push('prayer');
   if (!selectedPerms.length) { showToast('Select at least one permission'); return; }
   // Save admin
   list.push(email);
@@ -7207,7 +7650,7 @@ function loadNotifSettings() {
     if (adv && s['n-advance']) adv.value = s['n-advance'];
     if (tim && s['n-time']) tim.value = s['n-time'];
     syncTimeToSelects();
-    ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom'].forEach(id=>{
+    ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer'].forEach(id=>{
       const el=document.getElementById(id);
       if(el && s[id]!==undefined) el.checked=s[id];
     });
@@ -7252,7 +7695,7 @@ function syncTimeFromSelects() {
 
 function saveS() {
   const s={};
-  ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom'].forEach(id=>{
+  ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer'].forEach(id=>{
     const el=document.getElementById(id); if(el)s[id]=el.checked;
   });
   const adv = document.getElementById('n-advance');
@@ -8338,7 +8781,7 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests'};
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
@@ -8364,6 +8807,7 @@ function switchScreen(name, btn) {
   if (name==='notes') renderNotes();
   if (name==='dhamas') renderDhamas();
   if (name==='sevakart') skRenderHome();
+  if (name==='prayer') pcRenderFeed();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
 }
@@ -10608,6 +11052,681 @@ function skSubmitReport() {
 
 // Fetch SevaKart data on load
 setTimeout(_skFetchFromServer, 2000);
+
+// ===================================================================
+// PRAYER CIRCLE
+// ===================================================================
+let pcRequests = JSON.parse(localStorage.getItem('pcRequests') || '[]');
+let pcPrayers = JSON.parse(localStorage.getItem('pcPrayers') || '[]');
+let pcReports = JSON.parse(localStorage.getItem('pcReports') || '[]');
+let _pcCatFilter = '';
+let _pcStatusFilter = '';  // '' | 'urgent' | 'answered' | 'pending'
+let _pcCurrentDetailId = null;
+let _pcWritePrayerId = null;
+let _pcReportId = null;
+let _pcRejectId = null;
+
+const PC_CATEGORIES = ['Health','Family','Career','Spiritual Growth','Crisis','Other'];
+const PC_CAT_ICONS = {Health:'💚',Family:'👨‍👩‍👧',Career:'💼','Spiritual Growth':'🙏',Crisis:'🆘',Other:'📿'};
+const PC_CAT_CLASS = {Health:'cat-health',Family:'cat-family',Career:'cat-career','Spiritual Growth':'cat-spiritual',Crisis:'cat-crisis',Other:'cat-other'};
+
+function _pcGenId() {
+  return 'PR-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2,6).toUpperCase();
+}
+
+function _pcTimeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff/60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs/24);
+  if (days < 7) return days + 'd ago';
+  return new Date(ts).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+function _pcSave() {
+  localStorage.setItem('pcRequests', JSON.stringify(pcRequests));
+  localStorage.setItem('pcPrayers', JSON.stringify(pcPrayers));
+  localStorage.setItem('pcReports', JSON.stringify(pcReports));
+  _pcSyncToServer();
+}
+
+async function _pcSyncToServer() {
+  try {
+    const userEmail = (gUser && gUser.email) ? gUser.email : '';
+    await fetch(SONGS_API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({
+        action:'savePrayerCircle',
+        requests: pcRequests,
+        prayers: pcPrayers,
+        reports: pcReports,
+        updatedBy: userEmail
+      })
+    });
+  } catch(e) { /* offline fallback */ }
+}
+
+async function _pcFetchFromServer() {
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=prayercircle');
+    const data = await resp.json();
+    if (data.success && data.requests) {
+      pcRequests = data.requests;
+      if (data.prayers) pcPrayers = data.prayers;
+      if (data.reports) pcReports = data.reports;
+      localStorage.setItem('pcRequests', JSON.stringify(pcRequests));
+      localStorage.setItem('pcPrayers', JSON.stringify(pcPrayers));
+      localStorage.setItem('pcReports', JSON.stringify(pcReports));
+    }
+  } catch(e) { /* offline - use localStorage */ }
+}
+
+// Content moderation filter
+function _pcModerateContent(text) {
+  const badWords = ['damn','hell','shit','fuck','ass','bitch','bastard','crap','hate','kill','die','stupid'];
+  let clean = text;
+  badWords.forEach(w => {
+    const re = new RegExp('\\b' + w + '\\b', 'gi');
+    clean = clean.replace(re, '*'.repeat(w.length));
+  });
+  return clean;
+}
+
+function pcOpenSubmitModal() {
+  // Reset form
+  document.getElementById('pcReqName').value = (gUser && gUser.name) ? gUser.name : '';
+  document.getElementById('pcReqName').disabled = false;
+  document.getElementById('pcReqAnon').checked = false;
+  document.getElementById('pcReqFor').value = 'self';
+  document.getElementById('pcReqCategory').value = 'Health';
+  document.getElementById('pcReqTitle').value = '';
+  document.getElementById('pcReqDesc').value = '';
+  document.getElementById('pcReqUrgency').value = 'normal';
+  document.getElementById('pcReqPublic').value = 'yes';
+  document.getElementById('pcReqConsent').checked = false;
+  document.getElementById('pcSubmitModal').classList.add('open');
+}
+
+function pcSubmitRequest() {
+  const name = document.getElementById('pcReqName').value.trim();
+  const isAnon = document.getElementById('pcReqAnon').checked;
+  const forWhom = document.getElementById('pcReqFor').value;
+  const category = document.getElementById('pcReqCategory').value;
+  const title = document.getElementById('pcReqTitle').value.trim();
+  const desc = document.getElementById('pcReqDesc').value.trim();
+  const urgency = document.getElementById('pcReqUrgency').value;
+  const isPublic = document.getElementById('pcReqPublic').value === 'yes';
+  const consent = document.getElementById('pcReqConsent').checked;
+
+  if (!consent) { showToast('Please provide your consent to continue'); return; }
+  if (!title) { showToast('Please enter a title for your prayer'); return; }
+  if (!desc) { showToast('Please describe your prayer request'); return; }
+
+  const req = {
+    id: _pcGenId(),
+    name: isAnon ? 'Anonymous' : (name || 'A Devotee'),
+    email: (gUser && gUser.email) ? gUser.email : '',
+    anonymous: isAnon,
+    forWhom,
+    category,
+    title: _pcModerateContent(title),
+    description: _pcModerateContent(desc),
+    urgency,
+    public: isPublic,
+    status: 'approved', // Auto-approve; admins can reject later
+    prayedBy: [],
+    timestamp: Date.now(),
+    answered: false,
+    updates: []
+  };
+
+  pcRequests.unshift(req);
+  _pcSave();
+  closeModal('pcSubmitModal');
+  showToast('🙏 Prayer request submitted! Prayer ID: ' + req.id);
+  pcRenderFeed();
+
+  // In-app notification to signed-in users (simulated — real push via server)
+  _pcNotifyNewRequest(req);
+}
+
+function _pcNotifyNewRequest(req) {
+  // Check if prayer notifications are enabled
+  const s = JSON.parse(localStorage.getItem('settings') || '{}');
+  if (s['n-prayer'] === false) return;
+  // This would trigger push notification via server in production
+  // For now, just a toast for the submitter confirmation
+}
+
+function _pcGetApprovedPublic() {
+  return pcRequests.filter(r => r.status === 'approved' && r.public !== false);
+}
+
+function pcSetCatFilter(cat) {
+  _pcCatFilter = cat;
+  document.querySelectorAll('.pc-stat-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent.includes(cat) || (!cat && c.textContent === 'All'));
+  });
+  pcRenderFeed();
+}
+
+function pcCycleFilter() {
+  const btn = document.querySelector('.pc-filter-btn');
+  const filters = ['','urgent','answered','needs'];
+  const labels = ['All ▾','Urgent ▾','Answered ▾','Needs Prayer ▾'];
+  const idx = filters.indexOf(_pcStatusFilter);
+  const next = (idx + 1) % filters.length;
+  _pcStatusFilter = filters[next];
+  btn.textContent = labels[next];
+  pcRenderFeed();
+}
+
+function pcFilterFeed() {
+  pcRenderFeed();
+}
+
+function pcRenderFeed() {
+  const container = document.getElementById('pcFeedContainer');
+  const empty = document.getElementById('pcEmptyState');
+  const query = (document.getElementById('pcSearchInp')?.value || '').toLowerCase();
+
+  let items = _pcGetApprovedPublic();
+
+  // Apply category filter
+  if (_pcCatFilter) items = items.filter(r => r.category === _pcCatFilter);
+
+  // Apply status filter
+  if (_pcStatusFilter === 'urgent') items = items.filter(r => r.urgency === 'urgent' && !r.answered);
+  else if (_pcStatusFilter === 'answered') items = items.filter(r => r.answered);
+  else if (_pcStatusFilter === 'needs') items = items.filter(r => !r.answered);
+
+  // Apply search
+  if (query) items = items.filter(r =>
+    r.title.toLowerCase().includes(query) ||
+    r.description.toLowerCase().includes(query) ||
+    r.category.toLowerCase().includes(query) ||
+    r.name.toLowerCase().includes(query)
+  );
+
+  // Sort: urgent first, then by timestamp
+  items.sort((a,b) => {
+    if (a.urgency === 'urgent' && b.urgency !== 'urgent' && !a.answered) return -1;
+    if (b.urgency === 'urgent' && a.urgency !== 'urgent' && !b.answered) return 1;
+    return b.timestamp - a.timestamp;
+  });
+
+  // Admin dashboard
+  const dash = document.getElementById('pcAdminDashboard');
+  if (hasPermission('prayer')) {
+    dash.style.display = '';
+    document.getElementById('pcStatTotal').textContent = pcRequests.length;
+    document.getElementById('pcStatPending').textContent = pcRequests.filter(r => r.status === 'pending').length;
+    document.getElementById('pcStatAnswered').textContent = pcRequests.filter(r => r.answered).length;
+    document.getElementById('pcStatReported').textContent = pcReports.filter(r => !r.resolved).length;
+  } else {
+    dash.style.display = 'none';
+  }
+
+  if (!items.length) {
+    container.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const userEmail = (gUser && gUser.email) ? gUser.email.toLowerCase() : '';
+  container.innerHTML = items.map(r => {
+    const prayerCount = r.prayedBy ? r.prayedBy.length : 0;
+    const hasPrayed = userEmail && r.prayedBy && r.prayedBy.includes(userEmail);
+    const catClass = PC_CAT_CLASS[r.category] || 'cat-other';
+    const catIcon = PC_CAT_ICONS[r.category] || '📿';
+    const cardClass = r.answered ? 'answered' : (r.urgency === 'urgent' ? 'urgent' : '');
+    const avatar = r.anonymous ? '🙏' : (r.name ? r.name.charAt(0).toUpperCase() : '🙏');
+    const writtenPrayers = pcPrayers.filter(p => p.requestId === r.id);
+
+    return `<div class="pc-card ${cardClass}" onclick="pcOpenDetail('${r.id}')">
+      <div class="pc-card-top">
+        <div class="pc-card-avatar">${avatar}</div>
+        <div class="pc-card-meta">
+          <div class="pc-card-author">${r.anonymous ? 'Anonymous Devotee' : r.name}</div>
+          <div class="pc-card-time">${_pcTimeAgo(r.timestamp)} · ${r.forWhom === 'self' ? 'For self' : 'For someone'}</div>
+        </div>
+      </div>
+      <div class="pc-card-badges">
+        <span class="pc-badge ${catClass}">${catIcon} ${r.category}</span>
+        ${r.urgency==='urgent' && !r.answered ? '<span class="pc-badge urgent-tag">🔴 Urgent</span>' : ''}
+        ${r.answered ? '<span class="pc-badge answered-tag">✅ Prayer Answered</span>' : ''}
+        ${!r.answered && r.updates && r.updates.some(u=>u.type==='update') ? '<span class="pc-badge needs-tag">🔄 Updated</span>' : ''}
+      </div>
+      <div class="pc-card-title">${r.title}</div>
+      <div class="pc-card-desc">${r.description}</div>
+      <div class="pc-card-footer" onclick="event.stopPropagation()">
+        <button class="pc-pray-btn ${hasPrayed?'prayed':''}" onclick="event.stopPropagation();pcQuickPray('${r.id}')">
+          🙏 ${hasPrayed ? 'Prayed' : 'Offer Prayer'}
+        </button>
+        <button class="pc-write-btn" onclick="event.stopPropagation();pcOpenWritePrayer('${r.id}')">✍️ Write</button>
+        <span class="pc-pray-count">${prayerCount} 🙏${writtenPrayers.length ? ' · ' + writtenPrayers.length + ' ✍️' : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pcQuickPray(reqId) {
+  if (!gUser || !gUser.email) { showToast('Please sign in to offer a prayer'); return; }
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  const email = gUser.email.toLowerCase();
+  if (!req.prayedBy) req.prayedBy = [];
+  if (req.prayedBy.includes(email)) {
+    showToast('You have already prayed for this request');
+    return;
+  }
+  req.prayedBy.push(email);
+  _pcSave();
+  showToast('🙏 Your prayer has been offered. Hare Krishna!');
+  pcRenderFeed();
+  if (_pcCurrentDetailId === reqId) pcRenderDetail(reqId);
+}
+
+function pcOpenWritePrayer(reqId) {
+  if (!gUser || !gUser.email) { showToast('Please sign in to write a prayer'); return; }
+  _pcWritePrayerId = reqId;
+  document.getElementById('pcWritePrayerText').value = '';
+  document.getElementById('pcWritePrayerModal').classList.add('open');
+}
+
+function pcSubmitWrittenPrayer() {
+  const text = document.getElementById('pcWritePrayerText').value.trim();
+  if (!text) { showToast('Please write your prayer'); return; }
+
+  const prayer = {
+    id: Date.now().toString(36),
+    requestId: _pcWritePrayerId,
+    author: gUser.name || 'A Devotee',
+    email: gUser.email.toLowerCase(),
+    text: _pcModerateContent(text),
+    timestamp: Date.now()
+  };
+
+  pcPrayers.push(prayer);
+
+  // Also count as a prayer
+  const req = pcRequests.find(r => r.id === _pcWritePrayerId);
+  if (req && !req.prayedBy.includes(gUser.email.toLowerCase())) {
+    req.prayedBy.push(gUser.email.toLowerCase());
+  }
+
+  _pcSave();
+  closeModal('pcWritePrayerModal');
+  showToast('🙏 Your prayer has been offered. Hare Krishna!');
+  pcRenderFeed();
+  if (_pcCurrentDetailId === _pcWritePrayerId) pcRenderDetail(_pcWritePrayerId);
+}
+
+function pcOpenDetail(reqId) {
+  _pcCurrentDetailId = reqId;
+  pcRenderDetail(reqId);
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-prayer-detail').classList.add('active');
+  history.pushState({screen:'prayer-detail'}, '', '');
+}
+
+function pcRenderDetail(reqId) {
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  const body = document.getElementById('pcDetailBody');
+  const prayerCount = req.prayedBy ? req.prayedBy.length : 0;
+  const userEmail = (gUser && gUser.email) ? gUser.email.toLowerCase() : '';
+  const hasPrayed = userEmail && req.prayedBy && req.prayedBy.includes(userEmail);
+  const isOwner = userEmail && req.email && req.email.toLowerCase() === userEmail;
+  const isAdminUser = hasPermission('prayer');
+  const catClass = PC_CAT_CLASS[req.category] || 'cat-other';
+  const catIcon = PC_CAT_ICONS[req.category] || '📿';
+  const writtenPrayers = pcPrayers.filter(p => p.requestId === reqId);
+
+  let html = `
+    <div class="pc-detail-card">
+      <div class="pc-card-top" style="margin-bottom:12px;">
+        <div class="pc-card-avatar" style="width:38px;height:38px;font-size:1.1rem;">${req.anonymous ? '🙏' : (req.name ? req.name.charAt(0).toUpperCase() : '🙏')}</div>
+        <div class="pc-card-meta">
+          <div class="pc-card-author" style="font-size:0.82rem;">${req.anonymous ? 'Anonymous Devotee' : req.name}</div>
+          <div class="pc-card-time">${_pcTimeAgo(req.timestamp)} · Prayer ID: ${req.id}</div>
+        </div>
+      </div>
+      <div class="pc-card-badges" style="margin-bottom:12px;">
+        <span class="pc-badge ${catClass}">${catIcon} ${req.category}</span>
+        <span class="pc-badge" style="background:rgba(255,255,255,0.06);color:var(--text2);">${req.forWhom === 'self' ? '🧘 For Self' : '💛 For Someone Else'}</span>
+        ${req.urgency==='urgent' && !req.answered ? '<span class="pc-badge urgent-tag">🔴 Urgent</span>' : ''}
+        ${req.answered ? '<span class="pc-badge answered-tag">✅ Prayer Answered</span>' : ''}
+      </div>
+      <div class="pc-detail-title">${req.title}</div>
+      <div class="pc-detail-desc">${req.description}</div>
+      <div style="font-size:0.72rem;color:var(--text3);margin-bottom:14px;">${prayerCount} devotee${prayerCount!==1?'s':''} prayed · ${writtenPrayers.length} written prayer${writtenPrayers.length!==1?'s':''}</div>
+      <div class="pc-detail-actions">
+        <button class="pc-detail-pray-btn ${hasPrayed?'prayed':''}" onclick="pcQuickPray('${req.id}')">
+          🙏 ${hasPrayed ? 'Already Prayed' : 'Offer Prayer'}
+        </button>
+        <button class="pc-write-btn" style="padding:12px 16px;" onclick="pcOpenWritePrayer('${req.id}')">✍️ Write a Prayer</button>
+      </div>
+    </div>`;
+
+  // Written prayers
+  if (writtenPrayers.length) {
+    html += `<div class="pc-prayers-section">
+      <div class="pc-prayers-title">✍️ Written Prayers (${writtenPrayers.length})</div>
+      ${writtenPrayers.map(p => `
+        <div class="pc-prayer-item">
+          <div class="pc-prayer-author">${p.author}</div>
+          <div class="pc-prayer-text">"${p.text}"</div>
+          <div class="pc-prayer-time">${_pcTimeAgo(p.timestamp)}</div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  // Updates
+  if (req.updates && req.updates.length) {
+    html += `<div class="pc-updates-section">
+      <div class="pc-prayers-title">💬 Updates</div>
+      ${req.updates.map(u => `
+        <div class="pc-update-item">
+          <div class="pc-update-type">${u.type === 'gratitude' ? '💛 Gratitude' : '🔄 Update'}</div>
+          <div class="pc-update-text">${u.text}</div>
+          <div class="pc-update-time">${_pcTimeAgo(u.timestamp)}</div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  // Owner actions
+  if (isOwner && !req.answered) {
+    html += `<div class="pc-owner-actions">
+      <div class="pc-owner-title">Your Request — Update Status</div>
+      <div class="pc-owner-btns">
+        <button class="pc-owner-btn answered" onclick="pcMarkAnswered('${req.id}')">✅ Prayer Answered</button>
+        <button class="pc-owner-btn" onclick="pcOpenUpdateModal('${req.id}')">💬 Post Update</button>
+      </div>
+    </div>`;
+  } else if (isOwner && req.answered) {
+    html += `<div class="pc-owner-actions">
+      <div class="pc-owner-title">Your Request — Status</div>
+      <div class="pc-owner-btns">
+        <button class="pc-owner-btn" onclick="pcMarkNeedsPrayers('${req.id}')">🙏 Still Need Prayers</button>
+        <button class="pc-owner-btn" onclick="pcOpenUpdateModal('${req.id}')">💬 Post Gratitude</button>
+      </div>
+    </div>`;
+  }
+
+  // Admin actions
+  if (isAdminUser) {
+    html += `<div class="pc-admin-section" style="margin-top:16px;">
+      <div class="pc-admin-title">🛡️ Admin Actions</div>
+      <div class="pc-admin-btns">
+        ${req.status!=='approved' ? `<button class="pc-admin-btn" onclick="pcAdminApprove('${req.id}')">✅ Approve</button>` : ''}
+        <button class="pc-admin-btn" onclick="pcAdminStartReject('${req.id}')">❌ Reject</button>
+        <button class="pc-admin-btn" onclick="pcAdminHighlight('${req.id}')">${req.urgency==='urgent'?'Remove Urgent':'⚡ Mark Urgent'}</button>
+        <button class="pc-admin-btn" onclick="pcAdminRemove('${req.id}')">🗑️ Remove</button>
+      </div>
+    </div>`;
+  }
+
+  // Report button
+  html += `<button class="pc-report-btn" onclick="pcOpenReport('${req.id}')">🚩 Report this request</button>`;
+
+  body.innerHTML = html;
+}
+
+function pcCloseDetail() {
+  _pcCurrentDetailId = null;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-prayer').classList.add('active');
+  pcRenderFeed();
+}
+
+function pcMarkAnswered(reqId) {
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  req.answered = true;
+  req.answeredAt = Date.now();
+  _pcSave();
+  showToast('✅ Marked as Prayer Answered!');
+  pcRenderDetail(reqId);
+}
+
+function pcMarkNeedsPrayers(reqId) {
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  req.answered = false;
+  _pcSave();
+  showToast('🙏 Marked as Still Needing Prayers');
+  pcRenderDetail(reqId);
+}
+
+function pcOpenUpdateModal(reqId) {
+  _pcCurrentDetailId = reqId;
+  document.getElementById('pcUpdateType').value = 'update';
+  document.getElementById('pcUpdateText').value = '';
+  document.getElementById('pcUpdateModal').classList.add('open');
+}
+
+function pcSubmitUpdate() {
+  const type = document.getElementById('pcUpdateType').value;
+  const text = document.getElementById('pcUpdateText').value.trim();
+  if (!text) { showToast('Please enter your message'); return; }
+
+  const req = pcRequests.find(r => r.id === _pcCurrentDetailId);
+  if (!req) return;
+  if (!req.updates) req.updates = [];
+  req.updates.push({
+    type,
+    text: _pcModerateContent(text),
+    timestamp: Date.now()
+  });
+  _pcSave();
+  closeModal('pcUpdateModal');
+  showToast(type === 'gratitude' ? '💛 Gratitude posted!' : '💬 Update posted!');
+  pcRenderDetail(_pcCurrentDetailId);
+}
+
+function pcOpenReport(reqId) {
+  _pcReportId = reqId;
+  document.getElementById('pcReportReason').value = 'inappropriate';
+  document.getElementById('pcReportDetails').value = '';
+  document.getElementById('pcReportModal').classList.add('open');
+}
+
+function pcSubmitReport() {
+  const reason = document.getElementById('pcReportReason').value;
+  const details = document.getElementById('pcReportDetails').value.trim();
+  const report = {
+    id: Date.now().toString(36),
+    requestId: _pcReportId,
+    reason,
+    details,
+    email: (gUser && gUser.email) ? gUser.email : '',
+    timestamp: Date.now(),
+    resolved: false
+  };
+  pcReports.push(report);
+  _pcSave();
+  closeModal('pcReportModal');
+  showToast('🚩 Report submitted. Thank you.');
+}
+
+// My requests
+function pcShowMyRequests() {
+  if (!gUser || !gUser.email) { showToast('Please sign in to view your requests'); return; }
+  const email = gUser.email.toLowerCase();
+  const myReqs = pcRequests.filter(r => r.email && r.email.toLowerCase() === email);
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-prayer-my').classList.add('active');
+  history.pushState({screen:'prayer-my'}, '', '');
+
+  const container = document.getElementById('pcMyRequestsContainer');
+  if (!myReqs.length) {
+    container.innerHTML = '<div class="pc-empty"><div class="pc-empty-icon">📋</div><div class="pc-empty-text">You haven\'t submitted any prayer requests yet.</div></div>';
+    return;
+  }
+
+  container.innerHTML = myReqs.map(r => {
+    const prayerCount = r.prayedBy ? r.prayedBy.length : 0;
+    const catIcon = PC_CAT_ICONS[r.category] || '📿';
+    return `<div class="pc-card ${r.answered?'answered':r.urgency==='urgent'?'urgent':''}" onclick="pcOpenDetail('${r.id}')" style="margin-bottom:10px;">
+      <div class="pc-card-badges">
+        <span class="pc-badge ${PC_CAT_CLASS[r.category]||'cat-other'}">${catIcon} ${r.category}</span>
+        ${r.answered ? '<span class="pc-badge answered-tag">✅ Answered</span>' : ''}
+        ${r.status==='pending' ? '<span class="pc-badge needs-tag">⏳ Pending Review</span>' : ''}
+        ${r.status==='rejected' ? '<span class="pc-badge urgent-tag">❌ Rejected</span>' : ''}
+      </div>
+      <div class="pc-card-title">${r.title}</div>
+      <div class="pc-card-time">${_pcTimeAgo(r.timestamp)} · ${prayerCount} 🙏</div>
+    </div>`;
+  }).join('');
+}
+
+function pcBackToMain() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-prayer').classList.add('active');
+  pcRenderFeed();
+}
+
+// Admin functions
+function pcShowPending() {
+  _pcStatusFilter = '';
+  _pcCatFilter = '';
+  const allPending = pcRequests.filter(r => r.status === 'pending');
+  const container = document.getElementById('pcFeedContainer');
+  const empty = document.getElementById('pcEmptyState');
+  if (!allPending.length) {
+    container.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  container.innerHTML = allPending.map(r => {
+    const catIcon = PC_CAT_ICONS[r.category] || '📿';
+    return `<div class="pc-card" onclick="pcOpenDetail('${r.id}')" style="margin-bottom:10px;">
+      <div class="pc-card-badges">
+        <span class="pc-badge ${PC_CAT_CLASS[r.category]||'cat-other'}">${catIcon} ${r.category}</span>
+        <span class="pc-badge needs-tag">⏳ Pending</span>
+      </div>
+      <div class="pc-card-title">${r.title}</div>
+      <div class="pc-card-desc">${r.description}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="pc-action-btn" onclick="event.stopPropagation();pcAdminApprove('${r.id}')" style="padding:8px 14px;font-size:0.72rem;">✅ Approve</button>
+        <button class="pc-action-btn secondary" onclick="event.stopPropagation();pcAdminStartReject('${r.id}')" style="padding:8px 14px;font-size:0.72rem;">❌ Reject</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pcShowReported() {
+  const unresolvedReports = pcReports.filter(r => !r.resolved);
+  const container = document.getElementById('pcFeedContainer');
+  const empty = document.getElementById('pcEmptyState');
+  if (!unresolvedReports.length) {
+    container.innerHTML = '';
+    empty.style.display = '';
+    empty.querySelector('.pc-empty-text').textContent = 'No reported content.';
+    return;
+  }
+  empty.style.display = 'none';
+  container.innerHTML = unresolvedReports.map(rpt => {
+    const req = pcRequests.find(r => r.id === rpt.requestId);
+    if (!req) return '';
+    return `<div class="pc-card" style="margin-bottom:10px;border-color:rgba(192,57,43,0.3);">
+      <div class="pc-card-badges">
+        <span class="pc-badge urgent-tag">🚩 ${rpt.reason}</span>
+      </div>
+      <div class="pc-card-title">${req.title}</div>
+      <div class="pc-card-desc">${rpt.details || 'No details provided'}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="pc-action-btn secondary" onclick="pcOpenDetail('${req.id}')" style="padding:8px 14px;font-size:0.72rem;">View Request</button>
+        <button class="pc-action-btn secondary" onclick="pcResolveReport('${rpt.id}')" style="padding:8px 14px;font-size:0.72rem;">✓ Resolve</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pcResolveReport(reportId) {
+  const rpt = pcReports.find(r => r.id === reportId);
+  if (rpt) rpt.resolved = true;
+  _pcSave();
+  showToast('Report resolved');
+  pcShowReported();
+}
+
+function pcAdminApprove(reqId) {
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  req.status = 'approved';
+  _pcSave();
+  showToast('✅ Prayer request approved');
+  pcRenderFeed();
+  if (_pcCurrentDetailId === reqId) pcRenderDetail(reqId);
+}
+
+function pcAdminStartReject(reqId) {
+  _pcRejectId = reqId;
+  document.getElementById('pcRejectReason').value = '';
+  document.getElementById('pcAdminRejectModal').classList.add('open');
+}
+
+function pcAdminReject() {
+  const reason = document.getElementById('pcRejectReason').value.trim();
+  const req = pcRequests.find(r => r.id === _pcRejectId);
+  if (!req) return;
+  req.status = 'rejected';
+  req.rejectReason = reason;
+  _pcSave();
+  closeModal('pcAdminRejectModal');
+  showToast('❌ Prayer request rejected');
+  pcRenderFeed();
+}
+
+function pcAdminHighlight(reqId) {
+  const req = pcRequests.find(r => r.id === reqId);
+  if (!req) return;
+  req.urgency = req.urgency === 'urgent' ? 'normal' : 'urgent';
+  _pcSave();
+  showToast(req.urgency === 'urgent' ? '⚡ Marked as urgent' : 'Urgency removed');
+  pcRenderDetail(reqId);
+}
+
+function pcAdminRemove(reqId) {
+  if (!confirm('Are you sure you want to remove this prayer request?')) return;
+  pcRequests = pcRequests.filter(r => r.id !== reqId);
+  _pcSave();
+  showToast('Prayer request removed');
+  pcCloseDetail();
+}
+
+function pcExportData() {
+  const data = {
+    exportDate: new Date().toISOString(),
+    totalRequests: pcRequests.length,
+    totalPrayers: pcPrayers.length,
+    totalReports: pcReports.length,
+    requests: pcRequests,
+    prayers: pcPrayers,
+    reports: pcReports
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'prayer_circle_export_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📊 Data exported');
+}
+
+// Fetch prayer circle data on load
+setTimeout(_pcFetchFromServer, 2500);
 
 function init() {
   // Load settings
