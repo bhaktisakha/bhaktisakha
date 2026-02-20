@@ -2146,6 +2146,7 @@ body {
 .admin-perm-tag.perm-dhamas { background: rgba(212,175,55,0.12); color: var(--accent-gold); }
 .admin-perm-tag.perm-sevakart { background: rgba(180,120,40,0.12); color: #d4a017; }
 .admin-perm-tag.perm-prayer { background: rgba(232,168,56,0.12); color: #f0c850; }
+.admin-perm-tag.perm-users { background: rgba(52,152,219,0.12); color: #3498db; }
 .evt-modal-icon {
   padding: 18px 20px 0;
   font-size: 2.4rem; text-align: center;
@@ -2706,6 +2707,73 @@ body {
 }
 .adm-section-icon.sevakart { background:rgba(167,139,250,0.12); }
 .adm-section-icon.prayer { background:rgba(232,168,56,0.12); }
+.adm-section-icon.users { background:rgba(52,152,219,0.12); }
+
+/* User List Screen */
+.ul-wrap { padding:18px 16px 80px; }
+.ul-header {
+  display:flex; align-items:center; gap:12px; margin-bottom:18px;
+}
+.ul-back { background:none; border:none; color:var(--text); font-size:1.3rem; cursor:pointer; padding:4px; }
+.ul-title { font-size:1.05rem; font-weight:700; color:var(--text); }
+
+.ul-summary {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px;
+}
+.ul-summary-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:12px 8px; text-align:center;
+}
+.ul-summary-num { font-size:1.3rem; font-weight:700; }
+.ul-summary-num.total { color:var(--lavender); }
+.ul-summary-num.active { color:#2ecc71; }
+.ul-summary-num.inactive { color:#f39c12; }
+.ul-summary-lbl { font-size:0.58rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+
+.ul-filters {
+  display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; justify-content:center;
+}
+.ul-filter-chip {
+  padding:7px 16px; border-radius:20px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text3); font-size:0.72rem; font-weight:500;
+  cursor:pointer; transition:all 0.2s;
+}
+.ul-filter-chip.active { border-color:rgba(167,139,250,0.4); background:rgba(167,139,250,0.1); color:var(--lavender); }
+
+.ul-search {
+  width:100%; padding:10px 14px; border-radius:12px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text); font-size:0.8rem; margin-bottom:14px;
+  box-sizing:border-box;
+}
+.ul-search::placeholder { color:var(--text3); }
+
+.ul-list { display:flex; flex-direction:column; gap:8px; }
+.ul-user {
+  display:flex; align-items:center; gap:12px; padding:12px 14px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  transition:all 0.2s;
+}
+.ul-avatar {
+  width:38px; height:38px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0;
+  color:#fff;
+}
+.ul-avatar.active-user { background:linear-gradient(135deg,#2ecc71,#27ae60); }
+.ul-avatar.inactive-user { background:linear-gradient(135deg,#f39c12,#e67e22); }
+.ul-user-info { flex:1; min-width:0; }
+.ul-user-name { font-size:0.82rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ul-user-email { font-size:0.65rem; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+.ul-user-meta { display:flex; gap:8px; margin-top:3px; }
+.ul-user-meta-item { font-size:0.6rem; color:var(--text3); }
+.ul-user-right { text-align:right; flex-shrink:0; }
+.ul-user-status {
+  font-size:0.6rem; font-weight:600; padding:3px 8px; border-radius:8px;
+  text-transform:uppercase; letter-spacing:0.3px;
+}
+.ul-user-status.active { background:rgba(46,204,113,0.1); color:#2ecc71; }
+.ul-user-status.inactive { background:rgba(243,156,18,0.1); color:#f39c12; }
+.ul-user-lastseen { font-size:0.58rem; color:var(--text3); margin-top:4px; }
+.ul-empty { text-align:center; padding:40px 20px; font-size:0.82rem; color:var(--text3); }
 .adm-section-info { flex:1; }
 .adm-section-name { font-size:0.88rem; font-weight:600; color:var(--text); }
 .adm-section-status { font-size:0.68rem; color:var(--text3); margin-top:2px; }
@@ -3413,6 +3481,9 @@ body {
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permPrayer" checked> 🙏 Prayer Circle Admin</label>
           </div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="permUsers"> 👥 View User Stats</label>
+          </div>
         </div>
       </div>
 
@@ -3963,6 +4034,30 @@ body {
 
       <!-- Feature sections container -->
       <div id="admSectionsContainer"></div>
+    </div>
+  </div>
+
+  <!-- USER LIST SCREEN -->
+  <div class="screen" id="screen-userlist">
+    <div class="ul-wrap">
+      <div class="ul-header">
+        <button class="ul-back" onclick="switchScreen('admin',null)">←</button>
+        <div class="ul-title">👥 App Users</div>
+      </div>
+      <div class="ul-summary">
+        <div class="ul-summary-card"><div class="ul-summary-num total" id="ulTotal">0</div><div class="ul-summary-lbl">Total Users</div></div>
+        <div class="ul-summary-card"><div class="ul-summary-num active" id="ulActive">0</div><div class="ul-summary-lbl">Active (24h)</div></div>
+        <div class="ul-summary-card"><div class="ul-summary-num inactive" id="ulInactive">0</div><div class="ul-summary-lbl">Inactive</div></div>
+      </div>
+      <input class="ul-search" id="ulSearchInput" placeholder="🔍 Search users..." oninput="ulFilterList()">
+      <div class="ul-filters">
+        <div class="ul-filter-chip active" onclick="ulSetFilter('all')">All</div>
+        <div class="ul-filter-chip" onclick="ulSetFilter('active')">🟢 Active</div>
+        <div class="ul-filter-chip" onclick="ulSetFilter('inactive')">🟡 Inactive</div>
+      </div>
+      <div class="ul-list" id="ulListContainer">
+        <div class="ul-empty">Loading user data...</div>
+      </div>
     </div>
   </div>
 
@@ -7266,6 +7361,7 @@ function renderAdminList() {
       if (!userPerms || userPerms.includes('dhamas')) permTags += '<span class="admin-perm-tag perm-dhamas">Dhamas</span>';
       if (!userPerms || userPerms.includes('sevakart')) permTags += '<span class="admin-perm-tag perm-sevakart">SevaKart</span>';
       if (!userPerms || userPerms.includes('prayer')) permTags += '<span class="admin-perm-tag perm-prayer">Prayer</span>';
+      if (userPerms && userPerms.includes('users')) permTags += '<span class="admin-perm-tag perm-users">Users</span>';
     }
     return `<div class="admin-email-row">
       <div style="flex:1;min-width:0;">
@@ -7293,6 +7389,7 @@ function addAdmin() {
   if (document.getElementById('permDhamas').checked) selectedPerms.push('dhamas');
   if (document.getElementById('permSevakart').checked) selectedPerms.push('sevakart');
   if (document.getElementById('permPrayer').checked) selectedPerms.push('prayer');
+  if (document.getElementById('permUsers').checked) selectedPerms.push('users');
   if (!selectedPerms.length) { showToast('Select at least one permission'); return; }
   // Save admin
   list.push(email);
@@ -8091,6 +8188,7 @@ async function registerTokenWithServer(token) {
       advance: document.getElementById('n-advance')?.value || '1'
     };
     const email = (gUser && gUser.email) ? gUser.email : 'anonymous';
+    const name = (gUser && gUser.name) ? gUser.name : '';
 
     await fetch(SONGS_API_URL, {
       method: 'POST',
@@ -8099,6 +8197,7 @@ async function registerTokenWithServer(token) {
         action: 'registerToken',
         token: token,
         email: email,
+        name: name,
         prefs: prefs
       })
     });
@@ -8879,7 +8978,7 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', userlist:'App Users'};
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
@@ -8907,6 +9006,7 @@ function switchScreen(name, btn) {
   if (name==='sevakart') skRenderHome();
   if (name==='prayer') pcRenderFeed();
   if (name==='admin') renderAdminDashboard();
+  if (name==='userlist') ulFetchAndRender();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
 }
@@ -11291,6 +11391,189 @@ function renderAdminDashboard() {
       </div>
     </div>
   `).join('');
+
+  // --- Users Section (only for admins with 'users' permission) ---
+  if (hasPermission('users') || isSuperAdmin()) {
+    const usersHtml = `
+      <div class="adm-section expanded" id="admSec-users">
+        <div class="adm-section-header" onclick="admToggleSection('users')">
+          <div class="adm-section-icon users">👥</div>
+          <div class="adm-section-info">
+            <div class="adm-section-name">App Users</div>
+            <div class="adm-section-status" id="admUsersStatus">Loading...</div>
+          </div>
+          <div class="adm-section-badge zero" id="admUsersBadge">–</div>
+          <div class="adm-section-arrow">▼</div>
+        </div>
+        <div class="adm-section-body">
+          <div class="adm-section-content">
+            <div class="adm-stats" id="admUsersStats">
+              <div class="adm-stat"><div class="adm-stat-num" id="admUsTotal">–</div><div class="adm-stat-lbl">Total</div></div>
+              <div class="adm-stat"><div class="adm-stat-num" style="color:#2ecc71" id="admUsActive">–</div><div class="adm-stat-lbl">Active</div></div>
+              <div class="adm-stat"><div class="adm-stat-num" style="color:#f39c12" id="admUsInactive">–</div><div class="adm-stat-lbl">Inactive</div></div>
+              <div class="adm-stat"><div class="adm-stat-num" style="color:var(--lavender)" id="admUsNew">–</div><div class="adm-stat-lbl">New (7d)</div></div>
+            </div>
+            <div class="adm-actions">
+              <button class="adm-action-btn primary" onclick="switchScreen('userlist',null)" style="grid-column:1/-1;">👥 View All Users</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML += usersHtml;
+    // Fetch user stats asynchronously
+    admFetchUserStats();
+  }
+}
+
+// Fetch user stats for admin dashboard summary
+let _admCachedUsers = null;
+async function admFetchUserStats() {
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=userStats');
+    const data = await resp.json();
+    if (!data.success) return;
+
+    _admCachedUsers = data.users || [];
+    const now = Date.now();
+    const h24 = 24 * 60 * 60 * 1000;
+    const d7 = 7 * 24 * 60 * 60 * 1000;
+    const total = _admCachedUsers.length;
+    const active = _admCachedUsers.filter(u => (now - new Date(u.lastSeen).getTime()) < h24).length;
+    const inactive = total - active;
+    const newUsers = _admCachedUsers.filter(u => (now - new Date(u.registered).getTime()) < d7).length;
+
+    document.getElementById('admUsTotal').textContent = total;
+    document.getElementById('admUsActive').textContent = active;
+    document.getElementById('admUsInactive').textContent = inactive;
+    document.getElementById('admUsNew').textContent = newUsers;
+    document.getElementById('admUsersStatus').textContent = total + ' users · ' + active + ' active now';
+    document.getElementById('admUsersBadge').textContent = total;
+    document.getElementById('admUsersBadge').className = 'adm-section-badge zero';
+  } catch(e) {
+    document.getElementById('admUsersStatus').textContent = 'Failed to load';
+  }
+}
+
+// ===== USER LIST SCREEN =====
+let _ulFilter = 'all';
+let _ulUsers = [];
+
+async function ulFetchAndRender() {
+  const container = document.getElementById('ulListContainer');
+  container.innerHTML = '<div class="ul-empty">Loading user data...</div>';
+
+  try {
+    // Use cached data if available (from admin dashboard), else fetch fresh
+    if (_admCachedUsers && _admCachedUsers.length) {
+      _ulUsers = _admCachedUsers;
+    } else {
+      const resp = await fetch(SONGS_API_URL + '?type=userStats');
+      const data = await resp.json();
+      if (!data.success) throw new Error(data.error || 'Failed');
+      _ulUsers = data.users || [];
+      _admCachedUsers = _ulUsers;
+    }
+
+    _ulFilter = 'all';
+    document.getElementById('ulSearchInput').value = '';
+    ulRenderList();
+  } catch(e) {
+    container.innerHTML = '<div class="ul-empty">Failed to load user data. Please try again.</div>';
+  }
+}
+
+function ulRenderList() {
+  const now = Date.now();
+  const h24 = 24 * 60 * 60 * 1000;
+  const searchTerm = (document.getElementById('ulSearchInput')?.value || '').toLowerCase();
+
+  // Classify users
+  let users = _ulUsers.map(u => {
+    const lastSeenMs = new Date(u.lastSeen).getTime();
+    const registeredMs = new Date(u.registered).getTime();
+    const isActive = (now - lastSeenMs) < h24;
+    return { ...u, isActive, lastSeenMs, registeredMs };
+  });
+
+  // Filter
+  if (_ulFilter === 'active') users = users.filter(u => u.isActive);
+  if (_ulFilter === 'inactive') users = users.filter(u => !u.isActive);
+
+  // Search
+  if (searchTerm) {
+    users = users.filter(u => (u.name || '').toLowerCase().includes(searchTerm) || (u.email || '').toLowerCase().includes(searchTerm));
+  }
+
+  // Sort: active first, then by last seen (most recent first)
+  users.sort((a, b) => {
+    if (a.isActive && !b.isActive) return -1;
+    if (!a.isActive && b.isActive) return 1;
+    return b.lastSeenMs - a.lastSeenMs;
+  });
+
+  // Update summary counts (always from full list)
+  const allActive = _ulUsers.filter(u => (now - new Date(u.lastSeen).getTime()) < h24).length;
+  document.getElementById('ulTotal').textContent = _ulUsers.length;
+  document.getElementById('ulActive').textContent = allActive;
+  document.getElementById('ulInactive').textContent = _ulUsers.length - allActive;
+
+  // Update filter chip states
+  document.querySelectorAll('.ul-filter-chip').forEach(c => {
+    const f = c.textContent.includes('Active') && !c.textContent.includes('Inactive') ? 'active' :
+              c.textContent.includes('Inactive') ? 'inactive' : 'all';
+    c.classList.toggle('active', f === _ulFilter);
+  });
+
+  const container = document.getElementById('ulListContainer');
+  if (!users.length) {
+    container.innerHTML = '<div class="ul-empty">No users found</div>';
+    return;
+  }
+
+  container.innerHTML = users.map(u => {
+    const initial = (u.name || u.email || '?').charAt(0).toUpperCase();
+    const displayName = u.name || u.email.split('@')[0];
+    const lastSeenText = _ulTimeAgo(u.lastSeenMs);
+    const joinedText = _ulTimeAgo(u.registeredMs);
+
+    return `<div class="ul-user">
+      <div class="ul-avatar ${u.isActive ? 'active-user' : 'inactive-user'}">${initial}</div>
+      <div class="ul-user-info">
+        <div class="ul-user-name">${displayName}</div>
+        <div class="ul-user-email">${u.email}</div>
+        <div class="ul-user-meta">
+          <span class="ul-user-meta-item">Joined ${joinedText}</span>
+        </div>
+      </div>
+      <div class="ul-user-right">
+        <div class="ul-user-status ${u.isActive ? 'active' : 'inactive'}">${u.isActive ? 'Active' : 'Inactive'}</div>
+        <div class="ul-user-lastseen">Last: ${lastSeenText}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function ulSetFilter(f) {
+  _ulFilter = f;
+  ulRenderList();
+}
+
+function ulFilterList() {
+  ulRenderList();
+}
+
+function _ulTimeAgo(ms) {
+  const diff = Date.now() - ms;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return days + 'd ago';
+  const months = Math.floor(days / 30);
+  return months + 'mo ago';
 }
 
 function admToggleSection(id) {
