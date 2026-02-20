@@ -5316,6 +5316,7 @@ body {
       </div>
 
       <button class="f-submit" id="evtSaveBtn" onclick="saveEvt()">Save Event</button>
+      <button class="f-cancel" id="evtDeleteBtn" onclick="delEvtFromModal()" style="display:none;background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);color:#e74c3c;margin-top:6px;">🗑 Delete Event</button>
       <button class="f-cancel" onclick="closeModal('addEvtModal')">Cancel</button>
     </div>
   </div>
@@ -8460,7 +8461,6 @@ function _evtCardHTML(e, showTime, showCountdown) {
     ${countdown}
     <div class="evt-card-actions">
       <button class="evt-del" onclick="editEvt(${e.id})" title="Edit">✏️</button>
-      <button class="evt-del" onclick="delEvt(${e.id})" title="Delete">🗑</button>
     </div>
   </div>`;
 }
@@ -8699,6 +8699,7 @@ function openAddEvt() {
   document.querySelectorAll('.evt-form-section').forEach(s=>s.classList.remove('visible'));
   document.getElementById('addEvtModalTitle').textContent = '✨ Add Event';
   document.getElementById('evtSaveBtn').textContent = 'Save Event';
+  document.getElementById('evtDeleteBtn').style.display = 'none';
   document.getElementById('addEvtModal').classList.add('open');
 }
 
@@ -8753,6 +8754,7 @@ function editEvt(id) {
 
   document.getElementById('addEvtModalTitle').textContent = '✏️ Edit Event';
   document.getElementById('evtSaveBtn').textContent = 'Update Event';
+  document.getElementById('evtDeleteBtn').style.display = '';
   document.getElementById('addEvtModal').classList.add('open');
 }
 
@@ -8854,7 +8856,7 @@ function renderEvts() {
 
 // ── Delete ──
 function delEvt(id) {
-  if (!confirm('Delete this event?')) return;
+  if (!confirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?')) return;
   customEvts = customEvts.filter(e => e.id!==id);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
   renderEvts();
@@ -8867,6 +8869,25 @@ function delEvt(id) {
     else if (tab==='calendar') evtRenderCalendar();
   }
   renderCalendar();
+}
+
+function delEvtFromModal() {
+  if (!editingEvtId) return;
+  if (!confirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?')) return;
+  customEvts = customEvts.filter(e => e.id !== editingEvtId);
+  localStorage.setItem('customEvts', JSON.stringify(customEvts));
+  editingEvtId = null;
+  closeModal('addEvtModal');
+  renderEvts();
+  const activeTab = document.querySelector('.evt-tab-btn.active');
+  if (activeTab) {
+    const tab = activeTab.getAttribute('data-evttab');
+    if (tab==='occasions') evtRenderOccasions();
+    else if (tab==='appointments') evtRenderAppointments();
+    else if (tab==='calendar') evtRenderCalendar();
+  }
+  renderCalendar();
+  showToast('Event deleted');
 }
 
 function exportEvts() {
