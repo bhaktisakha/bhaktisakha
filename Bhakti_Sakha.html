@@ -11130,6 +11130,7 @@ function _pcModerateContent(text) {
 }
 
 function pcOpenSubmitModal() {
+  if (!gUser || !gUser.email) { showToast('Please sign in to submit a prayer request'); return; }
   // Reset form
   document.getElementById('pcReqName').value = (gUser && gUser.name) ? gUser.name : '';
   document.getElementById('pcReqName').disabled = false;
