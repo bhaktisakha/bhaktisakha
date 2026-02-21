@@ -14673,7 +14673,7 @@ function skOpenDetail(id, fromScreen) {
     '<div class="sk-detail-section-title">Contact</div>' +
     '<div class="sk-contact-btns">';
   if (l.whatsapp || l.mobile) {
-    const phone = (l.whatsapp||l.mobile).replace(/[^0-9]/g,'');
+    const phone = String(l.whatsapp||l.mobile||'').replace(/[^0-9]/g,'');
     html += '<a class="sk-contact-btn whatsapp" href="https://wa.me/' + phone + '" target="_blank" rel="noopener">💬 WhatsApp</a>';
   }
   if (l.mobile) html += '<a class="sk-contact-btn call" href="tel:' + _escHtml(l.mobile) + '">📞 Call</a>';
