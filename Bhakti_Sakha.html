@@ -5417,6 +5417,21 @@ body {
           </div>
           <label class="toggle"><input type="checkbox" id="n-prayer" checked onchange="saveS()"></label>
         </div>
+        <div class="notif-divider"></div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-name">📅 My Events Reminders</div>
+            <div class="sett-desc" id="desc-myevents">Get reminded about your personal calendar events</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="n-myevents" checked onchange="saveS()"></label>
+        </div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-name">📝 My To-Do Reminders</div>
+            <div class="sett-desc" id="desc-mytodo">Get reminded about upcoming and overdue tasks</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="n-mytodo" checked onchange="saveS()"></label>
+        </div>
       </div>
     </div>
   </div>
@@ -9035,7 +9050,7 @@ function _buildSongCard(s, idx, searchQuery) {
     : '';
   const num = typeof idx === 'number' ? idx + 1 : '';
   const hasAudio = s.audios && s.audios.length > 0;
-  const audioBadge = hasAudio ? `<span class="song-audio-badge"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>Audio</span>` : '';
+  const audioBadge = hasAudio ? `<span class="song-audio-badge"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>${s.audios.length} Audio${s.audios.length > 1 ? 's' : ''}</span>` : '';
   const authorText = s.author ? s.author : '';
   const subLine = (authorText || hasAudio)
     ? `<div class="song-by">${authorText}${authorText && hasAudio ? ' ' : ''}${audioBadge}</div>` : '';
@@ -11157,7 +11172,7 @@ function loadNotifSettings() {
     if (adv && s['n-advance']) adv.value = s['n-advance'];
     if (tim && s['n-time']) tim.value = s['n-time'];
     syncTimeToSelects();
-    ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer'].forEach(id=>{
+    ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer','n-myevents','n-mytodo'].forEach(id=>{
       const el=document.getElementById(id);
       if(el && s[id]!==undefined) el.checked=s[id];
     });
@@ -11202,7 +11217,7 @@ function syncTimeFromSelects() {
 
 function saveS() {
   const s={};
-  ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer'].forEach(id=>{
+  ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer','n-myevents','n-mytodo'].forEach(id=>{
     const el=document.getElementById(id); if(el)s[id]=el.checked;
   });
   const adv = document.getElementById('n-advance');
@@ -11235,6 +11250,10 @@ function updateNotifDescs() {
   if (gayEl) gayEl.textContent = `Remind 10 min before sunrise · noon · sunset`;
   const rahuEl = document.getElementById('desc-rahu');
   if (rahuEl) rahuEl.textContent = `Alert on the day, at start of Rahu Kalam`;
+  const evtEl = document.getElementById('desc-myevents');
+  if (evtEl) evtEl.textContent = `Remind ${dayStr} before, at ${tStr}`;
+  const todoEl = document.getElementById('desc-mytodo');
+  if (todoEl) todoEl.textContent = `Remind at ${tStr} for tasks due that day`;
 }
 
 function _updateAuthorDatalist() {
@@ -11600,6 +11619,17 @@ async function registerUpcomingEvents() {
           }
         }
       }
+
+      // My To-Do tasks (if enabled)
+      const todoOn = document.getElementById('n-mytodo')?.checked || s['n-mytodo'] !== false;
+      if (todoOn && typeof tdTasks !== 'undefined') {
+        tdTasks.filter(t => !t.done && t.date === dateStr && t.reminder).forEach(t => {
+          upcoming.push({
+            date: dateStr, name: `📝 ${t.title}`,
+            type: 'todo', icon: '📝', time: t.time || ''
+          });
+        });
+      }
     }
 
     if (upcoming.length === 0) return;
@@ -11632,7 +11662,7 @@ setTimeout(initFirebase, 1500);
 
 // Hook notification toggles to re-register preferences
 setTimeout(() => {
-  ['n-ekadashi','n-festival','n-appearance','n-custom','n-gayatri','n-rahu','n-prayer','n-time','n-advance'].forEach(id => {
+  ['n-ekadashi','n-festival','n-appearance','n-custom','n-gayatri','n-rahu','n-prayer','n-myevents','n-mytodo','n-time','n-advance'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', () => {
       if (_fcmToken) { registerTokenWithServer(_fcmToken); registerUpcomingEvents(); }
@@ -18624,6 +18654,11 @@ async function tdClearCompleted() {
 
 // ── Notifications ──
 function _tdScheduleNotif(task) {
+  // Respect settings toggle
+  try {
+    const s = JSON.parse(localStorage.getItem('settings') || '{}');
+    if (s['n-mytodo'] === false) return;
+  } catch(e) {}
   if (!('Notification' in window) || Notification.permission !== 'granted') {
     if ('Notification' in window) Notification.requestPermission();
     return;
