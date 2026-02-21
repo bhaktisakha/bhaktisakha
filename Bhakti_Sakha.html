@@ -2520,10 +2520,11 @@ body {
   background:var(--bg);
 }
 .dhamas-search {
-  width:100%; padding:10px 14px; margin:0 16px 10px;
+  display:block; padding:10px 14px; margin:0 16px 10px;
+  width:calc(100% - 32px);
   background:rgba(255,255,255,0.05); border:1px solid var(--border);
   border-radius:10px; color:var(--text); font-size:0.85rem;
-  font-family:inherit; outline:none;
+  font-family:inherit; outline:none; box-sizing:border-box;
 }
 .dhamas-search:focus { border-color:var(--accent-blue); }
 .dhamas-grid {
@@ -2744,10 +2745,20 @@ body {
 /* Admin add dham button */
 .dham-add-btn {
   background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.25);
-  border-radius:10px; padding:7px 14px; font-size:0.78rem; font-weight:600;
+  border-radius:12px; padding:10px 20px; font-size:0.84rem; font-weight:600;
   color:var(--lavender); cursor:pointer; transition:background 0.15s;
+  width:100%; font-family:inherit;
 }
 .dham-add-btn:active { background:rgba(167,139,250,0.25); }
+/* Admin edit dham button */
+.dham-card-edit {
+  position:absolute; top:6px; left:6px; z-index:3;
+  width:24px; height:24px; border-radius:7px;
+  background:rgba(61,127,212,0.85); border:none; color:white;
+  font-size:0.7rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
 
 /* Add Dham Modal */
 .dham-form-section { margin-bottom:16px; }
@@ -5053,10 +5064,12 @@ body {
       </div>
       <div class="dhamas-hdr">
         <div class="screen-title" style="margin:0;border:none;padding:0;display:none;">Holy Dhamas</div>
-        <button class="dham-add-btn" id="dhamAddBtn" onclick="openAddDham()" style="display:none;">＋ Add Dham</button>
       </div>
       <input class="dhamas-search" id="dhamSearchInp" placeholder="🔍  Search dhamas..." oninput="renderDhamas(this.value)">
       <div class="dhamas-grid" id="dhamasGrid"></div>
+      <div style="padding:10px 16px 20px;text-align:center;">
+        <button class="dham-add-btn" id="dhamAddBtn" onclick="openAddDham()" style="display:none;">＋ Add Dham</button>
+      </div>
     </div>
   </div>
 
@@ -5066,6 +5079,7 @@ body {
       <div class="dham-detail-header">
         <button class="dham-back-btn" onclick="closeDhamDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
         <div class="dham-detail-title" id="dhamDetailTitle"></div>
+        <button class="dham-card-edit" id="dhamDetailEditBtn" style="position:static;width:30px;height:30px;font-size:0.8rem;display:none;" onclick="openEditDham(_currentDhamId)">✏️</button>
       </div>
       <div class="dham-detail-body" id="dhamDetailBody"></div>
     </div>
@@ -14350,7 +14364,17 @@ Railway Station: 139`,
 
 // User/admin can add custom dhamas
 let customDhamas = JSON.parse(localStorage.getItem('customDhamas') || '[]');
-function getAllDhamas() { return [...DHAMAS, ...customDhamas]; }
+function getAllDhamas() {
+  const customIds = new Set(customDhamas.map(d => d.id));
+  // Built-in dhamas, with custom overrides applied
+  const builtIn = DHAMAS.map(d => {
+    const override = customDhamas.find(c => c.id === d.id);
+    return override ? { ...d, ...override } : d;
+  });
+  // Custom-only dhamas (not overriding built-in)
+  const customOnly = customDhamas.filter(d => !DHAMAS.find(b => b.id === d.id));
+  return [...builtIn, ...customOnly];
+}
 
 function renderDhamas(filter) {
   const q = (filter !== undefined ? filter : document.getElementById('dhamSearchInp')?.value || '').trim().toLowerCase();
@@ -14376,8 +14400,11 @@ function renderDhamas(filter) {
     const delBtn = admin && isCustom
       ? `<button class="dham-card-del" onclick="event.stopPropagation();deleteCustomDham('${d.id}')" title="Delete">✕</button>`
       : '';
+    const editBtn = admin
+      ? `<button class="dham-card-edit" onclick="event.stopPropagation();openEditDham('${d.id}')" title="Edit">✏️</button>`
+      : '';
     return `<div class="dham-card" onclick="openDhamDetail('${d.id}')">
-      ${delBtn}
+      ${delBtn}${editBtn}
       <div class="dham-card-img">${d.icon || '🛕'}</div>
       <div class="dham-card-body">
         <div class="dham-card-name">${d.name}</div>
@@ -14399,6 +14426,7 @@ function deleteCustomDham(id) {
 }
 
 let _dhamDetailPrevScreen = 'dhamas';
+let _currentDhamId = null;
 
 // Rich text formatter for dham content
 function _fmtDhamText(text) {
@@ -14471,7 +14499,10 @@ function _fmtInline(text) {
 function openDhamDetail(id) {
   const d = getAllDhamas().find(x => x.id === id);
   if (!d) return;
+  _currentDhamId = id;
   document.getElementById('dhamDetailTitle').textContent = d.name;
+  const editBtn = document.getElementById('dhamDetailEditBtn');
+  if (editBtn) editBtn.style.display = hasPermission('dhamas') ? 'flex' : 'none';
 
   const sections = [
     { icon:'🕉️', title:'Overview',                          accent:'purple', content: d.overview, open:true },
@@ -14558,6 +14589,7 @@ function closeDhamDetail() {
 // ===== ADMIN: ADD DHAM =====
 function openAddDham() {
   if (!hasPermission('dhamas')) { showToast('Dhamas admin access required'); return; }
+  _editingDhamId = null;
   // Clear form
   ['dhamFName','dhamFLoc','dhamFIcon','dhamFOverview','dhamFScript','dhamFReach',
    'dhamFDarshan','dhamFFest','dhamFAccom','dhamFFood','dhamFSeva','dhamFPlaces',
@@ -14566,6 +14598,8 @@ function openAddDham() {
     if (el) el.value = '';
   });
   document.getElementById('dhamFTag').value = '';
+  const modalTitle = document.querySelector('#addDhamModal .modal-title');
+  if (modalTitle) modalTitle.textContent = '🛕 Add New Dham';
   document.getElementById('addDhamModal').classList.add('open');
 }
 
@@ -14586,8 +14620,7 @@ function saveNewDham() {
     return { name: (parts[0]||'').trim(), desc: (parts[1]||'').trim() };
   }) : [];
 
-  const dham = {
-    id: 'custom_' + Date.now(),
+  const dhamData = {
     name, location: loc,
     icon: document.getElementById('dhamFIcon').value.trim() || '🛕',
     tag: tagVal, tagLabel: TAG_LABELS[tagVal] || '',
@@ -14607,17 +14640,80 @@ function saveNewDham() {
     devoteeTips: document.getElementById('dhamFTips').value.trim(),
   };
 
-  customDhamas.push(dham);
-  localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
-  closeModal('addDhamModal');
-  renderDhamas();
-  showToast('Dham added ✓');
+  if (_editingDhamId) {
+    // Edit mode — find and update
+    const isCustom = _editingDhamId.startsWith('custom_');
+    if (isCustom) {
+      const idx = customDhamas.findIndex(d => d.id === _editingDhamId);
+      if (idx >= 0) {
+        customDhamas[idx] = { ...customDhamas[idx], ...dhamData };
+        localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+      }
+    } else {
+      // Built-in dham — save overrides in customDhamas
+      const overrideIdx = customDhamas.findIndex(d => d.id === _editingDhamId);
+      if (overrideIdx >= 0) {
+        customDhamas[overrideIdx] = { ...customDhamas[overrideIdx], ...dhamData };
+      } else {
+        customDhamas.push({ id: _editingDhamId, ...dhamData });
+      }
+      localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+    }
+    closeModal('addDhamModal');
+    renderDhamas();
+    // Refresh detail if open
+    if (document.getElementById('screen-dham-detail').classList.contains('active')) {
+      openDhamDetail(_editingDhamId);
+    }
+    showToast('Dham updated ✓');
+    _editingDhamId = null;
+  } else {
+    // Add mode
+    const dham = { id: 'custom_' + Date.now(), ...dhamData };
+    customDhamas.push(dham);
+    localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+    closeModal('addDhamModal');
+    renderDhamas();
+    showToast('Dham added ✓');
+  }
 }
 
 // Update dham add button visibility
 function updateDhamAdminUI() {
   const btn = document.getElementById('dhamAddBtn');
   if (btn) btn.style.display = hasPermission('dhamas') ? '' : 'none';
+}
+
+let _editingDhamId = null;
+
+function openEditDham(id) {
+  if (!hasPermission('dhamas')) { showToast('Dhamas admin access required'); return; }
+  const d = getAllDhamas().find(x => x.id === id);
+  if (!d) { showToast('Dham not found'); return; }
+  _editingDhamId = id;
+  // Pre-fill form
+  document.getElementById('dhamFName').value = d.name || '';
+  document.getElementById('dhamFLoc').value = d.location || '';
+  document.getElementById('dhamFIcon').value = d.icon || '';
+  document.getElementById('dhamFTag').value = d.tag || '';
+  document.getElementById('dhamFOverview').value = d.overview || '';
+  document.getElementById('dhamFScript').value = d.scriptural || '';
+  document.getElementById('dhamFReach').value = d.howToReach || '';
+  document.getElementById('dhamFDarshan').value = d.darshan || '';
+  document.getElementById('dhamFFest').value = d.festivals || '';
+  document.getElementById('dhamFAccom').value = d.accommodation || '';
+  document.getElementById('dhamFFood').value = d.prasadam || '';
+  document.getElementById('dhamFSeva').value = d.seva || '';
+  document.getElementById('dhamFPlaces').value = (d.keyPlaces||[]).map(p => p.name + (p.desc ? ' | ' + p.desc : '')).join('\n');
+  document.getElementById('dhamFItin').value = d.itinerary || '';
+  document.getElementById('dhamFDos').value = d.dos || '';
+  document.getElementById('dhamFBest').value = d.bestTime || '';
+  document.getElementById('dhamFContacts').value = d.contacts || '';
+  document.getElementById('dhamFTips').value = d.devoteeTips || '';
+  // Update modal title
+  const modalTitle = document.querySelector('#addDhamModal .modal-title');
+  if (modalTitle) modalTitle.textContent = '✏️ Edit Dham';
+  document.getElementById('addDhamModal').classList.add('open');
 }
 
 // ===================================================================
