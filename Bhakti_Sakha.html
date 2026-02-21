@@ -141,6 +141,39 @@ body {
 .screen { display:none; flex-direction:column; height:100%; overflow:hidden; }
 .screen.active { display:flex; }
 
+/* ===== SCREEN TRANSITION ANIMATIONS ===== */
+@keyframes scrn-slidedown {
+  from { opacity:0; transform:translateY(-25px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes scrn-zoomin {
+  from { opacity:0; transform:scale(0.82); }
+  to { opacity:1; transform:scale(1); }
+}
+@keyframes scrn-circleexpand {
+  from { opacity:0; clip-path:circle(0% at 50% 50%); }
+  to { opacity:1; clip-path:circle(100% at 50% 50%); }
+}
+@keyframes scrn-blur {
+  from { opacity:0; filter:blur(10px); transform:scale(1.04); }
+  to { opacity:1; filter:blur(0); transform:scale(1); }
+}
+@keyframes scrn-combo {
+  0% { opacity:0; clip-path:circle(0% at 50% 40%); transform:translateY(-15px); }
+  40% { opacity:0.6; clip-path:circle(55% at 50% 45%); transform:translateY(-5px); }
+  100% { opacity:1; clip-path:circle(100% at 50% 50%); transform:translateY(0); }
+}
+.scrn-anim-slidedown > *:first-child { animation: scrn-slidedown 0.4s ease-out both; }
+.scrn-anim-zoomin > *:first-child { animation: scrn-zoomin 0.42s cubic-bezier(0.34,1.4,0.64,1) both; }
+.scrn-anim-circleexpand > *:first-child { animation: scrn-circleexpand 0.48s ease-out both; }
+.scrn-anim-blur > *:first-child { animation: scrn-blur 0.45s ease-out both; }
+.scrn-anim-combo > *:first-child { animation: scrn-combo 0.5s ease-out both; }
+/* Info sub-page animation */
+.info-page.scrn-anim-combo > .info-page-content { animation: scrn-combo 0.45s ease-out both; }
+/* Song inner category animation */
+#songsContent.scrn-anim-combo > * { animation: scrn-combo 0.45s ease-out both; }
+#songsContent.scrn-anim-zoomin > * { animation: scrn-zoomin 0.4s cubic-bezier(0.34,1.4,0.64,1) both; }
+
 
 /* ===== CALENDAR LOCATION BAR ===== */
 .cal-loc-bar {
@@ -8616,6 +8649,11 @@ function renderSongs(filter) {
         <button class="kirtan-add-btn" onclick="openAdminSong()">＋</button>
       </div>
       <div style="padding:8px 0 100px;">${innerCards}</div>`;
+    // Animate songs inside category
+    const sc = document.getElementById('songsContent');
+    sc.classList.remove('scrn-anim-combo','scrn-anim-zoomin');
+    void sc.offsetWidth;
+    sc.classList.add('scrn-anim-combo');
   } else {
     // Show category folder cards
     const CAT_ORDER = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
@@ -8774,8 +8812,9 @@ function openSongDetail(id) {
   _hookSongDetailAudio(id);
 
   // Switch to detail screen (no nav highlight change)
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-song-detail').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const sdEl = document.getElementById('screen-song-detail');
+  sdEl.classList.add('active','scrn-anim-slidedown');
 
   // Hide mini bar when we're looking at the playing song (avoid redundancy)
   const bar = document.getElementById('nowPlayingBar');
@@ -8823,8 +8862,9 @@ async function changeSongCat(songId, newCat) {
 
 function closeSongDetail() {
   _persistCurrentAudio(); // Keep audio playing if active
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + _songDetailPrevScreen).classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const prevEl = document.getElementById('screen-' + _songDetailPrevScreen);
+  prevEl.classList.add('active','scrn-anim-zoomin');
   _currentSongId = null;
   // Re-show now-playing bar if audio is still playing
   if (_playingSongId && _persistentAudio && !_persistentAudio.paused) {
@@ -12883,8 +12923,21 @@ function switchScreen(name, btn) {
     // Re-show mini bar since we're leaving song detail
     setTimeout(() => _updateNowPlayingBar(true), 50);
   }
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(`screen-${name}`).classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo');
+  });
+  const screenEl = document.getElementById(`screen-${name}`);
+  // Screen animation map
+  const SCREEN_ANIM = {
+    home:'slidedown', sevakart:'slidedown', prayer:'slidedown', 'prayer-detail':'slidedown', 'prayer-my':'slidedown',
+    dhamas:'slidedown', settings:'slidedown', 'song-detail':'slidedown',
+    songs:'zoomin',
+    notes:'circleexpand', events:'circleexpand',
+    calendar:'blur', search:'blur',
+    info:'combo', admin:'combo', 'admin-sevakart':'combo', 'admin-prayer':'combo', userlist:'combo'
+  };
+  const anim = SCREEN_ANIM[name] || 'slidedown';
+  screenEl.classList.add('active', 'scrn-anim-' + anim);
 
   // Sync bottom nav state
   const mainTabs = ['home','calendar','songs','events'];
@@ -13000,10 +13053,10 @@ function switchScreen(name, btn) {
 
 /* ── Info Page Navigation ── */
 function infoGoPage(name) {
-  document.querySelectorAll('.info-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.info-page').forEach(p => p.classList.remove('active','scrn-anim-combo'));
   const target = document.getElementById('infoPage-' + name);
   if (target) {
-    target.classList.add('active');
+    target.classList.add('active','scrn-anim-combo');
     const content = target.querySelector('.info-page-content');
     if (content) content.scrollTop = 0;
   }
@@ -14582,8 +14635,9 @@ function openDhamDetail(id) {
   if (currentScreen !== 'dham-detail') {
     _dhamDetailPrevScreen = currentScreen;
   }
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-dham-detail').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const ddEl = document.getElementById('screen-dham-detail');
+  ddEl.classList.add('active','scrn-anim-slidedown');
   document.getElementById('headerDate').textContent = d.name;
   document.getElementById('headerMasa').style.display = 'none';
   document.getElementById('headerIcons').style.display = 'none';
@@ -14591,8 +14645,9 @@ function openDhamDetail(id) {
 }
 
 function closeDhamDetail() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + _dhamDetailPrevScreen).classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const prevEl = document.getElementById('screen-' + _dhamDetailPrevScreen);
+  prevEl.classList.add('active','scrn-anim-slidedown');
   if (_dhamDetailPrevScreen === 'dhamas') {
     document.getElementById('headerDate').textContent = 'Holy Dhamas';
     document.getElementById('headerMasa').style.display = 'none';
