@@ -4357,8 +4357,8 @@ body {
     <!-- Fixed top bar -->
     <div class="kirtan-topbar">
       <div class="kirtan-search-wrap">
-        <input class="kirtan-search-inp" id="kirtanSearchInp" placeholder="Search songs, author, lyrics…" autocomplete="off"
-          oninput="kirtanSearch(this.value)" onfocus="kirtanSearch(this.value)" onblur="setTimeout(()=>kirtanHideDropdown(),200)">
+        <input class="kirtan-search-inp" id="kirtanSearchInp" placeholder="Search songs, lyrics…" autocomplete="off"
+          oninput="_kirtanSearchDebounced(this.value)" onfocus="_kirtanSearchDebounced(this.value)" onblur="setTimeout(()=>kirtanHideDropdown(),200)">
         <button class="kirtan-clear-btn" id="kirtanClearBtn" onclick="kirtanClear()" style="display:none;">✕</button>
       </div>
       <!-- Live dropdown -->
@@ -7749,16 +7749,18 @@ function _songTitle(s) {
   return s.title_dev || iastToDev(s.title || '');
 }
 
-// Extract a snippet from lyrics around the search query (2 words before & after)
+// Extract a snippet from lyrics around the search query (whole-word match, 2 words before & after)
 function _getLyricSnippet(text, query) {
   if (!text || !query) return '';
-  const lower = text.toLowerCase();
-  const ql = query.toLowerCase();
-  const idx = lower.indexOf(ql);
-  if (idx === -1) return '';
-  // Get surrounding text: find word boundaries
-  const before = text.substring(0, idx);
-  const after = text.substring(idx + query.length);
+  const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\\n])(' + escaped + ')(?:$|[\\s,;!?\\.\\-—\\n])', 'i');
+  const m = re.exec(text);
+  if (!m) return '';
+  const idx = m.index + (m[0].length - m[1].length - (m[0].length - m[0].trimEnd().length || 0));
+  const matchStart = text.indexOf(m[1], m.index);
+  // Get surrounding text
+  const before = text.substring(0, matchStart);
+  const after = text.substring(matchStart + query.length);
   // Get 2 words before
   const wordsBefore = before.replace(/\n/g,' ').trimEnd().split(/\s+/);
   const pre = wordsBefore.slice(-2).join(' ');
@@ -7766,7 +7768,7 @@ function _getLyricSnippet(text, query) {
   const wordsAfter = after.replace(/\n/g,' ').trimStart().split(/\s+/);
   const post = wordsAfter.slice(0, 2).join(' ');
   // The matched text (preserve original case)
-  const matched = text.substring(idx, idx + query.length);
+  const matched = text.substring(matchStart, matchStart + query.length);
   return (pre ? '…' + pre + ' ' : '') + '**' + matched + '**' + (post ? ' ' + post + '…' : '');
 }
 
@@ -8101,16 +8103,14 @@ function _buildSongCard(s, idx, searchQuery) {
   const authorText = s.author ? s.author : '';
   const subLine = (authorText || hasAudio)
     ? `<div class="song-by">${authorText}${authorText && hasAudio ? ' ' : ''}${audioBadge}</div>` : '';
-  // Lyrics snippet: show only if search query matches lyrics but NOT title
+  // Lyrics snippet: show only if search query matches lyrics (whole-word) but NOT title
   let snippetHtml = '';
   if (searchQuery) {
     const ql = searchQuery.toLowerCase();
     const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
     if (!titleMatch) {
-      if ((s.lyrics||'').toLowerCase().includes(ql)) {
+      if (_lyricsWholeWordMatch(s.lyrics, ql)) {
         snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'song-lyric-snippet');
-      } else if ((s.trans||'').toLowerCase().includes(ql)) {
-        snippetHtml = _lyricSnippetHtml(s.trans, ql, 'song-lyric-snippet');
       }
     }
   }
@@ -8168,11 +8168,8 @@ function renderSongs(filter) {
   let pool = q ? songs.filter(s =>
     (s.title||'').toLowerCase().includes(q) ||
     (s.officialName||'').toLowerCase().includes(q) ||
-    (s.author||'').toLowerCase().includes(q) ||
-    (s.book||'').toLowerCase().includes(q) ||
-    (s.lyrics||'').toLowerCase().includes(q) ||
-    (s.trans||'').toLowerCase().includes(q) ||
-    (songLang !== 'en' && _songTitle(s).includes(q))
+    (songLang !== 'en' && _songTitle(s).includes(q)) ||
+    _lyricsWholeWordMatch(s.lyrics, q)
   ) : songs;
 
   let cards = '';
@@ -8471,6 +8468,27 @@ function deleteSongFromDetail() {
 
 
 // ---- Kirtan search ----
+let _kirtanSearchTimer = null;
+function _kirtanSearchDebounced(q) {
+  const clearBtn = document.getElementById('kirtanClearBtn');
+  if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+  // If empty, clear immediately
+  if (!q.trim()) { kirtanSearch(q); return; }
+  // If last char is space, search immediately (word boundary)
+  if (q.endsWith(' ')) { clearTimeout(_kirtanSearchTimer); kirtanSearch(q); return; }
+  // Otherwise debounce 400ms
+  clearTimeout(_kirtanSearchTimer);
+  _kirtanSearchTimer = setTimeout(() => kirtanSearch(q), 400);
+}
+
+// Whole-word match helper for lyrics
+function _lyricsWholeWordMatch(lyrics, query) {
+  if (!lyrics || !query) return false;
+  const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\\n])' + escaped + '(?:$|[\\s,;!?\\.\\-—\\n])', 'i');
+  return re.test(lyrics);
+}
+
 function kirtanSearch(q) {
   const clearBtn = document.getElementById('kirtanClearBtn');
   if (clearBtn) clearBtn.style.display = q ? '' : 'none';
@@ -8480,11 +8498,8 @@ function kirtanSearch(q) {
   const matches = songs.filter(s =>
     (s.title||'').toLowerCase().includes(ql) ||
     (s.officialName||'').toLowerCase().includes(ql) ||
-    (s.author||'').toLowerCase().includes(ql) ||
-    (s.book||'').toLowerCase().includes(ql) ||
-    (s.lyrics||'').toLowerCase().includes(ql) ||
-    (s.trans||'').toLowerCase().includes(ql) ||
-    (songLang !== 'en' && _songTitle(s).includes(ql))
+    (songLang !== 'en' && _songTitle(s).includes(ql)) ||
+    _lyricsWholeWordMatch(s.lyrics, ql)
   ).slice(0, 12);
 
   if (!matches.length) {
@@ -8495,14 +8510,12 @@ function kirtanSearch(q) {
       const hl = t => (t||'').replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
       const displayTitle = _songTitle(s);
-      // Show lyrics snippet only if match is NOT in title/officialName but IS in lyrics/trans
+      // Show lyrics snippet only if match is NOT in title/officialName but IS in lyrics (whole-word)
       const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
       let snippetHtml = '';
       if (!titleMatch) {
-        if ((s.lyrics||'').toLowerCase().includes(ql)) {
+        if (_lyricsWholeWordMatch(s.lyrics, ql)) {
           snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'kd-lyric-snippet');
-        } else if ((s.trans||'').toLowerCase().includes(ql)) {
-          snippetHtml = _lyricSnippetHtml(s.trans, ql, 'kd-lyric-snippet');
         }
       }
       const icon = s.i || (_getCatIcon(s.cat));
