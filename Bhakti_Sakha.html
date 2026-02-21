@@ -8568,8 +8568,10 @@ function renderSongs(filter) {
     _openCatKey = null;
     const authors = [...new Set(pool.map(s => s.author))].sort((a,b) => a.localeCompare(b));
     authors.forEach(author => {
-      pool.filter(s => s.author === author).forEach((s,i) => {
-        if (i===0) cards += `<div class="cat-title">✍️ ${author}</div>`;
+      const authorSongs = pool.filter(s => s.author === author);
+      const cnt = authorSongs.length;
+      cards += `<div class="cat-title">✍️ ${author}<span style="margin-left:auto;font-weight:600;letter-spacing:0;text-transform:none;color:var(--text3);font-size:0.68rem;">${cnt} song${cnt!==1?'s':''}</span></div>`;
+      authorSongs.forEach((s,i) => {
         cards += _buildSongCard(s, i, q || undefined);
       });
     });
@@ -8595,6 +8597,7 @@ function renderSongs(filter) {
     // Show songs inside the opened category folder
     const CAT_ORDER_KEYS = ['vbhajan','astakam','stotram','gita','bhagavatam','samhita'];
     const info = CAT_FOLDER_INFO[_openCatKey] || { icon:'📌', name:'Other' };
+    const detailName = _openCatKey === 'bhagavatam' ? 'SB Prayers' : info.name;
     const catSongs = _openCatKey === 'other'
       ? pool.filter(s => !CAT_ORDER_KEYS.includes(s.cat)).sort(_naturalSongSort)
       : pool.filter(s => s.cat === _openCatKey).sort(_naturalSongSort);
@@ -8608,7 +8611,7 @@ function renderSongs(filter) {
           Back
         </button>
         <span style="font-size:1.2rem;">${info.icon}</span>
-        <span class="cat-detail-title">${info.name}</span>
+        <span class="cat-detail-title">${detailName}</span>
         <span class="cat-detail-count">${catSongs.length} song${catSongs.length!==1?'s':''}</span>
         <button class="kirtan-add-btn" onclick="openAdminSong()">＋</button>
       </div>
