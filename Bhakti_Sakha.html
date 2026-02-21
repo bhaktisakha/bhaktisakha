@@ -3696,19 +3696,20 @@ body {
 .home-card--fullwidth .home-evt-top {
   display:flex; align-items:center; gap:10px; margin-bottom:2px;
 }
-.home-evt-upcoming { margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+.home-evt-upcoming { margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:6px; max-height:108px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent; }
+.home-evt-upcoming::-webkit-scrollbar { width:3px; }
+.home-evt-upcoming::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
 .home-evt-row {
-  display:flex; align-items:center; gap:8px; padding:6px 0;
+  display:flex; align-items:center; gap:6px; padding:5px 0;
   border-bottom:1px solid rgba(255,255,255,0.04);
 }
 .home-evt-row:last-child { border-bottom:none; }
-.home-evt-row-icon { font-size:1.1rem; width:28px; text-align:center; flex-shrink:0; }
-.home-evt-row-info { flex:1; min-width:0; }
-.home-evt-row-name { font-size:0.78rem; color:var(--text); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.home-evt-row-meta { font-size:0.67rem; color:var(--text3); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.home-evt-row-icon { font-size:1rem; width:22px; text-align:center; flex-shrink:0; }
+.home-evt-row-name { font-size:0.76rem; color:var(--text); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.home-evt-row-date { font-size:0.64rem; color:var(--text3); white-space:nowrap; flex-shrink:0; }
 .home-evt-row-badge {
-  flex-shrink:0; font-size:0.62rem; font-weight:700; padding:2px 8px; border-radius:10px;
-  letter-spacing:0.3px;
+  flex-shrink:0; font-size:0.6rem; font-weight:700; padding:2px 7px; border-radius:10px;
+  letter-spacing:0.3px; white-space:nowrap;
 }
 .home-evt-badge-today { background:rgba(39,174,96,0.2); color:#5ee8a0; }
 .home-evt-badge-soon { background:rgba(232,168,56,0.15); color:#f0c850; }
@@ -12785,19 +12786,20 @@ function _updateHomeEvtWidget() {
     return;
   }
   const todayStr = new Date().toISOString().slice(0,10);
-  // Get next 3 events: today + upcoming + ongoing multi-day
+  // Only events within the next 7 days (including today + ongoing multi-day)
   const sorted = [...customEvts].filter(e => {
-    if (_evtDaysUntil(e) >= 0) return true;
+    const days = _evtDaysUntil(e);
+    if (days >= 0 && days <= 7) return true;
     // Include ongoing multi-day events
     if (_evtIsMultiDay(e)) {
       const {end} = _evtDateRange(e);
       return end >= todayStr;
     }
     return false;
-  }).sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b)).slice(0,3);
+  }).sort((a,b) => _evtDaysUntil(a) - _evtDaysUntil(b));
 
   if (!sorted.length) {
-    w.innerHTML = '<div class="home-evt-empty">No upcoming events. Tap to add one.</div>';
+    w.innerHTML = '<div class="home-evt-empty">No upcoming events in the next 7 days.</div>';
     return;
   }
 
@@ -12805,18 +12807,15 @@ function _updateHomeEvtWidget() {
     const icon = _evtIcon(e.type);
     const name = e.name || e.apptTitle || e.spiritTitle || 'Event';
     const days = _evtDaysUntil(e);
-    const label = _evtTypeLabel(e.type);
 
-    // Date/time meta line
-    let meta = '';
+    // Short date string (e.g. "Feb 28")
+    let dateStr = '';
     if (e.apptDate || e.spiritDate) {
       const sd = e.apptDate || e.spiritDate;
       const d = new Date(sd);
-      meta = d.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short'});
-      const time = e.startTime || e.spiritTime;
-      if (time) meta += ' · ' + _evtFormatTime(time);
-    } else {
-      meta = typeof MONTHS_SHORT !== 'undefined' ? MONTHS_SHORT[e.month] + ' ' + e.day : label;
+      dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+    } else if (typeof MONTHS_SHORT !== 'undefined') {
+      dateStr = MONTHS_SHORT[e.month] + ' ' + e.day;
     }
 
     // Badge
@@ -12840,10 +12839,8 @@ function _updateHomeEvtWidget() {
 
     return `<div class="home-evt-row">
       <div class="home-evt-row-icon">${icon}</div>
-      <div class="home-evt-row-info">
-        <div class="home-evt-row-name">${name}</div>
-        <div class="home-evt-row-meta">${meta}</div>
-      </div>
+      <div class="home-evt-row-name">${name}</div>
+      <div class="home-evt-row-date">${dateStr}</div>
       <div class="home-evt-row-badge ${badgeClass}">${badgeLabel}</div>
     </div>`;
   }).join('');
