@@ -16601,6 +16601,9 @@ function pcRenderDetail(reqId) {
     </div>`;
   }
 
+  // Report button
+  html += `<button class="pc-report-btn" onclick="pcOpenReport('${req.id}')">🚩 Report this request</button>`;
+
   // Admin actions
   if (isAdminUser) {
     html += `<div class="admin-dropdown" id="pcAdminDropdown" style="margin-top:16px;">
@@ -16618,9 +16621,6 @@ function pcRenderDetail(reqId) {
       </div>
     </div>`;
   }
-
-  // Report button
-  html += `<button class="pc-report-btn" onclick="pcOpenReport('${req.id}')">🚩 Report this request</button>`;
 
   body.innerHTML = html;
 }
