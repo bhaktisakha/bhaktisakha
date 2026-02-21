@@ -4184,6 +4184,24 @@ body {
 .pc-prayer-author { font-size:0.74rem; font-weight:600; color:#f0c850; margin-bottom:4px; }
 .pc-prayer-text { font-size:0.84rem; color:var(--text2); line-height:1.5; font-style:italic; }
 .pc-prayer-time { font-size:0.66rem; color:var(--text3); margin-top:4px; }
+.pc-prayer-reactions {
+  display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; align-items:center;
+}
+.pc-react-btn {
+  display:flex; align-items:center; gap:3px;
+  padding:4px 10px; border-radius:20px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);
+  font-size:0.82rem; cursor:pointer;
+  transition:all 0.2s; color:var(--text3);
+}
+.pc-react-btn:active { transform:scale(0.92); }
+.pc-react-btn.reacted {
+  background:rgba(232,168,56,0.1); border-color:rgba(232,168,56,0.25);
+}
+.pc-react-count {
+  font-size:0.68rem; font-weight:600; color:var(--text2); min-width:8px; text-align:center;
+}
 
 /* Updates / gratitude section */
 .pc-updates-section { margin-top:16px; }
@@ -16456,6 +16474,23 @@ function pcSubmitWrittenPrayer() {
   if (_pcCurrentDetailId === _pcWritePrayerId) pcRenderDetail(_pcWritePrayerId);
 }
 
+function pcToggleReaction(prayerId, emoji) {
+  if (!gUser || !gUser.email) { showToast('Please sign in to react'); return; }
+  const prayer = pcPrayers.find(p => p.id === prayerId);
+  if (!prayer) return;
+  if (!prayer.reactions) prayer.reactions = {};
+  if (!prayer.reactions[emoji]) prayer.reactions[emoji] = [];
+  const email = gUser.email.toLowerCase();
+  const idx = prayer.reactions[emoji].indexOf(email);
+  if (idx > -1) {
+    prayer.reactions[emoji].splice(idx, 1);
+  } else {
+    prayer.reactions[emoji].push(email);
+  }
+  _pcSave();
+  if (_pcCurrentDetailId) pcRenderDetail(_pcCurrentDetailId);
+}
+
 let _pcDetailReturnScreen = 'prayer'; // Track where to return when closing detail
 
 function pcOpenDetail(reqId, fromScreen) {
@@ -16507,17 +16542,29 @@ function pcRenderDetail(reqId) {
       </div>
     </div>`;
 
-  // Written prayers
+  // Written prayers (latest first)
   if (writtenPrayers.length) {
+    const sortedPrayers = [...writtenPrayers].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
     html += `<div class="pc-prayers-section">
-      <div class="pc-prayers-title">✍️ Written Prayers (${writtenPrayers.length})</div>
-      ${writtenPrayers.map(p => `
+      <div class="pc-prayers-title">✍️ Written Prayers (${sortedPrayers.length})</div>
+      ${sortedPrayers.map(p => {
+        const reactions = p.reactions || {};
+        const PC_REACT_EMOJIS = ['🙏','🙇‍♂️','🙇‍♀️','🩷'];
+        const reactHtml = PC_REACT_EMOJIS.map(em => {
+          const users = reactions[em] || [];
+          const count = users.length;
+          const reacted = userEmail && users.includes(userEmail);
+          return `<button class="pc-react-btn ${reacted?'reacted':''}" onclick="pcToggleReaction('${p.id}','${em}')">${em}${count ? `<span class="pc-react-count">${count}</span>` : ''}</button>`;
+        }).join('');
+        const totalReactions = Object.values(reactions).reduce((s,arr) => s + (arr ? arr.length : 0), 0);
+        return `
         <div class="pc-prayer-item">
           <div class="pc-prayer-author">${p.author}</div>
           <div class="pc-prayer-text">"${p.text}"</div>
-          <div class="pc-prayer-time">${_pcTimeAgo(p.timestamp)}</div>
+          <div class="pc-prayer-time">${_pcTimeAgo(p.timestamp)}${totalReactions ? ' · ' + totalReactions + ' reaction' + (totalReactions!==1?'s':'') : ''}</div>
+          <div class="pc-prayer-reactions">${reactHtml}</div>
         </div>
-      `).join('')}
+      `}).join('')}
     </div>`;
   }
 
