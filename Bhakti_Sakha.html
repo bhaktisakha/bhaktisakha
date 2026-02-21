@@ -3276,8 +3276,40 @@ body {
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sk-detail-gallery { position:relative; height:200px; background:var(--bg3);
   display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.sk-detail-gallery img { width:100%; height:200px; object-fit:cover; }
+.sk-detail-gallery img { width:100%; height:200px; object-fit:cover; cursor:pointer; }
 .sk-detail-gallery-placeholder { font-size:3.06rem; color:var(--text3); }
+
+/* Image lightbox */
+.sk-lightbox {
+  position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999;
+  background:rgba(0,0,0,0.92); display:flex; align-items:center;
+  justify-content:center; opacity:0; pointer-events:none;
+  transition:opacity 0.25s;
+}
+.sk-lightbox.open { opacity:1; pointer-events:auto; }
+.sk-lightbox img {
+  max-width:95vw; max-height:90vh; object-fit:contain; border-radius:8px;
+  box-shadow:0 4px 30px rgba(0,0,0,0.5);
+}
+.sk-lightbox-close {
+  position:absolute; top:16px; right:16px; width:36px; height:36px;
+  border-radius:50%; background:rgba(255,255,255,0.15); border:none;
+  color:#fff; font-size:1.3rem; cursor:pointer; display:flex;
+  align-items:center; justify-content:center;
+}
+.sk-lightbox-nav {
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,0.12); border:none; color:#fff;
+  font-size:1.2rem; cursor:pointer; display:flex;
+  align-items:center; justify-content:center;
+}
+.sk-lightbox-nav.prev { left:12px; }
+.sk-lightbox-nav.next { right:12px; }
+.sk-lightbox-counter {
+  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+  color:rgba(255,255,255,0.7); font-size:0.78rem;
+}
 .sk-detail-gallery-dots { position:absolute; bottom:8px; display:flex; gap:6px; }
 .sk-detail-gallery-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.4); }
 .sk-detail-gallery-dot.active { background:var(--accent-gold); }
@@ -5844,6 +5876,15 @@ body {
     <button class="f-submit" onclick="skConfirmReject()" style="background:var(--accent-red);">Reject Listing</button>
     <button class="f-cancel" onclick="closeModal('skRejectModal')">Cancel</button>
   </div>
+</div>
+
+<!-- SevaKart: Image Lightbox -->
+<div class="sk-lightbox" id="skLightbox" onclick="skCloseLightbox()">
+  <button class="sk-lightbox-close" onclick="skCloseLightbox()">✕</button>
+  <button class="sk-lightbox-nav prev" onclick="event.stopPropagation();skLightboxNav(-1)">‹</button>
+  <img id="skLightboxImg" src="" alt="" onclick="event.stopPropagation()">
+  <button class="sk-lightbox-nav next" onclick="event.stopPropagation();skLightboxNav(1)">›</button>
+  <div class="sk-lightbox-counter" id="skLightboxCounter"></div>
 </div>
 
 <!-- Admin Song Modal -->
@@ -14514,28 +14555,32 @@ let _skDetailReturnScreen = 'sevakart';
 function skOpenDetail(id, fromScreen) {
   if (fromScreen) _skDetailReturnScreen = fromScreen;
   else _skDetailReturnScreen = 'sevakart';
-  const l = skListings.find(x => x.id === id);
-  if (!l) return;
-  _skViewingId = id;
+  const l = skListings.find(x => String(x.id) === String(id));
+  if (!l) { showToast('Listing not found — it may have been removed'); return; }
+  _skViewingId = l.id;
 
   document.getElementById('skDetailHTitle').textContent = l.bizName || l.contactName || 'Untitled';
   const content = document.getElementById('skDetailContent');
 
-  const r = _skGetRating(id);
-  const reviews = skReviews.filter(rv => rv.listingId === id).slice(-3).reverse();
+  const r = _skGetRating(l.id);
+  const reviews = skReviews.filter(rv => rv.listingId === l.id).slice(-3).reverse();
   const isSkAdmin = hasPermission('sevakart');
   const userEmail = gUser?.email?.toLowerCase() || '';
-  const hasReviewed = skReviews.some(rv => rv.listingId === id && rv.userEmail === userEmail);
-  const hasContacted = localStorage.getItem('skContacted:'+id);
+  const hasReviewed = skReviews.some(rv => rv.listingId === l.id && rv.userEmail === userEmail);
+  const hasContacted = localStorage.getItem('skContacted:'+l.id);
 
-  // Gallery
+  // Gallery with lightbox
   const photos = (l.photos||[]).filter(Boolean);
+  _skLightboxPhotos = photos;
+  _skLightboxIdx = 0;
   let galleryHTML = '';
   if (photos.length) {
-    galleryHTML = `<div class="sk-detail-gallery"><img src="${photos[0]}" alt="" id="skGalleryImg">
+    galleryHTML = `<div class="sk-detail-gallery">
+      <img src="${photos[0]}" alt="" id="skGalleryImg" onclick="skOpenLightbox(0)">
       ${photos.length > 1 ? `<div class="sk-detail-gallery-dots">${photos.map((_,i) =>
-        `<div class="sk-detail-gallery-dot ${i===0?'active':''}" onclick="document.getElementById('skGalleryImg').src='${photos[i]}';document.querySelectorAll('.sk-detail-gallery-dot').forEach((d,j)=>d.classList.toggle('active',j===${i}))"></div>`
+        `<div class="sk-detail-gallery-dot ${i===0?'active':''}" onclick="event.stopPropagation();document.getElementById('skGalleryImg').src='${photos[i]}';_skLightboxIdx=${i};document.querySelectorAll('.sk-detail-gallery-dot').forEach((d,j)=>d.classList.toggle('active',j===${i}))"></div>`
       ).join('')}</div>` : ''}
+      <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;font-size:0.64rem;padding:3px 8px;border-radius:6px;pointer-events:none;">Tap to expand</div>
     </div>`;
   } else {
     const catIcon = SK_CATEGORIES.find(c=>c.id===l.category)?.icon || '🪔';
@@ -14605,6 +14650,32 @@ function skOpenDetail(id, fromScreen) {
   // Switch screen
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-sevakart-detail').classList.add('active');
+  history.pushState({screen:'sevakart-detail'}, '', '');
+}
+
+// ---- Image Lightbox ----
+let _skLightboxPhotos = [];
+let _skLightboxIdx = 0;
+
+function skOpenLightbox(idx) {
+  if (!_skLightboxPhotos.length) return;
+  _skLightboxIdx = idx || 0;
+  const lb = document.getElementById('skLightbox');
+  document.getElementById('skLightboxImg').src = _skLightboxPhotos[_skLightboxIdx];
+  const counter = document.getElementById('skLightboxCounter');
+  counter.textContent = _skLightboxPhotos.length > 1 ? (_skLightboxIdx + 1) + ' / ' + _skLightboxPhotos.length : '';
+  document.querySelectorAll('.sk-lightbox-nav').forEach(b => b.style.display = _skLightboxPhotos.length > 1 ? '' : 'none');
+  lb.classList.add('open');
+}
+
+function skCloseLightbox() {
+  document.getElementById('skLightbox').classList.remove('open');
+}
+
+function skLightboxNav(dir) {
+  _skLightboxIdx = (_skLightboxIdx + dir + _skLightboxPhotos.length) % _skLightboxPhotos.length;
+  document.getElementById('skLightboxImg').src = _skLightboxPhotos[_skLightboxIdx];
+  document.getElementById('skLightboxCounter').textContent = (_skLightboxIdx + 1) + ' / ' + _skLightboxPhotos.length;
 }
 
 function skCloseDetail() {
@@ -15163,8 +15234,6 @@ function renderAdminSevakart() {
           ${l.fullDesc && l.fullDesc !== l.shortDesc ? `<div class="adm-item-card-desc" style="font-size:0.78rem;color:var(--text3);">${l.fullDesc.replace(/\n?<!--SKMETA:.*?-->/s, '').substring(0, 300)}${l.fullDesc.length > 300 ? '...' : ''}</div>` : ''}
           <div class="adm-item-card-actions">
             <button class="adm-item-action-btn review" onclick="skOpenDetail('${l.id}','admin-sevakart')">👁 Review Details</button>
-            <button class="adm-item-action-btn approve" onclick="event.stopPropagation();_admSkQuickApprove('${l.id}')">✅ Approve</button>
-            <button class="adm-item-action-btn reject" onclick="event.stopPropagation();_admSkQuickReject('${l.id}')">❌ Reject</button>
           </div>
         </div>`;
       }).join('');
