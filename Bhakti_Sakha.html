@@ -1415,92 +1415,115 @@ body {
 .tog-slider { display:none; }
 
 /* About Modal */
-/* INFO SCREEN */
-.info-screen { padding:0 16px 100px; overflow-y:auto; height:100%; }
-.info-hero {
-  text-align:center; padding:28px 0 20px;
-}
-.info-hero-icon { font-size:3.2rem; margin-bottom:10px; filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
-.info-hero-name { font-size:1.4rem; font-weight:700; color:var(--text); letter-spacing:0.5px; }
-.info-hero-version {
-  font-size:0.72rem; color:var(--accent-blue); font-weight:600; margin-top:6px;
-  display:inline-block; background:rgba(61,127,212,0.12); padding:3px 12px; border-radius:20px;
-}
-.info-hero-sub {
-  font-size:0.78rem; color:var(--text2); margin-top:8px; line-height:1.5;
-}
-.info-hero-glory {
-  font-size:0.88rem; color:var(--accent-gold); font-style:italic; margin-top:14px; font-weight:500;
-}
-.info-section {
-  background:var(--card); border:1px solid var(--border); border-radius:16px;
-  padding:18px 16px; margin-bottom:14px;
-}
-.info-section-title {
-  font-size:0.92rem; font-weight:700; color:var(--accent-blue); margin-bottom:12px;
-  display:flex; align-items:center; gap:8px;
-}
-.info-section-title .info-icon {
-  font-size:1.1rem;
-}
-.info-text {
-  font-size:0.82rem; color:var(--text2); line-height:1.7; margin-bottom:0;
-}
-.info-text strong { color:var(--text); }
-.info-step {
-  display:flex; align-items:flex-start; gap:12px; margin-bottom:12px;
-}
-.info-step-num {
-  min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-  font-size:0.72rem; font-weight:700; color:#fff; flex-shrink:0; margin-top:1px;
-}
-.info-step-num.blue { background:linear-gradient(135deg,#3d7fd4,#60a5fa); }
-.info-step-num.purple { background:linear-gradient(135deg,#a78bfa,#7c3aed); }
-.info-step-num.green { background:linear-gradient(135deg,#34d399,#059669); }
-.info-step-num.amber { background:linear-gradient(135deg,#fbbf24,#d97706); }
-.info-step-text {
-  font-size:0.82rem; color:var(--text2); line-height:1.6;
-}
-.info-step-text strong { color:var(--text); }
-.info-toggle-row {
-  display:flex; align-items:center; gap:10px; padding:8px 12px; margin-bottom:6px;
-  background:rgba(255,255,255,0.03); border-radius:10px; border:1px solid rgba(255,255,255,0.04);
-}
-.info-toggle-emoji { font-size:1rem; flex-shrink:0; }
-.info-toggle-label { font-size:0.8rem; color:var(--text); font-weight:500; }
-.info-toggle-desc { font-size:0.7rem; color:var(--text3); }
-.info-note-box {
-  background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.2);
-  border-radius:12px; padding:14px 14px; margin-top:14px;
-}
-.info-note-box .info-note-title {
-  font-size:0.8rem; font-weight:700; color:var(--accent-gold); margin-bottom:6px;
-  display:flex; align-items:center; gap:6px;
-}
-.info-note-box .info-note-text {
-  font-size:0.78rem; color:var(--text2); line-height:1.6;
-}
-.info-note-box .info-note-text strong { color:var(--text); }
-.info-tip-box {
-  background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.2);
-  border-radius:12px; padding:14px 14px; margin-top:10px;
-}
-.info-tip-box .info-tip-title {
-  font-size:0.8rem; font-weight:700; color:var(--accent-blue); margin-bottom:6px;
-  display:flex; align-items:center; gap:6px;
-}
-.info-tip-box .info-tip-text {
-  font-size:0.78rem; color:var(--text2); line-height:1.6;
-}
+/* INFO SCREEN — Redesigned */
+.info-screen { height:100%; display:flex; flex-direction:column; overflow:hidden; }
+.info-page { display:none; flex-direction:column; height:100%; overflow:hidden; }
+.info-page.active { display:flex; }
+.info-page-content { flex:1; overflow-y:auto; padding-bottom:80px; }
+
+/* Back button */
 .info-back-btn {
-  display:flex; align-items:center; gap:4px;
-  background:rgba(61,127,212,0.12); border:1px solid rgba(61,127,212,0.25); color:var(--accent-blue);
-  font-family:inherit; font-size:0.82rem; font-weight:500; cursor:pointer;
-  padding:6px 12px 6px 8px; border-radius:10px; transition:all 0.2s ease;
-  margin-bottom:4px;
+  display:flex; align-items:center; gap:5px;
+  background:rgba(96,165,250,0.1); border:1px solid rgba(96,165,250,0.2);
+  color:#60a5fa; font-family:inherit; font-size:0.76rem; font-weight:500;
+  cursor:pointer; padding:5px 12px 5px 8px; border-radius:10px;
+  margin:14px 18px 0; width:fit-content; transition:all 0.15s;
 }
-.info-back-btn:active { background:rgba(61,127,212,0.22); transform:scale(0.96); }
-.info-divider { height:1px; background:var(--border); margin:4px 0 14px; }
+.info-back-btn:active { transform:scale(0.96); background:rgba(96,165,250,0.2); }
+.info-back-btn svg { width:14px; height:14px; }
+
+/* Hero */
+.info-hero {
+  text-align:center; padding:24px 20px 14px; position:relative;
+}
+.info-hero-icon { font-size:2.4rem; margin-bottom:6px; }
+.info-hero-name {
+  font-family:'Philosopher',serif; font-size:1.6rem; font-weight:700;
+  background:linear-gradient(135deg, #e8c800, #f0d860, #e8c800);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.info-hero-version { font-size:0.68rem; color:var(--text3); margin-top:2px; letter-spacing:1px; }
+.info-hero-tagline {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:0.82rem; color:rgba(232,200,0,0.6); margin-top:8px; letter-spacing:0.5px;
+}
+.info-hero-data { font-size:0.62rem; color:var(--text3); margin-top:6px; }
+
+/* Glass pills */
+.info-pills-label {
+  font-size:0.68rem; color:var(--text3); text-transform:uppercase;
+  letter-spacing:1.5px; padding:0 20px; margin:16px 0 10px; font-weight:600;
+}
+.info-pills-grid { display:flex; flex-direction:column; gap:8px; padding:0 16px; }
+.info-glass-pill {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px; border-radius:16px;
+  cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden; border:1px solid;
+}
+.info-glass-pill:active { transform:scale(0.98); }
+.info-glass-pill::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 20% 50%, var(--pill-glow) 0%, transparent 70%);
+  opacity:0.15; pointer-events:none;
+}
+.info-pill-icon {
+  width:42px; height:42px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; flex-shrink:0; position:relative; z-index:1;
+}
+.info-pill-info { flex:1; position:relative; z-index:1; }
+.info-pill-title { font-size:0.88rem; font-weight:600; }
+.info-pill-desc { font-size:0.66rem; color:var(--text3); margin-top:2px; line-height:1.3; }
+.info-pill-arrow { color:var(--text3); font-size:0.9rem; position:relative; z-index:1; }
+
+/* Pill color themes */
+.ipill-calendar { --pill-glow:#8ac4ff; background:rgba(138,196,255,0.06); border-color:rgba(138,196,255,0.15); }
+.ipill-calendar .info-pill-icon { background:rgba(138,196,255,0.12); } .ipill-calendar .info-pill-title { color:#8ac4ff; }
+.ipill-songs { --pill-glow:#f0a848; background:rgba(240,168,72,0.06); border-color:rgba(240,168,72,0.15); }
+.ipill-songs .info-pill-icon { background:rgba(240,168,72,0.12); } .ipill-songs .info-pill-title { color:#f0a848; }
+.ipill-notes { --pill-glow:#cec0ff; background:rgba(206,192,255,0.06); border-color:rgba(206,192,255,0.15); }
+.ipill-notes .info-pill-icon { background:rgba(206,192,255,0.12); } .ipill-notes .info-pill-title { color:#cec0ff; }
+.ipill-events { --pill-glow:#5ee8a0; background:rgba(94,232,160,0.06); border-color:rgba(94,232,160,0.15); }
+.ipill-events .info-pill-icon { background:rgba(94,232,160,0.12); } .ipill-events .info-pill-title { color:#5ee8a0; }
+.ipill-sevakart { --pill-glow:#5ce0f0; background:rgba(92,224,240,0.06); border-color:rgba(92,224,240,0.15); }
+.ipill-sevakart .info-pill-icon { background:rgba(92,224,240,0.12); } .ipill-sevakart .info-pill-title { color:#5ce0f0; }
+.ipill-prayer { --pill-glow:#f0c850; background:rgba(240,200,80,0.06); border-color:rgba(240,200,80,0.15); }
+.ipill-prayer .info-pill-icon { background:rgba(240,200,80,0.12); } .ipill-prayer .info-pill-title { color:#f0c850; }
+.ipill-dhamas { --pill-glow:#f08070; background:rgba(240,128,112,0.06); border-color:rgba(240,128,112,0.15); }
+.ipill-dhamas .info-pill-icon { background:rgba(240,128,112,0.12); } .ipill-dhamas .info-pill-title { color:#f08070; }
+.ipill-notif { --pill-glow:#f472b6; background:rgba(244,114,182,0.06); border-color:rgba(244,114,182,0.15); }
+.ipill-notif .info-pill-icon { background:rgba(244,114,182,0.12); } .ipill-notif .info-pill-title { color:#f472b6; }
+.ipill-google { --pill-glow:#60a5fa; background:rgba(96,165,250,0.06); border-color:rgba(96,165,250,0.15); }
+.ipill-google .info-pill-icon { background:rgba(96,165,250,0.12); } .ipill-google .info-pill-title { color:#60a5fa; }
+
+/* Sub-page hero */
+.info-sub-hero { text-align:center; padding:20px 20px 14px; }
+.info-sub-icon { font-size:2rem; margin-bottom:4px; }
+.info-sub-title { font-family:'Philosopher',serif; font-size:1.25rem; font-weight:700; }
+.info-sub-tagline { font-size:0.72rem; color:var(--text3); margin-top:4px; font-style:italic; }
+
+/* Accordion */
+.info-acc-list { padding:0 14px; }
+.info-acc-item { margin-bottom:8px; border-radius:14px; overflow:hidden; border:1px solid var(--border); background:rgba(26,48,80,0.4); transition:border-color 0.2s; }
+.info-acc-item.open { border-color:rgba(255,255,255,0.12); }
+.info-acc-header { display:flex; align-items:center; gap:10px; padding:13px 14px; cursor:pointer; transition:background 0.15s; }
+.info-acc-header:active { background:rgba(255,255,255,0.03); }
+.info-acc-icon { font-size:1rem; flex-shrink:0; width:28px; text-align:center; }
+.info-acc-title { flex:1; font-size:0.82rem; font-weight:500; color:var(--text); }
+.info-acc-chevron { color:var(--text3); font-size:0.7rem; transition:transform 0.25s; flex-shrink:0; }
+.info-acc-item.open .info-acc-chevron { transform:rotate(180deg); }
+.info-acc-body { max-height:0; overflow:hidden; transition:max-height 0.35s ease; }
+.info-acc-item.open .info-acc-body { max-height:600px; }
+.info-acc-inner { padding:0 14px 14px; font-size:0.76rem; color:var(--text2); line-height:1.6; }
+.info-acc-inner strong { color:var(--text); font-weight:500; }
+.info-acc-inner ul { padding-left:16px; margin:4px 0; }
+.info-acc-inner li { margin-bottom:4px; }
+.info-acc-tip { margin-top:8px; padding:8px 10px; border-radius:8px; background:rgba(212,160,23,0.06); border-left:2px solid rgba(212,160,23,0.3); font-size:0.7rem; color:var(--text2); }
+.info-acc-tip::before { content:'💡 '; }
+
+/* Footer */
+.info-footer { text-align:center; padding:20px 20px 8px; font-size:0.72rem; color:var(--text3); line-height:1.7; }
+.info-footer .info-maha { color:var(--accent-gold); font-weight:600; font-size:0.74rem; }
 
 .loc-search { width:100%; background:var(--card); border:1.5px solid var(--border);
   border-radius:10px; padding:9px 14px; color:var(--text); font-family:inherit;
@@ -3534,40 +3557,12 @@ body {
 .home-g-actions { flex-shrink:0; display:flex; gap:8px; align-items:center; }
 .home-g-action-btn {
   width:40px; height:40px; border-radius:50%;
-  background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:all 0.2s; color:var(--text3);
 }
-.home-g-action-btn:active { transform:scale(0.9); }
+.home-g-action-btn:active { background:rgba(255,255,255,0.08); color:var(--text); transform:scale(0.9); }
 .home-g-action-btn svg { width:18px; height:18px; }
-/* Sync - Hot Pink */
-.home-g-action-btn.btn-sync {
-  color:#f472b6; border-color:rgba(244,114,182,0.35);
-  background:rgba(244,114,182,0.08);
-  box-shadow:0 0 12px rgba(244,114,182,0.2), inset 0 0 8px rgba(244,114,182,0.05);
-}
-.home-g-action-btn.btn-sync:active { background:rgba(244,114,182,0.18); }
-/* Admin - Bright Violet */
-.home-g-action-btn.btn-admin {
-  color:#c084fc; border-color:rgba(192,132,252,0.35);
-  background:rgba(192,132,252,0.08);
-  box-shadow:0 0 12px rgba(192,132,252,0.2), inset 0 0 8px rgba(192,132,252,0.05);
-}
-.home-g-action-btn.btn-admin:active { background:rgba(192,132,252,0.18); }
-/* Settings - Cornflower Blue */
-.home-g-action-btn.btn-settings {
-  color:#60a5fa; border-color:rgba(96,165,250,0.35);
-  background:rgba(96,165,250,0.08);
-  box-shadow:0 0 12px rgba(96,165,250,0.2), inset 0 0 8px rgba(96,165,250,0.05);
-}
-.home-g-action-btn.btn-settings:active { background:rgba(96,165,250,0.18); }
-/* About - Lime Green */
-.home-g-action-btn.btn-about {
-  color:#a3e635; border-color:rgba(163,230,53,0.35);
-  background:rgba(163,230,53,0.08);
-  box-shadow:0 0 12px rgba(163,230,53,0.2), inset 0 0 8px rgba(163,230,53,0.05);
-}
-.home-g-action-btn.btn-about:active { background:rgba(163,230,53,0.18); }
 
 /* ── Greeting Section ── */
 .home-greeting {
@@ -4050,6 +4045,7 @@ body {
 /* Admin icon on home */
 .home-admin-btn {
   display:none; /* Hidden by default, shown via JS for admins */
+  color:var(--lavender) !important;
 }
 
 /* ===== PRAYER CIRCLE ===== */
@@ -4361,16 +4357,16 @@ body {
               <div id="homeGEmail" class="home-g-email"></div>
             </div>
             <div class="home-g-actions">
-              <button class="home-g-action-btn btn-sync" onclick="gSyncAll()" title="Sync Now">
+              <button class="home-g-action-btn" onclick="gSyncAll()" title="Sync Now">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/><path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"/></svg>
               </button>
-              <button class="home-g-action-btn home-admin-btn btn-admin" id="homeAdminBtn" onclick="switchScreen('admin',null)" title="Admin Dashboard">
+              <button class="home-g-action-btn home-admin-btn" id="homeAdminBtn" onclick="switchScreen('admin',null)" title="Admin Dashboard">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </button>
-              <button class="home-g-action-btn btn-settings" onclick="switchScreen('settings',null)" title="Settings">
+              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               </button>
-              <button class="home-g-action-btn btn-about" onclick="switchScreen('info',null)" title="About">
+              <button class="home-g-action-btn" onclick="switchScreen('info',null)" title="About">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               </button>
             </div>
@@ -4392,10 +4388,10 @@ body {
               <div class="home-g-signin-cta" onclick="switchScreen('settings',null)">Sign in with Google →</div>
             </div>
             <div class="home-g-actions">
-              <button class="home-g-action-btn btn-settings" onclick="switchScreen('settings',null)" title="Settings">
+              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               </button>
-              <button class="home-g-action-btn btn-about" onclick="switchScreen('info',null)" title="About">
+              <button class="home-g-action-btn" onclick="switchScreen('info',null)" title="About">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               </button>
             </div>
@@ -4932,203 +4928,158 @@ body {
     </div>
   </div>
 
-  <!-- INFO SCREEN -->
+  <!-- INFO SCREEN (Redesigned) -->
   <div class="screen" id="screen-info">
     <div class="info-screen">
 
-      <button class="info-back-btn" onclick="switchScreen('home',document.querySelectorAll('.nav-btn')[0])"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
-
-      <!-- Hero Section -->
-      <div class="info-hero">
-        <div class="info-hero-icon">🙏</div>
-        <div class="info-hero-name">Bhakti Sakha</div>
-        <div class="info-hero-version">V2.0</div>
-        <div class="info-hero-sub"><strong>Data range:</strong> 1975–2075 CE &nbsp;·&nbsp; Per <strong>ISKCON standards</strong> &amp; Panchangam</div>
-        <div class="info-hero-glory">All glories to Srila Prabhupada!</div>
-      </div>
-
-      <!-- NOTIFICATION GUIDE -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">🔔</span> How Notifications Work
-        </div>
-        <div class="info-text">
-          Bhakti Sakha sends you timely reminders for Vaishnava events, Ekadashis, festivals, appearance days, and your own custom events — so you never miss an important day of devotional service.
-        </div>
-      </div>
-
-      <!-- STEP 1: Phone Permission -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">📱</span> Step 1 — Enable Phone Permission
-        </div>
-        <div class="info-text" style="margin-bottom:14px;">
-          Before enabling notifications inside the app, you must first allow notification permissions on your phone:
-        </div>
-
-        <div class="info-step">
-          <div class="info-step-num amber">1</div>
-          <div class="info-step-text">Open your phone's <strong>Settings</strong> app</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num amber">2</div>
-          <div class="info-step-text">Go to <strong>Notifications</strong> → <strong>App Notifications</strong> (or <strong>Apps & Notifications</strong> on some phones)</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num amber">3</div>
-          <div class="info-step-text">Find your <strong>browser app</strong> (Chrome, Safari, etc.) or <strong>Bhakti Sakha</strong> if installed as a PWA</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num amber">4</div>
-          <div class="info-step-text">Make sure notifications are <strong>turned ON</strong> for this app. Also check that <strong>"Show on Lock Screen"</strong> and <strong>"Allow Sound"</strong> are enabled.</div>
-        </div>
-
-        <div class="info-note-box">
-          <div class="info-note-title">⚠️ Important</div>
-          <div class="info-note-text">If phone-level permissions are not enabled, the app will not be able to send you any notifications — even if they are turned on inside Bhakti Sakha.</div>
-        </div>
-      </div>
-
-      <!-- STEP 2: Enable in App -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">⚙️</span> Step 2 — Enable Inside the App
-        </div>
-        <div class="info-step">
-          <div class="info-step-num blue">1</div>
-          <div class="info-step-text">Open Bhakti Sakha and go to the <strong>Settings</strong> screen (gear icon in header)</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num blue">2</div>
-          <div class="info-step-text">Scroll to the <strong>Notifications</strong> section</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num blue">3</div>
-          <div class="info-step-text">Tap the <strong>"Enable"</strong> button next to <strong>Push Notifications</strong></div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num blue">4</div>
-          <div class="info-step-text">When your browser prompts "Allow notifications?", tap <strong>Allow</strong></div>
-        </div>
-        <div class="info-step" style="margin-bottom:0;">
-          <div class="info-step-num blue">5</div>
-          <div class="info-step-text">The button will change to <strong>"Enabled ✓"</strong> — you're all set!</div>
-        </div>
-      </div>
-
-      <!-- CUSTOMIZE -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">🎛️</span> What You Can Customize
-        </div>
-        <div class="info-text" style="margin-bottom:12px;">Once enabled, you can tailor your reminders in Settings:</div>
-
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">⏰</div>
-          <div>
-            <div class="info-toggle-label">Alert Time</div>
-            <div class="info-toggle-desc">Choose what time of day you receive reminders (default 7:00 AM)</div>
+      <!-- ===== MAIN INFO PAGE ===== -->
+      <div class="info-page active" id="infoPage-main">
+        <div class="info-page-content">
+          <button class="info-back-btn" onclick="switchScreen('home',document.querySelectorAll('.nav-btn')[0])"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+          <div class="info-hero">
+            <div class="info-hero-icon">🙏</div>
+            <div class="info-hero-name">Bhakti Sakha</div>
+            <div class="info-hero-version">Version 2.0</div>
+            <div class="info-hero-tagline">Your Friend on the Path of Devotional Service</div>
+            <div class="info-hero-data">Data: 1975–2075 CE · Per ISKCON standards &amp; Panchangam</div>
           </div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">📅</div>
-          <div>
-            <div class="info-toggle-label">Advance Notice</div>
-            <div class="info-toggle-desc">Get reminded 1, 2, 3, or 7 days before the event</div>
+          <div class="info-pills-label">Explore Features</div>
+          <div class="info-pills-grid">
+            <div class="info-glass-pill ipill-calendar" onclick="infoGoPage('calendar')"><div class="info-pill-icon">📅</div><div class="info-pill-info"><div class="info-pill-title">Calendar</div><div class="info-pill-desc">Ekadashis, festivals, panchanga &amp; more</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-songs" onclick="infoGoPage('songs')"><div class="info-pill-icon">📖</div><div class="info-pill-info"><div class="info-pill-title">Song Book</div><div class="info-pill-desc">Bhajans, stotrams &amp; kirtan collection</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-notes" onclick="infoGoPage('notes')"><div class="info-pill-icon">📒</div><div class="info-pill-info"><div class="info-pill-title">Notes</div><div class="info-pill-desc">Organize spiritual reflections &amp; journals</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-events" onclick="infoGoPage('events')"><div class="info-pill-icon">🎯</div><div class="info-pill-info"><div class="info-pill-title">My Events</div><div class="info-pill-desc">Personal reminders &amp; custom occasions</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-sevakart" onclick="infoGoPage('sevakart')"><div class="info-pill-icon">🪔</div><div class="info-pill-info"><div class="info-pill-title">SevaKart</div><div class="info-pill-desc">Devotee service marketplace</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-prayer" onclick="infoGoPage('prayer')"><div class="info-pill-icon">🙏</div><div class="info-pill-info"><div class="info-pill-title">Prayer Circle</div><div class="info-pill-desc">Request &amp; offer prayers for devotees</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-dhamas" onclick="infoGoPage('dhamas')"><div class="info-pill-icon">🛕</div><div class="info-pill-info"><div class="info-pill-title">Holy Dhamas</div><div class="info-pill-desc">Sacred pilgrimage guides</div></div><div class="info-pill-arrow">›</div></div>
           </div>
-        </div>
-
-        <div class="info-divider"></div>
-
-        <div class="info-text" style="margin-bottom:10px;"><strong>Toggle reminders ON/OFF individually:</strong></div>
-
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">🟣</div>
-          <div><div class="info-toggle-label">Ekadashi Reminders</div></div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">🟠</div>
-          <div><div class="info-toggle-label">Festival Reminders</div></div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">🔵</div>
-          <div><div class="info-toggle-label">Appearance Day Reminders</div></div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">🟢</div>
-          <div><div class="info-toggle-label">Your Custom Events</div></div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">🌅</div>
-          <div>
-            <div class="info-toggle-label">Gayatri / Sandhya Times</div>
-            <div class="info-toggle-desc">Reminders 10 min before sunrise, noon &amp; sunset</div>
+          <div class="info-pills-label" style="margin-top:20px;">App Settings &amp; Setup</div>
+          <div class="info-pills-grid">
+            <div class="info-glass-pill ipill-notif" onclick="infoGoPage('notif')"><div class="info-pill-icon">🔔</div><div class="info-pill-info"><div class="info-pill-title">Notifications</div><div class="info-pill-desc">Setup &amp; customize reminders</div></div><div class="info-pill-arrow">›</div></div>
+            <div class="info-glass-pill ipill-google" onclick="infoGoPage('google')"><div class="info-pill-icon">☁️</div><div class="info-pill-info"><div class="info-pill-title">Google Sync</div><div class="info-pill-desc">Backup, sync &amp; restore your data</div></div><div class="info-pill-arrow">›</div></div>
           </div>
-        </div>
-        <div class="info-toggle-row">
-          <div class="info-toggle-emoji">⚫</div>
-          <div>
-            <div class="info-toggle-label">Rahu Kalam Alerts</div>
-            <div class="info-toggle-desc">Get notified at the start of Rahu Kalam each day</div>
-          </div>
+          <div class="info-footer">Built with devotion for the Vaishnava community<br><span class="info-maha">Hare Krishna Hare Krishna Krishna Krishna Hare Hare</span><br><span class="info-maha">Hare Rama Hare Rama Rama Rama Hare Hare</span></div>
         </div>
       </div>
 
-      <!-- HOW IT WORKS -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">🧩</span> How It Works Behind the Scenes
+      <!-- ===== CALENDAR SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-calendar"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">📅</div><div class="info-sub-title" style="color:#8ac4ff;">Calendar</div><div class="info-sub-tagline">Ekadashis, festivals, panchanga &amp; Vedic timings at your fingertips</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📆</div><div class="info-acc-title">Monthly Calendar View</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Browse any month from <strong>1975 to 2075 CE</strong>. Each day cell shows color-coded dots — <strong>green</strong> for Ekadashi, <strong>saffron</strong> for festivals, and <strong>gold</strong> for appearance days. Tap any date to see its full details. Use the arrow buttons or the month/year jump selectors to navigate quickly.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🟢</div><div class="info-acc-title">Ekadashi Tracking</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">All Ekadashis are calculated per <strong>ISKCON standards</strong> for your location. Each Ekadashi shows its name, fasting rules, and whether it is a <strong>Mahadvadashi</strong> or special observance. Days with Ekadashi get a small flag icon on the calendar.<div class="info-acc-tip">Tap the Ekadashi row in the day detail to see full fasting guidelines.</div></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🎪</div><div class="info-acc-title">Festivals &amp; Appearance Days</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">View all Vaishnava festivals, appearance &amp; disappearance days of Acharyas. Each event is color-coded and sorted by type. Tap any event row to see its significance and details.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🕉️</div><div class="info-acc-title">Panchanga Details</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">For every date, see the full Vedic panchanga:<ul><li><strong>Tithi</strong> — lunar day with Shukla/Krishna paksha</li><li><strong>Nakshatra</strong> — star constellation</li><li><strong>Yoga</strong> — auspicious/inauspicious yoga</li><li><strong>Karana</strong> — half-tithi</li><li><strong>Vaishnava Masa</strong> — traditional month name</li></ul></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🌅</div><div class="info-acc-title">Gayatri &amp; Sandhya Times</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">See the three <strong>Sandhya vandana</strong> times for your location — <strong>Brahma Muhurta</strong> (before sunrise), <strong>Madhyahna</strong> (solar noon), and <strong>Sayam</strong> (sunset). All times are calculated based on your GPS location for precise accuracy. You can also enable reminders 10 minutes before each time.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🌙</div><div class="info-acc-title">Sun, Moon &amp; Rahu Kalam</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">View precise <strong>sunrise &amp; sunset</strong> times along with <strong>moonrise &amp; moonset</strong>. The <strong>Rahu Kalam</strong> section shows the inauspicious time window for each day, with an option to receive alerts. A scrolling ticker at the top highlights today's key events.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📍</div><div class="info-acc-title">Location-Based Calculations</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">All timings are computed for <strong>your exact location</strong>. The app auto-detects your location or you can manually select from a list of cities. Change your location anytime from the calendar's location bar.<div class="info-acc-tip">Location changes affect all astronomical calculations instantly.</div></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔍</div><div class="info-acc-title">Search Calendar</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Use the search feature (magnifying glass in header) to find any Ekadashi, festival, or tithi by name. Results show matching events across all months — tap any result to jump to that day.</div></div></div>
         </div>
-        <div class="info-step">
-          <div class="info-step-num purple">●</div>
-          <div class="info-step-text">Bhakti Sakha uses <strong>Firebase Cloud Messaging</strong> to deliver real push notifications to your phone or browser — even when the app is closed</div>
-        </div>
-        <div class="info-step">
-          <div class="info-step-num purple">●</div>
-          <div class="info-step-text">Your notification preferences and upcoming events are synced with our server, which sends the reminders at the right time</div>
-        </div>
-        <div class="info-step" style="margin-bottom:0;">
-          <div class="info-step-num purple">●</div>
-          <div class="info-step-text"><strong>No personal data is shared</strong> — only your device token and event schedule are stored securely</div>
-        </div>
-      </div>
+      </div></div>
 
-      <!-- PLATFORM NOTES -->
-      <div class="info-section">
-        <div class="info-section-title">
-          <span class="info-icon">💡</span> Platform-Specific Tips
+      <!-- ===== SONG BOOK SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-songs"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">📖</div><div class="info-sub-title" style="color:#f0a848;">Song Book</div><div class="info-sub-tagline">Sacred Songs for Every Heart</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📚</div><div class="info-acc-title">Browse by Category or Author</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Songs are organized into categories — <strong>Bhajans, Astakams, Stotrams, Pranam Mantras</strong> and more. Switch to <strong>Author view</strong> to see songs grouped by Acharya. Each song shows its category, author, and whether it has audio.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔍</div><div class="info-acc-title">Search Songs &amp; Lyrics</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Search by <strong>song title, author name, or any lyric text</strong>. A live dropdown shows matching results as you type — tap any result to jump directly to that song's detail page.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🌐</div><div class="info-acc-title">Multi-Language Support</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Read lyrics in <strong>English, हिन्दी (Hindi),</strong> or <strong>मराठी (Marathi)</strong>. Switch languages from the dropdown in the song list or detail page. Translations appear below the original script.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🎵</div><div class="info-acc-title">Audio Player</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Many songs include <strong>audio recordings</strong> by different singers. A <strong>Now Playing mini-bar</strong> appears at the bottom so you can navigate while listening. Songs with audio show a 🎵 indicator in the list.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔤</div><div class="info-acc-title">Font Size Control</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Adjust lyrics font size using the <strong>A− / A+</strong> buttons in the song detail header. Your preference is saved and applied to all songs.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">✏️</div><div class="info-acc-title">Add &amp; Edit Songs (Admin)</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Admins can add new songs using the <strong>＋ button</strong>. Fill in title, author, category, lyrics in multiple languages, and attach audio. Existing songs can be edited or deleted. All changes sync across users via Google Drive.</div></div></div>
         </div>
+      </div></div>
 
-        <div class="info-tip-box" style="margin-top:0; margin-bottom:10px;">
-          <div class="info-tip-title">🤖 Android</div>
-          <div class="info-tip-text">Notifications work best when the app is <strong>installed as a PWA</strong> (tap the browser menu → "Add to Home Screen"). This ensures reliable background delivery.</div>
+      <!-- ===== NOTES SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-notes"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">📒</div><div class="info-sub-title" style="color:#cec0ff;">My Notes</div><div class="info-sub-tagline">Reflections on Your Spiritual Journey</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📂</div><div class="info-acc-title">Folders &amp; Organization</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Notes are organized into color-coded folders — <strong>Gratitude, Lecture Notes, Personal, Japa Reflections,</strong> and more. Each folder shows its note count and has a unique visual identity. You can create custom folders too.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">✍️</div><div class="info-acc-title">Creating &amp; Editing Notes</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Tap the <strong>+ button</strong> inside any folder to create a new note. Give it a title and write your content. Notes are auto-saved. You can edit or delete anytime. Sort notes by <strong>date</strong> or <strong>title</strong> using the sort buttons.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔍</div><div class="info-acc-title">Search Within Folders</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Inside each folder, use the <strong>search bar</strong> to find notes by title or content. Results filter in real-time as you type.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">☁️</div><div class="info-acc-title">Google Drive Sync</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Sign in with Google to <strong>automatically backup and sync</strong> all your notes across devices. You can also manually <strong>export</strong> or <strong>import</strong> notes as a backup file.<div class="info-acc-tip">Sign in via Settings to enable cloud sync.</div></div></div></div>
         </div>
+      </div></div>
 
-        <div class="info-tip-box" style="margin-bottom:10px;">
-          <div class="info-tip-title">🍎 iOS (iPhone / iPad)</div>
-          <div class="info-tip-text">You <strong>must first "Add to Home Screen"</strong> from Safari, then open the installed app and enable notifications from within. iOS does not support push notifications in the browser — only through installed PWAs.</div>
+      <!-- ===== EVENTS SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-events"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🎯</div><div class="info-sub-title" style="color:#5ee8a0;">My Events</div><div class="info-sub-tagline">Keeping You Close to Every Sacred Moment</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📋</div><div class="info-acc-title">Today View</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">See all of <strong>today's events</strong> at a glance — custom events, Vaishnava occasions, and appointments. Below, see <strong>upcoming events for the next 7 days</strong> to plan ahead.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📅</div><div class="info-acc-title">Calendar View</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">A monthly calendar with dots marking days that have events. Tap any day to see its events listed below. Navigate between months to plan ahead.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🎂</div><div class="info-acc-title">Occasions</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Track recurring special dates — <strong>birthdays, anniversaries, memorial days</strong>. Each shows a countdown to the next occurrence. Set reminders so you never miss someone's special day.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📌</div><div class="info-acc-title">Appointments</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Create one-time or recurring appointments with <strong>categories</strong> like Medical, Work, Personal, Temple, and more. Sort by date or category. Each shows time, location, and description.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔔</div><div class="info-acc-title">Custom Reminders</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Set <strong>push notification reminders</strong> for any event. Choose how far in advance — on the day, 1 day before, or more. Reminders work even when the app is closed.<div class="info-acc-tip">Make sure notifications are enabled in Settings first.</div></div></div></div>
         </div>
+      </div></div>
 
-        <div class="info-note-box" style="margin-top:0;">
-          <div class="info-note-title">🔄 Troubleshooting</div>
-          <div class="info-note-text">
-            If notifications stop working, try these steps:<br><br>
-            <strong>1.</strong> Check that phone-level notification permissions are still ON (Settings → Notifications → App Notifications)<br>
-            <strong>2.</strong> Open Bhakti Sakha Settings and <strong>Disable</strong> then <strong>re-Enable</strong> push notifications<br>
-            <strong>3.</strong> Make sure you have an active internet connection<br>
-            <strong>4.</strong> On Android, ensure battery optimization is not killing the app in background
-          </div>
+      <!-- ===== SEVAKART SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-sevakart"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🪔</div><div class="info-sub-title" style="color:#5ce0f0;">SevaKart</div><div class="info-sub-tagline">Devotees Supporting Devotees</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🗂️</div><div class="info-acc-title">Browse Categories</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Services are organized into categories like <strong>Cooking, Tutoring, Music, Housing, Transport, Astrology</strong> and more. Each category shows the number of active listings. Tap a category to filter.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🪔</div><div class="info-acc-title">Listing Your Service</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Tap <strong>"List Your Service"</strong> to offer your skills. Fill in name, description, category, city, and contact details. Upload images. Listings are reviewed by admins before going live.<div class="info-acc-tip">Only Bhakti-aligned services — no alcohol, meat, gambling, MLM or political campaigns.</div></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔍</div><div class="info-acc-title">Search &amp; Filter</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Use the search bar to find services by <strong>name, city, or category</strong>. Results update in real-time. Combine search with category filters for precise results.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">⭐</div><div class="info-acc-title">Reviews &amp; Ratings</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Leave <strong>star ratings and written reviews</strong> for services you've used. Reviews help other devotees find reliable services.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📋</div><div class="info-acc-title">My Listings</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">View and manage all your listings. Check status — <strong>pending review, approved, or rejected</strong>. Edit or update anytime.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">⚠️</div><div class="info-acc-title">Reporting &amp; Safety</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Use the <strong>Report</strong> button on any listing to flag it. SevaKart facilitates connections only — all transactions happen directly between users.</div></div></div>
         </div>
-      </div>
+      </div></div>
 
-      <!-- App Info -->
-      <div class="info-section" style="text-align:center; padding:20px 16px;">
-        <div style="font-size:0.78rem; color:var(--text3); line-height:1.7;">
-          Built with devotion for the Vaishnava community<br>
-          <strong style="color:var(--accent-gold);">Hare Krishna Hare Krishna Krishna Krishna Hare Hare</strong><br>
-          <strong style="color:var(--accent-gold);">Hare Rama Hare Rama Rama Rama Hare Hare</strong>
+      <!-- ===== PRAYER CIRCLE SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-prayer"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🙏</div><div class="info-sub-title" style="color:#f0c850;">Prayer Circle</div><div class="info-sub-tagline">United in Prayer, Bound by Grace</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📝</div><div class="info-acc-title">Submitting a Prayer Request</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Tap <strong>"Request Prayer"</strong> to ask for spiritual support. Add a title, description, and category — <strong>Health, Family, Career, Spiritual Growth, Crisis,</strong> or <strong>Other</strong>. Post anonymously if preferred. Requests are reviewed before appearing.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🙏</div><div class="info-acc-title">Praying for Others</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Browse the prayer feed and tap the <strong>🙏 Pray button</strong> on any request. The prayer count updates in real-time. You can also post <strong>gratitude messages</strong> or <strong>updates</strong>.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔍</div><div class="info-acc-title">Filter &amp; Search Prayers</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Use category chips to filter by type. Search by keyword. Toggle between <strong>All, Active,</strong> and <strong>Answered</strong> prayers using the filter button.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📋</div><div class="info-acc-title">My Prayer Requests</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">View all your requests. See how many people have prayed, read gratitude messages, and mark requests as <strong>answered</strong> when fulfilled.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🛡️</div><div class="info-acc-title">Moderation &amp; Safety</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">All requests are <strong>reviewed by admins</strong> before publishing. Report inappropriate content using the flag button. Content is automatically filtered.</div></div></div>
         </div>
-      </div>
+      </div></div>
+
+      <!-- ===== HOLY DHAMAS SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-dhamas"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🛕</div><div class="info-sub-title" style="color:#f08070;">Holy Dhamas</div><div class="info-sub-tagline">Journeys to Places of Divine Mercy</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🗺️</div><div class="info-acc-title">Browse Sacred Places</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Explore <strong>sacred pilgrimage destinations</strong> — Vrindavan, Mayapur, Jagannath Puri, Dwarka, and more. Each has a card with icon, name, and location. Use search to find specific dhamas.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📖</div><div class="info-acc-title">Detailed Pilgrimage Guides</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Each dham has sections covering:<ul><li><strong>Overview</strong> — spiritual significance &amp; main deity</li><li><strong>Scriptural references</strong> — pastimes &amp; Acharya connections</li><li><strong>How to reach</strong> — airports, railways &amp; local transport</li><li><strong>Temple timings</strong> — darshan schedule &amp; aarti</li><li><strong>Festivals</strong> — special celebrations</li><li><strong>Accommodation &amp; Prasadam</strong></li><li><strong>Key places</strong> — must-visit spots</li></ul></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📝</div><div class="info-acc-title">Itineraries &amp; Tips</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Many dhamas include <strong>suggested itineraries</strong> with day-by-day plans, <strong>do's &amp; don'ts</strong>, <strong>best time to visit</strong>, and <strong>devotee tips</strong> from experienced pilgrims.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">➕</div><div class="info-acc-title">Adding New Dhamas (Admin)</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Admins can add new dhamas with a comprehensive form covering all sections. Added dhamas sync across all users.</div></div></div>
+        </div>
+      </div></div>
+
+      <!-- ===== NOTIFICATIONS SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-notif"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🔔</div><div class="info-sub-title" style="color:#f472b6;">Notifications</div><div class="info-sub-tagline">Setup &amp; customize your reminders</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📱</div><div class="info-acc-title">Step 1 — Enable Phone Permission</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Before enabling in the app, allow notifications on your phone:<ul><li>Open phone <strong>Settings → Notifications</strong></li><li>Find your <strong>browser</strong> or <strong>Bhakti Sakha</strong> (if installed as PWA)</li><li>Turn notifications <strong>ON</strong>, enable "Show on Lock Screen" and "Allow Sound"</li></ul><div class="info-acc-tip">Without phone-level permission, the app cannot send any notifications.</div></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">⚙️</div><div class="info-acc-title">Step 2 — Enable Inside the App</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Go to <strong>Settings → Notifications</strong> and tap <strong>"Enable"</strong>. When prompted "Allow notifications?", tap <strong>Allow</strong>. The button changes to "Enabled ✓".</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🎛️</div><div class="info-acc-title">What You Can Customize</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner"><strong>Alert Time</strong> — choose when you receive reminders (default 7 AM)<br><br><strong>Advance Notice</strong> — 1, 2, 3, or 7 days before<br><br><strong>Individual toggles:</strong><ul><li>🟣 Ekadashi Reminders</li><li>🟠 Festival Reminders</li><li>🔵 Appearance Day Reminders</li><li>🟢 Your Custom Events</li><li>🌅 Gayatri / Sandhya Times</li><li>⚫ Rahu Kalam Alerts</li></ul></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">💡</div><div class="info-acc-title">Platform Tips</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner"><strong>Android:</strong> Works best installed as a <strong>PWA</strong> (browser menu → "Add to Home Screen").<br><br><strong>iOS:</strong> You <strong>must</strong> "Add to Home Screen" from Safari first, then enable notifications from the installed app.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔧</div><div class="info-acc-title">Troubleshooting</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">If notifications stop working:<ul><li>Check phone permissions are still ON</li><li><strong>Disable</strong> then <strong>re-Enable</strong> push notifications in Settings</li><li>Ensure active internet connection</li><li>On Android, disable battery optimization for the app</li></ul></div></div></div>
+        </div>
+      </div></div>
+
+      <!-- ===== GOOGLE SYNC SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-google"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">☁️</div><div class="info-sub-title" style="color:#60a5fa;">Google Sync</div><div class="info-sub-tagline">Backup, sync &amp; restore your data</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔑</div><div class="info-acc-title">Signing In</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Go to <strong>Settings → Google Account</strong> and tap sign-in. Once authenticated, your avatar and email appear on the home screen. Syncing begins automatically.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🔄</div><div class="info-acc-title">What Gets Synced</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Synced via Google Drive:<ul><li><strong>Notes</strong> — all folders and notes</li><li><strong>Events</strong> — occasions, appointments &amp; custom events</li><li><strong>Songs</strong> — kirtan collection &amp; admin additions</li><li><strong>SevaKart</strong> — service directory data</li><li><strong>Prayer Circle</strong> — requests &amp; responses</li></ul><div class="info-acc-tip">Data is stored in your own Google Drive — private and secure.</div></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📲</div><div class="info-acc-title">Sync Across Devices</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Sign in with the <strong>same Google account</strong> on any device. Changes sync automatically. Use the <strong>🔄 Sync button</strong> on the home screen to force a manual sync.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📤</div><div class="info-acc-title">Export &amp; Import</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Even without Google sign-in, you can <strong>export</strong> notes as a backup file and <strong>import</strong> them back later from the Notes section's backup panel.</div></div></div>
+        </div>
+      </div></div>
 
     </div>
   </div>
@@ -12800,12 +12751,29 @@ function switchScreen(name, btn) {
   if (name==='dhamas') renderDhamas();
   if (name==='sevakart') { skRenderHome(); _skFetchFromServer(); }
   if (name==='prayer') pcRenderFeed();
+  if (name==='info') infoGoPage('main');
   if (name==='admin') { renderAdminDashboard(); _skFetchFromServer(); _pcFetchFromServer(); }
   if (name==='admin-sevakart') { renderAdminSevakart(); }
   if (name==='admin-prayer') { renderAdminPrayer(); }
   if (name==='userlist') ulFetchAndRender();
   if (name==='search') { initJumpSelects(); doSearch(); }
   if (name==='settings') { renderLocGrid(); const n=document.getElementById('curLocName'); if(n)n.textContent=curLoc.name; loadNotifSettings(); }
+}
+
+/* ── Info Page Navigation ── */
+function infoGoPage(name) {
+  document.querySelectorAll('.info-page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('infoPage-' + name);
+  if (target) {
+    target.classList.add('active');
+    const content = target.querySelector('.info-page-content');
+    if (content) content.scrollTop = 0;
+  }
+}
+function infoToggleAcc(item) {
+  const siblings = item.parentElement.querySelectorAll('.info-acc-item');
+  siblings.forEach(s => { if (s !== item) s.classList.remove('open'); });
+  item.classList.toggle('open');
 }
 
 // Back button handler - navigate to home instead of exiting
