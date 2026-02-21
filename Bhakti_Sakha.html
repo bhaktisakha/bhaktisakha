@@ -1889,7 +1889,9 @@ body {
 .ne-content-editable h2 { font-size:1.5rem; margin:6px 0; }
 .ne-content-editable ul, .ne-content-editable ol { padding-left:20px; margin:6px 0; }
 .ne-content-editable mark { background:rgba(241,196,15,0.3); color:inherit; border-radius:2px; padding:0 2px; }
-.ne-content-editable a { color:var(--accent-blue); text-decoration:underline; cursor:pointer; }
+.ne-content-editable a { color:#5ce0f0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+.ne-content-editable a:active { color:var(--accent-gold); }
+.nf-share-card-content a { color:#5ce0f0; text-decoration:underline; }
 .ne-content-editable img.ne-attached-img {
   max-width:100%; height:auto; border-radius:10px; margin:10px 0;
   display:block; box-shadow:0 2px 12px rgba(0,0,0,0.25);
@@ -11532,6 +11534,8 @@ function nfOpenEditNote_unlocked(id) {
   _nfCurrentEditNoteId = id;
   document.getElementById('neTitle').value = n.title || '';
   document.getElementById('neBody').innerHTML = n.body || '';
+  // Auto-linkify any plain URLs in the note body
+  _neAutoLinkify(document.getElementById('neBody'));
 
   const d = new Date(n.updatedAt || n.createdAt);
   document.getElementById('neAutosaveMsg').textContent = 'Last saved ' + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
@@ -12260,6 +12264,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (t || (b && b !== '<br>')) nfSaveNote(true);
       }, 3000);
     });
+
+    // Click on links: open in new tab
+    bodyEl.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (link && link.href) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(link.href, '_blank', 'noopener');
+      }
+    });
+
+    // Auto-linkify plain URLs on paste
+    bodyEl.addEventListener('paste', function() {
+      setTimeout(function() { _neAutoLinkify(bodyEl); }, 100);
+    });
   }
   const titleEl = document.getElementById('neTitle');
   if (titleEl) {
@@ -12277,6 +12296,51 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initial render of folder grid
   nfRenderFolders();
 });
+
+// --- AUTO-LINKIFY: Convert plain URLs in contenteditable to <a> tags ---
+function _neAutoLinkify(el) {
+  if (!el) return;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+  const urlRegex = /\bhttps?:\/\/[^\s<>"'`,;!?\)}\]]+/gi;
+  const textNodes = [];
+  while (walker.nextNode()) {
+    // Skip text nodes already inside <a> tags
+    let parent = walker.currentNode.parentElement;
+    let insideLink = false;
+    while (parent && parent !== el) {
+      if (parent.tagName === 'A') { insideLink = true; break; }
+      parent = parent.parentElement;
+    }
+    if (!insideLink && urlRegex.test(walker.currentNode.textContent)) {
+      textNodes.push(walker.currentNode);
+    }
+    urlRegex.lastIndex = 0;
+  }
+  textNodes.forEach(function(node) {
+    const text = node.textContent;
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0, match;
+    urlRegex.lastIndex = 0;
+    while ((match = urlRegex.exec(text)) !== null) {
+      if (match.index > lastIdx) {
+        frag.appendChild(document.createTextNode(text.substring(lastIdx, match.index)));
+      }
+      const a = document.createElement('a');
+      a.href = match[0];
+      a.textContent = match[0];
+      a.target = '_blank';
+      a.rel = 'noopener';
+      frag.appendChild(a);
+      lastIdx = match.index + match[0].length;
+    }
+    if (lastIdx < text.length) {
+      frag.appendChild(document.createTextNode(text.substring(lastIdx)));
+    }
+    if (lastIdx > 0) {
+      node.parentNode.replaceChild(frag, node);
+    }
+  });
+}
 
 // --- FORMATTING TOOLBAR ---
 function neExec(cmd) {
