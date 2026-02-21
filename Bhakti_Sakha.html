@@ -11545,7 +11545,7 @@ function updateNotifDescs() {
   const evtEl = document.getElementById('desc-myevents');
   if (evtEl) evtEl.textContent = `Remind ${dayStr} before, at ${tStr}`;
   const todoEl = document.getElementById('desc-mytodo');
-  if (todoEl) todoEl.textContent = `Remind at ${tStr} for tasks due that day`;
+  if (todoEl) todoEl.textContent = `Remind at each task's set time on its due date`;
 }
 
 function _updateAuthorDatalist() {
