@@ -1577,9 +1577,9 @@ body {
 .notes-backup-btns { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
 
 /* ── Folder Grid View ── */
-.nf-header { padding:16px 16px 8px; flex-shrink:0; }
-.nf-header-title { font-size:1.3rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
-.nf-header-sub { font-size:0.75rem; color:var(--text3); margin-top:4px; }
+.nf-header { padding:0; flex-shrink:0; }
+.nf-header-title { display:none; }
+.nf-header-sub { display:none; }
 .nf-folder-scroll { flex:1; overflow-y:auto; padding:0 16px 100px; min-height:0; }
 .nf-folder-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 
@@ -3208,16 +3208,65 @@ body {
 .empty-state { text-align:center; padding:40px 20px; color:var(--text3); font-size:0.85rem; }
 .empty-state-icon { font-size:2.5rem; margin-bottom:10px; }
 
+/* ===== TAB TAGLINE (shared Option-B style) ===== */
+.tab-tagline {
+  text-align:center; padding:16px 24px 12px; position:relative;
+}
+.tab-tagline-ornament {
+  font-size:0.65rem; letter-spacing:8px; margin-bottom:7px; opacity:0.45;
+}
+.tab-tagline-text {
+  font-family:'Philosopher', serif; font-size:0.95rem; font-weight:700;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  letter-spacing:0.8px;
+}
+.tab-tagline-divider {
+  width:45px; height:2px; margin:9px auto 0; border-radius:2px;
+}
+/* -- color variants -- */
+.tab-tagline--gold   { background:linear-gradient(180deg, rgba(232,200,0,0.05) 0%, transparent 100%); }
+.tab-tagline--gold .tab-tagline-ornament { color:rgba(232,200,0,0.5); }
+.tab-tagline--gold .tab-tagline-text { background:linear-gradient(135deg, #e8c800 0%, #f0d860 50%, #e8c800 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--gold .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(232,200,0,0.35), transparent); }
+
+.tab-tagline--cyan   { background:linear-gradient(180deg, rgba(92,224,240,0.05) 0%, transparent 100%); }
+.tab-tagline--cyan .tab-tagline-ornament { color:rgba(92,224,240,0.5); }
+.tab-tagline--cyan .tab-tagline-text { background:linear-gradient(135deg, #5ce0f0 0%, #7eeaf5 50%, #5ce0f0 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--cyan .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(92,224,240,0.35), transparent); }
+
+.tab-tagline--amber  { background:linear-gradient(180deg, rgba(240,168,72,0.05) 0%, transparent 100%); }
+.tab-tagline--amber .tab-tagline-ornament { color:rgba(240,168,72,0.5); }
+.tab-tagline--amber .tab-tagline-text { background:linear-gradient(135deg, #f0a848 0%, #f5c878 50%, #f0a848 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--amber .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(240,168,72,0.35), transparent); }
+
+.tab-tagline--lavender { background:linear-gradient(180deg, rgba(206,192,255,0.05) 0%, transparent 100%); }
+.tab-tagline--lavender .tab-tagline-ornament { color:rgba(206,192,255,0.5); }
+.tab-tagline--lavender .tab-tagline-text { background:linear-gradient(135deg, #cec0ff 0%, #e0d8ff 50%, #cec0ff 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--lavender .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(206,192,255,0.35), transparent); }
+
+.tab-tagline--green  { background:linear-gradient(180deg, rgba(94,232,160,0.05) 0%, transparent 100%); }
+.tab-tagline--green .tab-tagline-ornament { color:rgba(94,232,160,0.5); }
+.tab-tagline--green .tab-tagline-text { background:linear-gradient(135deg, #5ee8a0 0%, #88f0be 50%, #5ee8a0 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--green .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(94,232,160,0.35), transparent); }
+
+.tab-tagline--warmgold { background:linear-gradient(180deg, rgba(240,200,80,0.05) 0%, transparent 100%); }
+.tab-tagline--warmgold .tab-tagline-ornament { color:rgba(240,200,80,0.5); }
+.tab-tagline--warmgold .tab-tagline-text { background:linear-gradient(135deg, #f0c850 0%, #f5da78 50%, #f0c850 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--warmgold .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(240,200,80,0.35), transparent); }
+
+.tab-tagline--coral  { background:linear-gradient(180deg, rgba(240,128,112,0.05) 0%, transparent 100%); }
+.tab-tagline--coral .tab-tagline-ornament { color:rgba(240,128,112,0.5); }
+.tab-tagline--coral .tab-tagline-text { background:linear-gradient(135deg, #f08070 0%, #f5a898 50%, #f08070 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--coral .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(240,128,112,0.35), transparent); }
+
 /* ===== SEVAKART ===== */
 .sk-screen { flex:1; overflow-y:auto; padding-bottom:70px; }
 .sk-header {
   text-align:center; padding:18px 18px 12px;
-  background:linear-gradient(180deg, rgba(180,120,40,0.08) 0%, transparent 100%);
+  background:linear-gradient(180deg, rgba(212,160,23,0.06) 0%, transparent 100%);
 }
-.sk-title { font-family:'Philosopher',serif; font-size:1.36rem; font-weight:700;
-  background:linear-gradient(135deg, #d4a017, #f0d060, #d4a017);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.sk-subtitle { font-size:0.78rem; color:var(--text3); letter-spacing:1.5px; margin-top:2px; }
+.sk-title { display:none; }
+.sk-subtitle { display:none; }
 .sk-search-bar {
   display:flex; gap:8px; padding:8px 18px 12px; align-items:center;
 }
@@ -3557,12 +3606,39 @@ body {
 .home-g-actions { flex-shrink:0; display:flex; gap:8px; align-items:center; }
 .home-g-action-btn {
   width:40px; height:40px; border-radius:50%;
-  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.06);
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:all 0.2s; color:var(--text3);
 }
-.home-g-action-btn:active { background:rgba(255,255,255,0.08); color:var(--text); transform:scale(0.9); }
+.home-g-action-btn:active { transform:scale(0.9); }
 .home-g-action-btn svg { width:18px; height:18px; }
+/* Sync - Hot Pink */
+.home-g-action-btn.btn-sync {
+  color:#f472b6; border-color:rgba(244,114,182,0.35);
+  background:rgba(244,114,182,0.08);
+  box-shadow:0 0 12px rgba(244,114,182,0.2), inset 0 0 8px rgba(244,114,182,0.05);
+}
+.home-g-action-btn.btn-sync:active { background:rgba(244,114,182,0.18); }
+/* Admin - Bright Violet */
+.home-g-action-btn.btn-admin {
+  color:#c084fc; border-color:rgba(192,132,252,0.35);
+  background:rgba(192,132,252,0.08);
+  box-shadow:0 0 12px rgba(192,132,252,0.2), inset 0 0 8px rgba(192,132,252,0.05);
+}
+.home-g-action-btn.btn-admin:active { background:rgba(192,132,252,0.18); }
+/* Settings - Cornflower Blue */
+.home-g-action-btn.btn-settings {
+  color:#60a5fa; border-color:rgba(96,165,250,0.35);
+  background:rgba(96,165,250,0.08);
+  box-shadow:0 0 12px rgba(96,165,250,0.2), inset 0 0 8px rgba(96,165,250,0.05);
+}
+.home-g-action-btn.btn-settings:active { background:rgba(96,165,250,0.18); }
+/* About - Lime Green */
+.home-g-action-btn.btn-about {
+  color:#a3e635; border-color:rgba(163,230,53,0.35);
+  background:rgba(163,230,53,0.08);
+  box-shadow:0 0 12px rgba(163,230,53,0.2), inset 0 0 8px rgba(163,230,53,0.05);
+}
 
 /* ── Greeting Section ── */
 .home-greeting {
@@ -4045,16 +4121,13 @@ body {
 /* Admin icon on home */
 .home-admin-btn {
   display:none; /* Hidden by default, shown via JS for admins */
-  color:var(--lavender) !important;
 }
 
 /* ===== PRAYER CIRCLE ===== */
 .pc-screen { padding:14px 18px 100px; overflow-y:auto; height:100%; }
-.pc-header { text-align:center; padding:8px 0 16px; }
-.pc-title { font-family:'Philosopher',serif; font-size:1.36rem; font-weight:700;
-  background:linear-gradient(135deg,#e8c800,#f0d860,#d4a84c);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.pc-subtitle { font-size:0.78rem; color:var(--text3); margin-top:2px; letter-spacing:0.3px; }
+.pc-header { text-align:center; padding:8px 0 0; }
+.pc-title { display:none; }
+.pc-subtitle { display:none; }
 .pc-actions { display:flex; gap:10px; margin-bottom:16px; }
 .pc-action-btn {
   flex:1; padding:10px; border-radius:12px; border:1px solid rgba(232,168,56,0.3);
@@ -4326,7 +4399,10 @@ body {
 
 <header class="header">
   <div class="header-date-wrap">
-    <div class="header-date" id="headerDate">18 February 2026</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="headerScreenIcon" style="display:none;line-height:0;"></span>
+      <div class="header-date" id="headerDate">18 February 2026</div>
+    </div>
     <div class="header-masa" id="headerMasa"></div>
   </div>
   <div class="header-icons" id="headerIcons">
@@ -4357,16 +4433,16 @@ body {
               <div id="homeGEmail" class="home-g-email"></div>
             </div>
             <div class="home-g-actions">
-              <button class="home-g-action-btn" onclick="gSyncAll()" title="Sync Now">
+              <button class="home-g-action-btn btn-sync" onclick="gSyncAll()" title="Sync Now">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/><path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"/></svg>
               </button>
-              <button class="home-g-action-btn home-admin-btn" id="homeAdminBtn" onclick="switchScreen('admin',null)" title="Admin Dashboard">
+              <button class="home-g-action-btn home-admin-btn btn-admin" id="homeAdminBtn" onclick="switchScreen('admin',null)" title="Admin Dashboard">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </button>
-              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
+              <button class="home-g-action-btn btn-settings" onclick="switchScreen('settings',null)" title="Settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               </button>
-              <button class="home-g-action-btn" onclick="switchScreen('info',null)" title="About">
+              <button class="home-g-action-btn btn-about" onclick="switchScreen('info',null)" title="About">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               </button>
             </div>
@@ -4388,15 +4464,22 @@ body {
               <div class="home-g-signin-cta" onclick="switchScreen('settings',null)">Sign in with Google →</div>
             </div>
             <div class="home-g-actions">
-              <button class="home-g-action-btn" onclick="switchScreen('settings',null)" title="Settings">
+              <button class="home-g-action-btn btn-settings" onclick="switchScreen('settings',null)" title="Settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               </button>
-              <button class="home-g-action-btn" onclick="switchScreen('info',null)" title="About">
+              <button class="home-g-action-btn btn-about" onclick="switchScreen('info',null)" title="About">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               </button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Tab Tagline -->
+      <div class="tab-tagline tab-tagline--gold">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Your Friend on the Path of Devotional Service</div>
+        <div class="tab-tagline-divider"></div>
       </div>
 
       <!-- ── Greeting ── -->
@@ -4554,6 +4637,12 @@ body {
 
   <!-- SONGS / KIRTANS -->
   <div class="screen" id="screen-songs">
+    <!-- Tagline -->
+    <div class="tab-tagline tab-tagline--amber">
+      <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+      <div class="tab-tagline-text">Sacred Songs for Every Heart</div>
+      <div class="tab-tagline-divider"></div>
+    </div>
     <!-- Fixed top bar -->
     <div class="kirtan-topbar">
       <div class="kirtan-search-wrap">
@@ -4607,6 +4696,13 @@ body {
   <!-- EVENTS (Redesigned) -->
   <div class="screen" id="screen-events">
     <div class="events-screen">
+
+      <!-- Tagline -->
+      <div class="tab-tagline tab-tagline--green">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Keeping You Close to Every Sacred Moment</div>
+        <div class="tab-tagline-divider"></div>
+      </div>
 
       <!-- Inner Tab Navigation -->
       <div class="evt-tabs">
@@ -4667,8 +4763,11 @@ body {
       <!-- FOLDER VIEW (default) -->
       <div id="nfFolderView">
         <div class="nf-header" style="text-align:center;">
-          <div class="nf-header-title" style="justify-content:center;">📒 My Notes</div>
-          <div class="nf-header-sub">Organize your spiritual journey</div>
+          <div class="tab-tagline tab-tagline--lavender">
+            <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+            <div class="tab-tagline-text">Reflections on Your Spiritual Journey</div>
+            <div class="tab-tagline-divider"></div>
+          </div>
         </div>
         <div class="nf-folder-scroll">
           <div class="nf-folder-grid" id="nfFolderGrid">
@@ -4908,8 +5007,14 @@ body {
   <!-- HOLY DHAMAS -->
   <div class="screen" id="screen-dhamas">
     <div class="dhamas-screen">
+      <!-- Tagline -->
+      <div class="tab-tagline tab-tagline--coral">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Journeys to Places of Divine Mercy</div>
+        <div class="tab-tagline-divider"></div>
+      </div>
       <div class="dhamas-hdr">
-        <div class="screen-title" style="margin:0;border:none;padding:0">Holy Dhamas</div>
+        <div class="screen-title" style="margin:0;border:none;padding:0;display:none;">Holy Dhamas</div>
         <button class="dham-add-btn" id="dhamAddBtn" onclick="openAddDham()" style="display:none;">＋ Add Dham</button>
       </div>
       <input class="dhamas-search" id="dhamSearchInp" placeholder="🔍  Search dhamas..." oninput="renderDhamas(this.value)">
@@ -5145,6 +5250,12 @@ body {
   <!-- SEVAKART SCREEN -->
   <div class="screen" id="screen-sevakart">
     <div class="sk-screen">
+      <!-- Tagline -->
+      <div class="tab-tagline tab-tagline--cyan">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Devotees Supporting Devotees</div>
+        <div class="tab-tagline-divider"></div>
+      </div>
       <div class="sk-header">
         <div class="sk-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>SevaKart</div>
         <div class="sk-subtitle">Devotees Supporting Devotees</div>
@@ -5192,6 +5303,12 @@ body {
   <!-- PRAYER CIRCLE -->
   <div class="screen" id="screen-prayer">
     <div class="pc-screen">
+      <!-- Tagline -->
+      <div class="tab-tagline tab-tagline--warmgold">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">United in Prayer, Bound by Grace</div>
+        <div class="tab-tagline-divider"></div>
+      </div>
       <div class="pc-header">
         <div class="pc-title"><svg viewBox="0 0 48 48" width="22" height="22" fill="none" style="vertical-align:middle;margin-right:6px;"><circle cx="24" cy="24" r="22" stroke="#f0c850" stroke-width="2" fill="none" opacity="0.5"/><g transform="translate(24,25)" fill="#f0c850"><path d="M-1,-14 C-1,-11 -1.5,-8 -3,-5 C-4.5,-2 -6,1 -7,3.5 C-7.5,5 -7.5,6.5 -6.5,7.5 C-5.5,8.5 -4,8.5 -3,7.5 C-1.5,6 -0.5,3 -0.3,0 L-0.3,-14Z"/><path d="M1,-14 C1,-11 1.5,-8 3,-5 C4.5,-2 6,1 7,3.5 C7.5,5 7.5,6.5 6.5,7.5 C5.5,8.5 4,8.5 3,7.5 C1.5,6 0.5,3 0.3,0 L0.3,-14Z"/><rect x="-9.5" y="7" width="5" height="6" rx="1.2" transform="rotate(-25,-7,10)"/><rect x="4.5" y="7" width="5" height="6" rx="1.2" transform="rotate(25,7,10)"/></g></svg>Prayer Circle</div>
         <div class="pc-subtitle">Supporting One Another Through Prayer</div>
@@ -12724,6 +12841,26 @@ function switchScreen(name, btn) {
     const headerIcons = document.getElementById('headerIcons');
     const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', 'admin-sevakart':'SevaKart Admin', 'admin-prayer':'Prayer Circle Admin', userlist:'App Users'};
     const SCREEN_COLORS = {songs:'#f0a848', events:'#5ee8a0', notes:'#cec0ff', dhamas:'#f08070', sevakart:'#5ce0f0', 'sevakart-detail':'#5ce0f0', 'sevakart-mylistings':'#5ce0f0', prayer:'#f0c850', 'prayer-detail':'#f0c850', 'prayer-my':'#f0c850', settings:'#a0b8d0', info:'#a0b8d0', search:'#6ab0ff', admin:'#f0c850', 'admin-sevakart':'#5ce0f0', 'admin-prayer':'#f0c850', userlist:'#a0b8d0'};
+    const SCREEN_ICONS = {
+      songs:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+      events:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+      notes:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+      dhamas:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+      sevakart:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/></svg>',
+      'sevakart-detail':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/></svg>',
+      'sevakart-mylistings':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>',
+      prayer:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5.5-3 8.5-7.5 8.5-12V5L12 2 3.5 5v5c0 4.5 3 9 8.5 12z"/></svg>',
+      'prayer-detail':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5.5-3 8.5-7.5 8.5-12V5L12 2 3.5 5v5c0 4.5 3 9 8.5 12z"/></svg>',
+      'prayer-my':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5.5-3 8.5-7.5 8.5-12V5L12 2 3.5 5v5c0 4.5 3 9 8.5 12z"/></svg>',
+      info:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+      admin:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      'admin-sevakart':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      'admin-prayer':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      userlist:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+      settings:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+      search:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+    };
+    const headerScreenIcon = document.getElementById('headerScreenIcon');
     const hdr = document.querySelector('.header');
     if (name === 'calendar') {
       updateHeaderDate();
@@ -12733,6 +12870,7 @@ function switchScreen(name, btn) {
       hdr.style.background = '';
       hdr.style.borderBottomColor = '';
       headerDate.style.color = '';
+      if (headerScreenIcon) { headerScreenIcon.style.display = 'none'; headerScreenIcon.innerHTML = ''; }
     } else {
       headerDate.textContent = TITLES[name] || name;
       headerIcons.style.display = 'none';
@@ -12742,6 +12880,11 @@ function switchScreen(name, btn) {
       headerDate.style.color = sc;
       hdr.style.background = `linear-gradient(135deg, ${sc}0a, ${sc}04, var(--bg2))`;
       hdr.style.borderBottomColor = sc + '18';
+      if (headerScreenIcon) {
+        const iconSvg = SCREEN_ICONS[name];
+        if (iconSvg) { headerScreenIcon.innerHTML = iconSvg; headerScreenIcon.style.display = ''; headerScreenIcon.style.color = sc; }
+        else { headerScreenIcon.style.display = 'none'; headerScreenIcon.innerHTML = ''; }
+      }
     }
   }
 
