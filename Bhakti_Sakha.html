@@ -5600,6 +5600,13 @@ body {
           </select>
         </div>
         <div class="f-grp">
+          <label class="f-lbl">Repeat</label>
+          <select class="f-sel" id="evtOccasionRepeat">
+            <option value="yearly" selected>🔁 Repeat yearly</option>
+            <option value="none">Does not repeat</option>
+          </select>
+        </div>
+        <div class="f-grp">
           <label class="f-lbl">Notes (optional)</label>
           <textarea class="f-area" id="evtNotes" placeholder="Any notes…"></textarea>
         </div>
@@ -9423,6 +9430,7 @@ function openAddEvt() {
   const dd = document.getElementById('evtDay'); if(dd)dd.selectedIndex=0;
   document.getElementById('evtRelation').selectedIndex=0;
   document.getElementById('evtReminderTiming').value='1';
+  document.getElementById('evtOccasionRepeat').value='yearly';
   document.getElementById('evtApptRepeat').value='none';
   document.getElementById('evtApptReminder').value='30';
   document.getElementById('evtSpiritRepeat').value='none';
@@ -9465,6 +9473,7 @@ function editEvt(id) {
     document.getElementById('evtYear').value = evt.year||'';
     document.getElementById('evtRelation').value = evt.relation||'';
     document.getElementById('evtReminderTiming').value = evt.reminderDays!=null?evt.reminderDays:'1';
+    document.getElementById('evtOccasionRepeat').value = evt.repeat_type||'yearly';
     document.getElementById('evtNotes').value = evt.notes||'';
   } else if (_evtSelectedType==='appointment') {
     document.getElementById('evtFormAppointment').classList.add('visible');
@@ -9530,7 +9539,7 @@ function saveEvt() {
       relation: document.getElementById('evtRelation').value||null,
       reminderDays: parseInt(document.getElementById('evtReminderTiming').value),
       notes: document.getElementById('evtNotes').value.trim(),
-      repeat_type: 'yearly'
+      repeat_type: document.getElementById('evtOccasionRepeat').value
     };
   } else if (_evtSelectedType==='appointment') {
     const title = document.getElementById('evtApptTitle').value.trim();
