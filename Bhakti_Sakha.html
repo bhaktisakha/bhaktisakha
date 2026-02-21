@@ -8058,8 +8058,12 @@ async function fetchSharedSongs() {
         if (s.trans) s.trans = _cleanLyrics(s.trans);
         return s;
       });
+      // Only re-render if data actually changed (avoid flicker)
+      const oldJSON = localStorage.getItem('songs') || '[]';
+      const newJSON = JSON.stringify(sharedSongs);
+      if (oldJSON === newJSON) return; // No changes, skip re-render
       songs = sharedSongs;
-      localStorage.setItem('songs', JSON.stringify(songs));
+      localStorage.setItem('songs', newJSON);
       _skipFolderAnimation = true;
       renderSongs();
     }
