@@ -1013,7 +1013,12 @@ body {
   display:flex; align-items:center; justify-content:center; gap:8px;
   padding:0 14px 10px;
 }
-.kirtan-sort-wrap { display:flex; gap:8px; justify-content:center; }
+.kirtan-sort-wrap { display:flex; gap:8px; justify-content:center; align-items:center; }
+.songs-count-badge {
+  background:rgba(240,168,72,0.12); border:1px solid rgba(240,168,72,0.25);
+  color:#f0a848; font-size:0.72rem; font-weight:700; font-family:inherit;
+  padding:5px 10px; border-radius:10px; white-space:nowrap; line-height:1;
+}
 .kirtan-add-btn {
   background:var(--accent-blue); border:none; border-radius:8px;
   width:32px; height:32px; color:white; font-size:1.2rem;
@@ -4710,6 +4715,7 @@ body {
             <option value="hi">हिन्दी</option>
             <option value="mr">मराठी</option>
           </select>
+          <span class="songs-count-badge" id="songsCountBadge">0</span>
         </div>
       </div>
     </div>
@@ -8537,6 +8543,10 @@ function renderSongs(filter) {
   const ab = document.getElementById('ksort-author');
   if (sb) sb.classList.toggle('active', songSortMode==='cat');
   if (ab) ab.classList.toggle('active', songSortMode==='author');
+
+  // Update total song count badge
+  const cntBadge = document.getElementById('songsCountBadge');
+  if (cntBadge) cntBadge.textContent = songs.length;
 
   // Font label
   const fl = document.getElementById('songFontLabel');
