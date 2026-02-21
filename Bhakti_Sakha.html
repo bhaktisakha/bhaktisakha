@@ -5936,7 +5936,8 @@ body {
     </div>
     <div class="f-grp">
       <label class="f-lbl">Author / Composer</label>
-      <input class="f-inp" id="aSongAuthor" placeholder="e.g. Bhaktivinoda Thakura">
+      <input class="f-inp" id="aSongAuthor" list="aSongAuthorList" placeholder="Select or type new author..." autocomplete="off">
+      <datalist id="aSongAuthorList"></datalist>
     </div>
     <div class="f-grp">
       <label class="f-lbl">Category</label>
@@ -8872,6 +8873,7 @@ function openEditSong(id) {
   document.getElementById('aSongTitle').value = s.title || '';
   document.getElementById('aSongOfficialName').value = s.officialName || '';
   document.getElementById('aSongAuthor').value = s.author || '';
+  _updateAuthorDatalist();
   document.getElementById('aSongCat').value = s.cat || 'vbhajan';
   document.getElementById('aSongBook').value = s.book || '';
   document.getElementById('aSongLang').value = s.lang || 'Sanskrit';
@@ -10500,6 +10502,13 @@ function updateNotifDescs() {
   if (rahuEl) rahuEl.textContent = `Alert on the day, at start of Rahu Kalam`;
 }
 
+function _updateAuthorDatalist() {
+  const dl = document.getElementById('aSongAuthorList');
+  if (!dl) return;
+  const authors = [...new Set(songs.map(s => s.author).filter(a => a && a !== 'Traditional'))].sort((a,b) => a.localeCompare(b));
+  dl.innerHTML = authors.map(a => `<option value="${a}">`).join('');
+}
+
 function openAdminSong() {
   if (!hasPermission('songs')) { showToast('Songs admin access required'); return; }
   _audioFieldsShown = 1;
@@ -10507,6 +10516,7 @@ function openAdminSong() {
   for (let i = 1; i < 5; i++) document.getElementById('aRow' + i).style.display = 'none';
   document.getElementById('addAudioBtn').style.display = '';
   document.getElementById('adminSongModal').classList.add('open');
+  _updateAuthorDatalist();
 }
 
 // ---- Rich Text Editor helpers ----
