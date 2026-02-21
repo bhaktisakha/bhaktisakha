@@ -14413,11 +14413,8 @@ function renderDhamas(filter) {
     const delBtn = admin && isCustom
       ? `<button class="dham-card-del" onclick="event.stopPropagation();deleteCustomDham('${d.id}')" title="Delete">✕</button>`
       : '';
-    const editBtn = admin
-      ? `<button class="dham-card-edit" onclick="event.stopPropagation();openEditDham('${d.id}')" title="Edit">✏️</button>`
-      : '';
     return `<div class="dham-card" onclick="openDhamDetail('${d.id}')">
-      ${delBtn}${editBtn}
+      ${delBtn}
       <div class="dham-card-img">${d.icon || '🛕'}</div>
       <div class="dham-card-body">
         <div class="dham-card-name">${d.name}</div>
@@ -14581,7 +14578,10 @@ function openDhamDetail(id) {
 
   document.getElementById('dhamDetailBody').innerHTML = html;
 
-  _dhamDetailPrevScreen = document.querySelector('.screen.active')?.id?.replace('screen-','') || 'dhamas';
+  const currentScreen = document.querySelector('.screen.active')?.id?.replace('screen-','') || 'dhamas';
+  if (currentScreen !== 'dham-detail') {
+    _dhamDetailPrevScreen = currentScreen;
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-dham-detail').classList.add('active');
   document.getElementById('headerDate').textContent = d.name;
