@@ -4226,10 +4226,10 @@ body {
 
         <div class="home-card home-card--audio" onclick="switchScreen('songs',document.querySelectorAll('.nav-btn')[2])">
           <div class="home-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10h6"/><path d="M9 14h4"/></svg>
           </div>
-          <div class="home-card-title">Audio</div>
-          <div class="home-card-desc">Transcendental vibrations — Vaishnava bhajans, and more</div>
+          <div class="home-card-title">Song Book</div>
+          <div class="home-card-desc">Vaishnava bhajans, astakams, stotrams and more</div>
         </div>
 
         <div class="home-card home-card--notes" onclick="switchScreen('notes',document.querySelectorAll('.nav-btn')[4])">
@@ -5297,8 +5297,8 @@ body {
         <span class="nav-lbl">Calendar</span>
       </button>
       <button class="nav-btn" data-tab="songs" data-idx="2" onclick="navTo('songs',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        <span class="nav-lbl">Audio</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="nav-lbl">Song Book</span>
       </button>
       <button class="nav-btn" data-tab="events" data-idx="3" onclick="navTo('events',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -12302,7 +12302,7 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Transcendental Vibrations', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', userlist:'App Users'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', userlist:'App Users'};
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
