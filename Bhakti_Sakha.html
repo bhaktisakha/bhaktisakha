@@ -136,15 +136,6 @@ body {
   transition: color 0.2s;
 }
 .header-icons button:active { color: var(--text); }
-.header-date.songs-title {
-  font-family:'Playfair Display', serif;
-  font-style:italic; font-weight:600;
-  font-size:1.2rem; letter-spacing:0.5px;
-  background:linear-gradient(135deg, #f0a848, #f0d068, #f0a848);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-
 /* ===== SCREENS ===== */
 .screens { flex:1; overflow:hidden; display:flex; flex-direction:column; }
 .screen { display:none; flex-direction:column; height:100%; overflow:hidden; }
@@ -12750,7 +12741,6 @@ function switchScreen(name, btn) {
       updateHeaderDate();
       headerIcons.style.display = '';
       headerMasa.style.display = '';
-      headerDate.classList.remove('songs-title');
       hdr.classList.remove('header-screen');
       hdr.style.background = '';
       hdr.style.borderBottomColor = '';
@@ -12764,11 +12754,6 @@ function switchScreen(name, btn) {
       headerDate.style.color = sc;
       hdr.style.background = `linear-gradient(135deg, ${sc}0a, ${sc}04, var(--bg2))`;
       hdr.style.borderBottomColor = sc + '18';
-      if (name === 'songs') {
-        headerDate.classList.add('songs-title');
-      } else {
-        headerDate.classList.remove('songs-title');
-      }
     }
   }
 
