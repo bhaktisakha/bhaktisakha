@@ -7922,13 +7922,18 @@ function _songTitle(s) {
 }
 
 // Extract a snippet from lyrics around the search phrase (2 words before & after)
+// Diacritic-insensitive: matches on stripped text, extracts from original
 function _getLyricSnippet(text, query) {
   if (!text || !query) return '';
+  // Normalize to NFC so stripped positions map 1:1 to original
+  const nfcText = text.normalize('NFC');
+  const stripped = _stripDiacritics(nfcText);
+  const strippedQ = _stripDiacritics(query);
   const WB = '[\\s,;!?\\.\\-—\'\"\\n]';
-  const words = query.split(/\s+/).filter(Boolean);
+  const words = strippedQ.split(/\s+/).filter(Boolean);
   if (!words.length) return '';
 
-  // Build phrase regex: completed words whole-word, last word prefix
+  // Build phrase regex on stripped text
   let pattern = '(';
   words.forEach(function(w, i) {
     const escaped = w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
@@ -7936,24 +7941,26 @@ function _getLyricSnippet(text, query) {
     if (i < words.length - 1) {
       pattern += escaped + '(?=' + WB + '|$)';
     } else {
-      pattern += escaped + '\\S*'; // last word: capture the full word it matches
+      pattern += escaped + '\\S*';
     }
   });
   pattern += ')';
 
   let re = new RegExp('(?:^|' + WB + ')' + pattern, 'i');
-  let m = re.exec(text);
+  let m = re.exec(stripped);
   if (!m || !m[1]) return '';
 
-  const matchStart = text.indexOf(m[1], m.index);
-  const matchLen = m[1].length;
-  const before = text.substring(0, matchStart);
-  const after = text.substring(matchStart + matchLen);
+  // Positions in stripped map 1:1 to nfcText (same length after NFC)
+  const matchStart = stripped.indexOf(m[1], m.index);
+  const matchEnd = matchStart + m[1].length;
+
+  const before = nfcText.substring(0, matchStart);
+  const after = nfcText.substring(matchEnd);
   const wordsBefore = before.replace(/\n/g,' ').trimEnd().split(/\s+/);
   const pre = wordsBefore.slice(-2).join(' ');
   const wordsAfter = after.replace(/\n/g,' ').trimStart().split(/\s+/);
   const post = wordsAfter.slice(0, 2).join(' ');
-  const matched = text.substring(matchStart, matchStart + matchLen);
+  const matched = nfcText.substring(matchStart, matchEnd);
   return (pre ? '…' + pre + ' ' : '') + '**' + matched + '**' + (post ? ' ' + post + '…' : '');
 }
 
@@ -8660,19 +8667,25 @@ function _kirtanSearchDebounced(q) {
 }
 
 // Whole-word match helper (single word)
+// Strip diacritics for search: ā→a, ṅ→n, ṣ→s, ś→s, etc.
+function _stripDiacritics(str) {
+  if (!str) return '';
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function _wholeWordMatch(text, word) {
   if (!text || !word) return false;
-  const escaped = word.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+  const escaped = _stripDiacritics(word).replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
   const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])' + escaped + '(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
-  return re.test(text);
+  return re.test(_stripDiacritics(text));
 }
 
 // Phrase match — all words must appear CONTIGUOUSLY in sequence
 // Completed words need whole-word boundaries; last word is prefix only
-// "ami ja" → matches "Ami Jamuna" but NOT "Ami ... ja somewhere else"
+// Diacritic-insensitive: strips diacritics from both text and query
 function _phraseMatch(text, queryStr, allCompleted) {
   if (!text || !queryStr) return false;
-  const words = queryStr.split(/\s+/).filter(Boolean);
+  const words = _stripDiacritics(queryStr).split(/\s+/).filter(Boolean);
   if (!words.length) return false;
 
   // Build a single regex for the contiguous phrase
@@ -8682,16 +8695,14 @@ function _phraseMatch(text, queryStr, allCompleted) {
     const escaped = w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
     if (i > 0) pattern += WB + '+'; // require whitespace/separator between words
     if (i < words.length - 1 || allCompleted) {
-      // Completed word → whole-word boundary on right
       pattern += escaped + '(?=$|' + WB + ')';
     } else {
-      // Last word still being typed → prefix match (no right boundary needed)
       pattern += escaped;
     }
   });
 
   const re = new RegExp(pattern, 'i');
-  return re.test(text);
+  return re.test(_stripDiacritics(text));
 }
 
 // Check if song matches phrase query across any of its searchable fields
@@ -8725,11 +8736,34 @@ function kirtanSearch(q) {
   if (!matches.length) {
     dd.innerHTML = `<div class="kd-empty">No songs found for "${q.trim()}"</div>`;
   } else {
-    // Highlight: build regex that highlights contiguous phrase
-    const allEscaped = words.map(w => w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&'));
+    // Diacritic-aware highlight: find matches on stripped text, highlight original
+    const allEscaped = words.map(w => _stripDiacritics(w).replace(/[.*+?^${}()|\[\]\\]/g, '\\$&'));
     const phrasePattern = allEscaped.join('[\\s,;!?\\.\\-—\'\"\\n]+');
-    const hlRe = new RegExp('(^|[\\s,;!?\\.\\-—\'\"\\n])(' + phrasePattern + ')', 'gi');
-    const hl = t => (t||'').replace(hlRe, '$1<mark>$2</mark>');
+    const hlPhraseRe = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])(' + phrasePattern + ')', 'gi');
+
+    function hl(t) {
+      if (!t) return '';
+      const nfc = t.normalize('NFC');
+      const stripped = _stripDiacritics(nfc);
+      // Find all match positions in stripped text
+      const ranges = [];
+      let m;
+      const re = new RegExp(hlPhraseRe.source, 'gi');
+      while ((m = re.exec(stripped)) !== null) {
+        // m[1] is the phrase part (without leading boundary)
+        const phraseStart = stripped.indexOf(m[1], m.index);
+        ranges.push([phraseStart, phraseStart + m[1].length]);
+      }
+      if (!ranges.length) return nfc;
+      // Build result using original NFC text with <mark> at matched positions
+      let result = '', last = 0;
+      ranges.forEach(function(r) {
+        result += nfc.substring(last, r[0]) + '<mark>' + nfc.substring(r[0], r[1]) + '</mark>';
+        last = r[1];
+      });
+      result += nfc.substring(last);
+      return result;
+    }
 
     dd.innerHTML = matches.map(s => {
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
