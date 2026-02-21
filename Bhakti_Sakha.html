@@ -4640,25 +4640,25 @@ body {
   <!-- NOTES -->
   <div class="screen" id="screen-notes">
     <div class="notes-screen">
-      <!-- Backup/Sign-in banner -->
-      <div class="notes-backup-box" id="notesBackupBox">
-        <span id="notesBackupMsg"><strong>Sign in with Google</strong> to backup & sync notes across devices.</span>
-        <div class="notes-backup-btns">
-          <button class="bk-btn" id="notesGoogleBtn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="switchScreen('settings')">🔑 Sign In</button>
-          <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="exportNotes()">📤 Export</button>
-          <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="importNotes()">📥 Import</button>
-        </div>
-      </div>
 
       <!-- FOLDER VIEW (default) -->
       <div id="nfFolderView">
-        <div class="nf-header">
-          <div class="nf-header-title">📒 My Notes</div>
+        <div class="nf-header" style="text-align:center;">
+          <div class="nf-header-title" style="justify-content:center;">📒 My Notes</div>
           <div class="nf-header-sub">Organize your spiritual journey</div>
         </div>
         <div class="nf-folder-scroll">
           <div class="nf-folder-grid" id="nfFolderGrid">
             <!-- rendered by JS -->
+          </div>
+        </div>
+        <!-- Backup/Sign-in banner -->
+        <div class="notes-backup-box" id="notesBackupBox" style="margin-bottom:80px;">
+          <span id="notesBackupMsg"><strong>Sign in with Google</strong> to backup & sync notes across devices.</span>
+          <div class="notes-backup-btns">
+            <button class="bk-btn" id="notesGoogleBtn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="switchScreen('settings')">🔑 Sign In</button>
+            <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="exportNotes()">📤 Export</button>
+            <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="importNotes()">📥 Import</button>
           </div>
         </div>
       </div>
