@@ -5425,42 +5425,35 @@ body {
         <!-- Each notification toggle -->
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">Ekadashi Reminders</div>
+            <div class="sett-name" style="color:#6ab0ff;">Ekadashi Reminders</div>
             <div class="sett-desc" id="desc-ekadashi">Alert 1 day before, at 7:00 am</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-ekadashi" checked onchange="saveS()"></label>
         </div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">Festival Reminders</div>
+            <div class="sett-name" style="color:#6ab0ff;">Festival Reminders</div>
             <div class="sett-desc" id="desc-festival">Alert 1 day before, at 7:00 am</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-festival" checked onchange="saveS()"></label>
         </div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">Appearance Days</div>
+            <div class="sett-name" style="color:#6ab0ff;">Appearance Days</div>
             <div class="sett-desc" id="desc-appearance">Alert 1 day before, at 7:00 am</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-appearance" checked onchange="saveS()"></label>
         </div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">My Custom Events</div>
-            <div class="sett-desc" id="desc-custom">Alert 1 day before, at 7:00 am</div>
-          </div>
-          <label class="toggle"><input type="checkbox" id="n-custom" checked onchange="saveS()"></label>
-        </div>
-        <div class="sett-row">
-          <div class="sett-info">
-            <div class="sett-name">Gayatri / Sandhya Times</div>
+            <div class="sett-name" style="color:#6ab0ff;">Gayatri / Sandhya Times</div>
             <div class="sett-desc" id="desc-gayatri">Remind 10 min before sunrise · noon · sunset</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-gayatri" onchange="saveS()"></label>
         </div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">Rahu Kalam</div>
+            <div class="sett-name" style="color:#6ab0ff;">Rahu Kalam</div>
             <div class="sett-desc" id="desc-rahu">Alert on the day, at start of Rahu Kalam</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-rahu" onchange="saveS()"></label>
@@ -5468,7 +5461,7 @@ body {
         <div class="notif-divider"></div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">🙏 Prayer Circle Alerts</div>
+            <div class="sett-name" style="color:#f0c850;">Prayer Circle Alerts</div>
             <div class="sett-desc">Get notified about new prayer requests from devotees</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-prayer" checked onchange="saveS()"></label>
@@ -5476,15 +5469,16 @@ body {
         <div class="notif-divider"></div>
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">📅 My Events Reminders</div>
-            <div class="sett-desc" id="desc-myevents">Get reminded about your personal calendar events</div>
+            <div class="sett-name" style="color:#5ee8a0;">My Events Reminders</div>
+            <div class="sett-desc" id="desc-myevents">Reminders for your personal calendar events</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-myevents" checked onchange="saveS()"></label>
         </div>
+        <input type="checkbox" id="n-custom" checked style="display:none;">
         <div class="sett-row">
           <div class="sett-info">
-            <div class="sett-name">📝 My To-Do Reminders</div>
-            <div class="sett-desc" id="desc-mytodo">Get reminded about upcoming and overdue tasks</div>
+            <div class="sett-name" style="color:#f8a4bc;">My To-Do Reminders</div>
+            <div class="sett-desc" id="desc-mytodo">Remind at each task's set time on its due date</div>
           </div>
           <label class="toggle"><input type="checkbox" id="n-mytodo" checked onchange="saveS()"></label>
         </div>
@@ -11509,6 +11503,10 @@ function syncTimeFromSelects() {
 
 function saveS() {
   const s={};
+  // Sync n-custom (hidden) with n-myevents
+  const myEvtEl = document.getElementById('n-myevents');
+  const customEl = document.getElementById('n-custom');
+  if (myEvtEl && customEl) customEl.checked = myEvtEl.checked;
   ['n-ekadashi','n-festival','n-appearance','n-gayatri','n-rahu','n-custom','n-prayer','n-myevents','n-mytodo'].forEach(id=>{
     const el=document.getElementById(id); if(el)s[id]=el.checked;
   });
@@ -11534,7 +11532,7 @@ function updateNotifDescs() {
   const tStr = fmtNotifTime(tim);
   const dayStr = adv === 1 ? '1 day' : `${adv} days`;
   const desc = `Alert ${dayStr} before, at ${tStr}`;
-  ['ekadashi','festival','appearance','custom'].forEach(k => {
+  ['ekadashi','festival','appearance'].forEach(k => {
     const el = document.getElementById('desc-'+k);
     if (el) el.textContent = desc;
   });
@@ -11812,7 +11810,7 @@ async function registerTokenWithServer(token) {
       ekadashi: document.getElementById('n-ekadashi')?.checked ?? true,
       festival: document.getElementById('n-festival')?.checked ?? true,
       appearance: document.getElementById('n-appearance')?.checked ?? true,
-      custom: document.getElementById('n-custom')?.checked ?? true,
+      custom: document.getElementById('n-myevents')?.checked ?? true,
       gayatri: document.getElementById('n-gayatri')?.checked ?? false,
       rahu: document.getElementById('n-rahu')?.checked ?? false,
       prayer: document.getElementById('n-prayer')?.checked ?? true,
