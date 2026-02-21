@@ -101,7 +101,12 @@ body {
   justify-content: space-between;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border);
+  transition: background 0.3s, border-color 0.3s;
 }
+.header.header-screen {
+  justify-content: center;
+}
+.header.header-screen .header-date-wrap { width:100%; text-align:center; }
 .header-date-wrap {
   display: flex; flex-direction: column;
 }
@@ -110,6 +115,13 @@ body {
   font-weight: 600;
   color: var(--text);
   letter-spacing: 0.2px;
+  transition: color 0.3s;
+}
+.header.header-screen .header-date {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 .header-masa {
   font-size: 0.72rem;
@@ -124,13 +136,11 @@ body {
   transition: color 0.2s;
 }
 .header-icons button:active { color: var(--text); }
-.header.header-songs { justify-content:center; }
-.header.header-songs .header-date-wrap { width:100%; text-align:center; }
 .header-date.songs-title {
   font-family:'Playfair Display', serif;
   font-style:italic; font-weight:600;
   font-size:1.2rem; letter-spacing:0.5px;
-  background:linear-gradient(135deg, #c9a84c, #f0d68a, #c9a84c);
+  background:linear-gradient(135deg, #f0a848, #f0d068, #f0a848);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
 }
@@ -12734,22 +12744,30 @@ function switchScreen(name, btn) {
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
     const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', 'admin-sevakart':'SevaKart Admin', 'admin-prayer':'Prayer Circle Admin', userlist:'App Users'};
+    const SCREEN_COLORS = {songs:'#f0a848', events:'#5ee8a0', notes:'#cec0ff', dhamas:'#f08070', sevakart:'#5ce0f0', 'sevakart-detail':'#5ce0f0', 'sevakart-mylistings':'#5ce0f0', prayer:'#f0c850', 'prayer-detail':'#f0c850', 'prayer-my':'#f0c850', settings:'#a0b8d0', info:'#a0b8d0', search:'#6ab0ff', admin:'#f0c850', 'admin-sevakart':'#5ce0f0', 'admin-prayer':'#f0c850', userlist:'#a0b8d0'};
+    const hdr = document.querySelector('.header');
     if (name === 'calendar') {
       updateHeaderDate();
       headerIcons.style.display = '';
       headerMasa.style.display = '';
       headerDate.classList.remove('songs-title');
-      document.querySelector('.header').classList.remove('header-songs');
+      hdr.classList.remove('header-screen');
+      hdr.style.background = '';
+      hdr.style.borderBottomColor = '';
+      headerDate.style.color = '';
     } else {
       headerDate.textContent = TITLES[name] || name;
       headerIcons.style.display = 'none';
       headerMasa.style.display = 'none';
+      hdr.classList.add('header-screen');
+      const sc = SCREEN_COLORS[name] || '#a0b8d0';
+      headerDate.style.color = sc;
+      hdr.style.background = `linear-gradient(135deg, ${sc}0a, ${sc}04, var(--bg2))`;
+      hdr.style.borderBottomColor = sc + '18';
       if (name === 'songs') {
         headerDate.classList.add('songs-title');
-        document.querySelector('.header').classList.add('header-songs');
       } else {
         headerDate.classList.remove('songs-title');
-        document.querySelector('.header').classList.remove('header-songs');
       }
     }
   }
