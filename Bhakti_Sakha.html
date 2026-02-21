@@ -14402,7 +14402,9 @@ function _skDeepMergeListing(primary, secondary) {
   for (const key of SK_LISTING_FIELDS) {
     const pVal = primary[key];
     const sVal = secondary[key];
-    if ((pVal === undefined || pVal === null || pVal === '') && sVal !== undefined && sVal !== null && sVal !== '') {
+    const pEmpty = (pVal === undefined || pVal === null || pVal === '' || (Array.isArray(pVal) && pVal.length === 0));
+    const sEmpty = (sVal === undefined || sVal === null || sVal === '' || (Array.isArray(sVal) && sVal.length === 0));
+    if (pEmpty && !sEmpty) {
       merged[key] = sVal;
     }
   }
@@ -14712,7 +14714,11 @@ function skOpenDetail(id, fromScreen) {
   }
   if (l.mobile) html += '<a class="sk-contact-btn call" href="tel:' + _escHtml(l.mobile) + '">📞 Call</a>';
   if (l.email) html += '<a class="sk-contact-btn email" href="mailto:' + _escHtml(l.email) + '">✉ Email</a>';
-  if (l.website) html += '<a class="sk-contact-btn website" href="' + _escHtml(l.website) + '" target="_blank" rel="noopener">🔗 Website</a>';
+  if (l.website) {
+    var webUrl = String(l.website).trim();
+    if (webUrl && !/^https?:\/\//i.test(webUrl)) webUrl = 'https://' + webUrl;
+    html += '<a class="sk-contact-btn website" href="' + _escHtml(webUrl) + '" target="_blank" rel="noopener">🔗 Website</a>';
+  }
   html += '</div>' +
     '<div class="sk-disclaimer">SevaKart facilitates connection. All transactions happen directly between users.</div>' +
   '</div>';
@@ -14734,7 +14740,7 @@ function skOpenDetail(id, fromScreen) {
   } else {
     html += '<div style="font-size:0.8rem;color:var(--text3);margin-bottom:8px;">No reviews yet.</div>';
   }
-  if (!hasReviewed && hasContacted && isSignedIn()) {
+  if (!hasReviewed && isSignedIn()) {
     html += '<button class="sk-add-review-btn" onclick="skOpenReview()">⭐ Write a Review</button>';
   }
   html += '</div>';
