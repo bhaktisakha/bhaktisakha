@@ -5818,7 +5818,7 @@ body {
       <div class="f-grp"><label class="f-lbl">Mobile Number *</label>
         <input class="f-inp" id="skMobile" type="tel" placeholder="+91 98765 43210"></div>
       <div class="f-grp">
-        <label class="f-lbl">WhatsApp Number (same as mobile?)</label>
+        <label class="f-lbl">WhatsApp Number * (same as mobile?)</label>
         <div style="display:flex;gap:10px;align-items:center;">
           <label style="font-size:0.8rem;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer;">
             <input type="checkbox" id="skWASame" checked onchange="document.getElementById('skWA').disabled=this.checked; if(this.checked) document.getElementById('skWA').value='';" style="accent-color:var(--accent-gold);"> Same as mobile
@@ -5826,7 +5826,7 @@ body {
           <input class="f-inp" id="skWA" type="tel" placeholder="WhatsApp number" disabled style="flex:1;">
         </div>
       </div>
-      <div class="f-grp"><label class="f-lbl">Email (optional)</label>
+      <div class="f-grp"><label class="f-lbl">Email *</label>
         <input class="f-inp" id="skEmail" type="email" placeholder="email@example.com"></div>
       <div class="f-grp"><label class="f-lbl">City *</label>
         <input class="f-inp" id="skCity" placeholder="e.g. Mumbai, Vrindavan, Dallas"></div>
@@ -5836,7 +5836,7 @@ body {
           <option value="Deity Services">🪷 Deity Services</option>
           <option value="Prasadam & Catering">🍲 Prasadam & Catering</option>
           <option value="Kirtan & Events">🎵 Kirtan & Events</option>
-          <option value="Devotional Products">📿 Devotional Products</option>
+          <option value="Devotional Products">🛍️ Devotional and/or Organic Products</option>
           <option value="Education">📖 Education</option>
           <option value="Professional Services">💼 Professional Services</option>
           <option value="Temple Supplies">🛕 Temple Supplies</option>
@@ -5844,13 +5844,13 @@ body {
         </select></div>
       <div class="f-grp"><label class="f-lbl">Short Description (max 100 chars) *</label>
         <input class="f-inp" id="skShortDesc" maxlength="100" placeholder="Brief summary of your service"></div>
-      <div class="f-grp"><label class="f-lbl">Full Description (max 500 chars)</label>
+      <div class="f-grp"><label class="f-lbl">Full Description (max 500 chars) *</label>
         <textarea class="f-area" id="skFullDesc" maxlength="500" placeholder="Detailed description..." style="min-height:100px;"></textarea></div>
-      <div class="f-grp"><label class="f-lbl">Years in Service (optional)</label>
+      <div class="f-grp"><label class="f-lbl">Years in Service *</label>
         <input class="f-inp" id="skYears" type="number" min="0" placeholder="e.g. 5"></div>
       <div class="f-grp"><label class="f-lbl">Website / Instagram link (optional)</label>
         <input class="f-inp" id="skWebsite" type="url" placeholder="https://..."></div>
-      <div class="f-grp"><label class="f-lbl">Photos (up to 3)</label>
+      <div class="f-grp"><label class="f-lbl">Photos (at least 1, up to 3) *</label>
         <div class="sk-photo-upload" id="skPhotoUpload">
           <div class="sk-photo-slot" onclick="skPickPhoto(0)">＋</div>
           <div class="sk-photo-slot" onclick="skPickPhoto(1)">＋</div>
@@ -14433,7 +14433,7 @@ const SK_CATEGORIES = [
   {id:'Deity Services', icon:'🪷', name:'Deity Services'},
   {id:'Prasadam & Catering', icon:'🍲', name:'Prasadam'},
   {id:'Kirtan & Events', icon:'🎵', name:'Kirtan & Events'},
-  {id:'Devotional Products', icon:'📿', name:'Products'},
+  {id:'Devotional Products', icon:'🛍️', name:'Products'},
   {id:'Education', icon:'📖', name:'Education'},
   {id:'Professional Services', icon:'💼', name:'Professional'},
   {id:'Temple Supplies', icon:'🛕', name:'Temple'},
@@ -15316,10 +15316,21 @@ function skNextStep(from) {
     const bn = document.getElementById('skBizName').value.trim();
     const cn = document.getElementById('skContactName').value.trim();
     const mob = document.getElementById('skMobile').value.trim();
+    const waSame = document.getElementById('skWASame').checked;
+    const wa = waSame ? mob : document.getElementById('skWA').value.trim();
+    const email = document.getElementById('skEmail').value.trim();
     const city = document.getElementById('skCity').value.trim();
     const cat = document.getElementById('skCategory').value;
     const sd = document.getElementById('skShortDesc').value.trim();
+    const fd = document.getElementById('skFullDesc').value.trim();
+    const yrs = document.getElementById('skYears').value.trim();
+    const hasPhoto = _skPhotoData.some(Boolean);
     if (!bn||!cn||!mob||!city||!cat||!sd) { showToast('Please fill all required fields (*)'); return; }
+    if (!wa) { showToast('WhatsApp number is required'); return; }
+    if (!email) { showToast('Email is required'); return; }
+    if (!fd) { showToast('Full Description is required'); return; }
+    if (!yrs) { showToast('Years in Service is required'); return; }
+    if (!hasPhoto) { showToast('Please add at least 1 photo'); return; }
     _skFormStep = 3;
     _skBuildPreview();
   }
