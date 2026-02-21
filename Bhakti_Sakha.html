@@ -8986,6 +8986,11 @@ function _audSwitchSource(pid) {
   au.currentTime = 0;
   au.src = sources[idx].url;
   au.load();
+  // Track selected index for persistent audio
+  if (_persistentAudio === au) {
+    _playingAudioIdx = idx;
+    _playingAudioSrc = sources[idx].url;
+  }
   _audUpdateWave(pid, 0);
   const curEl = wrap.querySelector('.aud-cur');
   const totalEl = wrap.querySelector('.aud-total');
@@ -9012,12 +9017,14 @@ function _audInitPlayers() {
       const curEl = wrap.querySelector('.aud-cur');
       const totalEl = wrap.querySelector('.aud-total');
       if (!au.paused) {
+        // Currently playing — show pause button, update waveform & time
         if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
-        if (au.duration) {
-          if (totalEl) totalEl.textContent = _audFmtTime(au.duration);
-          if (curEl) curEl.textContent = _audFmtTime(au.currentTime);
-          _audUpdateWave(pid, au.currentTime / au.duration);
-        }
+      }
+      // Sync time & waveform for both playing and paused-at-position
+      if (au.duration) {
+        if (totalEl) totalEl.textContent = _audFmtTime(au.duration);
+        if (curEl) curEl.textContent = _audFmtTime(au.currentTime);
+        _audUpdateWave(pid, au.currentTime / au.duration);
       }
       // Re-point the pid reference so dynamic lookups find new DOM
       au._audPid = pid;
@@ -9101,7 +9108,11 @@ function _buildAudioHtml(s) {
   if (playable.length > 0) {
     _audPlayerIdx++;
     const pid = 'ap' + _audPlayerIdx;
-    const firstUrl = _resolveAudioUrl(playable[0].url);
+
+    // Check if this song is currently playing/paused — pre-select the correct singer
+    const isActiveSong = _playingSongId === s.id && _persistentAudio;
+    const activeIdx = isActiveSong ? Math.min(_playingAudioIdx, playable.length - 1) : 0;
+    const initialUrl = _resolveAudioUrl(playable[activeIdx].url);
 
     _audSources[pid] = playable.map(a => ({
       url: _resolveAudioUrl(a.url),
@@ -9112,7 +9123,7 @@ function _buildAudioHtml(s) {
     let selectorHtml = '';
     if (playable.length > 1) {
       const options = playable.map((a, i) =>
-        `<option value="${i}">${a.singer || 'Audio ' + (i+1)}</option>`
+        `<option value="${i}"${i === activeIdx ? ' selected' : ''}>${a.singer || 'Audio ' + (i+1)}</option>`
       ).join('');
       selectorHtml = `<div class="aud-selector">
         <span class="aud-sel-icon">🎤</span>
@@ -9128,7 +9139,7 @@ function _buildAudioHtml(s) {
     }
 
     html += `<div class="audio-item" id="${pid}">
-      <audio src="${firstUrl}" preload="none"></audio>
+      <audio src="${initialUrl}" preload="none"></audio>
       ${selectorHtml}
       <div class="aud-controls-row">
         <button class="aud-play" onclick="_audToggle('${pid}')">
@@ -9140,7 +9151,7 @@ function _buildAudioHtml(s) {
         <span class="aud-time aud-total">0:00</span>
         <button class="aud-speed" onclick="_audSpeed('${pid}')">1×</button>
       </div>
-      <a href="${playable[0].url}" target="_blank" rel="noopener" class="aud-fallback" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#e8c800,#d4a017);color:#0a0e1a;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:8px;">
+      <a href="${playable[activeIdx].url}" target="_blank" rel="noopener" class="aud-fallback" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#e8c800,#d4a017);color:#0a0e1a;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:8px;">
         ▶ Open Audio Link
       </a>
     </div>`;
@@ -9157,6 +9168,7 @@ let _persistentAudio = null;    // The <audio> element kept alive across screens
 let _playingSongTitle = '';      // Cached title for the mini bar
 let _playingSongCat = '';        // Cached category for the mini bar subtitle
 let _playingAudioSrc = '';      // src of the audio currently playing
+let _playingAudioIdx = 0;       // Index of selected singer in dropdown
 
 function _nowPlayingBarsHtml() {
   return '<div class="now-playing-bars"><span></span><span></span><span></span><span></span></div>';
@@ -9186,6 +9198,12 @@ function _onAudioPlay(audioEl, songId) {
   _playingSongId = songId;
   _persistentAudio = audioEl;
   _playingAudioSrc = audioEl.src;
+  // Capture which singer index is selected in the dropdown
+  const wrap = audioEl.closest('.audio-item[id^="ap"]');
+  if (wrap) {
+    const sel = wrap.querySelector('.aud-select');
+    _playingAudioIdx = sel ? parseInt(sel.value) || 0 : 0;
+  }
   _playingSongTitle = s ? _songTitle(s) : '';
   _playingSongCat = s ? (_catLabel(s.cat || '').replace(/^[^ ]+ /,'')) : '';
   _updateNowPlayingBar(true);
@@ -9212,6 +9230,7 @@ function _clearNowPlaying() {
   _playingSongId = null;
   _persistentAudio = null;
   _playingAudioSrc = '';
+  _playingAudioIdx = 0;
   _playingSongTitle = '';
   _playingSongCat = '';
   _updateNowPlayingBar(false);
@@ -9274,7 +9293,8 @@ function npBarStop(e) {
 // Persist audio when leaving song detail
 function _persistCurrentAudio() {
   if (!_persistentAudio || !_playingSongId) return;
-  if (_persistentAudio.paused) return; // Not playing, nothing to persist
+  // Persist both playing AND paused-at-position audio (so user can resume)
+  if (_persistentAudio.paused && _persistentAudio.currentTime === 0) return;
   // Move the audio element to the persistent container so it survives DOM changes
   const wrap = document.getElementById('persistentAudioWrap');
   if (wrap && _persistentAudio.parentNode !== wrap) {
@@ -9290,13 +9310,23 @@ function _reconnectPersistentAudio(songId) {
   // Find the matching audio slot in the detail body and replace it
   const body = document.getElementById('songDetailBody');
   if (!body) return false;
-  const audioEls = body.querySelectorAll('audio');
+  const audioEls = body.querySelectorAll('.audio-item[id^="ap"] audio');
+  // Try to match by src first
   for (const au of audioEls) {
     if (au.src === _playingAudioSrc || _decodeUrlMatch(au.src, _playingAudioSrc)) {
-      // Replace this fresh audio with our persistent one
       au.parentNode.replaceChild(_persistentAudio, au);
+      // Update the pid reference so waveform updates find the right DOM
+      const wrap = _persistentAudio.closest('.audio-item[id^="ap"]');
+      if (wrap) _persistentAudio._audPid = wrap.id;
       return true;
     }
+  }
+  // Fallback: replace the first audio element (dropdown was pre-set to correct singer)
+  if (audioEls.length > 0) {
+    audioEls[0].parentNode.replaceChild(_persistentAudio, audioEls[0]);
+    const wrap = _persistentAudio.closest('.audio-item[id^="ap"]');
+    if (wrap) _persistentAudio._audPid = wrap.id;
+    return true;
   }
   return false;
 }
