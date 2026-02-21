@@ -3349,10 +3349,12 @@ body {
   letter-spacing:0.8px; margin-bottom:10px; font-weight:600; }
 .sk-contact-btns { display:flex; gap:8px; flex-wrap:wrap; }
 .sk-contact-btn {
-  flex:1; min-width:80px; display:flex; align-items:center; justify-content:center; gap:6px;
-  padding:10px 12px; border-radius:10px; border:1px solid var(--border);
-  font-size:0.86rem; font-weight:600; cursor:pointer; text-decoration:none;
+  flex:1; min-width:70px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  padding:12px 8px; border-radius:10px; border:1px solid var(--border);
+  font-size:0.78rem; font-weight:600; cursor:pointer; text-decoration:none; text-align:center;
 }
+.sk-contact-btn .sk-cb-icon { font-size:1.2rem; line-height:1; }
+.sk-contact-btn .sk-cb-label { font-size:0.76rem; font-weight:600; }
 .sk-contact-btn.whatsapp { background:rgba(37,211,102,0.1); border-color:rgba(37,211,102,0.3); color:#25d366; }
 .sk-contact-btn.call { background:rgba(61,127,212,0.1); border-color:rgba(61,127,212,0.3); color:var(--accent-blue); }
 .sk-contact-btn.email { background:rgba(155,89,182,0.1); border-color:rgba(155,89,182,0.3); color:#9b59b6; }
@@ -14963,14 +14965,14 @@ function skOpenDetail(id, fromScreen) {
     '<div class="sk-contact-btns">';
   if (l.whatsapp || l.mobile) {
     const phone = String(l.whatsapp||l.mobile||'').replace(/[^0-9]/g,'');
-    html += '<a class="sk-contact-btn whatsapp" href="https://wa.me/' + phone + '" target="_blank" rel="noopener">💬 WhatsApp</a>';
+    html += '<a class="sk-contact-btn whatsapp" href="https://wa.me/' + phone + '" target="_blank" rel="noopener"><span class="sk-cb-icon">💬</span><span class="sk-cb-label">WhatsApp</span></a>';
   }
-  if (l.mobile) html += '<a class="sk-contact-btn call" href="tel:' + _escHtml(l.mobile) + '">📞 Call</a>';
-  if (l.email) html += '<a class="sk-contact-btn email" href="mailto:' + _escHtml(l.email) + '">✉ Email</a>';
+  if (l.mobile) html += '<a class="sk-contact-btn call" href="tel:' + _escHtml(l.mobile) + '"><span class="sk-cb-icon">📞</span><span class="sk-cb-label">Call</span></a>';
+  if (l.email) html += '<a class="sk-contact-btn email" href="mailto:' + _escHtml(l.email) + '"><span class="sk-cb-icon">✉️</span><span class="sk-cb-label">Email</span></a>';
   if (l.website) {
     var webUrl = String(l.website).trim();
     if (webUrl && !/^https?:\/\//i.test(webUrl)) webUrl = 'https://' + webUrl;
-    html += '<a class="sk-contact-btn website" href="' + _escHtml(webUrl) + '" target="_blank" rel="noopener">🔗 Website</a>';
+    html += '<a class="sk-contact-btn website" href="' + _escHtml(webUrl) + '" target="_blank" rel="noopener"><span class="sk-cb-icon">🔗</span><span class="sk-cb-label">Website</span></a>';
   }
   html += '</div>' +
     '<div class="sk-disclaimer">SevaKart facilitates connection. All transactions happen directly between users.</div>' +
