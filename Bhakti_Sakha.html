@@ -18334,6 +18334,7 @@ function tdSaveTask() {
 }
 
 function tdDeleteTask(id) {
+  if (!confirm('Delete this task?')) return;
   if (typeof id === 'string' && id) {
     tdTasks = tdTasks.filter(t => t.id !== id);
   } else if (_tdEditingId) {
