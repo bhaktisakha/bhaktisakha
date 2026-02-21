@@ -3205,16 +3205,11 @@ body {
   display:flex; gap:8px; padding:8px 18px 12px; align-items:center;
 }
 .sk-search-inp {
-  flex:1; background:var(--card); border:1.5px solid var(--border); border-radius:10px;
-  padding:9px 14px; color:var(--text); font-size:0.91rem; outline:none; font-family:inherit;
+  flex:1; width:100%; background:var(--card); border:1.5px solid var(--border); border-radius:10px;
+  padding:10px 14px; color:var(--text); font-size:0.91rem; outline:none; font-family:inherit;
 }
 .sk-search-inp:focus { border-color:var(--accent-gold); }
 .sk-search-inp::placeholder { color:var(--text3); }
-.sk-filter-btn {
-  background:var(--card); border:1.5px solid var(--border); border-radius:10px;
-  padding:8px 12px; color:var(--text2); font-size:0.91rem; cursor:pointer;
-}
-.sk-filter-btn:active { border-color:var(--accent-gold); }
 .sk-actions { display:flex; gap:8px; padding:0 18px 14px; }
 .sk-action-btn {
   flex:1; background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.25);
@@ -3481,16 +3476,6 @@ body {
 .sk-my-listings { padding:0 18px 16px; display:flex; flex-direction:column; gap:10px; }
 
 /* Filter modal */
-.sk-filter-section { margin-bottom:14px; }
-.sk-filter-lbl { font-size:0.76rem; color:var(--text3); text-transform:uppercase;
-  letter-spacing:0.5px; margin-bottom:6px; }
-.sk-filter-chips { display:flex; flex-wrap:wrap; gap:6px; }
-.sk-filter-chip {
-  background:var(--card); border:1px solid var(--border); border-radius:20px;
-  padding:6px 12px; font-size:0.81rem; color:var(--text2); cursor:pointer;
-}
-.sk-filter-chip.active { background:rgba(212,160,23,0.15); border-color:rgba(212,160,23,0.4); color:var(--accent-gold); }
-
 /* ===== HOME SCREEN ===== */
 .home-wrap {
   padding:0 0 80px; overflow-y:auto; height:100%;
@@ -5193,16 +5178,15 @@ body {
         <div class="sk-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>SevaKart</div>
         <div class="sk-subtitle">Devotees Supporting Devotees</div>
       </div>
-      <div class="sk-search-bar">
-        <input class="sk-search-inp" id="skSearchInp" placeholder="🔍 Search service, city, category..." oninput="skFilterListings()">
-        <button class="sk-filter-btn" onclick="openModal('skFilterModal')">⚙ Filter</button>
-      </div>
       <div class="sk-actions">
         <button class="sk-action-btn" onclick="skStartListing()">🪔 List Your Service</button>
         <button class="sk-action-btn secondary" onclick="skShowMyListings()">📋 My Listings</button>
       </div>
       <div class="sk-section-title">Browse Categories</div>
       <div class="sk-categories" id="skCategoriesGrid"></div>
+      <div class="sk-search-bar">
+        <input class="sk-search-inp" id="skSearchInp" placeholder="🔍 Search service, city, category..." oninput="skFilterListings()">
+      </div>
       <div class="sk-section-title" id="skListingsTitle">Featured Listings</div>
       <div class="sk-listings" id="skListingsContainer"></div>
       <div class="sk-empty" id="skEmptyState" style="display:none;">
@@ -5879,21 +5863,6 @@ body {
 </div>
 
 <!-- SevaKart: Filter Modal -->
-<div class="modal-overlay" id="skFilterModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">⚙ Filter Listings</div>
-    <div class="sk-filter-section">
-      <div class="sk-filter-lbl">Category</div>
-      <div class="sk-filter-chips" id="skFilterCats"></div>
-    </div>
-    <div class="f-grp"><label class="f-lbl">City</label>
-      <input class="f-inp" id="skFilterCity" placeholder="Filter by city..."></div>
-    <button class="f-submit" onclick="skApplyFilter()">Apply Filter</button>
-    <button class="f-cancel" onclick="skClearFilter()">Clear Filters</button>
-  </div>
-</div>
-
 <!-- SevaKart: Review Modal -->
 <div class="modal-overlay" id="skReviewModal">
   <div class="modal-sheet">
@@ -14468,7 +14437,7 @@ skListings = skListings.map(l => {
 });
 let skReviews = JSON.parse(localStorage.getItem('skReviews') || '[]');
 let skReports = JSON.parse(localStorage.getItem('skReports') || '[]');
-let _skFilter = {category:'', city:''};
+let _skFilter = {category:''};
 let _skViewingId = null;
 let _skPhotoData = [null,null,null];
 let _skPhotoSlot = 0;
@@ -14827,12 +14796,6 @@ function skRenderHome() {
     </div>`;
   }).join('');
 
-  // Filter chips in modal
-  const filterCats = document.getElementById('skFilterCats');
-  filterCats.innerHTML = SK_CATEGORIES.map(c =>
-    `<div class="sk-filter-chip ${_skFilter.category===c.id?'active':''}" onclick="this.classList.toggle('active');skToggleFilterCat('${c.id}')">${c.icon} ${c.name}</div>`
-  ).join('');
-
   skRenderListings();
 }
 
@@ -14850,9 +14813,6 @@ function skRenderListings() {
     titleEl.textContent = _skFilter.category;
   } else {
     titleEl.textContent = 'Featured Listings';
-  }
-  if (_skFilter.city) {
-    listings = listings.filter(l => l.city.toLowerCase().includes(_skFilter.city.toLowerCase()));
   }
   if (query) {
     listings = listings.filter(l =>
@@ -14896,18 +14856,6 @@ function skRenderListings() {
 function skFilterListings() { skRenderListings(); }
 function skFilterByCategory(cat) {
   _skFilter.category = _skFilter.category === cat ? '' : cat;
-  skRenderListings();
-}
-function skToggleFilterCat(cat) { _skFilter.category = _skFilter.category === cat ? '' : cat; }
-function skApplyFilter() {
-  _skFilter.city = document.getElementById('skFilterCity').value;
-  closeModal('skFilterModal');
-  skRenderListings();
-}
-function skClearFilter() {
-  _skFilter = {category:'',city:''};
-  document.getElementById('skFilterCity').value = '';
-  closeModal('skFilterModal');
   skRenderListings();
 }
 
