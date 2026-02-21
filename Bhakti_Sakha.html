@@ -15537,7 +15537,7 @@ function renderAdminDashboard() {
 
   if (hasPermission('users') || isSuperAdmin()) {
     const usersHtml = `
-      <div class="adm-section expanded" id="admSec-users">
+      <div class="adm-section" id="admSec-users">
         <div class="adm-section-header" onclick="admToggleSection('users')">
           <div class="adm-section-icon users">👥</div>
           <div class="adm-section-info">
@@ -15571,7 +15571,7 @@ function renderAdminDashboard() {
     const currentKey = _getImgbbKey();
     const masked = currentKey ? currentKey.substring(0,6) + '••••••' + currentKey.substring(currentKey.length-4) : '';
     const statusText = currentKey ? '✅ Configured' : '⚠️ Not configured — photos won\'t upload';
-    const imgbbHtml = '<div class="adm-section expanded" id="admSec-imgbb" style="margin-top:12px;">' +
+    const imgbbHtml = '<div class="adm-section" id="admSec-imgbb" style="margin-top:12px;">' +
       '<div class="adm-section-header" onclick="admToggleSection(\'imgbb\')">' +
         '<div class="adm-section-icon" style="background:rgba(80,200,120,0.15);">📸</div>' +
         '<div class="adm-section-info">' +
