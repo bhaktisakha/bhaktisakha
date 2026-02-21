@@ -1008,22 +1008,25 @@ body {
   border-radius:14px; padding:14px 16px; position:relative;
 }
 .audio-item audio { display:none; }
-/* -- Design 2: Golden Waveform Player -- */
-.aud-top {
-  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+/* -- Design 2: Dropdown Selector + Golden Waveform -- */
+.aud-selector {
+  display:flex; align-items:center; gap:8px; margin-bottom:12px;
 }
-.aud-icon {
-  width:32px; height:32px; border-radius:10px;
-  background:rgba(232,200,0,0.1); display:flex; align-items:center;
-  justify-content:center; font-size:0.85rem; flex-shrink:0;
+.aud-sel-icon { font-size:0.85rem; flex-shrink:0; }
+.aud-select {
+  flex:1; background:var(--bg2); color:var(--accent-gold);
+  border:1px solid rgba(232,200,0,0.2); border-radius:10px;
+  padding:8px 30px 8px 12px; font-size:0.78rem; font-weight:600;
+  font-family:inherit; cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e8c800'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+  outline:none; transition:border-color 0.2s;
 }
-.aud-name {
-  font-size:0.8rem; font-weight:600;
-  color:var(--accent-gold);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.aud-meta {
-  font-size:0.62rem; color:var(--text3); margin-top:1px;
+.aud-select:focus { border-color:rgba(232,200,0,0.4); }
+.aud-count {
+  font-size:0.62rem; color:var(--text3); background:rgba(232,200,0,0.08);
+  border:1px solid rgba(232,200,0,0.12); padding:3px 8px; border-radius:8px;
+  font-weight:600; white-space:nowrap; flex-shrink:0;
 }
 .aud-wave {
   display:flex; align-items:flex-end; justify-content:center;
@@ -1062,7 +1065,7 @@ body {
   font-family:inherit; transition:all 0.2s; flex-shrink:0;
 }
 .aud-speed:active { background:rgba(232,200,0,0.12); color:var(--accent-gold); border-color:rgba(232,200,0,0.2); }
-/* External link players (YouTube, SoundCloud, pCloud) keep old simple style */
+/* External embed players (YouTube, SoundCloud, pCloud) */
 .audio-item.external-player { padding:10px 12px; }
 .audio-singer {
   font-size:0.70rem; color:var(--accent-gold); font-weight:500;
@@ -8851,93 +8854,60 @@ function _getCatIcon(cat) {
   return {vbhajan:'🌸', astakam:'🙏', stotram:'📿', gita:'📗', bhagavatam:'🌊', samhita:'📜'}[cat] || '🎵';
 }
 
-let _audPlayerIdx = 0; // unique ID counter for each player instance
+let _audPlayerIdx = 0;
 
-function _getAudioEmbed(url, singer) {
+function _isExternalEmbed(url) {
+  const u = (url || '').trim();
+  return /youtube\.com|youtu\.be/.test(u) || u.includes('soundcloud.com/') || u.includes('pcloud.link') || u.includes('pcloud.com');
+}
+
+function _getExternalEmbed(url, singer) {
   const u = (url || '').trim();
   if (!u) return '';
   const singerHtml = singer ? `<div class="audio-singer">${singer}</div>` : '';
-
-  // 1. YouTube — keep iframe
   const ytMatch = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
   if (ytMatch) {
     return `<div class="audio-item external-player">${singerHtml}
       <iframe src="https://www.youtube.com/embed/${ytMatch[1]}" style="width:100%;height:180px;border:none;border-radius:8px;" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>`;
   }
-
-  // 2. SoundCloud — keep iframe
   if (u.includes('soundcloud.com/')) {
     return `<div class="audio-item external-player">${singerHtml}
       <iframe width="100%" height="120" scrolling="no" frameborder="no" style="border-radius:8px;"
         src="https://w.soundcloud.com/player/?url=${encodeURIComponent(u)}&color=%23e8c800&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe></div>`;
   }
-
-  // 3. pCloud — keep external link
   if (u.includes('pcloud.link') || u.includes('pcloud.com')) {
     return `<div class="audio-item external-player">${singerHtml}
       <a href="${u}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#e8c800,#d4a017);color:#0a0e1a;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;">
         ▶ Play on pCloud
       </a></div>`;
   }
+  return '';
+}
 
-  // Resolve direct URL for various sources
-  let directUrl = u;
-  let srcType = 'direct';
-
-  // 4. Google Drive
+function _resolveAudioUrl(url) {
+  const u = (url || '').trim();
   if (u.includes('drive.google.com')) {
-    const idMatch = u.match(/\/d\/([\w-]+)/) || u.match(/id=([\w-]+)/);
-    if (idMatch) directUrl = `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+    const m = u.match(/\/d\/([\w-]+)/) || u.match(/id=([\w-]+)/);
+    if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
   }
-  // 5. Dropbox
-  else if (u.includes('dropbox.com')) {
-    directUrl = u.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '').replace('?dl=1', '');
+  if (u.includes('dropbox.com')) {
+    return u.replace('www.dropbox.com','dl.dropboxusercontent.com').replace('?dl=0','').replace('?dl=1','');
   }
-  // 5b. OneDrive
-  else if (u.includes('1drv.ms') || u.includes('onedrive.live.com') || u.includes('sharepoint.com')) {
-    if (u.includes('1drv.ms')) {
-      const encodedUrl = btoa(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-      directUrl = `https://api.onedrive.com/v1.0/shares/u!${encodedUrl}/root/content`;
-    } else if (u.includes('onedrive.live.com') && u.includes('resid=')) {
-      directUrl = u.replace('onedrive.live.com/redir', 'onedrive.live.com/download');
-    }
-    srcType = 'onedrive';
+  if (u.includes('1drv.ms')) {
+    const enc = btoa(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    return `https://api.onedrive.com/v1.0/shares/u!${enc}/root/content`;
   }
-
-  // Generate custom waveform player
-  const pid = 'ap' + (++_audPlayerIdx);
-  const singerName = singer || 'Audio';
-  return `<div class="audio-item" id="${pid}">
-    <audio src="${directUrl}" preload="none"${srcType==='onedrive'?` onerror="this.style.display='none';document.getElementById('${pid}').querySelector('.aud-fallback').style.display='flex';"`:``}></audio>
-    <div class="aud-top">
-      <div class="aud-icon">🎤</div>
-      <div style="flex:1;min-width:0;">
-        <div class="aud-name">${singerName}</div>
-        <div class="aud-meta"><span class="aud-dur-label">Tap play to load</span></div>
-      </div>
-    </div>
-    <div class="aud-wave" onclick="_audWaveSeek(event,'${pid}')"></div>
-    <div class="aud-bottom">
-      <button class="aud-play" onclick="_audToggle('${pid}')">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-      <div class="aud-time-bar">
-        <span class="aud-time aud-cur">0:00</span>
-        <div style="flex:1"></div>
-        <span class="aud-time aud-total">0:00</span>
-      </div>
-      <button class="aud-speed" onclick="_audSpeed('${pid}')">1×</button>
-    </div>
-    <a href="${u}" target="_blank" rel="noopener" class="aud-fallback" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#e8c800,#d4a017);color:#0a0e1a;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:8px;">
-      ▶ Open Audio Link
-    </a>
-  </div>`;
+  if (u.includes('onedrive.live.com') && u.includes('resid=')) {
+    return u.replace('onedrive.live.com/redir','onedrive.live.com/download');
+  }
+  return u;
 }
 
 // ── Golden Waveform Audio Player Engine ──
 const _AUD_SPEEDS = [1, 1.25, 1.5, 0.75];
 const _AUD_BARS = 50;
-let _audWaveBars = {}; // pid → array of bar heights
+let _audWaveBars = {};
+let _audSources = {};
 
 function _audFmtTime(sec) {
   if (!sec || isNaN(sec)) return '0:00';
@@ -8977,11 +8947,8 @@ function _audToggle(pid) {
   if (!wrap) return;
   const au = wrap.querySelector('audio');
   if (!au) return;
-  if (au.paused) {
-    au.play().catch(() => {});
-  } else {
-    au.pause();
-  }
+  if (au.paused) au.play().catch(() => {});
+  else au.pause();
 }
 
 function _audSpeed(pid) {
@@ -9008,27 +8975,43 @@ function _audWaveSeek(e, pid) {
   au.currentTime = pct * au.duration;
 }
 
+function _audSwitchSource(pid) {
+  const wrap = document.getElementById(pid);
+  if (!wrap) return;
+  const sel = wrap.querySelector('.aud-select');
+  const au = wrap.querySelector('audio');
+  if (!sel || !au) return;
+  const idx = parseInt(sel.value);
+  const sources = _audSources[pid];
+  if (!sources || !sources[idx]) return;
+  au.pause();
+  au.currentTime = 0;
+  au.src = sources[idx].url;
+  au.load();
+  _audUpdateWave(pid, 0);
+  const curEl = wrap.querySelector('.aud-cur');
+  const totalEl = wrap.querySelector('.aud-total');
+  if (curEl) curEl.textContent = '0:00';
+  if (totalEl) totalEl.textContent = '0:00';
+  const playBtn = wrap.querySelector('.aud-play');
+  if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  _audGenWave(pid);
+}
+
 function _audInitPlayers() {
-  // Find all custom waveform players and hook them up
   document.querySelectorAll('.audio-item[id^="ap"]').forEach(wrap => {
     const pid = wrap.id;
     const au = wrap.querySelector('audio');
     if (!au || wrap.dataset.hooked) return;
     wrap.dataset.hooked = '1';
-
-    // Generate waveform
     _audGenWave(pid);
-
     const playBtn = wrap.querySelector('.aud-play');
     const curEl = wrap.querySelector('.aud-cur');
     const totalEl = wrap.querySelector('.aud-total');
-    const durLabel = wrap.querySelector('.aud-dur-label');
 
     au.addEventListener('loadedmetadata', () => {
       if (totalEl) totalEl.textContent = _audFmtTime(au.duration);
-      if (durLabel) durLabel.textContent = _audFmtTime(au.duration);
     });
-
     au.addEventListener('timeupdate', () => {
       if (!au.duration) return;
       const pct = au.currentTime / au.duration;
@@ -9036,28 +9019,21 @@ function _audInitPlayers() {
       if (curEl) curEl.textContent = _audFmtTime(au.currentTime);
       if (totalEl) totalEl.textContent = _audFmtTime(au.duration);
     });
-
     au.addEventListener('play', () => {
       if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
-      if (durLabel) durLabel.textContent = _audFmtTime(au.duration) || 'Playing...';
     });
-
     au.addEventListener('pause', () => {
       if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     });
-
     au.addEventListener('ended', () => {
       if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
       _audUpdateWave(pid, 0);
       if (curEl) curEl.textContent = '0:00';
     });
-
-    // If audio is already playing (reconnected persistent audio), update UI
     if (!au.paused) {
       if (playBtn) playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
       if (au.duration) {
         if (totalEl) totalEl.textContent = _audFmtTime(au.duration);
-        if (durLabel) durLabel.textContent = _audFmtTime(au.duration);
         if (curEl) curEl.textContent = _audFmtTime(au.currentTime);
         _audUpdateWave(pid, au.currentTime / au.duration);
       }
@@ -9066,13 +9042,78 @@ function _audInitPlayers() {
 }
 
 function _buildAudioHtml(s) {
-  // Support both old `audio` string and new `audios` array
   const list = s.audios && s.audios.length ? s.audios
     : (s.audio ? [{url: s.audio, singer:''}] : []);
   if (!list.length) return '';
-  _audPlayerIdx = 0; // Reset counter for each song
+
+  _audPlayerIdx = 0;
   _audWaveBars = {};
-  return `<div class="audio-list">${list.map(a => _getAudioEmbed(a.url, a.singer)).join('')}</div>`;
+  _audSources = {};
+
+  const externals = [];
+  const playable = [];
+  list.forEach(a => {
+    if (_isExternalEmbed(a.url)) externals.push(a);
+    else playable.push(a);
+  });
+
+  let html = '';
+
+  // External embeds rendered individually
+  externals.forEach(a => { html += _getExternalEmbed(a.url, a.singer); });
+
+  // Playable audios → ONE dropdown + ONE player
+  if (playable.length > 0) {
+    _audPlayerIdx++;
+    const pid = 'ap' + _audPlayerIdx;
+    const firstUrl = _resolveAudioUrl(playable[0].url);
+
+    _audSources[pid] = playable.map(a => ({
+      url: _resolveAudioUrl(a.url),
+      singer: a.singer || 'Audio',
+      originalUrl: a.url
+    }));
+
+    let selectorHtml = '';
+    if (playable.length > 1) {
+      const options = playable.map((a, i) =>
+        `<option value="${i}">${a.singer || 'Audio ' + (i+1)}</option>`
+      ).join('');
+      selectorHtml = `<div class="aud-selector">
+        <span class="aud-sel-icon">🎤</span>
+        <select class="aud-select" onchange="_audSwitchSource('${pid}')">${options}</select>
+        <span class="aud-count">${playable.length} Audios</span>
+      </div>`;
+    } else {
+      const name = playable[0].singer || 'Audio';
+      selectorHtml = `<div class="aud-selector">
+        <span class="aud-sel-icon">🎤</span>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--accent-gold);">${name}</div>
+      </div>`;
+    }
+
+    html += `<div class="audio-item" id="${pid}">
+      <audio src="${firstUrl}" preload="none"></audio>
+      ${selectorHtml}
+      <div class="aud-wave" onclick="_audWaveSeek(event,'${pid}')"></div>
+      <div class="aud-bottom">
+        <button class="aud-play" onclick="_audToggle('${pid}')">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="aud-time-bar">
+          <span class="aud-time aud-cur">0:00</span>
+          <div style="flex:1"></div>
+          <span class="aud-time aud-total">0:00</span>
+        </div>
+        <button class="aud-speed" onclick="_audSpeed('${pid}')">1×</button>
+      </div>
+      <a href="${playable[0].url}" target="_blank" rel="noopener" class="aud-fallback" style="display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,#e8c800,#d4a017);color:#0a0e1a;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:8px;">
+        ▶ Open Audio Link
+      </a>
+    </div>`;
+  }
+
+  return `<div class="audio-list">${html}</div>`;
 }
 
 // ===================================================================
