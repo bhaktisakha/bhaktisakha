@@ -2994,6 +2994,61 @@ body {
 .modal-handle { width:40px; height:4px; background:rgba(255,255,255,0.15);
   border-radius:2px; margin:0 auto 16px; }
 .modal-title { font-size:1.1rem; font-weight:600; color:var(--text); margin-bottom:20px; }
+
+/* ── Bhakti Sakha Branded Confirm Modal ── */
+.bs-confirm-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999;
+  display:none; align-items:center; justify-content:center; padding:24px;
+}
+.bs-confirm-overlay.open { display:flex; }
+.bs-confirm-box {
+  background:var(--bg2); border:1px solid rgba(232,200,0,0.15);
+  border-radius:18px; padding:24px 22px 20px; max-width:320px; width:100%;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5), 0 0 30px rgba(232,200,0,0.06);
+  animation:bsConfirmIn 0.25s ease;
+}
+@keyframes bsConfirmIn {
+  from { opacity:0; transform:scale(0.9) translateY(10px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+.bs-confirm-brand {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:14px; padding-bottom:12px;
+  border-bottom:1px solid rgba(232,200,0,0.12);
+}
+.bs-confirm-brand-name {
+  font-family:'Philosopher', serif; font-size:1rem; font-weight:700;
+  background:linear-gradient(135deg, #e8c800, #f0d860, #e8c800);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; letter-spacing:0.5px;
+}
+.bs-confirm-brand-sub {
+  font-size:0.6rem; color:var(--text3); letter-spacing:1px;
+}
+.bs-confirm-msg {
+  font-size:0.88rem; color:var(--text); line-height:1.55;
+  text-align:center; margin-bottom:20px; white-space:pre-line;
+}
+.bs-confirm-btns {
+  display:flex; gap:10px;
+}
+.bs-confirm-btn {
+  flex:1; padding:12px; border-radius:12px; font-size:0.88rem;
+  font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.2s; border:none;
+}
+.bs-confirm-btn:active { transform:scale(0.96); }
+.bs-confirm-cancel {
+  background:var(--bg3); color:var(--text2); border:1px solid var(--border);
+}
+.bs-confirm-ok {
+  background:linear-gradient(135deg, var(--todo-rose), #d4607e);
+  color:white; box-shadow:0 2px 10px rgba(232,120,154,0.3);
+}
+.bs-confirm-ok.danger {
+  background:linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow:0 2px 10px rgba(231,76,60,0.3);
+}
 .f-grp { margin-bottom:14px; }
 .f-lbl { display:block; font-size:0.68rem; color:var(--text3); text-transform:uppercase;
   letter-spacing:0.8px; margin-bottom:6px; }
@@ -6116,6 +6171,21 @@ body {
   </div>
 </div>
 
+<!-- Bhakti Sakha Branded Confirm Modal -->
+<div class="bs-confirm-overlay" id="bsConfirmOverlay">
+  <div class="bs-confirm-box">
+    <div class="bs-confirm-brand">
+      <span class="bs-confirm-brand-name">Bhakti Sakha</span>
+      <span class="bs-confirm-brand-sub">says</span>
+    </div>
+    <div class="bs-confirm-msg" id="bsConfirmMsg">Are you sure?</div>
+    <div class="bs-confirm-btns">
+      <button class="bs-confirm-btn bs-confirm-cancel" id="bsConfirmCancel">Cancel</button>
+      <button class="bs-confirm-btn bs-confirm-ok" id="bsConfirmOk">OK</button>
+    </div>
+  </div>
+</div>
+
 <nav class="bottom-nav" id="bottomNav">
   <div class="nav-glass-bar">
     <div class="nav-glow-track">
@@ -6478,7 +6548,7 @@ body {
       <div id="skPreviewContainer"></div>
       <div class="sk-eligibility-check" style="margin-top:10px;">
         <input type="checkbox" id="skTerms">
-        <label for="skTerms">I agree to the <span style="color:var(--accent-gold);cursor:pointer;" onclick="alert('SevaKart Terms:\\n\\n1. Only Bhakti-aligned services allowed.\\n2. No alcohol, meat, gambling, political campaigns, MLM, or financial schemes.\\n3. SevaKart facilitates connection only — all transactions are between users.\\n4. Listings may be reviewed and moderated by admins.\\n5. Misleading or inappropriate listings will be removed.')">Terms & Conditions</span>.</label>
+        <label for="skTerms">I agree to the <span style="color:var(--accent-gold);cursor:pointer;" onclick="bsAlert('SevaKart Terms:\n\n1. Only Bhakti-aligned services allowed.\n2. No alcohol, meat, gambling, political campaigns, MLM, or financial schemes.\n3. SevaKart facilitates connection only — all transactions are between users.\n4. Listings may be reviewed and moderated by admins.\n5. Misleading or inappropriate listings will be removed.')">Terms & Conditions</span>.</label>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="f-cancel" onclick="skPrevStep(3)" style="flex:1;">← Edit</button>
@@ -9328,13 +9398,13 @@ function openEditSongFromDetail() {
   if (_currentSongId) openEditSong(_currentSongId);
 }
 
-function deleteSongFromDetail() {
+async function deleteSongFromDetail() {
   if (!hasPermission('songs')) { showToast('Songs admin access required'); return; }
   if (!_currentSongId) return;
   const s = songs.find(x => x.id === _currentSongId);
   if (!s) return;
-  if (!confirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.')) return;
-  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
+  if (!(await bsConfirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.'))) return;
+  if (!(await bsConfirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.'))) return;
   const deletedId = _currentSongId;
   songs = songs.filter(x => x.id !== _currentSongId);
   localStorage.setItem('songs', JSON.stringify(songs));
@@ -9540,11 +9610,11 @@ function openEditSong(id) {
   document.getElementById('adminSongModal').dataset.editId = id;
 }
 
-function deleteSong(id) {
+async function deleteSong(id) {
   const s = songs.find(s => s.id === id);
   if (!s) return;
-  if (!confirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.')) return;
-  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
+  if (!(await bsConfirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.'))) return;
+  if (!(await bsConfirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.'))) return;
   songs = songs.filter(s => s.id !== id);
   localStorage.setItem('songs', JSON.stringify(songs));
   renderSongs();
@@ -10316,8 +10386,8 @@ async function evtDoSync() {
 }
 
 // ── Delete ──
-function delEvt(id) {
-  if (!confirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?')) return;
+async function delEvt(id) {
+  if (!(await bsConfirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?'))) return;
   customEvts = customEvts.filter(e => e.id!==id);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
   renderEvts();
@@ -10332,9 +10402,9 @@ function delEvt(id) {
   renderCalendar();
 }
 
-function delEvtFromModal() {
+async function delEvtFromModal() {
   if (!editingEvtId) return;
-  if (!confirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?')) return;
+  if (!(await bsConfirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?'))) return;
   customEvts = customEvts.filter(e => e.id !== editingEvtId);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
   editingEvtId = null;
@@ -10623,11 +10693,11 @@ function addAdmin() {
   _syncAdminConfigToServer();
 }
 
-function removeAdmin(email) {
+async function removeAdmin(email) {
   if (!isSuperAdmin()) return;
   if (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) { showToast('Cannot remove super admin'); return; }
-  if (!confirm('⚠️ Remove admin rights for ' + email + '?\n\nThis person will lose all admin access.')) return;
-  if (!confirm('🛑 Final Confirmation\n\nAre you sure you want to revoke admin privileges for ' + email + '?')) return;
+  if (!(await bsConfirm('⚠️ Remove admin rights for ' + email + '?\n\nThis person will lose all admin access.'))) return;
+  if (!(await bsConfirm('🛑 Final Confirmation\n\nAre you sure you want to revoke admin privileges for ' + email + '?'))) return;
   let list = _getAdminList().filter(e => e.toLowerCase() !== email.toLowerCase());
   _saveAdminList(list);
   // Also remove permissions
@@ -11882,8 +11952,8 @@ function showPinError(msg) {
   }, 600);
 }
 
-function forgotPin() {
-  if (confirm('Reset your PIN?\n\nThis will remove PIN protection from Gratitude Journal and unlock all locked notes. You will need to set a new PIN.\n\nTo verify your identity, you must be signed in with Google.')) {
+async function forgotPin() {
+  if (await bsConfirm('Reset your PIN?\n\nThis will remove PIN protection from Gratitude Journal and unlock all locked notes. You will need to set a new PIN.\n\nTo verify your identity, you must be signed in with Google.')) {
     if (!isSignedIn()) { showToast('Please sign in with Google first to reset PIN'); return; }
     localStorage.removeItem('notesPinHash');
     _nfGratitudeUnlocked = false;
@@ -11983,14 +12053,14 @@ function nfRenameFolder(folderId) {
   nfTriggerSync();
 }
 
-function nfDeleteFolder(folderId) {
+async function nfDeleteFolder(folderId) {
   const f = customFolders.find(x => x.id === folderId);
   if (!f) return;
   const count = notes.filter(n => n.folder === folderId).length;
   const msg = count > 0
     ? `Delete folder "${f.name}"?\n\nThis will also delete ${count} note${count!==1?'s':''} inside it.`
     : `Delete folder "${f.name}"?`;
-  if (!confirm(msg)) return;
+  if (!(await bsConfirm(msg))) return;
   // Remove notes in this folder
   notes = notes.filter(n => n.folder !== folderId);
   localStorage.setItem('notes', JSON.stringify(notes));
@@ -12359,9 +12429,9 @@ function nfSaveNote(silent) {
   nfTriggerSync();
 }
 
-function nfDeleteCurrentNote() {
+async function nfDeleteCurrentNote() {
   if (!_nfCurrentEditNoteId) { nfCloseNoteEditor(); return; }
-  if (!confirm('Delete this note?')) return;
+  if (!(await bsConfirm('Delete this note?'))) return;
   notes = notes.filter(n => n.id !== _nfCurrentEditNoteId);
   localStorage.setItem('notes', JSON.stringify(notes));
   showToast('Note deleted');
@@ -12371,8 +12441,8 @@ function nfDeleteCurrentNote() {
   nfTriggerSync();
 }
 
-function nfDelNote(id) {
-  if (!confirm('Delete this note?')) return;
+async function nfDelNote(id) {
+  if (!(await bsConfirm('Delete this note?'))) return;
   notes = notes.filter(n => n.id !== id);
   localStorage.setItem('notes', JSON.stringify(notes));
   nfRenderFolderNotes();
@@ -13814,6 +13884,53 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
+// ── Bhakti Sakha Branded Confirm Dialog ──
+function bsConfirm(msg, isDanger) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('bsConfirmOverlay');
+    const msgEl = document.getElementById('bsConfirmMsg');
+    const okBtn = document.getElementById('bsConfirmOk');
+    const cancelBtn = document.getElementById('bsConfirmCancel');
+    msgEl.textContent = msg;
+    // Auto-detect danger from message content
+    const danger = isDanger || /delete|remove|clear|irreversible|⚠️|🛑/i.test(msg);
+    if (danger) { okBtn.classList.add('danger'); okBtn.textContent = 'Yes, Proceed'; }
+    else { okBtn.classList.remove('danger'); okBtn.textContent = 'OK'; }
+    overlay.classList.add('open');
+    function cleanup(result) {
+      overlay.classList.remove('open');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    }
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  });
+}
+
+function bsAlert(msg) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('bsConfirmOverlay');
+    const msgEl = document.getElementById('bsConfirmMsg');
+    const okBtn = document.getElementById('bsConfirmOk');
+    const cancelBtn = document.getElementById('bsConfirmCancel');
+    msgEl.textContent = msg;
+    okBtn.classList.remove('danger'); okBtn.textContent = 'OK';
+    cancelBtn.style.display = 'none';
+    overlay.classList.add('open');
+    function cleanup() {
+      overlay.classList.remove('open');
+      cancelBtn.style.display = '';
+      okBtn.removeEventListener('click', onOk);
+      resolve();
+    }
+    function onOk() { cleanup(); }
+    okBtn.addEventListener('click', onOk);
+  });
+}
+
 // ===================================================================
 // INIT
 // ===================================================================
@@ -14934,9 +15051,9 @@ function renderDhamas(filter) {
   updateDhamAdminUI();
 }
 
-function deleteCustomDham(id) {
+async function deleteCustomDham(id) {
   if (!hasPermission('dhamas')) return;
-  if (!confirm('Delete this Dham?')) return;
+  if (!(await bsConfirm('Delete this Dham?'))) return;
   customDhamas = customDhamas.filter(d => d.id !== id);
   localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
   renderDhamas();
@@ -16002,7 +16119,7 @@ function skShowReportedListings() {
 }
 
 // ---- Admin Actions ----
-function skAdminAction(action) {
+async function skAdminAction(action) {
   if (!hasPermission('sevakart')) { showToast('SevaKart admin access required'); return; }
   const l = skListings.find(x => x.id === _skViewingId);
   if (!l) return;
@@ -16029,8 +16146,8 @@ function skAdminAction(action) {
       showToast('Listing suspended');
       break;
     case 'delete':
-      if (!confirm('⚠️ Delete this listing?\n\nThis will permanently remove this SevaKart listing and it cannot be recovered.')) return;
-      if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
+      if (!(await bsConfirm('⚠️ Delete this listing?\n\nThis will permanently remove this SevaKart listing and it cannot be recovered.'))) return;
+      if (!(await bsConfirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.'))) return;
       skListings = skListings.filter(x => x.id !== _skViewingId);
       _skSave();
       skCloseDetail();
@@ -17660,9 +17777,9 @@ function pcAdminHighlight(reqId) {
   pcRenderDetail(reqId);
 }
 
-function pcAdminRemove(reqId) {
-  if (!confirm('⚠️ Remove this prayer request?\n\nThis will permanently remove this prayer request and all associated prayers.')) return;
-  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
+async function pcAdminRemove(reqId) {
+  if (!(await bsConfirm('⚠️ Remove this prayer request?\n\nThis will permanently remove this prayer request and all associated prayers.'))) return;
+  if (!(await bsConfirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.'))) return;
   pcRequests = pcRequests.filter(r => r.id !== reqId);
   _pcSave();
   showToast('Prayer request removed');
@@ -18333,8 +18450,8 @@ function tdSaveTask() {
   if (task.reminder && task.date && task.time) _tdScheduleNotif(task);
 }
 
-function tdDeleteTask(id) {
-  if (!confirm('Delete this task?')) return;
+async function tdDeleteTask(id) {
+  if (!(await bsConfirm('Delete this task?'))) return;
   if (typeof id === 'string' && id) {
     tdTasks = tdTasks.filter(t => t.id !== id);
   } else if (_tdEditingId) {
@@ -18437,8 +18554,8 @@ function tdSaveProject() {
   showToast('✓ Project created');
 }
 
-function tdDeleteProject(pid) {
-  if (!confirm('Delete this project? Tasks in it will be unassigned.')) return;
+async function tdDeleteProject(pid) {
+  if (!(await bsConfirm('Delete this project? Tasks in it will be unassigned.'))) return;
   tdProjects = tdProjects.filter(p => p.id !== pid);
   tdTasks.forEach(t => { if (t.project === pid) t.project = ''; });
   _tdSave();
@@ -18489,16 +18606,16 @@ function tdLogSpiritual(goalId) {
   }
 }
 
-function tdDeleteSpGoal(goalId) {
-  if (!confirm('Remove this spiritual goal?')) return;
+async function tdDeleteSpGoal(goalId) {
+  if (!(await bsConfirm('Remove this spiritual goal?'))) return;
   tdSpGoals = tdSpGoals.filter(g => g.id !== goalId);
   _tdSave();
   tdRenderTab();
 }
 
 // ── Completed ──
-function tdClearCompleted() {
-  if (!confirm('Clear all completed tasks?')) return;
+async function tdClearCompleted() {
+  if (!(await bsConfirm('Clear all completed tasks?'))) return;
   tdTasks = tdTasks.filter(t => !t.done);
   _tdSave();
   tdRenderTab();
