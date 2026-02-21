@@ -561,8 +561,8 @@ body {
   padding:10px 16px; display:flex; align-items:center; gap:8px;
 }
 .songs-sort-btn {
-  background:var(--card); border:1px solid var(--border); border-radius:8px;
-  padding:5px 10px; color:var(--text2); font-size:0.72rem; cursor:pointer;
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:7px 14px; color:var(--text2); font-size:0.84rem; cursor:pointer;
   font-family:inherit; transition:all 0.2s; white-space:nowrap;
 }
 .songs-sort-btn.active { background:rgba(61,127,212,0.15); border-color:var(--accent-blue); color:var(--accent-blue); }
@@ -592,11 +592,11 @@ body {
 }
 .cat-folder-card {
   position:relative;
-  border-radius:18px; padding:18px 16px 16px;
+  border-radius:16px; padding:14px 14px 12px;
   cursor:pointer; overflow:hidden;
   transition:transform 0.15s ease, box-shadow 0.15s ease;
-  display:flex; flex-direction:column; gap:8px;
-  min-height:118px;
+  display:flex; flex-direction:column; gap:6px;
+  min-height:100px;
   opacity:0; animation: homeIn 0.45s ease forwards;
 }
 .cat-folder-card:nth-child(1) { animation-delay:0.08s; }
@@ -700,7 +700,7 @@ body {
   background:rgba(61,127,212,0.22); transform:scale(0.96);
 }
 .cat-detail-title { font-size:0.95rem; font-weight:600; color:var(--text); }
-.cat-detail-count { font-size:0.72rem; color:var(--text3); margin-left:auto; }
+.cat-detail-count { font-size:0.72rem; color:var(--text3); margin-left:auto; margin-right:4px; }
 .song-card {
   display:flex; align-items:center;
   padding:12px 14px; margin:0 12px 8px;
@@ -868,10 +868,10 @@ body {
 .song-detail-hdr-actions { display:flex; gap:8px; align-items:center; }
 .song-lang-sel {
   background:rgba(61,127,212,0.12); border:1px solid rgba(61,127,212,0.3);
-  color:var(--accent-blue); font-family:inherit; font-size:0.72rem; font-weight:600;
-  padding:4px 6px; border-radius:8px; cursor:pointer;
+  color:var(--accent-blue); font-family:inherit; font-size:0.84rem; font-weight:600;
+  padding:6px 10px; border-radius:10px; cursor:pointer;
   -webkit-appearance:none; appearance:none; text-align:center;
-  min-width:58px;
+  min-width:66px;
 }
 .song-lang-sel option { background:var(--bg2); color:var(--text); }
 .song-detail-body {
@@ -1010,10 +1010,10 @@ body {
   color:var(--text3); font-size:0.8rem; cursor:pointer; padding:4px;
 }
 .kirtan-actions {
-  display:flex; align-items:center; gap:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
   padding:0 14px 10px;
 }
-.kirtan-sort-wrap { display:flex; gap:6px; }
+.kirtan-sort-wrap { display:flex; gap:8px; justify-content:center; }
 .kirtan-add-btn {
   background:var(--accent-blue); border:none; border-radius:8px;
   width:32px; height:32px; color:white; font-size:1.2rem;
@@ -4700,7 +4700,6 @@ body {
             <option value="mr">मराठी</option>
           </select>
         </div>
-        <button class="kirtan-add-btn" style="margin-left:auto;" onclick="openAdminSong()">＋</button>
       </div>
     </div>
     <!-- Song list -->
@@ -8587,6 +8586,7 @@ function renderSongs(filter) {
         <span style="font-size:1.2rem;">${info.icon}</span>
         <span class="cat-detail-title">${info.name}</span>
         <span class="cat-detail-count">${catSongs.length} song${catSongs.length!==1?'s':''}</span>
+        <button class="kirtan-add-btn" onclick="openAdminSong()">＋</button>
       </div>
       <div style="padding:8px 0 100px;">${innerCards}</div>`;
   } else {
