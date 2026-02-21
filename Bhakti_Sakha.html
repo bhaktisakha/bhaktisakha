@@ -6009,14 +6009,14 @@ body {
       </div>
       <div>
         <label class="todo-modal-label">Recurring</label>
-        <select class="todo-modal-select" id="tdRecur">
+        <select class="todo-modal-select" id="tdRecur" onchange="tdRecurChanged(this.value)">
           <option value="">None</option>
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="monthly">Monthly</option>
-          <option value="weekdays">Weekdays</option>
           <option value="custom">Custom...</option>
         </select>
+        <div id="tdCustomDaysDisplay" style="display:none;font-size:0.7rem;color:var(--todo-rose-light);margin-top:5px;"></div>
       </div>
     </div>
     <div class="todo-modal-field">
@@ -6101,6 +6101,18 @@ body {
       <button id="tdDetailRepeatBtn" style="flex:1;padding:13px;border:1.5px solid rgba(232,120,154,0.35);border-radius:12px;background:rgba(232,120,154,0.08);color:var(--todo-rose-light);font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onclick="tdRepeatTomorrow()">↻ Repeat Tomorrow</button>
     </div>
     <button class="f-cancel" onclick="closeModal('todoDetailModal')" style="margin-top:10px;">Close</button>
+  </div>
+</div>
+
+<!-- Custom Days Picker Modal -->
+<div class="modal-overlay" id="todoCustomDaysModal">
+  <div class="modal-sheet" style="max-height:70vh;">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--todo-rose-light);">✦ Select Repeat Days</div>
+    <div style="font-size:0.76rem;color:var(--text3);text-align:center;margin-bottom:16px;">Tap the days you want this task to repeat on</div>
+    <div id="tdCustomDaysGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;"></div>
+    <button class="todo-modal-save" onclick="tdConfirmCustomDays()">Confirm Selection</button>
+    <button class="f-cancel" onclick="tdCancelCustomDays()" style="margin-top:8px;">Cancel</button>
   </div>
 </div>
 
@@ -17671,6 +17683,7 @@ let tdSpLog = JSON.parse(localStorage.getItem('td_splog') || '{}');
 let _tdCurrentTab = 'today';
 let _tdEditingId = null;
 let _tdPriority = 'medium';
+let _tdCustomDays = []; // 0=Sun,1=Mon,...6=Sat
 
 function _tdSave() {
   localStorage.setItem('td_tasks', JSON.stringify(tdTasks));
@@ -17764,7 +17777,7 @@ function _tdProcessRecurring() {
   tdTasks.forEach(t => {
     if (!t.recur || !t.done || !t.doneDate) return;
     // Check if we need to create next occurrence
-    let nextDate = _tdNextRecurDate(t.doneDate, t.recur);
+    let nextDate = _tdNextRecurDate(t.doneDate, t.recur, t.customDays);
     if (nextDate && nextDate <= today) {
       // Check if task for this date already exists
       const exists = tdTasks.some(x => x.recurParent === t.id && x.date === nextDate && !x.done);
@@ -17772,7 +17785,8 @@ function _tdProcessRecurring() {
         tdTasks.push({
           id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
           title: t.title, notes: t.notes, date: nextDate, time: t.time,
-          category: t.category, recur: t.recur, priority: t.priority,
+          category: t.category, recur: t.recur, customDays: t.customDays || [],
+          priority: t.priority,
           reminder: t.reminder, project: t.project,
           done: false, created: Date.now(), recurParent: t.id
         });
@@ -17782,16 +17796,23 @@ function _tdProcessRecurring() {
   });
 }
 
-function _tdNextRecurDate(fromDate, recur) {
+function _tdNextRecurDate(fromDate, recur, customDays) {
   const d = new Date(fromDate + 'T00:00:00');
   switch(recur) {
     case 'daily': d.setDate(d.getDate()+1); break;
     case 'weekly': d.setDate(d.getDate()+7); break;
     case 'monthly': d.setMonth(d.getMonth()+1); break;
-    case 'weekdays':
-      d.setDate(d.getDate()+1);
-      while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()+1);
-      break;
+    case 'custom':
+      if (!customDays || !customDays.length) return null;
+      // Find next matching day
+      for (let i = 1; i <= 7; i++) {
+        const next = new Date(d);
+        next.setDate(next.getDate() + i);
+        if (customDays.includes(next.getDay())) {
+          return next.toISOString().slice(0,10);
+        }
+      }
+      return null;
     default: return null;
   }
   return d.toISOString().slice(0,10);
@@ -17985,7 +18006,13 @@ function _tdItemHTML(task, isOverdue) {
   if (task.category) metaParts.push(`<span class="todo-meta-cat">${task.category}</span>`);
   if (task.time) metaParts.push(`<span class="todo-meta-time">⏰ ${_tdFormatTime(task.time)}</span>`);
   if (task.date && task.date !== _tdToday()) metaParts.push(`<span class="todo-meta-time">📅 ${_tdFormatDate(task.date)}</span>`);
-  if (task.recur) metaParts.push(`<span class="todo-meta-recur">🔄 ${task.recur}</span>`);
+  if (task.recur) {
+    let recurLabel = task.recur;
+    if (task.recur === 'custom' && task.customDays && task.customDays.length) {
+      recurLabel = task.customDays.map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ');
+    }
+    metaParts.push(`<span class="todo-meta-recur">🔄 ${recurLabel}</span>`);
+  }
   return `<div class="todo-item ${task.done?'done':''} ${overdue?'overdue':''}" data-id="${task.id}">
     <div class="todo-item-check ${task.done?'checked':''}" onclick="event.stopPropagation();tdOpenDetailPopup('${task.id}')"></div>
     <div class="todo-item-body" onclick="tdOpenDetailPopup('${task.id}')">
@@ -18050,7 +18077,13 @@ function tdOpenDetailPopup(id) {
   if (t.date) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Due Date</span><span style="font-size:0.76rem;color:var(--text);font-weight:500;">📅 ${_tdFormatDate(t.date)}</span></div>`;
   if (t.time) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Time</span><span style="font-size:0.76rem;color:var(--text);font-weight:500;">⏰ ${_tdFormatTime(t.time)}</span></div>`;
   html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Priority</span><span style="font-size:0.76rem;color:${priColor};font-weight:600;">${priLabel}</span></div>`;
-  if (t.recur) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Recurring</span><span style="font-size:0.76rem;color:var(--accent-blue);font-weight:500;">🔄 ${t.recur}</span></div>`;
+  if (t.recur) {
+    let recurLabel = t.recur;
+    if (t.recur === 'custom' && t.customDays && t.customDays.length) {
+      recurLabel = t.customDays.map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ');
+    }
+    html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Recurring</span><span style="font-size:0.76rem;color:var(--accent-blue);font-weight:500;">🔄 ${recurLabel}</span></div>`;
+  }
   if (t.reminder) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Reminder</span><span style="font-size:0.76rem;color:var(--accent-green);font-weight:500;">🔔 On</span></div>`;
   if (t.project) {
     const proj = tdProjects.find(p => p.id === t.project);
@@ -18099,6 +18132,7 @@ function tdRepeatTomorrow() {
     title: t.title, notes: t.notes,
     date: tmr.toISOString().slice(0,10),
     time: t.time, category: t.category, recur: t.recur,
+    customDays: t.customDays || [],
     priority: t.priority, reminder: t.reminder, project: t.project,
     done: false, created: Date.now()
   };
@@ -18128,6 +18162,78 @@ function tdToggleTask(id) {
   showToast(t.done ? '✓ Task completed!' : 'Task reopened');
 }
 
+// ── Custom Days Picker ──
+const _TD_DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const _TD_DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function tdRecurChanged(val) {
+  const display = document.getElementById('tdCustomDaysDisplay');
+  if (val === 'custom') {
+    _tdShowCustomDaysPicker();
+  } else {
+    _tdCustomDays = [];
+    if (display) display.style.display = 'none';
+  }
+}
+
+function _tdShowCustomDaysPicker() {
+  const grid = document.getElementById('tdCustomDaysGrid');
+  grid.innerHTML = _TD_DAY_NAMES.map((name, i) => {
+    const isSelected = _tdCustomDays.includes(i);
+    return `<div id="tdDayBtn${i}" onclick="tdToggleCustomDay(${i})" style="
+      padding:14px 8px; border-radius:12px; text-align:center; cursor:pointer;
+      border:1.5px solid ${isSelected ? 'var(--todo-rose)' : 'var(--border)'};
+      background:${isSelected ? 'rgba(232,120,154,0.15)' : 'var(--bg3)'};
+      color:${isSelected ? 'var(--todo-rose-light)' : 'var(--text3)'};
+      font-size:0.82rem; font-weight:${isSelected ? '600' : '400'};
+      transition:all 0.2s; font-family:inherit;
+    ">
+      <div style="font-size:1.1rem;margin-bottom:4px;">${['🌅','🌤','🌤','🌤','🌤','🌤','☀️'][i]}</div>
+      ${_TD_DAY_SHORT[i]}
+    </div>`;
+  }).join('');
+  document.getElementById('todoCustomDaysModal').classList.add('open');
+}
+
+function tdToggleCustomDay(dayIdx) {
+  if (_tdCustomDays.includes(dayIdx)) {
+    _tdCustomDays = _tdCustomDays.filter(d => d !== dayIdx);
+  } else {
+    _tdCustomDays.push(dayIdx);
+    _tdCustomDays.sort();
+  }
+  // Re-render buttons
+  _TD_DAY_NAMES.forEach((name, i) => {
+    const btn = document.getElementById('tdDayBtn' + i);
+    if (!btn) return;
+    const sel = _tdCustomDays.includes(i);
+    btn.style.borderColor = sel ? 'var(--todo-rose)' : 'var(--border)';
+    btn.style.background = sel ? 'rgba(232,120,154,0.15)' : 'var(--bg3)';
+    btn.style.color = sel ? 'var(--todo-rose-light)' : 'var(--text3)';
+    btn.style.fontWeight = sel ? '600' : '400';
+  });
+}
+
+function tdConfirmCustomDays() {
+  if (!_tdCustomDays.length) {
+    showToast('Please select at least one day');
+    return;
+  }
+  closeModal('todoCustomDaysModal');
+  // Update display label under the dropdown
+  const display = document.getElementById('tdCustomDaysDisplay');
+  const label = _tdCustomDays.map(d => _TD_DAY_SHORT[d]).join(', ');
+  display.textContent = '🔄 ' + label;
+  display.style.display = '';
+}
+
+function tdCancelCustomDays() {
+  _tdCustomDays = [];
+  document.getElementById('tdRecur').value = '';
+  document.getElementById('tdCustomDaysDisplay').style.display = 'none';
+  closeModal('todoCustomDaysModal');
+}
+
 function tdOpenAddModal() {
   _tdEditingId = null;
   _tdPriority = 'medium';
@@ -18137,6 +18243,8 @@ function tdOpenAddModal() {
   document.getElementById('tdTime').value = '';
   document.getElementById('tdCategory').value = 'Personal';
   document.getElementById('tdRecur').value = '';
+  _tdCustomDays = [];
+  document.getElementById('tdCustomDaysDisplay').style.display = 'none';
   document.getElementById('tdEditId').value = '';
   document.getElementById('tdDeleteBtn').style.display = 'none';
   document.getElementById('todoModalTitle').textContent = '✦ Add Task';
@@ -18161,6 +18269,15 @@ function tdEditTask(id) {
   document.getElementById('tdTime').value = t.time || '';
   document.getElementById('tdCategory').value = t.category || 'Personal';
   document.getElementById('tdRecur').value = t.recur || '';
+  // Restore custom days if applicable
+  _tdCustomDays = (t.recur === 'custom' && t.customDays) ? [...t.customDays] : [];
+  const cdDisplay = document.getElementById('tdCustomDaysDisplay');
+  if (_tdCustomDays.length) {
+    cdDisplay.textContent = '🔄 ' + _tdCustomDays.map(d => _TD_DAY_SHORT[d]).join(', ');
+    cdDisplay.style.display = '';
+  } else {
+    cdDisplay.style.display = 'none';
+  }
   _tdResetReminderUI(t.reminder || false);
   document.getElementById('tdEditId').value = id;
   document.getElementById('tdDeleteBtn').style.display = '';
@@ -18175,6 +18292,12 @@ function tdEditTask(id) {
 function tdSaveTask() {
   const title = document.getElementById('tdTitle').value.trim();
   if (!title) { showToast('Please enter a task title'); return; }
+  const recurVal = document.getElementById('tdRecur').value;
+  if (recurVal === 'custom' && !_tdCustomDays.length) {
+    showToast('Please select repeat days for custom recurrence');
+    _tdShowCustomDaysPicker();
+    return;
+  }
   const task = {
     id: _tdEditingId || (Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
     title,
@@ -18183,6 +18306,7 @@ function tdSaveTask() {
     time: document.getElementById('tdTime').value,
     category: document.getElementById('tdCategory').value,
     recur: document.getElementById('tdRecur').value,
+    customDays: document.getElementById('tdRecur').value === 'custom' ? [..._tdCustomDays] : [],
     priority: _tdPriority,
     reminder: document.getElementById('tdReminder').checked,
     project: document.getElementById('tdProject').value,
