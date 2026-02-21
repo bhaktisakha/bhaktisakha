@@ -4710,7 +4710,7 @@ body {
         <div class="kirtan-sort-wrap">
           <button class="songs-sort-btn active" id="ksort-cat" onclick="setSongSort('cat',this)">Category</button>
           <button class="songs-sort-btn" id="ksort-author" onclick="setSongSort('author',this)">Author</button>
-          <select class="song-lang-sel" id="songLangSelList" onchange="setSongLang(this.value)" style="margin-left:6px;">
+          <select class="song-lang-sel" id="songLangSelList" onchange="setSongLang(this.value)">
             <option value="en">English</option>
             <option value="hi">हिन्दी</option>
             <option value="mr">मराठी</option>
@@ -8546,7 +8546,7 @@ function renderSongs(filter) {
 
   // Update total song count badge
   const cntBadge = document.getElementById('songsCountBadge');
-  if (cntBadge) cntBadge.textContent = songs.length;
+  if (cntBadge) cntBadge.textContent = songs.length + ' Songs';
 
   // Font label
   const fl = document.getElementById('songFontLabel');
