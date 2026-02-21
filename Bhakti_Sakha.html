@@ -3347,6 +3347,11 @@ body {
 .tab-tagline--coral .tab-tagline-text { background:linear-gradient(135deg, #f08070 0%, #f5a898 50%, #f08070 100%); -webkit-background-clip:text; background-clip:text; }
 .tab-tagline--coral .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(240,128,112,0.35), transparent); }
 
+.tab-tagline--rose { background:linear-gradient(180deg, rgba(248,164,188,0.08) 0%, rgba(248,164,188,0.03) 60%, transparent 100%); }
+.tab-tagline--rose .tab-tagline-ornament { color:rgba(248,164,188,0.5); }
+.tab-tagline--rose .tab-tagline-text { background:linear-gradient(135deg, #f8a4bc 0%, #fcc8d8 50%, #f8a4bc 100%); -webkit-background-clip:text; background-clip:text; }
+.tab-tagline--rose .tab-tagline-divider { background:linear-gradient(90deg, transparent, rgba(248,164,188,0.35), transparent); }
+
 /* ===== SEVAKART ===== */
 .sk-screen { flex:1; overflow-y:auto; padding-bottom:70px; }
 .sk-header {
@@ -3962,13 +3967,12 @@ body {
 .home-todo-empty { font-size:0.75rem; color:var(--text3); padding:6px 0; text-align:center; }
 .todo-wrap { display:flex; flex-direction:column; height:100%; overflow:hidden; }
 .todo-tabs {
-  display:flex; padding:8px 12px; gap:4px; background:var(--bg2);
+  display:flex; padding:6px 10px; gap:3px; background:var(--bg2);
   border-bottom:1px solid var(--border); flex-shrink:0;
-  overflow-x:auto; scrollbar-width:none;
+  justify-content:center;
 }
-.todo-tabs::-webkit-scrollbar { display:none; }
 .todo-tab {
-  padding:7px 14px; border-radius:20px; font-size:0.76rem; font-weight:500;
+  padding:6px 10px; border-radius:18px; font-size:0.7rem; font-weight:500;
   border:1px solid var(--border); background:var(--bg3); color:var(--text3);
   cursor:pointer; white-space:nowrap; transition:all 0.2s; font-family:inherit;
 }
@@ -5948,6 +5952,11 @@ body {
 <!-- ===== TO-DO SCREEN ===== -->
 <div class="screen" id="screen-todo">
   <div class="todo-wrap">
+    <div class="tab-tagline tab-tagline--rose">
+      <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+      <div class="tab-tagline-text">Your Humble Sevak for Daily Devotional Life</div>
+      <div class="tab-tagline-divider"></div>
+    </div>
     <div class="todo-tabs" id="todoTabs">
       <button class="todo-tab active" data-tab="today" onclick="tdSwitchTab('today',this)">Today</button>
       <button class="todo-tab" data-tab="upcoming" onclick="tdSwitchTab('upcoming',this)">Upcoming</button>
