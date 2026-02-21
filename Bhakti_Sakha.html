@@ -8505,7 +8505,7 @@ function renderSongs(filter) {
 let _currentSongId = null;
 let _songDetailPrevScreen = 'songs';
 
-function _buildVerseCards(lyrics, sz) {
+function _buildVerseCards(lyrics, sz, cat) {
   if (!lyrics) return '';
   // Split by verse markers (1), (2), (10) etc. — only when NOT preceded by a digit
   const parts = lyrics.split(/(?<!\d)(?=\(\d+\))/);
@@ -8520,6 +8520,10 @@ function _buildVerseCards(lyrics, sz) {
       cards.push({ num: null, text: trimmed });
     }
   }
+  // Auto-assign "1" to first card if it has no number but other cards do (exclude Bhagavad Gita)
+  if (cat !== 'gita' && cards.length > 1 && !cards[0].num && cards.some(c => c.num)) {
+    cards[0].num = '1';
+  }
   if (!cards.length) return `<div class="sd-lyrics" style="font-size:${sz}rem">${lyrics}</div>`;
   return `<div class="sd-verse-cards">${cards.map(c => `
     <div class="sd-verse-card">
@@ -8528,7 +8532,7 @@ function _buildVerseCards(lyrics, sz) {
     </div>`).join('')}</div>`;
 }
 
-function _buildTransCards(trans, sz) {
+function _buildTransCards(trans, sz, cat) {
   if (!trans) return '';
   // Split translation by verse numbers like "1)", "10)" — only when NOT preceded by a digit
   const parts = trans.split(/(?<!\d)(?=\d+\)\s)/);
@@ -8542,6 +8546,10 @@ function _buildTransCards(trans, sz) {
     } else {
       cards.push({ num: null, text: trimmed });
     }
+  }
+  // Auto-assign "1" to first card if it has no number but other cards do (exclude Bhagavad Gita)
+  if (cat !== 'gita' && cards.length > 1 && !cards[0].num && cards.some(c => c.num)) {
+    cards[0].num = '1';
   }
   if (!cards.length) return `<div class="sd-trans" style="font-size:${sz * 0.92}rem">${trans}</div>`;
   const fontSize = sz * 0.92;
@@ -8602,12 +8610,12 @@ function openSongDetail(id) {
 
     ${lyrics ? `
       <div class="sd-section-lbl">${songLang !== 'en' ? 'पद (Lyrics)' : 'Lyrics'}</div>
-      ${_buildVerseCards(lyrics, sz)}
+      ${_buildVerseCards(lyrics, sz, s.cat)}
     ` : ''}
     ${trans ? `
       <div class="sd-divider"></div>
       <div class="sd-section-lbl">${transLabel}</div>
-      ${_buildTransCards(trans, sz)}
+      ${_buildTransCards(trans, sz, s.cat)}
     ` : ''}
   `;
 
