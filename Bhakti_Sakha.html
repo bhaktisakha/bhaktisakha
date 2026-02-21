@@ -7921,21 +7921,28 @@ function _songTitle(s) {
   return s.title_dev || iastToDev(s.title || '');
 }
 
-// Extract a snippet from lyrics around the search query (whole-word match, 2 words before & after)
+// Extract a snippet from lyrics around the search query (word-boundary match, 2 words before & after)
 function _getLyricSnippet(text, query) {
   if (!text || !query) return '';
   const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
-  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + ')(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
-  const m = re.exec(text);
+  // Try whole-word first, then prefix match
+  let re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + ')(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
+  let m = re.exec(text);
+  if (!m) {
+    // Try prefix match (word starts with query)
+    re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + '\\S*)', 'i');
+    m = re.exec(text);
+  }
   if (!m) return '';
   const matchStart = text.indexOf(m[1], m.index);
+  const matchLen = m[1].length;
   const before = text.substring(0, matchStart);
-  const after = text.substring(matchStart + query.length);
+  const after = text.substring(matchStart + matchLen);
   const wordsBefore = before.replace(/\n/g,' ').trimEnd().split(/\s+/);
   const pre = wordsBefore.slice(-2).join(' ');
   const wordsAfter = after.replace(/\n/g,' ').trimStart().split(/\s+/);
   const post = wordsAfter.slice(0, 2).join(' ');
-  const matched = text.substring(matchStart, matchStart + query.length);
+  const matched = text.substring(matchStart, matchStart + matchLen);
   return (pre ? '…' + pre + ' ' : '') + '**' + matched + '**' + (post ? ' ' + post + '…' : '');
 }
 
@@ -8270,15 +8277,17 @@ function _buildSongCard(s, idx, searchQuery) {
   const authorText = s.author ? s.author : '';
   const subLine = (authorText || hasAudio)
     ? `<div class="song-by">${authorText}${authorText && hasAudio ? ' ' : ''}${audioBadge}</div>` : '';
-  // Lyrics snippet: show only if search query matches lyrics (whole-word) but NOT title
+  // Lyrics snippet: show only if search query matches lyrics but NOT title
   let snippetHtml = '';
   if (searchQuery) {
     const ql = searchQuery.toLowerCase();
-    const titleMatch = _wholeWordMatch(s.title, ql) || _wholeWordMatch(s.officialName, ql) || (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql));
-    if (!titleMatch) {
-      if (_wholeWordMatch(s.lyrics, ql)) {
-        snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'song-lyric-snippet');
-      }
+    const words = ql.split(/\s+/).filter(Boolean);
+    const lastWord = words[words.length - 1];
+    const completedWords = words.slice(0, -1);
+    const titleText = [s.title||'', s.officialName||'', (songLang !== 'en' ? _songTitle(s) : '')].join('\n');
+    const titleMatch = _multiWordMatchText(titleText, completedWords, lastWord);
+    if (!titleMatch && _multiWordMatchText(s.lyrics||'', completedWords, lastWord)) {
+      snippetHtml = _lyricSnippetHtml(s.lyrics, lastWord, 'song-lyric-snippet');
     }
   }
   return `<div class="song-card${isPlaying ? ' now-playing' : ''}" id="sc-${s.id}" onclick="openSongDetail(${s.id})">
@@ -8331,13 +8340,10 @@ function renderSongs(filter) {
   if (fl) fl.textContent = SONG_FONT_LABELS[songFontIdx];
 
   // Filter songs if search active
-  const q = (filter !== undefined ? filter : document.getElementById('kirtanSearchInp')?.value || '').trim().toLowerCase();
-  let pool = q ? songs.filter(s =>
-    _wholeWordMatch(s.title, q) ||
-    _wholeWordMatch(s.officialName, q) ||
-    (songLang !== 'en' && _wholeWordMatch(_songTitle(s), q)) ||
-    _wholeWordMatch(s.lyrics, q)
-  ) : songs;
+  const rawQ = (filter !== undefined ? filter : document.getElementById('kirtanSearchInp')?.value || '');
+  const q = rawQ.trim().toLowerCase();
+  const qAllCompleted = rawQ.endsWith(' ');
+  let pool = q ? songs.filter(s => _songMatchesQuery(s, q, qAllCompleted)) : songs;
 
   let cards = '';
   if (!pool.length) {
@@ -8645,12 +8651,46 @@ function _kirtanSearchDebounced(q) {
   _kirtanSearchTimer = setTimeout(() => kirtanSearch(q), 400);
 }
 
-// Whole-word match helper — works for title, officialName, lyrics etc.
-function _wholeWordMatch(text, query) {
-  if (!text || !query) return false;
-  const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+// Whole-word match helper (single word)
+function _wholeWordMatch(text, word) {
+  if (!text || !word) return false;
+  const escaped = word.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
   const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])' + escaped + '(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
   return re.test(text);
+}
+
+// Prefix match — word appears at the START of any word in text
+function _prefixWordMatch(text, prefix) {
+  if (!text || !prefix) return false;
+  const escaped = prefix.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
+  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])' + escaped, 'i');
+  return re.test(text);
+}
+
+// Multi-word match: check if ALL words match in a text
+// Completed words → whole-word, last word → prefix
+function _multiWordMatchText(text, completedWords, lastWord) {
+  if (!text) return false;
+  for (const w of completedWords) {
+    if (!_wholeWordMatch(text, w)) return false;
+  }
+  if (lastWord && !_prefixWordMatch(text, lastWord)) return false;
+  return true;
+}
+
+// Check if song matches multi-word query across any of its searchable fields
+// queryStr should be the raw trimmed input; trailingSpace indicates all words completed
+function _songMatchesQuery(s, queryStr, allCompleted) {
+  if (!queryStr) return false;
+  const words = queryStr.split(/\s+/).filter(Boolean);
+  if (!words.length) return false;
+  const completedWords = allCompleted ? words : words.slice(0, -1);
+  const lastWord = allCompleted ? null : words[words.length - 1];
+
+  const fields = [s.title||'', s.officialName||'', s.lyrics||''];
+  if (songLang !== 'en') fields.push(_songTitle(s)||'');
+  const combined = fields.join('\n');
+  return _multiWordMatchText(combined, completedWords, lastWord);
 }
 
 function _setSearchFade(active) {
@@ -8663,28 +8703,36 @@ function kirtanSearch(q) {
   if (clearBtn) clearBtn.style.display = q ? '' : 'none';
   const dd = document.getElementById('kirtanDropdown');
   if (!q.trim()) { dd.classList.remove('open'); dd.innerHTML = ''; _setSearchFade(false); return; }
+  const endsWithSpace = q.endsWith(' ');
   const ql = q.trim().toLowerCase();
-  const matches = songs.filter(s =>
-    _wholeWordMatch(s.title, ql) ||
-    _wholeWordMatch(s.officialName, ql) ||
-    (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql)) ||
-    _wholeWordMatch(s.lyrics, ql)
-  ).slice(0, 12);
+  const words = ql.split(/\s+/).filter(Boolean);
+  if (!words.length) { dd.classList.remove('open'); dd.innerHTML = ''; _setSearchFade(false); return; }
+
+  // If query ends with space, all words are completed → whole-word only
+  // Otherwise, last word is still being typed → prefix match
+  const completedWords = endsWithSpace ? words : words.slice(0, -1);
+  const lastWord = endsWithSpace ? null : words[words.length - 1];
+
+  const matches = songs.filter(s => _songMatchesQuery(s, ql, endsWithSpace)).slice(0, 12);
 
   if (!matches.length) {
     dd.innerHTML = `<div class="kd-empty">No songs found for "${q.trim()}"</div>`;
   } else {
+    // Build highlight regex from all query words
+    const allEscaped = words.map(w => w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&'));
+    const hlRe = new RegExp('(^|[\\s,;!?\\.\\-—\'\"\\n])(' + allEscaped.join('|') + ')', 'gi');
+    const hl = t => (t||'').replace(hlRe, '$1<mark>$2</mark>');
+
     dd.innerHTML = matches.map(s => {
-      const escaped = ql.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
-      const hlRe = new RegExp('(^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + ')(?=$|[\\s,;!?\\.\\-—\'\"\\n])', 'gi');
-      const hl = t => (t||'').replace(hlRe, '$1<mark>$2</mark>');
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
       const displayTitle = _songTitle(s);
-      const titleMatch = _wholeWordMatch(s.title, ql) || _wholeWordMatch(s.officialName, ql) || (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql));
+      const titleText = [s.title||'', s.officialName||'', (songLang !== 'en' ? _songTitle(s) : '')].join('\n');
+      const titleMatch = _multiWordMatchText(titleText, completedWords, lastWord);
       let snippetHtml = '';
       if (!titleMatch) {
-        if (_wholeWordMatch(s.lyrics, ql)) {
-          snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'kd-lyric-snippet');
+        const snippetWord = lastWord || words[words.length - 1];
+        if (_multiWordMatchText(s.lyrics||'', completedWords, lastWord)) {
+          snippetHtml = _lyricSnippetHtml(s.lyrics, snippetWord, 'kd-lyric-snippet');
         }
       }
       const icon = s.i || (_getCatIcon(s.cat));
