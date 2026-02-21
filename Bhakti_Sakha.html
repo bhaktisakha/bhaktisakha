@@ -1155,17 +1155,29 @@ body {
 .evt-fab-bar {
   position:fixed; bottom:68px; left:50%; transform:translateX(-50%);
   width:min(430px, 100vw); padding:8px 16px;
-  display:flex; align-items:center; gap:10px; z-index:100;
+  display:flex; align-items:flex-end; gap:10px; z-index:100;
   pointer-events:none;
 }
-.evt-fab-signin {
-  pointer-events:auto;
-  flex:1; font-size:0.68rem; color:var(--text3); line-height:1.3;
-  background:rgba(13,27,42,0.92); backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.06); border-radius:12px;
-  padding:8px 12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.evt-fab-card {
+  pointer-events:auto; flex:1;
+  background:rgba(13,27,42,0.95); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.06); border-radius:14px;
+  padding:10px 12px 8px; overflow:hidden;
 }
-.evt-fab-signin strong { color:var(--text2); font-weight:500; }
+.evt-fab-status {
+  font-size:0.68rem; color:var(--text3); line-height:1.3;
+  margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.evt-fab-status strong { color:var(--text2); font-weight:500; }
+.evt-fab-status .sync-ok { color:#5ee8a0; font-weight:500; }
+.evt-fab-btns { display:flex; gap:6px; }
+.evt-fab-btns button {
+  flex:1; padding:6px 0; border-radius:8px; border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.04); color:var(--text2); font-size:0.68rem;
+  font-family:inherit; cursor:pointer; transition:all 0.15s;
+}
+.evt-fab-btns button:active { background:rgba(255,255,255,0.1); transform:scale(0.96); }
+.evt-fab-btns .sync-btn { border-color:rgba(94,232,160,0.2); color:#5ee8a0; }
 .evt-fab {
   pointer-events:auto;
   width:48px; height:48px; border-radius:14px; border:none;
@@ -4760,9 +4772,16 @@ body {
 
     </div>
 
-    <!-- Fixed bottom bar: Signin + FAB -->
+    <!-- Fixed bottom bar: Status + Buttons + FAB -->
     <div class="evt-fab-bar" id="evtFabBar">
-      <div class="evt-fab-signin" id="evtFabSignin"><span id="evtBackupMsg"><strong>Sign in with Google</strong> to sync events</span></div>
+      <div class="evt-fab-card">
+        <div class="evt-fab-status" id="evtFabStatus"><span id="evtBackupMsg"><strong>Sign in with Google</strong> to sync events</span></div>
+        <div class="evt-fab-btns">
+          <button class="sync-btn" id="evtSyncBtn" onclick="evtDoSync()">↻ Sync</button>
+          <button onclick="exportEvts()">📤 Export</button>
+          <button onclick="importEvts()">📥 Import</button>
+        </div>
+      </div>
       <button class="evt-fab" id="evtFab" onclick="openAddEvt()">＋</button>
     </div>
   </div>
@@ -4786,9 +4805,10 @@ body {
         </div>
         <!-- Backup/Sign-in banner -->
         <div class="notes-backup-box" id="notesBackupBox" style="margin-bottom:80px;">
-          <span id="notesBackupMsg"><strong>Sign in with Google</strong> to backup & sync notes across devices.</span>
+          <div style="font-size:0.72rem;color:var(--text3);margin-bottom:6px;"><span id="notesBackupMsg"><strong>Sign in with Google</strong> to backup & sync notes across devices.</span></div>
           <div class="notes-backup-btns">
             <button class="bk-btn" id="notesGoogleBtn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="switchScreen('settings')">🔑 Sign In</button>
+            <button class="bk-btn" id="notesSyncBtn" style="background:rgba(94,232,160,0.1);border-color:rgba(94,232,160,0.3);color:#5ee8a0;display:none;" onclick="notesDoSync()">↻ Sync</button>
             <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="exportNotes()">📤 Export</button>
             <button class="bk-btn" style="background:rgba(61,127,212,0.1);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);" onclick="importNotes()">📥 Import</button>
           </div>
@@ -9753,11 +9773,23 @@ function saveEvt() {
 // ── Main render (called by switchScreen) ──
 function renderEvts() {
   evtRenderToday();
-  // Update fab signin bar
+  // Update fab status bar
   const msg = document.getElementById('evtBackupMsg');
-  if (msg && gUser && gUser.email) {
-    msg.innerHTML = '☁️ Signed in as <strong>' + gUser.email + '</strong>';
+  const syncBtn = document.getElementById('evtSyncBtn');
+  if (gUser && gUser.email) {
+    if (msg) msg.innerHTML = '☁️ Signed in as <strong>' + gUser.email + '</strong>';
+    if (syncBtn) syncBtn.style.display = '';
+  } else {
+    if (syncBtn) syncBtn.style.display = 'none';
   }
+}
+
+async function evtDoSync() {
+  const msg = document.getElementById('evtBackupMsg');
+  const btn = document.getElementById('evtSyncBtn');
+  if (btn) { btn.textContent = '⟳ Syncing…'; btn.disabled = true; }
+  await gSyncAll();
+  if (btn) { btn.textContent = '↻ Sync'; btn.disabled = false; }
 }
 
 // ── Delete ──
@@ -9951,10 +9983,14 @@ function updateGoogleUI(signedIn) {
     // Update Events & Notes boxes
     const evtMsg = document.getElementById('evtBackupMsg');
     if (evtMsg) evtMsg.innerHTML = `☁️ Signed in as <strong>${gUser.email}</strong>`;
+    const evtSyncBtn = document.getElementById('evtSyncBtn');
+    if (evtSyncBtn) evtSyncBtn.style.display = '';
     const notesMsg = document.getElementById('notesBackupMsg');
-    if (notesMsg) notesMsg.innerHTML = `<strong>Signed in as ${gUser.email}</strong> — notes sync to Google Drive.`;
+    if (notesMsg) notesMsg.innerHTML = `☁️ Signed in as <strong>${gUser.email}</strong>`;
     const notesBtn = document.getElementById('notesGoogleBtn');
-    if (notesBtn) { notesBtn.textContent = '↻ Sync'; notesBtn.onclick = gSyncAll; }
+    if (notesBtn) notesBtn.style.display = 'none';
+    const notesSyncBtn = document.getElementById('notesSyncBtn');
+    if (notesSyncBtn) notesSyncBtn.style.display = '';
   } else {
     out.style.display = '';
     inn.style.display = 'none';
@@ -10247,6 +10283,11 @@ async function gSyncAll() {
     const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     if (statusEl) statusEl.textContent = `✓ Synced at ${now}`;
     if (detailEl) detailEl.textContent = `${mergedNotes.length} notes · ${customFolders.length} folders · ${mergedEvents.length} events · ${songs.length} songs`;
+    // Update Events & Notes sync status
+    const evtMsg = document.getElementById('evtBackupMsg');
+    if (evtMsg) evtMsg.innerHTML = `<span class="sync-ok">✓ Synced at ${now}</span> · <strong>${gUser.email}</strong>`;
+    const notesMsg = document.getElementById('notesBackupMsg');
+    if (notesMsg) notesMsg.innerHTML = `<span style="color:#5ee8a0;font-weight:500;">✓ Synced at ${now}</span> · <strong>${gUser.email}</strong>`;
     updateAdminUI();
     if (typeof updateHomeGoogleUI === 'function') updateHomeGoogleUI();
     showToast('✓ Synced to Google Drive');
@@ -12688,7 +12729,14 @@ document.addEventListener('click', function(e) {
   if (!e.target.closest('.ne-bg-picker-wrap')) pal.classList.remove('open');
 });
 
-// --- EXPORT / IMPORT ---
+// --- SYNC / EXPORT / IMPORT ---
+async function notesDoSync() {
+  const btn = document.getElementById('notesSyncBtn');
+  if (btn) { btn.textContent = '⟳ Syncing…'; btn.disabled = true; }
+  await gSyncAll();
+  if (btn) { btn.textContent = '↻ Sync'; btn.disabled = false; }
+}
+
 function exportNotes() {
   const blob = new Blob([JSON.stringify({notes, customFolders, exported: new Date().toISOString()}, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
