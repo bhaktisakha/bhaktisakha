@@ -1889,7 +1889,7 @@ body {
 .ne-content-editable h2 { font-size:1.5rem; margin:6px 0; }
 .ne-content-editable ul, .ne-content-editable ol { padding-left:20px; margin:6px 0; }
 .ne-content-editable mark { background:rgba(241,196,15,0.3); color:inherit; border-radius:2px; padding:0 2px; }
-.ne-content-editable a { color:#5ce0f0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+.ne-content-editable a { color:#5ce0f0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; pointer-events:auto; position:relative; z-index:1; }
 .ne-content-editable a:active { color:var(--accent-gold); }
 .nf-share-card-content a { color:#5ce0f0; text-decoration:underline; }
 .ne-content-editable img.ne-attached-img {
@@ -11535,7 +11535,13 @@ function nfOpenEditNote_unlocked(id) {
   document.getElementById('neTitle').value = n.title || '';
   document.getElementById('neBody').innerHTML = n.body || '';
   // Auto-linkify any plain URLs in the note body
-  _neAutoLinkify(document.getElementById('neBody'));
+  var neBodyEl = document.getElementById('neBody');
+  _neAutoLinkify(neBodyEl);
+  // Ensure all links open in new tab
+  neBodyEl.querySelectorAll('a').forEach(function(a) {
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+  });
 
   const d = new Date(n.updatedAt || n.createdAt);
   document.getElementById('neAutosaveMsg').textContent = 'Last saved ' + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
@@ -12265,15 +12271,34 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 3000);
     });
 
-    // Click on links: open in new tab
+    // Click/tap on links: open in new tab
+    // MUST use capture phase to intercept BEFORE contenteditable absorbs the event
+    var _neLinkTouchTarget = null;
+    bodyEl.addEventListener('touchstart', function(e) {
+      var t = e.touches && e.touches[0];
+      if (!t) return;
+      var el = document.elementFromPoint(t.clientX, t.clientY);
+      _neLinkTouchTarget = (el && el.closest) ? el.closest('a') : null;
+    }, true); // capture phase
+    bodyEl.addEventListener('touchend', function(e) {
+      if (!_neLinkTouchTarget || !_neLinkTouchTarget.href) { _neLinkTouchTarget = null; return; }
+      var href = _neLinkTouchTarget.href;
+      _neLinkTouchTarget = null;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      _neOpenLinkSafe(href);
+      return false;
+    }, true); // capture phase
+    // Desktop fallback
     bodyEl.addEventListener('click', function(e) {
-      const link = e.target.closest('a');
+      var link = e.target.closest ? e.target.closest('a') : null;
       if (link && link.href) {
         e.preventDefault();
         e.stopPropagation();
-        window.open(link.href, '_blank', 'noopener');
+        _neOpenLinkSafe(link.href);
       }
-    });
+    }, true); // capture phase
 
     // Auto-linkify plain URLs on paste
     bodyEl.addEventListener('paste', function() {
@@ -12296,6 +12321,28 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initial render of folder grid
   nfRenderFolders();
 });
+
+// --- SAFE LINK OPENER for notes (mobile-friendly) ---
+function _neOpenLinkSafe(url) {
+  if (!url) return;
+  // Method 1: window.open (works on most browsers)
+  var w = window.open(url, '_blank', 'noopener,noreferrer');
+  if (w) return;
+  // Method 2: Hidden anchor click (bypasses popup blockers in PWA)
+  try {
+    var a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { document.body.removeChild(a); }, 200);
+  } catch(e) {
+    // Method 3: Direct navigation (last resort)
+    window.location.href = url;
+  }
+}
 
 // --- AUTO-LINKIFY: Convert plain URLs in contenteditable to <a> tags ---
 function _neAutoLinkify(el) {
