@@ -4583,17 +4583,6 @@ body {
   <!-- EVENTS (Redesigned) -->
   <div class="screen" id="screen-events">
     <div class="events-screen">
-      <div class="events-hdr">
-        <div class="screen-title" style="margin:0;border:none;padding:0">My Events</div>
-      </div>
-      <div class="backup-box" id="evtBackupBox">
-        <div class="bk-text" id="evtBackupMsg"><strong>Sign in with Google</strong> to sync events across devices.</div>
-        <div class="bk-btns">
-          <button class="bk-btn" id="evtGoogleBtn" onclick="switchScreen('settings')" style="background:rgba(61,127,212,0.12);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);">🔑 Sign In</button>
-          <button class="bk-btn" onclick="exportEvts()">📤 Export</button>
-          <button class="bk-btn" onclick="importEvts()">📥 Import</button>
-        </div>
-      </div>
 
       <!-- Inner Tab Navigation -->
       <div class="evt-tabs">
@@ -4629,6 +4618,16 @@ body {
           <button class="evt-appt-sort-btn" onclick="evtApptSort('past',this)">Past</button>
         </div>
         <div id="evtApptList"></div>
+      </div>
+
+      <!-- Sync / Export / Import -->
+      <div class="backup-box" id="evtBackupBox" style="margin-bottom:80px;">
+        <div class="bk-text" id="evtBackupMsg"><strong>Sign in with Google</strong> to sync events across devices.</div>
+        <div class="bk-btns">
+          <button class="bk-btn" id="evtGoogleBtn" onclick="switchScreen('settings')" style="background:rgba(61,127,212,0.12);border-color:rgba(61,127,212,0.3);color:var(--accent-blue);">🔑 Sign In</button>
+          <button class="bk-btn" onclick="exportEvts()">📤 Export</button>
+          <button class="bk-btn" onclick="importEvts()">📥 Import</button>
+        </div>
       </div>
 
     </div>
