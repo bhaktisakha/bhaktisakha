@@ -14607,15 +14607,23 @@ function skOpenDetail(id, fromScreen) {
   if (!l) { showToast('Listing not found — it may have been removed'); return; }
   _skViewingId = l.id;
 
+  try {
   document.getElementById('skDetailHTitle').textContent = l.bizName || l.contactName || 'Untitled';
   const content = document.getElementById('skDetailContent');
 
   const r = _skGetRating(l.id);
-  const reviews = skReviews.filter(rv => rv.listingId === l.id).slice(-3).reverse();
+  const reviews = skReviews.filter(rv => String(rv.listingId) === String(l.id)).slice(-3).reverse();
   const isSkAdmin = hasPermission('sevakart');
   const userEmail = gUser?.email?.toLowerCase() || '';
-  const hasReviewed = skReviews.some(rv => rv.listingId === l.id && rv.userEmail === userEmail);
+  const hasReviewed = skReviews.some(rv => String(rv.listingId) === String(l.id) && rv.userEmail === userEmail);
   const hasContacted = localStorage.getItem('skContacted:'+l.id);
+
+  // Sanitize user content
+  const safeName = _escHtml(l.bizName || l.contactName || 'Untitled');
+  const safeCategory = _escHtml(l.category || '');
+  const safeCity = _escHtml(l.city || '');
+  const safeDesc = _escHtml((l.fullDesc || l.shortDesc || '').replace(/\n?<!--SKMETA:.*?-->/s, '')).replace(/\n/g, '<br>');
+  const safeYears = _escHtml(l.years || '');
 
   // Gallery with lightbox
   const photos = (l.photos||[]).filter(Boolean);
@@ -14623,82 +14631,121 @@ function skOpenDetail(id, fromScreen) {
   _skLightboxIdx = 0;
   let galleryHTML = '';
   if (photos.length) {
-    galleryHTML = `<div class="sk-detail-gallery">
-      <img src="${photos[0]}" alt="" id="skGalleryImg" onclick="skOpenLightbox(0)">
-      ${photos.length > 1 ? `<div class="sk-detail-gallery-dots">${photos.map((_,i) =>
-        `<div class="sk-detail-gallery-dot ${i===0?'active':''}" onclick="event.stopPropagation();document.getElementById('skGalleryImg').src='${photos[i]}';_skLightboxIdx=${i};document.querySelectorAll('.sk-detail-gallery-dot').forEach((d,j)=>d.classList.toggle('active',j===${i}))"></div>`
-      ).join('')}</div>` : ''}
-      <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;font-size:0.64rem;padding:3px 8px;border-radius:6px;pointer-events:none;">Tap to expand</div>
-    </div>`;
+    galleryHTML = '<div class="sk-detail-gallery">' +
+      '<img src="' + _escHtml(photos[0]) + '" alt="" id="skGalleryImg" onclick="skOpenLightbox(0)">' +
+      (photos.length > 1 ? '<div class="sk-detail-gallery-dots">' + photos.map(function(p,i) {
+        return '<div class="sk-detail-gallery-dot ' + (i===0?'active':'') + '" data-photo-idx="' + i + '"></div>';
+      }).join('') + '</div>' : '') +
+      '<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;font-size:0.64rem;padding:3px 8px;border-radius:6px;pointer-events:none;">Tap to expand</div>' +
+    '</div>';
   } else {
     const catIcon = SK_CATEGORIES.find(c=>c.id===l.category)?.icon || '🪔';
-    galleryHTML = `<div class="sk-detail-gallery"><div class="sk-detail-gallery-placeholder">${catIcon}</div></div>`;
+    galleryHTML = '<div class="sk-detail-gallery"><div class="sk-detail-gallery-placeholder">' + catIcon + '</div></div>';
   }
 
-  content.innerHTML = `
-    ${galleryHTML}
-    <div class="sk-detail-body">
-      <div class="sk-detail-name">${l.bizName || l.contactName || 'Untitled'}</div>
-      <div class="sk-detail-badges">
-        <span class="sk-detail-cat">${l.category}</span>
-        <span class="sk-detail-city-tag">📍 ${l.city}</span>
-        ${l.verified ? '<span class="sk-detail-verified">✓ Verified Devotee</span>' : ''}
-      </div>
-      ${r.count ? `<div class="sk-detail-rating-row">
-        <span class="sk-detail-stars">${_skStarStr(r.avg)}</span>
-        <span class="sk-detail-rating-num">${r.avg} · ${r.count} review${r.count>1?'s':''}</span>
-      </div>` : ''}
-      <div class="sk-detail-desc">${(l.fullDesc || l.shortDesc || '').replace(/\n?<!--SKMETA:.*?-->/s, '')}</div>
-      ${l.years ? `<div class="sk-detail-years">🕐 ${l.years} years in service</div>` : ''}
+  // Build HTML safely using string concatenation (not template literals)
+  let html = galleryHTML +
+    '<div class="sk-detail-body">' +
+      '<div class="sk-detail-name">' + safeName + '</div>' +
+      '<div class="sk-detail-badges">' +
+        '<span class="sk-detail-cat">' + safeCategory + '</span>' +
+        '<span class="sk-detail-city-tag">📍 ' + safeCity + '</span>' +
+        (l.verified ? '<span class="sk-detail-verified">✓ Verified Devotee</span>' : '') +
+      '</div>';
 
-      <div class="sk-detail-section">
-        <div class="sk-detail-section-title">Contact</div>
-        <div class="sk-contact-btns">
-          ${l.whatsapp || l.mobile ? `<a class="sk-contact-btn whatsapp" href="https://wa.me/${(l.whatsapp||l.mobile).replace(/[^0-9]/g,'')}" target="_blank" rel="noopener" onclick="localStorage.setItem('skContacted:${id}','1')">💬 WhatsApp</a>` : ''}
-          ${l.mobile ? `<a class="sk-contact-btn call" href="tel:${l.mobile}" onclick="localStorage.setItem('skContacted:${id}','1')">📞 Call</a>` : ''}
-          ${l.email ? `<a class="sk-contact-btn email" href="mailto:${l.email}">✉ Email</a>` : ''}
-          ${l.website ? `<a class="sk-contact-btn website" href="${l.website}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
-        </div>
-        <div class="sk-disclaimer">SevaKart facilitates connection. All transactions happen directly between users.</div>
-      </div>
+  if (r.count) {
+    html += '<div class="sk-detail-rating-row">' +
+      '<span class="sk-detail-stars">' + _skStarStr(r.avg) + '</span>' +
+      '<span class="sk-detail-rating-num">' + r.avg + ' · ' + r.count + ' review' + (r.count>1?'s':'') + '</span>' +
+    '</div>';
+  }
 
-      <div class="sk-detail-section">
-        <div class="sk-detail-section-title">Reviews</div>
-        ${reviews.length ? reviews.map(rv => `
-          <div class="sk-review-card">
-            <div class="sk-review-top">
-              <span class="sk-review-user">${rv.userName||'Devotee'}</span>
-              <span class="sk-review-stars">${_skStarStr(rv.rating)}</span>
-            </div>
-            ${rv.text ? `<div class="sk-review-text">${rv.text}</div>` : ''}
-            <div class="sk-review-date">${rv.date||''}</div>
-          </div>
-        `).join('') : '<div style="font-size:0.8rem;color:var(--text3);margin-bottom:8px;">No reviews yet.</div>'}
-        ${!hasReviewed && hasContacted && isSignedIn() ? `<button class="sk-add-review-btn" onclick="skOpenReview()">⭐ Write a Review</button>` : ''}
-        ${!hasReviewed && !hasContacted && isSignedIn() ? '<div style="font-size:0.72rem;color:var(--text3);margin-top:4px;">Contact the service first to leave a review.</div>' : ''}
-        ${!isSignedIn() ? '<div style="font-size:0.72rem;color:var(--text3);margin-top:4px;">Sign in to leave a review.</div>' : ''}
-      </div>
+  html += '<div class="sk-detail-desc">' + safeDesc + '</div>';
+  if (l.years) html += '<div class="sk-detail-years">🕐 ' + safeYears + ' years in service</div>';
 
-      <button class="sk-report-btn" onclick="skOpenReport()">🚩 Report this listing</button>
+  // Contact section
+  html += '<div class="sk-detail-section">' +
+    '<div class="sk-detail-section-title">Contact</div>' +
+    '<div class="sk-contact-btns">';
+  if (l.whatsapp || l.mobile) {
+    const phone = (l.whatsapp||l.mobile).replace(/[^0-9]/g,'');
+    html += '<a class="sk-contact-btn whatsapp" href="https://wa.me/' + phone + '" target="_blank" rel="noopener">💬 WhatsApp</a>';
+  }
+  if (l.mobile) html += '<a class="sk-contact-btn call" href="tel:' + _escHtml(l.mobile) + '">📞 Call</a>';
+  if (l.email) html += '<a class="sk-contact-btn email" href="mailto:' + _escHtml(l.email) + '">✉ Email</a>';
+  if (l.website) html += '<a class="sk-contact-btn website" href="' + _escHtml(l.website) + '" target="_blank" rel="noopener">🔗 Website</a>';
+  html += '</div>' +
+    '<div class="sk-disclaimer">SevaKart facilitates connection. All transactions happen directly between users.</div>' +
+  '</div>';
 
-      ${isSkAdmin ? `<div class="sk-detail-section">
-        <div class="sk-detail-section-title">🛡️ Admin Actions</div>
-        <div style="font-size:0.72rem;color:var(--text3);margin-bottom:8px;">Status: <strong>${l.status}</strong> ${l.verified?'· ✓ Verified':''}</div>
-        <div class="sk-admin-actions">
-          ${l.status!=='approved' ? `<button class="sk-admin-btn approve" onclick="skAdminAction('approve')">✓ Approve</button>` : ''}
-          ${l.status!=='rejected' ? `<button class="sk-admin-btn reject" onclick="skAdminAction('reject')">✕ Reject</button>` : ''}
-          ${!l.verified ? `<button class="sk-admin-btn verify" onclick="skAdminAction('verify')">🏅 Verify</button>` : `<button class="sk-admin-btn verify" onclick="skAdminAction('unverify')">Remove Badge</button>`}
-          ${l.status!=='suspended' ? `<button class="sk-admin-btn suspend" onclick="skAdminAction('suspend')">⏸ Suspend</button>` : `<button class="sk-admin-btn approve" onclick="skAdminAction('approve')">Unsuspend</button>`}
-          <button class="sk-admin-btn delete" onclick="skAdminAction('delete')">🗑 Delete</button>
-        </div>
-      </div>` : ''}
-    </div>
-  `;
+  // Reviews section
+  html += '<div class="sk-detail-section">' +
+    '<div class="sk-detail-section-title">Reviews</div>';
+  if (reviews.length) {
+    reviews.forEach(function(rv) {
+      html += '<div class="sk-review-card">' +
+        '<div class="sk-review-top">' +
+          '<span class="sk-review-user">' + _escHtml(rv.userName||'Devotee') + '</span>' +
+          '<span class="sk-review-stars">' + _skStarStr(rv.rating) + '</span>' +
+        '</div>' +
+        (rv.text ? '<div class="sk-review-text">' + _escHtml(rv.text) + '</div>' : '') +
+        '<div class="sk-review-date">' + _escHtml(rv.date||'') + '</div>' +
+      '</div>';
+    });
+  } else {
+    html += '<div style="font-size:0.8rem;color:var(--text3);margin-bottom:8px;">No reviews yet.</div>';
+  }
+  if (!hasReviewed && hasContacted && isSignedIn()) {
+    html += '<button class="sk-add-review-btn" onclick="skOpenReview()">⭐ Write a Review</button>';
+  }
+  html += '</div>';
+
+  // Report button
+  html += '<button class="sk-report-btn" onclick="skOpenReport()">🚩 Report this listing</button>';
+
+  // Admin actions
+  if (isSkAdmin) {
+    html += '<div class="sk-detail-section">' +
+      '<div class="sk-detail-section-title">🛡️ Admin Actions</div>' +
+      '<div style="font-size:0.72rem;color:var(--text3);margin-bottom:8px;">Status: <strong>' + _escHtml(l.status||'') + '</strong> ' + (l.verified?'· ✓ Verified':'') + '</div>' +
+      '<div class="sk-admin-actions">';
+    if (l.status!=='approved') html += '<button class="sk-admin-btn approve" onclick="skAdminAction(\'approve\')">✓ Approve</button>';
+    if (l.status!=='rejected') html += '<button class="sk-admin-btn reject" onclick="skAdminAction(\'reject\')">✕ Reject</button>';
+    if (!l.verified) html += '<button class="sk-admin-btn verify" onclick="skAdminAction(\'verify\')">🏅 Verify</button>';
+    else html += '<button class="sk-admin-btn verify" onclick="skAdminAction(\'unverify\')">Remove Badge</button>';
+    if (l.status!=='suspended') html += '<button class="sk-admin-btn suspend" onclick="skAdminAction(\'suspend\')">⏸ Suspend</button>';
+    else html += '<button class="sk-admin-btn approve" onclick="skAdminAction(\'approve\')">Unsuspend</button>';
+    html += '<button class="sk-admin-btn delete" onclick="skAdminAction(\'delete\')">🗑 Delete</button>';
+    html += '</div></div>';
+  }
+
+  html += '</div>'; // close sk-detail-body
+  content.innerHTML = html;
+
+  // Bind gallery dot clicks via delegation
+  const dotsContainer = content.querySelector('.sk-detail-gallery-dots');
+  if (dotsContainer) {
+    dotsContainer.onclick = function(e) {
+      const dot = e.target.closest('[data-photo-idx]');
+      if (!dot) return;
+      const idx = parseInt(dot.getAttribute('data-photo-idx'));
+      document.getElementById('skGalleryImg').src = photos[idx];
+      _skLightboxIdx = idx;
+      dotsContainer.querySelectorAll('.sk-detail-gallery-dot').forEach(function(d, j) {
+        d.classList.toggle('active', j === idx);
+      });
+    };
+  }
 
   // Switch screen
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-sevakart-detail').classList.add('active');
   history.pushState({screen:'sevakart-detail'}, '', '');
+
+  } catch(err) {
+    console.error('skOpenDetail error:', err);
+    showToast('Error opening listing: ' + err.message);
+  }
 }
 
 // ---- Image Lightbox ----
@@ -15263,27 +15310,28 @@ function renderAdminSevakart() {
       list.innerHTML = '<div class="adm-detail-empty"><div class="adm-detail-empty-icon">✅</div><div>No pending listings</div></div>';
     } else {
       list.innerHTML = skPending.map(l => {
-        const catIcon = (typeof SK_CATEGORIES !== 'undefined' ? SK_CATEGORIES.find(c=>c.id===l.category) : null)?.icon || '🪔';
-        return `<div class="adm-item-card">
-          <div class="adm-item-card-top">
-            <div class="adm-item-card-avatar">${catIcon}</div>
-            <div class="adm-item-card-info">
-              <div class="adm-item-card-name">${l.bizName || l.contactName || 'Untitled'}</div>
-              <div class="adm-item-card-meta">
-                <span class="adm-item-card-meta-tag">${l.category || ''}</span>
-                <span class="adm-item-card-meta-tag">📍 ${l.city || ''}</span>
-                <span class="adm-item-card-meta-tag">👤 ${l.ownerName || l.contactName || ''}</span>
-                ${l.createdAt ? `<span class="adm-item-card-meta-tag">🕐 ${_pcTimeAgo(l.createdAt)}</span>` : ''}
-              </div>
-            </div>
-            <div class="adm-item-card-status pending">Pending</div>
-          </div>
-          ${l.shortDesc ? `<div class="adm-item-card-desc">${l.shortDesc}</div>` : ''}
-          ${l.fullDesc && l.fullDesc !== l.shortDesc ? `<div class="adm-item-card-desc" style="font-size:0.78rem;color:var(--text3);">${l.fullDesc.replace(/\n?<!--SKMETA:.*?-->/s, '').substring(0, 300)}${l.fullDesc.length > 300 ? '...' : ''}</div>` : ''}
-          <div class="adm-item-card-actions">
-            <button class="adm-item-action-btn review" onclick="skOpenDetail('${l.id}','admin-sevakart')">👁 Review Details</button>
-          </div>
-        </div>`;
+        const catIcon = _escHtml((typeof SK_CATEGORIES !== 'undefined' ? SK_CATEGORIES.find(c=>c.id===l.category) : null)?.icon || '🪔');
+        const safeId = _escHtml(String(l.id));
+        const desc = _escHtml(l.shortDesc || '');
+        return '<div class="adm-item-card">' +
+          '<div class="adm-item-card-top">' +
+            '<div class="adm-item-card-avatar">' + catIcon + '</div>' +
+            '<div class="adm-item-card-info">' +
+              '<div class="adm-item-card-name">' + _escHtml(l.bizName || l.contactName || 'Untitled') + '</div>' +
+              '<div class="adm-item-card-meta">' +
+                '<span class="adm-item-card-meta-tag">' + _escHtml(l.category || '') + '</span>' +
+                '<span class="adm-item-card-meta-tag">📍 ' + _escHtml(l.city || '') + '</span>' +
+                '<span class="adm-item-card-meta-tag">👤 ' + _escHtml(l.ownerName || l.contactName || '') + '</span>' +
+                (l.createdAt ? '<span class="adm-item-card-meta-tag">🕐 ' + _escHtml(_pcTimeAgo(l.createdAt)) + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="adm-item-card-status pending">Pending</div>' +
+          '</div>' +
+          (desc ? '<div class="adm-item-card-desc">' + desc + '</div>' : '') +
+          '<div class="adm-item-card-actions">' +
+            '<button class="adm-item-action-btn review" data-sk-review="' + safeId + '">👁 Review Details</button>' +
+          '</div>' +
+        '</div>';
       }).join('');
     }
   } else {
@@ -15295,27 +15343,38 @@ function renderAdminSevakart() {
     } else {
       list.innerHTML = reported.map(l => {
         const rCount = unresolvedReports.filter(r=>r.listingId===l.id).length;
-        const catIcon = (typeof SK_CATEGORIES !== 'undefined' ? SK_CATEGORIES.find(c=>c.id===l.category) : null)?.icon || '🪔';
-        return `<div class="adm-item-card">
-          <div class="adm-item-card-top">
-            <div class="adm-item-card-avatar">${catIcon}</div>
-            <div class="adm-item-card-info">
-              <div class="adm-item-card-name">${l.bizName || l.contactName || 'Untitled'}</div>
-              <div class="adm-item-card-meta">
-                <span class="adm-item-card-meta-tag">${l.category || ''}</span>
-                <span class="adm-item-card-meta-tag">📍 ${l.city || ''}</span>
-              </div>
-            </div>
-            <div class="adm-item-card-status reported">🚩 ${rCount} report${rCount>1?'s':''}</div>
-          </div>
-          ${l.shortDesc ? `<div class="adm-item-card-desc">${l.shortDesc}</div>` : ''}
-          <div class="adm-item-card-actions">
-            <button class="adm-item-action-btn review" onclick="skOpenDetail('${l.id}','admin-sevakart')">👁 Review Details</button>
-          </div>
-        </div>`;
+        const catIcon = _escHtml((typeof SK_CATEGORIES !== 'undefined' ? SK_CATEGORIES.find(c=>c.id===l.category) : null)?.icon || '🪔');
+        const safeId = _escHtml(String(l.id));
+        return '<div class="adm-item-card">' +
+          '<div class="adm-item-card-top">' +
+            '<div class="adm-item-card-avatar">' + catIcon + '</div>' +
+            '<div class="adm-item-card-info">' +
+              '<div class="adm-item-card-name">' + _escHtml(l.bizName || l.contactName || 'Untitled') + '</div>' +
+              '<div class="adm-item-card-meta">' +
+                '<span class="adm-item-card-meta-tag">' + _escHtml(l.category || '') + '</span>' +
+                '<span class="adm-item-card-meta-tag">📍 ' + _escHtml(l.city || '') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="adm-item-card-status reported">🚩 ' + rCount + ' report' + (rCount>1?'s':'') + '</div>' +
+          '</div>' +
+          (l.shortDesc ? '<div class="adm-item-card-desc">' + _escHtml(l.shortDesc) + '</div>' : '') +
+          '<div class="adm-item-card-actions">' +
+            '<button class="adm-item-action-btn review" data-sk-review="' + safeId + '">👁 Review Details</button>' +
+          '</div>' +
+        '</div>';
       }).join('');
     }
   }
+
+  // Delegated click handler for review buttons
+  list.onclick = function(e) {
+    const btn = e.target.closest('[data-sk-review]');
+    if (btn) {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-sk-review');
+      skOpenDetail(id, 'admin-sevakart');
+    }
+  };
 }
 
 function _admSkQuickApprove(id) {
@@ -15367,28 +15426,30 @@ function renderAdminPrayer() {
       list.innerHTML = '<div class="adm-detail-empty"><div class="adm-detail-empty-icon">✅</div><div>No pending prayer requests</div></div>';
     } else {
       list.innerHTML = pcPending.map(r => {
-        const catIcon = (typeof PC_CAT_ICONS !== 'undefined' ? PC_CAT_ICONS[r.category] : null) || '📿';
-        return `<div class="adm-item-card">
-          <div class="adm-item-card-top">
-            <div class="adm-item-card-avatar">${r.anonymous ? '🙏' : (r.name ? r.name.charAt(0).toUpperCase() : '🙏')}</div>
-            <div class="adm-item-card-info">
-              <div class="adm-item-card-name">${r.title || 'Untitled'}</div>
-              <div class="adm-item-card-meta">
-                <span class="adm-item-card-meta-tag">${catIcon} ${r.category || ''}</span>
-                <span class="adm-item-card-meta-tag">👤 ${r.anonymous ? 'Anonymous' : (r.name || '')}</span>
-                <span class="adm-item-card-meta-tag">🕐 ${_pcTimeAgo(r.timestamp)}</span>
-                ${r.urgency === 'urgent' ? '<span class="adm-item-card-meta-tag urgent">🔴 Urgent</span>' : ''}
-              </div>
-            </div>
-            <div class="adm-item-card-status pending">Pending</div>
-          </div>
-          ${r.description ? `<div class="adm-item-card-desc">${r.description}</div>` : ''}
-          <div class="adm-item-card-actions">
-            <button class="adm-item-action-btn review" onclick="pcOpenDetail('${r.id}','admin-prayer')">👁 View Details</button>
-            <button class="adm-item-action-btn approve" onclick="event.stopPropagation();pcAdminApprove('${r.id}');renderAdminPrayer();">✅ Approve</button>
-            <button class="adm-item-action-btn reject" onclick="event.stopPropagation();pcAdminStartReject('${r.id}')">❌ Reject</button>
-          </div>
-        </div>`;
+        const catIcon = _escHtml((typeof PC_CAT_ICONS !== 'undefined' ? PC_CAT_ICONS[r.category] : null) || '📿');
+        const safeId = _escHtml(String(r.id));
+        const avatar = r.anonymous ? '🙏' : (r.name ? _escHtml(r.name.charAt(0).toUpperCase()) : '🙏');
+        return '<div class="adm-item-card">' +
+          '<div class="adm-item-card-top">' +
+            '<div class="adm-item-card-avatar">' + avatar + '</div>' +
+            '<div class="adm-item-card-info">' +
+              '<div class="adm-item-card-name">' + _escHtml(r.title || 'Untitled') + '</div>' +
+              '<div class="adm-item-card-meta">' +
+                '<span class="adm-item-card-meta-tag">' + catIcon + ' ' + _escHtml(r.category || '') + '</span>' +
+                '<span class="adm-item-card-meta-tag">👤 ' + _escHtml(r.anonymous ? 'Anonymous' : (r.name || '')) + '</span>' +
+                '<span class="adm-item-card-meta-tag">🕐 ' + _escHtml(_pcTimeAgo(r.timestamp)) + '</span>' +
+                (r.urgency === 'urgent' ? '<span class="adm-item-card-meta-tag urgent">🔴 Urgent</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="adm-item-card-status pending">Pending</div>' +
+          '</div>' +
+          (r.description ? '<div class="adm-item-card-desc">' + _escHtml(r.description) + '</div>' : '') +
+          '<div class="adm-item-card-actions">' +
+            '<button class="adm-item-action-btn review" data-pc-review="' + safeId + '">👁 View Details</button>' +
+            '<button class="adm-item-action-btn approve" data-pc-approve="' + safeId + '">✅ Approve</button>' +
+            '<button class="adm-item-action-btn reject" data-pc-reject="' + safeId + '">❌ Reject</button>' +
+          '</div>' +
+        '</div>';
       }).join('');
     }
   } else {
@@ -15399,26 +15460,46 @@ function renderAdminPrayer() {
       list.innerHTML = unresolvedReports.map(rpt => {
         const req = pcRequests.find(r => r.id === rpt.requestId);
         if (!req) return '';
-        return `<div class="adm-item-card">
-          <div class="adm-item-card-top">
-            <div class="adm-item-card-avatar">🚩</div>
-            <div class="adm-item-card-info">
-              <div class="adm-item-card-name">${req.title || 'Untitled'}</div>
-              <div class="adm-item-card-meta">
-                <span class="adm-item-card-meta-tag urgent">🚩 ${rpt.reason}</span>
-                <span class="adm-item-card-meta-tag">👤 ${req.anonymous ? 'Anonymous' : (req.name || '')}</span>
-              </div>
-            </div>
-          </div>
-          ${rpt.details ? `<div class="adm-item-card-desc">${rpt.details}</div>` : ''}
-          <div class="adm-item-card-actions">
-            <button class="adm-item-action-btn review" onclick="pcOpenDetail('${req.id}','admin-prayer')">👁 View Details</button>
-            <button class="adm-item-action-btn approve" onclick="event.stopPropagation();pcResolveReport('${rpt.id}');renderAdminPrayer();">✓ Resolve</button>
-          </div>
-        </div>`;
+        const safeReqId = _escHtml(String(req.id));
+        const safeRptId = _escHtml(String(rpt.id));
+        return '<div class="adm-item-card">' +
+          '<div class="adm-item-card-top">' +
+            '<div class="adm-item-card-avatar">🚩</div>' +
+            '<div class="adm-item-card-info">' +
+              '<div class="adm-item-card-name">' + _escHtml(req.title || 'Untitled') + '</div>' +
+              '<div class="adm-item-card-meta">' +
+                '<span class="adm-item-card-meta-tag urgent">🚩 ' + _escHtml(rpt.reason) + '</span>' +
+                '<span class="adm-item-card-meta-tag">👤 ' + _escHtml(req.anonymous ? 'Anonymous' : (req.name || '')) + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          (rpt.details ? '<div class="adm-item-card-desc">' + _escHtml(rpt.details) + '</div>' : '') +
+          '<div class="adm-item-card-actions">' +
+            '<button class="adm-item-action-btn review" data-pc-review="' + safeReqId + '">👁 View Details</button>' +
+            '<button class="adm-item-action-btn approve" data-pc-resolve="' + safeRptId + '">✓ Resolve</button>' +
+          '</div>' +
+        '</div>';
       }).join('');
     }
   }
+
+  // Delegated click handler for prayer admin buttons
+  list.onclick = function(e) {
+    const btn = e.target.closest('[data-pc-review],[data-pc-approve],[data-pc-reject],[data-pc-resolve]');
+    if (!btn) return;
+    e.stopPropagation();
+    if (btn.dataset.pcReview) {
+      pcOpenDetail(btn.dataset.pcReview, 'admin-prayer');
+    } else if (btn.dataset.pcApprove) {
+      pcAdminApprove(btn.dataset.pcApprove);
+      renderAdminPrayer();
+    } else if (btn.dataset.pcReject) {
+      pcAdminStartReject(btn.dataset.pcReject);
+    } else if (btn.dataset.pcResolve) {
+      pcResolveReport(btn.dataset.pcResolve);
+      renderAdminPrayer();
+    }
+  };
 }
 
 // Fetch user stats for admin dashboard summary
@@ -15574,6 +15655,12 @@ function _ulTimeAgo(ms) {
 function admToggleSection(id) {
   const sec = document.getElementById('admSec-' + id);
   if (sec) sec.classList.toggle('expanded');
+}
+
+// Safe HTML escape for user content in admin cards
+function _escHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
 }
 
 // PRAYER CIRCLE
