@@ -3399,6 +3399,32 @@ body {
 .sk-admin-btn.delete { background:rgba(192,57,43,0.08); border-color:rgba(192,57,43,0.2); color:var(--accent-red); }
 .sk-admin-btn:active { opacity:0.7; }
 
+/* Collapsible admin dropdown for detail views */
+.admin-dropdown-header {
+  display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; padding:12px 14px; border-radius:12px;
+  background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.15);
+  transition:all 0.2s;
+}
+.admin-dropdown-header:active { opacity:0.8; }
+.admin-dropdown-title {
+  font-size:0.84rem; font-weight:600; color:#c4b0ff;
+  display:flex; align-items:center; gap:6px;
+}
+.admin-dropdown-arrow {
+  font-size:0.7rem; color:var(--text3);
+  transition:transform 0.25s ease;
+}
+.admin-dropdown.open .admin-dropdown-arrow { transform:rotate(180deg); }
+.admin-dropdown-body {
+  max-height:0; overflow:hidden;
+  transition:max-height 0.3s ease, padding 0.3s ease;
+  padding:0 2px;
+}
+.admin-dropdown.open .admin-dropdown-body {
+  max-height:500px; padding:12px 2px 0;
+}
+
 /* Admin dashboard */
 .sk-admin-dashboard { padding:0 18px 16px; }
 .sk-admin-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
@@ -9947,7 +9973,8 @@ function addAdmin() {
 function removeAdmin(email) {
   if (!isSuperAdmin()) return;
   if (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) { showToast('Cannot remove super admin'); return; }
-  if (!confirm('Remove admin rights for ' + email + '?')) return;
+  if (!confirm('⚠️ Remove admin rights for ' + email + '?\n\nThis person will lose all admin access.')) return;
+  if (!confirm('🛑 Final Confirmation\n\nAre you sure you want to revoke admin privileges for ' + email + '?')) return;
   let list = _getAdminList().filter(e => e.toLowerCase() !== email.toLowerCase());
   _saveAdminList(list);
   // Also remove permissions
@@ -14967,7 +14994,12 @@ function skOpenDetail(id, fromScreen) {
   // Admin actions
   if (isSkAdmin) {
     html += '<div class="sk-detail-section">' +
-      '<div class="sk-detail-section-title">🛡️ Admin Actions</div>' +
+      '<div class="admin-dropdown" id="skAdminDropdown">' +
+      '<div class="admin-dropdown-header" onclick="document.getElementById(\'skAdminDropdown\').classList.toggle(\'open\')">' +
+      '<div class="admin-dropdown-title">🛡️ Admin Actions</div>' +
+      '<div class="admin-dropdown-arrow">▼</div>' +
+      '</div>' +
+      '<div class="admin-dropdown-body">' +
       '<div style="font-size:0.72rem;color:var(--text3);margin-bottom:8px;">Status: <strong>' + _escHtml(l.status||'') + '</strong> ' + (l.verified?'· ✓ Verified':'') + '</div>' +
       '<div class="sk-admin-actions">';
     if (l.status!=='approved') html += '<button class="sk-admin-btn approve" onclick="skAdminAction(\'approve\')">✓ Approve</button>';
@@ -14977,7 +15009,7 @@ function skOpenDetail(id, fromScreen) {
     if (l.status!=='suspended') html += '<button class="sk-admin-btn suspend" onclick="skAdminAction(\'suspend\')">⏸ Suspend</button>';
     else html += '<button class="sk-admin-btn approve" onclick="skAdminAction(\'approve\')">Unsuspend</button>';
     html += '<button class="sk-admin-btn delete" onclick="skAdminAction(\'delete\')">🗑 Delete</button>';
-    html += '</div></div>';
+    html += '</div></div></div></div>';
   }
 
   html += '</div>'; // close sk-detail-body
@@ -15175,7 +15207,8 @@ function skAdminAction(action) {
       showToast('Listing suspended');
       break;
     case 'delete':
-      if (!confirm('Permanently delete this listing?')) return;
+      if (!confirm('⚠️ Delete this listing?\n\nThis will permanently remove this SevaKart listing and it cannot be recovered.')) return;
+      if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
       skListings = skListings.filter(x => x.id !== _skViewingId);
       _skSave();
       skCloseDetail();
@@ -16511,13 +16544,18 @@ function pcRenderDetail(reqId) {
 
   // Admin actions
   if (isAdminUser) {
-    html += `<div class="pc-admin-section" style="margin-top:16px;">
-      <div class="pc-admin-title">🛡️ Admin Actions</div>
-      <div class="pc-admin-btns">
-        ${req.status!=='approved' ? `<button class="pc-admin-btn" onclick="pcAdminApprove('${req.id}')">✅ Approve</button>` : ''}
-        <button class="pc-admin-btn" onclick="pcAdminStartReject('${req.id}')">❌ Reject</button>
-        <button class="pc-admin-btn" onclick="pcAdminHighlight('${req.id}')">${req.urgency==='urgent'?'Remove Urgent':'⚡ Mark Urgent'}</button>
-        <button class="pc-admin-btn" onclick="pcAdminRemove('${req.id}')">🗑️ Remove</button>
+    html += `<div class="admin-dropdown" id="pcAdminDropdown" style="margin-top:16px;">
+      <div class="admin-dropdown-header" onclick="document.getElementById('pcAdminDropdown').classList.toggle('open')">
+        <div class="admin-dropdown-title">🛡️ Admin Actions</div>
+        <div class="admin-dropdown-arrow">▼</div>
+      </div>
+      <div class="admin-dropdown-body">
+        <div class="pc-admin-btns">
+          ${req.status!=='approved' ? `<button class="pc-admin-btn" onclick="pcAdminApprove('${req.id}')">✅ Approve</button>` : ''}
+          <button class="pc-admin-btn" onclick="pcAdminStartReject('${req.id}')">❌ Reject</button>
+          <button class="pc-admin-btn" onclick="pcAdminHighlight('${req.id}')">${req.urgency==='urgent'?'Remove Urgent':'⚡ Mark Urgent'}</button>
+          <button class="pc-admin-btn" onclick="pcAdminRemove('${req.id}')">🗑️ Remove</button>
+        </div>
       </div>
     </div>`;
   }
@@ -16761,7 +16799,8 @@ function pcAdminHighlight(reqId) {
 }
 
 function pcAdminRemove(reqId) {
-  if (!confirm('Are you sure you want to remove this prayer request?')) return;
+  if (!confirm('⚠️ Remove this prayer request?\n\nThis will permanently remove this prayer request and all associated prayers.')) return;
+  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
   pcRequests = pcRequests.filter(r => r.id !== reqId);
   _pcSave();
   showToast('Prayer request removed');
