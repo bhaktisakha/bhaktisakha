@@ -998,6 +998,12 @@ body {
   font-family:inherit; font-size:0.88rem; outline:none; transition:border-color 0.2s;
 }
 .kirtan-search-inp:focus { border-color:var(--accent-blue); }
+
+/* Fade song list when search dropdown is open */
+.songs-search-active #songsContent,
+.songs-search-active .kirtan-actions {
+  opacity:0.15; pointer-events:none; transition:opacity 0.25s;
+}
 .kirtan-clear-btn {
   position:absolute; right:20px; background:none; border:none;
   color:var(--text3); font-size:0.8rem; cursor:pointer; padding:4px;
@@ -3838,19 +3844,14 @@ body {
 .adm-detail-stat-lbl { font-size:0.62rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.3px; margin-top:2px; }
 
 .adm-detail-list { padding:8px 18px; display:flex; flex-direction:column; gap:10px; }
-.adm-detail-empty {
-  text-align:center; padding:40px 20px; color:var(--text3);
-}
+.adm-detail-empty { text-align:center; padding:40px 20px; color:var(--text3); }
 .adm-detail-empty-icon { font-size:2rem; margin-bottom:8px; }
 
-/* Admin detail item card (full info, no accordion) */
 .adm-item-card {
   background:var(--bg2); border:1px solid var(--border); border-radius:14px;
   padding:16px; transition:all 0.2s;
 }
-.adm-item-card-top {
-  display:flex; align-items:flex-start; gap:12px; margin-bottom:10px;
-}
+.adm-item-card-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
 .adm-item-card-avatar {
   width:42px; height:42px; border-radius:12px; display:flex; align-items:center;
   justify-content:center; font-size:1.2rem; flex-shrink:0;
@@ -3861,9 +3862,7 @@ body {
   font-size:0.92rem; font-weight:600; color:var(--text);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.adm-item-card-meta {
-  display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;
-}
+.adm-item-card-meta { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
 .adm-item-card-meta-tag {
   font-size:0.64rem; padding:2px 8px; border-radius:6px;
   background:var(--bg3); color:var(--text3); border:1px solid var(--border);
@@ -3877,24 +3876,16 @@ body {
 .adm-item-card-status.approved { background:rgba(46,204,113,0.12); color:#2ecc71; }
 .adm-item-card-status.rejected { background:rgba(231,76,60,0.12); color:#e74c3c; }
 .adm-item-card-status.reported { background:rgba(192,57,43,0.12); color:#c0392b; }
-
-.adm-item-card-desc {
-  font-size:0.82rem; color:var(--text2); line-height:1.5; margin-bottom:12px;
-}
-.adm-item-card-actions {
-  display:flex; gap:8px; flex-wrap:wrap;
-}
+.adm-item-card-desc { font-size:0.82rem; color:var(--text2); line-height:1.5; margin-bottom:12px; }
+.adm-item-card-actions { display:flex; gap:8px; flex-wrap:wrap; }
 .adm-item-action-btn {
   padding:8px 16px; border-radius:10px; font-size:0.74rem; font-weight:600;
   cursor:pointer; transition:all 0.2s; border:1px solid var(--border);
   background:var(--bg3); color:var(--text2);
 }
 .adm-item-action-btn.approve { background:rgba(46,204,113,0.12); color:#2ecc71; border-color:rgba(46,204,113,0.25); }
-.adm-item-action-btn.approve:active { background:rgba(46,204,113,0.25); }
 .adm-item-action-btn.reject { background:rgba(231,76,60,0.08); color:#e74c3c; border-color:rgba(231,76,60,0.2); }
-.adm-item-action-btn.reject:active { background:rgba(231,76,60,0.2); }
 .adm-item-action-btn.review { background:rgba(167,139,250,0.1); color:var(--lavender); border-color:rgba(167,139,250,0.25); }
-.adm-item-action-btn.review:active { background:rgba(167,139,250,0.2); }
 
 .adm-section-body {
   max-height:0; overflow:hidden; transition:max-height 0.3s ease;
@@ -5209,8 +5200,6 @@ body {
         <div class="adm-header-title">Admin Dashboard</div>
         <div class="adm-header-sub">Manage approvals, reviews & moderation</div>
       </div>
-
-      <!-- Summary cards -->
       <div class="adm-summary" id="admSummary">
         <div class="adm-summary-card">
           <div class="adm-summary-num pending" id="admTotalPending">0</div>
@@ -5225,8 +5214,6 @@ body {
           <div class="adm-summary-lbl">Approved</div>
         </div>
       </div>
-
-      <!-- Feature sections container -->
       <div id="admSectionsContainer"></div>
     </div>
   </div>
@@ -7897,7 +7884,7 @@ function _songTitle(s) {
 function _getLyricSnippet(text, query) {
   if (!text || !query) return '';
   const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
-  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\\n])(' + escaped + ')(?:$|[\\s,;!?\\.\\-—\\n])', 'i');
+  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + ')(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
   const m = re.exec(text);
   if (!m) return '';
   const matchStart = text.indexOf(m[1], m.index);
@@ -8246,9 +8233,9 @@ function _buildSongCard(s, idx, searchQuery) {
   let snippetHtml = '';
   if (searchQuery) {
     const ql = searchQuery.toLowerCase();
-    const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
+    const titleMatch = _wholeWordMatch(s.title, ql) || _wholeWordMatch(s.officialName, ql) || (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql));
     if (!titleMatch) {
-      if (_lyricsWholeWordMatch(s.lyrics, ql)) {
+      if (_wholeWordMatch(s.lyrics, ql)) {
         snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'song-lyric-snippet');
       }
     }
@@ -8305,10 +8292,10 @@ function renderSongs(filter) {
   // Filter songs if search active
   const q = (filter !== undefined ? filter : document.getElementById('kirtanSearchInp')?.value || '').trim().toLowerCase();
   let pool = q ? songs.filter(s =>
-    (s.title||'').toLowerCase().includes(q) ||
-    (s.officialName||'').toLowerCase().includes(q) ||
-    (songLang !== 'en' && _songTitle(s).includes(q)) ||
-    _lyricsWholeWordMatch(s.lyrics, q)
+    _wholeWordMatch(s.title, q) ||
+    _wholeWordMatch(s.officialName, q) ||
+    (songLang !== 'en' && _wholeWordMatch(_songTitle(s), q)) ||
+    _wholeWordMatch(s.lyrics, q)
   ) : songs;
 
   let cards = '';
@@ -8611,44 +8598,51 @@ let _kirtanSearchTimer = null;
 function _kirtanSearchDebounced(q) {
   const clearBtn = document.getElementById('kirtanClearBtn');
   if (clearBtn) clearBtn.style.display = q ? '' : 'none';
-  if (!q.trim()) { kirtanSearch(q); return; }
+  if (!q.trim()) { clearTimeout(_kirtanSearchTimer); kirtanSearch(q); return; }
   if (q.endsWith(' ')) { clearTimeout(_kirtanSearchTimer); kirtanSearch(q); return; }
   clearTimeout(_kirtanSearchTimer);
   _kirtanSearchTimer = setTimeout(() => kirtanSearch(q), 400);
 }
 
-function _lyricsWholeWordMatch(lyrics, query) {
-  if (!lyrics || !query) return false;
+// Whole-word match helper — works for title, officialName, lyrics etc.
+function _wholeWordMatch(text, query) {
+  if (!text || !query) return false;
   const escaped = query.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
-  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\\n])' + escaped + '(?:$|[\\s,;!?\\.\\-—\\n])', 'i');
-  return re.test(lyrics);
+  const re = new RegExp('(?:^|[\\s,;!?\\.\\-—\'\"\\n])' + escaped + '(?:$|[\\s,;!?\\.\\-—\'\"\\n])', 'i');
+  return re.test(text);
+}
+
+function _setSearchFade(active) {
+  const screen = document.getElementById('screen-songs');
+  if (screen) screen.classList.toggle('songs-search-active', active);
 }
 
 function kirtanSearch(q) {
   const clearBtn = document.getElementById('kirtanClearBtn');
   if (clearBtn) clearBtn.style.display = q ? '' : 'none';
   const dd = document.getElementById('kirtanDropdown');
-  if (!q.trim()) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+  if (!q.trim()) { dd.classList.remove('open'); dd.innerHTML = ''; _setSearchFade(false); return; }
   const ql = q.trim().toLowerCase();
   const matches = songs.filter(s =>
-    (s.title||'').toLowerCase().includes(ql) ||
-    (s.officialName||'').toLowerCase().includes(ql) ||
-    (songLang !== 'en' && _songTitle(s).includes(ql)) ||
-    _lyricsWholeWordMatch(s.lyrics, ql)
+    _wholeWordMatch(s.title, ql) ||
+    _wholeWordMatch(s.officialName, ql) ||
+    (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql)) ||
+    _wholeWordMatch(s.lyrics, ql)
   ).slice(0, 12);
 
   if (!matches.length) {
-    dd.innerHTML = `<div class="kd-empty">No songs found for "${q}"</div>`;
+    dd.innerHTML = `<div class="kd-empty">No songs found for "${q.trim()}"</div>`;
   } else {
     dd.innerHTML = matches.map(s => {
       const escaped = ql.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&');
-      const hl = t => (t||'').replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+      const hlRe = new RegExp('(^|[\\s,;!?\\.\\-—\'\"\\n])(' + escaped + ')(?=$|[\\s,;!?\\.\\-—\'\"\\n])', 'gi');
+      const hl = t => (t||'').replace(hlRe, '$1<mark>$2</mark>');
       const meta = [s.author, s.book].filter(Boolean).join(' · ');
       const displayTitle = _songTitle(s);
-      const titleMatch = (s.title||'').toLowerCase().includes(ql) || (s.officialName||'').toLowerCase().includes(ql) || (songLang !== 'en' && _songTitle(s).toLowerCase().includes(ql));
+      const titleMatch = _wholeWordMatch(s.title, ql) || _wholeWordMatch(s.officialName, ql) || (songLang !== 'en' && _wholeWordMatch(_songTitle(s), ql));
       let snippetHtml = '';
       if (!titleMatch) {
-        if (_lyricsWholeWordMatch(s.lyrics, ql)) {
+        if (_wholeWordMatch(s.lyrics, ql)) {
           snippetHtml = _lyricSnippetHtml(s.lyrics, ql, 'kd-lyric-snippet');
         }
       }
@@ -8665,6 +8659,7 @@ function kirtanSearch(q) {
     }).join('');
   }
   dd.classList.add('open');
+  _setSearchFade(true);
 }
 
 function kirtanSelectFromDropdown(id) {
@@ -8677,6 +8672,7 @@ function kirtanSelectFromDropdown(id) {
 function kirtanHideDropdown() {
   const dd = document.getElementById('kirtanDropdown');
   if (dd) { dd.classList.remove('open'); }
+  _setSearchFade(false);
 }
 
 function kirtanClear() {
@@ -15035,7 +15031,6 @@ setTimeout(_skFetchFromServer, 2000);
 function renderAdminDashboard() {
   if (!isAdmin()) return;
 
-  // Gather counts
   const skPending = (typeof skListings !== 'undefined') ? skListings.filter(l => l.status === 'pending').length : 0;
   const skRep = (typeof skReports !== 'undefined') ? skReports.filter(r => !r.resolved).length : 0;
   const pcPending = pcRequests.filter(r => r.status === 'pending').length;
@@ -15053,43 +15048,38 @@ function renderAdminDashboard() {
   const container = document.getElementById('admSectionsContainer');
   let html = '';
 
-  // SevaKart nav card
   if (hasPermission('sevakart') || isAdmin()) {
-    const skIcon = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>';
-    html += `
-      <div class="adm-nav-card" onclick="switchScreen('admin-sevakart',null)">
-        <div class="adm-nav-card-header">
-          <div class="adm-section-icon sevakart">${skIcon}</div>
-          <div class="adm-section-info">
-            <div class="adm-section-name">SevaKart</div>
-            <div class="adm-section-status">${skPending > 0 ? skPending + ' pending approval' : 'All clear ✓'}</div>
-          </div>
-          <div class="adm-section-badge ${skPending === 0 ? 'zero' : ''}">${skPending}</div>
-          <div class="adm-nav-card-arrow">›</div>
+    const skIcon = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5"/></svg>';
+    html += `<div class="adm-nav-card" onclick="switchScreen('admin-sevakart',null)">
+      <div class="adm-nav-card-header">
+        <div class="adm-section-icon sevakart">${skIcon}</div>
+        <div class="adm-section-info">
+          <div class="adm-section-name">SevaKart</div>
+          <div class="adm-section-status">${skPending > 0 ? skPending + ' pending approval' : 'All clear ✓'}</div>
         </div>
-      </div>`;
+        <div class="adm-section-badge ${skPending === 0 ? 'zero' : ''}">${skPending}</div>
+        <div class="adm-nav-card-arrow">›</div>
+      </div>
+    </div>`;
   }
 
-  // Prayer Circle nav card
   if (hasPermission('prayer') || isAdmin()) {
-    const pcIcon = '<svg viewBox="0 0 48 48" width="20" height="20" fill="none"><circle cx="24" cy="24" r="22" stroke="#f0c850" stroke-width="2.5" fill="none" opacity="0.5"/><g transform="translate(24,25)" fill="#f0c850"><path d="M-1,-14 C-1,-11 -1.5,-8 -3,-5 C-4.5,-2 -6,1 -7,3.5 C-7.5,5 -7.5,6.5 -6.5,7.5 C-5.5,8.5 -4,8.5 -3,7.5 C-1.5,6 -0.5,3 -0.3,0 L-0.3,-14Z"/><path d="M1,-14 C1,-11 1.5,-8 3,-5 C4.5,-2 6,1 7,3.5 C7.5,5 7.5,6.5 6.5,7.5 C5.5,8.5 4,8.5 3,7.5 C1.5,6 0.5,3 0.3,0 L0.3,-14Z"/><rect x="-9.5" y="7" width="5" height="6" rx="1.2" transform="rotate(-25,-7,10)"/><rect x="4.5" y="7" width="5" height="6" rx="1.2" transform="rotate(25,7,10)"/></g></svg>';
-    html += `
-      <div class="adm-nav-card" onclick="switchScreen('admin-prayer',null)">
-        <div class="adm-nav-card-header">
-          <div class="adm-section-icon prayer">${pcIcon}</div>
-          <div class="adm-section-info">
-            <div class="adm-section-name">Prayer Circle</div>
-            <div class="adm-section-status">${pcPending > 0 ? pcPending + ' pending approval' : 'All clear ✓'}</div>
-          </div>
-          <div class="adm-section-badge ${pcPending === 0 ? 'zero' : ''}">${pcPending}</div>
-          <div class="adm-nav-card-arrow">›</div>
+    const pcIcon = '<svg viewBox="0 0 48 48" width="20" height="20" fill="none"><circle cx="24" cy="24" r="22" stroke="#f0c850" stroke-width="2.5" fill="none" opacity="0.5"/><g transform="translate(24,25)" fill="#f0c850"><path d="M-1,-14 C-1,-11 -1.5,-8 -3,-5 C-4.5,-2 -6,1 -7,3.5 C-7.5,5 -7.5,6.5 -6.5,7.5 C-5.5,8.5 -4,8.5 -3,7.5 C-1.5,6 -0.5,3 -0.3,0 L-0.3,-14Z"/><path d="M1,-14 C1,-11 1.5,-8 3,-5 C4.5,-2 6,1 7,3.5 C7.5,5 7.5,6.5 6.5,7.5 C5.5,8.5 4,8.5 3,7.5 C1.5,6 0.5,3 0.3,0 L0.3,-14Z"/></g></svg>';
+    html += `<div class="adm-nav-card" onclick="switchScreen('admin-prayer',null)">
+      <div class="adm-nav-card-header">
+        <div class="adm-section-icon prayer">${pcIcon}</div>
+        <div class="adm-section-info">
+          <div class="adm-section-name">Prayer Circle</div>
+          <div class="adm-section-status">${pcPending > 0 ? pcPending + ' pending approval' : 'All clear ✓'}</div>
         </div>
-      </div>`;
+        <div class="adm-section-badge ${pcPending === 0 ? 'zero' : ''}">${pcPending}</div>
+        <div class="adm-nav-card-arrow">›</div>
+      </div>
+    </div>`;
   }
 
   container.innerHTML = html;
 
-  // --- Users Section (accordion, kept as-is) ---
   if (hasPermission('users') || isSuperAdmin()) {
     const usersHtml = `
       <div class="adm-section expanded" id="admSec-users">
@@ -15133,17 +15123,14 @@ function admSkSwitchTab(tab) {
 
 function renderAdminSevakart() {
   const skPending = (typeof skListings !== 'undefined') ? skListings.filter(l => l.status === 'pending') : [];
-  const skApproved = (typeof skListings !== 'undefined') ? skListings.filter(l => l.status === 'approved') : [];
   const skVerified = (typeof skListings !== 'undefined') ? skListings.filter(l => l.verified) : [];
   const skRep = (typeof skReports !== 'undefined') ? skReports.filter(r => !r.resolved) : [];
   const skTotal = (typeof skListings !== 'undefined') ? skListings.length : 0;
 
-  // Badge
   const badge = document.getElementById('admSkBadge');
   badge.textContent = skPending.length;
   badge.className = 'adm-detail-badge' + (skPending.length === 0 ? ' zero' : '');
 
-  // Stats
   document.getElementById('admSkStats').innerHTML = `
     <div class="adm-detail-stat"><div class="adm-detail-stat-num">${skTotal}</div><div class="adm-detail-stat-lbl">Total</div></div>
     <div class="adm-detail-stat"><div class="adm-detail-stat-num" style="color:${skPending.length ? '#f39c12' : 'var(--text)'}">${skPending.length}</div><div class="adm-detail-stat-lbl">Pending</div></div>
@@ -15152,7 +15139,6 @@ function renderAdminSevakart() {
   `;
 
   const list = document.getElementById('admSkList');
-
   if (_admSkTab === 'pending') {
     if (!skPending.length) {
       list.innerHTML = '<div class="adm-detail-empty"><div class="adm-detail-empty-icon">✅</div><div>No pending listings</div></div>';
@@ -15184,7 +15170,6 @@ function renderAdminSevakart() {
       }).join('');
     }
   } else {
-    // Reported tab
     const unresolvedReports = skReports.filter(r => !r.resolved);
     const reportedIds = [...new Set(unresolvedReports.map(r => r.listingId))];
     const reported = skListings.filter(l => reportedIds.includes(l.id));
@@ -15224,7 +15209,6 @@ function _admSkQuickApprove(id) {
   showToast('✅ Listing approved');
   renderAdminSevakart();
 }
-
 function _admSkQuickReject(id) {
   const l = skListings.find(x => x.id === id);
   if (!l) return;
@@ -15245,17 +15229,14 @@ function admPcSwitchTab(tab) {
 
 function renderAdminPrayer() {
   const pcPending = pcRequests.filter(r => r.status === 'pending');
-  const pcApproved = pcRequests.filter(r => r.status === 'approved');
   const pcAnswered = pcRequests.filter(r => r.answered);
   const pcRep = pcReports.filter(r => !r.resolved);
   const pcTotal = pcRequests.length;
 
-  // Badge
   const badge = document.getElementById('admPcBadge');
   badge.textContent = pcPending.length;
   badge.className = 'adm-detail-badge' + (pcPending.length === 0 ? ' zero' : '');
 
-  // Stats
   document.getElementById('admPcStats').innerHTML = `
     <div class="adm-detail-stat"><div class="adm-detail-stat-num">${pcTotal}</div><div class="adm-detail-stat-lbl">Total</div></div>
     <div class="adm-detail-stat"><div class="adm-detail-stat-num" style="color:${pcPending.length ? '#f39c12' : 'var(--text)'}">${pcPending.length}</div><div class="adm-detail-stat-lbl">Pending</div></div>
@@ -15264,7 +15245,6 @@ function renderAdminPrayer() {
   `;
 
   const list = document.getElementById('admPcList');
-
   if (_admPcTab === 'pending') {
     if (!pcPending.length) {
       list.innerHTML = '<div class="adm-detail-empty"><div class="adm-detail-empty-icon">✅</div><div>No pending prayer requests</div></div>';
@@ -15295,7 +15275,6 @@ function renderAdminPrayer() {
       }).join('');
     }
   } else {
-    // Reported tab
     const unresolvedReports = pcReports.filter(r => !r.resolved);
     if (!unresolvedReports.length) {
       list.innerHTML = '<div class="adm-detail-empty"><div class="adm-detail-empty-icon">✅</div><div>No reported prayer requests</div></div>';
@@ -16192,7 +16171,6 @@ function pcAdminReject() {
   closeModal('pcAdminRejectModal');
   showToast('❌ Prayer request rejected');
   pcRenderFeed();
-  // Re-render admin prayer screen if visible
   const admPcScreen = document.getElementById('screen-admin-prayer');
   if (admPcScreen && admPcScreen.classList.contains('active')) renderAdminPrayer();
 }
