@@ -6035,11 +6035,11 @@ body {
     </div>
     <div class="todo-modal-field" style="display:flex;align-items:center;gap:10px;">
       <label class="todo-modal-label" style="margin:0;">Reminder</label>
-      <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;">
-        <input type="checkbox" id="tdReminder" style="display:none;">
-        <span style="position:absolute;inset:0;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;transition:all 0.3s;cursor:pointer;" onclick="this.previousElementSibling.checked=!this.previousElementSibling.checked;this.style.background=this.previousElementSibling.checked?'var(--todo-rose)':'var(--bg3)';this.style.borderColor=this.previousElementSibling.checked?'var(--todo-rose)':'var(--border)'"></span>
-        <span style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform 0.3s;pointer-events:none;" id="tdReminderDot"></span>
-      </label>
+      <div id="tdReminderSwitch" style="position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;" onclick="tdToggleReminder()">
+        <div id="tdReminderTrack" style="position:absolute;inset:0;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;transition:all 0.3s;"></div>
+        <div id="tdReminderDot" style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:all 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+      </div>
+      <input type="checkbox" id="tdReminder" style="display:none;">
     </div>
     <div id="tdNaturalParsed" style="font-size:0.72rem;color:var(--todo-rose-light);padding:4px 0 8px;display:none;"></div>
     <button class="todo-modal-save" onclick="tdSaveTask()">Save Task</button>
@@ -6088,6 +6088,19 @@ body {
     <button class="todo-modal-save" onclick="tdSaveSpGoal()">Set Goal</button>
     <button class="f-cancel" onclick="closeModal('todoSpModal')" style="margin-top:8px;">Cancel</button>
     <input type="hidden" id="tdSpEditId">
+  </div>
+</div>
+
+<!-- Task Detail Popup -->
+<div class="modal-overlay" id="todoDetailModal">
+  <div class="modal-sheet" style="max-height:80vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div id="todoDetailContent"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button id="tdDetailCompleteBtn" class="todo-modal-save" style="flex:1;" onclick="tdCompleteFromDetail()">✓ Completed</button>
+      <button id="tdDetailRepeatBtn" style="flex:1;padding:13px;border:1.5px solid rgba(232,120,154,0.35);border-radius:12px;background:rgba(232,120,154,0.08);color:var(--todo-rose-light);font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onclick="tdRepeatTomorrow()">↻ Repeat Tomorrow</button>
+    </div>
+    <button class="f-cancel" onclick="closeModal('todoDetailModal')" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
@@ -17974,8 +17987,8 @@ function _tdItemHTML(task, isOverdue) {
   if (task.date && task.date !== _tdToday()) metaParts.push(`<span class="todo-meta-time">📅 ${_tdFormatDate(task.date)}</span>`);
   if (task.recur) metaParts.push(`<span class="todo-meta-recur">🔄 ${task.recur}</span>`);
   return `<div class="todo-item ${task.done?'done':''} ${overdue?'overdue':''}" data-id="${task.id}">
-    <div class="todo-item-check ${task.done?'checked':''}" onclick="event.stopPropagation();tdToggleTask('${task.id}')"></div>
-    <div class="todo-item-body" onclick="tdEditTask('${task.id}')">
+    <div class="todo-item-check ${task.done?'checked':''}" onclick="event.stopPropagation();tdOpenDetailPopup('${task.id}')"></div>
+    <div class="todo-item-body" onclick="tdOpenDetailPopup('${task.id}')">
       <div class="todo-item-title">${task.title}</div>
       ${metaParts.length ? '<div class="todo-item-meta">' + metaParts.join('') + '</div>' : ''}
     </div>
@@ -17985,6 +17998,118 @@ function _tdItemHTML(task, isOverdue) {
 }
 
 // ── Task Operations ──
+let _tdDetailId = null;
+
+function tdToggleReminder() {
+  const cb = document.getElementById('tdReminder');
+  const track = document.getElementById('tdReminderTrack');
+  const dot = document.getElementById('tdReminderDot');
+  cb.checked = !cb.checked;
+  if (cb.checked) {
+    track.style.background = 'var(--todo-rose)';
+    track.style.borderColor = 'var(--todo-rose)';
+    dot.style.transform = 'translateX(20px)';
+  } else {
+    track.style.background = 'var(--bg3)';
+    track.style.borderColor = 'var(--border)';
+    dot.style.transform = 'translateX(0)';
+  }
+}
+
+function _tdResetReminderUI(isOn) {
+  const track = document.getElementById('tdReminderTrack');
+  const dot = document.getElementById('tdReminderDot');
+  const cb = document.getElementById('tdReminder');
+  if (!track || !dot || !cb) return;
+  cb.checked = !!isOn;
+  if (isOn) {
+    track.style.background = 'var(--todo-rose)';
+    track.style.borderColor = 'var(--todo-rose)';
+    dot.style.transform = 'translateX(20px)';
+  } else {
+    track.style.background = 'var(--bg3)';
+    track.style.borderColor = 'var(--border)';
+    dot.style.transform = 'translateX(0)';
+  }
+}
+
+function tdOpenDetailPopup(id) {
+  const t = tdTasks.find(x => x.id === id);
+  if (!t) return;
+  _tdDetailId = id;
+  const c = document.getElementById('todoDetailContent');
+  const priLabel = t.priority === 'high' ? '🔴 High' : t.priority === 'medium' ? '🟡 Medium' : '🔵 Low';
+  const priColor = t.priority === 'high' ? '#e74c3c' : t.priority === 'medium' ? '#f39c12' : '#3498db';
+  let html = `<div style="text-align:center;margin-bottom:14px;">
+    <div style="font-size:1.6rem;margin-bottom:6px;">${t.category === 'Spiritual' ? '🙏' : t.category === 'Temple Seva' ? '🛕' : t.category === 'Health' ? '💪' : t.category === 'Family' ? '👨‍👩‍👧' : t.category === 'Work' ? '💼' : '📋'}</div>
+    <div style="font-size:1.05rem;font-weight:600;color:var(--text);line-height:1.4;">${t.title}</div>
+  </div>`;
+  // Details grid
+  html += '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:8px;">';
+  if (t.category) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Category</span><span style="font-size:0.76rem;color:var(--todo-rose-light);font-weight:500;">${t.category}</span></div>`;
+  if (t.date) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Due Date</span><span style="font-size:0.76rem;color:var(--text);font-weight:500;">📅 ${_tdFormatDate(t.date)}</span></div>`;
+  if (t.time) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Time</span><span style="font-size:0.76rem;color:var(--text);font-weight:500;">⏰ ${_tdFormatTime(t.time)}</span></div>`;
+  html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Priority</span><span style="font-size:0.76rem;color:${priColor};font-weight:600;">${priLabel}</span></div>`;
+  if (t.recur) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Recurring</span><span style="font-size:0.76rem;color:var(--accent-blue);font-weight:500;">🔄 ${t.recur}</span></div>`;
+  if (t.reminder) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Reminder</span><span style="font-size:0.76rem;color:var(--accent-green);font-weight:500;">🔔 On</span></div>`;
+  if (t.project) {
+    const proj = tdProjects.find(p => p.id === t.project);
+    if (proj) html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:0.76rem;color:var(--text3);">Project</span><span style="font-size:0.76rem;color:var(--text);font-weight:500;">📁 ${proj.name}</span></div>`;
+  }
+  html += '</div>';
+  if (t.notes) {
+    html += `<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+      <div style="font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Notes</div>
+      <div style="font-size:0.82rem;color:var(--text);line-height:1.5;">${t.notes}</div>
+    </div>`;
+  }
+  // Edit button
+  html += `<button style="width:100%;padding:10px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.04);color:var(--text2);font-size:0.8rem;cursor:pointer;font-family:inherit;margin-top:4px;" onclick="closeModal('todoDetailModal');tdEditTask('${t.id}')">✎ Edit Task</button>`;
+  c.innerHTML = html;
+  // Toggle buttons based on done state
+  document.getElementById('tdDetailCompleteBtn').textContent = t.done ? '↩ Reopen Task' : '✓ Completed';
+  document.getElementById('todoDetailModal').classList.add('open');
+}
+
+function tdCompleteFromDetail() {
+  if (!_tdDetailId) return;
+  const t = tdTasks.find(x => x.id === _tdDetailId);
+  if (!t) return;
+  t.done = !t.done;
+  t.doneDate = t.done ? Date.now() : null;
+  _tdSave();
+  closeModal('todoDetailModal');
+  tdRenderTab();
+  _updateHomeTodoWidget();
+  showToast(t.done ? '✓ Task completed! Hare Krishna!' : 'Task reopened');
+}
+
+function tdRepeatTomorrow() {
+  if (!_tdDetailId) return;
+  const t = tdTasks.find(x => x.id === _tdDetailId);
+  if (!t) return;
+  // Mark current as done
+  t.done = true;
+  t.doneDate = Date.now();
+  // Create copy for tomorrow
+  const tmr = new Date();
+  tmr.setDate(tmr.getDate() + 1);
+  const newTask = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    title: t.title, notes: t.notes,
+    date: tmr.toISOString().slice(0,10),
+    time: t.time, category: t.category, recur: t.recur,
+    priority: t.priority, reminder: t.reminder, project: t.project,
+    done: false, created: Date.now()
+  };
+  tdTasks.push(newTask);
+  _tdSave();
+  closeModal('todoDetailModal');
+  tdRenderTab();
+  _updateHomeTodoWidget();
+  showToast('✓ Completed & repeated for tomorrow');
+}
+
 function tdToggleTask(id) {
   const t = tdTasks.find(x => x.id === id);
   if (!t) return;
@@ -18012,11 +18137,11 @@ function tdOpenAddModal() {
   document.getElementById('tdTime').value = '';
   document.getElementById('tdCategory').value = 'Personal';
   document.getElementById('tdRecur').value = '';
-  document.getElementById('tdReminder').checked = false;
   document.getElementById('tdEditId').value = '';
   document.getElementById('tdDeleteBtn').style.display = 'none';
   document.getElementById('todoModalTitle').textContent = '✦ Add Task';
   document.getElementById('tdNaturalParsed').style.display = 'none';
+  _tdResetReminderUI(false);
   // Update priority selector
   document.querySelectorAll('.todo-pri-opt').forEach(o => o.classList.remove('active'));
   document.querySelector('.todo-pri-opt.pri-medium').classList.add('active');
@@ -18036,7 +18161,7 @@ function tdEditTask(id) {
   document.getElementById('tdTime').value = t.time || '';
   document.getElementById('tdCategory').value = t.category || 'Personal';
   document.getElementById('tdRecur').value = t.recur || '';
-  document.getElementById('tdReminder').checked = t.reminder || false;
+  _tdResetReminderUI(t.reminder || false);
   document.getElementById('tdEditId').value = id;
   document.getElementById('tdDeleteBtn').style.display = '';
   document.getElementById('todoModalTitle').textContent = '✦ Edit Task';
