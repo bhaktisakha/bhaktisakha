@@ -1532,6 +1532,13 @@ body {
 .toggle input[type=checkbox]:checked::before {
   background:var(--accent-blue); transform:translateX(20px);
 }
+/* Colored toggle variants for tab-specific reminders */
+.tog-prayer input[type=checkbox]:checked { background:rgba(240,200,80,0.4); border-color:#f0c850; }
+.tog-prayer input[type=checkbox]:checked::before { background:#f0c850; }
+.tog-events input[type=checkbox]:checked { background:rgba(94,232,160,0.4); border-color:#5ee8a0; }
+.tog-events input[type=checkbox]:checked::before { background:#5ee8a0; }
+.tog-todo input[type=checkbox]:checked { background:rgba(248,164,188,0.4); border-color:#f8a4bc; }
+.tog-todo input[type=checkbox]:checked::before { background:#f8a4bc; }
 .tog-slider { display:none; }
 
 /* About Modal */
@@ -5458,21 +5465,19 @@ body {
           </div>
           <label class="toggle"><input type="checkbox" id="n-rahu" onchange="saveS()"></label>
         </div>
-        <div class="notif-divider"></div>
         <div class="sett-row">
           <div class="sett-info">
             <div class="sett-name" style="color:#f0c850;">Prayer Circle Alerts</div>
-            <div class="sett-desc">Get notified about new prayer requests from devotees</div>
+            <div class="sett-desc">Get notified about new prayer requests</div>
           </div>
-          <label class="toggle"><input type="checkbox" id="n-prayer" checked onchange="saveS()"></label>
+          <label class="toggle tog-prayer"><input type="checkbox" id="n-prayer" checked onchange="saveS()"></label>
         </div>
-        <div class="notif-divider"></div>
         <div class="sett-row">
           <div class="sett-info">
             <div class="sett-name" style="color:#5ee8a0;">My Events Reminders</div>
             <div class="sett-desc" id="desc-myevents">Reminders for your personal calendar events</div>
           </div>
-          <label class="toggle"><input type="checkbox" id="n-myevents" checked onchange="saveS()"></label>
+          <label class="toggle tog-events"><input type="checkbox" id="n-myevents" checked onchange="saveS()"></label>
         </div>
         <input type="checkbox" id="n-custom" checked style="display:none;">
         <div class="sett-row">
@@ -5480,7 +5485,7 @@ body {
             <div class="sett-name" style="color:#f8a4bc;">My To-Do Reminders</div>
             <div class="sett-desc" id="desc-mytodo">Remind at each task's set time on its due date</div>
           </div>
-          <label class="toggle"><input type="checkbox" id="n-mytodo" checked onchange="saveS()"></label>
+          <label class="toggle tog-todo"><input type="checkbox" id="n-mytodo" checked onchange="saveS()"></label>
         </div>
       </div>
     </div>
