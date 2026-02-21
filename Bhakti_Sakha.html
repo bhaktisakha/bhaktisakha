@@ -8694,7 +8694,8 @@ function deleteSongFromDetail() {
   if (!_currentSongId) return;
   const s = songs.find(x => x.id === _currentSongId);
   if (!s) return;
-  if (!confirm('Delete "' + s.title + '"?')) return;
+  if (!confirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.')) return;
+  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
   const deletedId = _currentSongId;
   songs = songs.filter(x => x.id !== _currentSongId);
   localStorage.setItem('songs', JSON.stringify(songs));
@@ -8902,7 +8903,8 @@ function openEditSong(id) {
 function deleteSong(id) {
   const s = songs.find(s => s.id === id);
   if (!s) return;
-  if (!confirm('Delete "' + s.title + '"?')) return;
+  if (!confirm('⚠️ Delete "' + s.title + '"?\n\nThis song will be permanently removed from the shared library.')) return;
+  if (!confirm('🛑 Final Confirmation\n\nAre you absolutely sure? This action is irreversible.')) return;
   songs = songs.filter(s => s.id !== id);
   localStorage.setItem('songs', JSON.stringify(songs));
   renderSongs();
