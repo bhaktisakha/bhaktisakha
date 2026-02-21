@@ -1106,56 +1106,49 @@ body {
 /* Event cards */
 .evt-card {
   background:var(--card); border:1px solid var(--border);
-  border-radius:14px; padding:13px 14px; margin-bottom:10px;
-  display:flex; align-items:center; gap:12px;
+  border-radius:22px; padding:7px 10px; margin-bottom:5px;
+  display:flex; align-items:center; gap:8px;
   transition:all 0.2s; position:relative; overflow:hidden;
+  border-left:3px solid var(--border);
 }
-.evt-card::before {
-  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  border-radius:3px 0 0 3px;
-}
-.evt-card.cat-spiritual::before { background:#e8a020; }
-.evt-card.cat-health::before { background:#27ae60; }
-.evt-card.cat-work::before { background:#3d7fd4; }
-.evt-card.cat-personal::before { background:#f0c040; }
-.evt-card.cat-travel::before { background:#9b59b6; }
-.evt-card.cat-birthday::before { background:#e74c8b; }
-.evt-card.cat-anniversary::before { background:#e8a020; }
-.evt-card.cat-default::before { background:#5ee8a0; }
+.evt-card::before { display:none; }
+.evt-card.cat-spiritual  { border-left-color:#e8a020; }
+.evt-card.cat-health     { border-left-color:#27ae60; }
+.evt-card.cat-work       { border-left-color:#3d7fd4; }
+.evt-card.cat-personal   { border-left-color:#f0c040; }
+.evt-card.cat-travel     { border-left-color:#9b59b6; }
+.evt-card.cat-birthday   { border-left-color:#e74c8b; }
+.evt-card.cat-anniversary{ border-left-color:#e8a020; }
+.evt-card.cat-default    { border-left-color:#5ee8a0; }
 .evt-card:active { transform:scale(0.985); }
-.evt-emoji { font-size:1.5rem; flex-shrink:0; width:38px; text-align:center; }
-.evt-info { flex:1; min-width:0; }
-.evt-name-text { font-size:0.92rem; color:var(--text); font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.evt-time-text { font-size:0.76rem; color:var(--accent-gold); font-weight:500; margin-bottom:2px; }
-.evt-date { font-size:0.76rem; color:var(--text3); }
-.evt-type-badge {
-  display:inline-block; font-size:0.62rem; font-weight:600;
-  border-radius:20px; padding:2px 8px; letter-spacing:0.3px;
-  text-transform:uppercase; margin-bottom:3px;
-}
-.evt-type-badge.badge-spiritual { background:rgba(232,160,32,0.15); color:#e8a020; border:1px solid rgba(232,160,32,0.25); }
-.evt-type-badge.badge-health { background:rgba(39,174,96,0.12); color:#27ae60; border:1px solid rgba(39,174,96,0.25); }
-.evt-type-badge.badge-work { background:rgba(61,127,212,0.12); color:#3d7fd4; border:1px solid rgba(61,127,212,0.25); }
-.evt-type-badge.badge-personal { background:rgba(240,192,64,0.12); color:#dab030; border:1px solid rgba(240,192,64,0.25); }
-.evt-type-badge.badge-travel { background:rgba(155,89,182,0.12); color:#9b59b6; border:1px solid rgba(155,89,182,0.25); }
-.evt-type-badge.badge-birthday { background:rgba(231,76,139,0.12); color:#e74c8b; border:1px solid rgba(231,76,139,0.2); }
-.evt-type-badge.badge-anniversary { background:rgba(232,160,32,0.12); color:#e8a020; border:1px solid rgba(232,160,32,0.2); }
+.evt-emoji { font-size:0.95rem; flex-shrink:0; width:24px; text-align:center; }
+.evt-info { flex:1; min-width:0; display:flex; align-items:center; gap:6px; }
+.evt-name-text { font-size:0.78rem; color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1; }
+.evt-time-text { font-size:0.64rem; color:var(--accent-gold); font-weight:500; white-space:nowrap; flex-shrink:0; }
+.evt-date { font-size:0.6rem; color:var(--text3); white-space:nowrap; flex-shrink:0; }
+.evt-type-badge { display:none; }
 .evt-countdown {
-  font-size:0.68rem; color:var(--accent-gold); font-weight:600;
-  background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.2);
-  border-radius:8px; padding:3px 8px; white-space:nowrap; flex-shrink:0;
+  font-size:0.55rem; color:#2ecc71; font-weight:700;
+  white-space:nowrap; flex-shrink:0;
 }
 .evt-card-actions {
-  display:flex; flex-direction:column; gap:5px; flex-shrink:0;
+  display:flex; flex-direction:row; gap:4px; flex-shrink:0;
 }
 .evt-del {
-  background:transparent; border:1px solid var(--border);
-  border-radius:8px; width:30px; height:30px;
+  background:transparent; border:none;
+  width:24px; height:24px;
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:0.85rem; color:var(--text2);
+  cursor:pointer; font-size:0.68rem; color:var(--text3);
   transition:all 0.15s;
 }
-.evt-del:active { background:rgba(255,255,255,0.06); }
+.evt-del:active { background:rgba(255,255,255,0.06); border-radius:6px; }
+/* Occasion cards (birthday/anniversary tab) need multi-line layout */
+.evt-card.evt-occasion { border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+.evt-card.evt-occasion .evt-info { display:block; }
+.evt-card.evt-occasion .evt-emoji { font-size:1.2rem; width:32px; }
+.evt-card.evt-occasion .evt-name-text { font-size:0.84rem; margin-bottom:2px; }
+.evt-card.evt-occasion .evt-date { font-size:0.68rem; display:inline; }
+.evt-card.evt-occasion .evt-countdown { font-size:0.6rem; }
 
 /* Floating add button */
 .evt-fab {
@@ -9205,10 +9198,9 @@ function _evtCardHTML(e, showTime, showCountdown, contextDateStr) {
     <div class="evt-emoji">${icon}</div>
     <div class="evt-info">
       <div class="evt-name-text">${name}${multiBadge}</div>
-      ${timeStr?'<div class="evt-time-text">'+timeStr+'</div>':''}
-      <span class="evt-type-badge ${badgeClass}">${label}</span>
-      <div class="evt-date">${dateStr}${e.location?' · 📍'+e.location:''}</div>
+      ${timeStr?'<span class="evt-time-text">'+timeStr+'</span>':''}
     </div>
+    <div class="evt-date">${dateStr}</div>
     ${countdown}
     <div class="evt-card-actions">
       <button class="evt-del" onclick="editEvt(${e.id})" title="Edit">✏️</button>
@@ -9234,7 +9226,7 @@ function evtRenderOccasions() {
     const dateStr = MONTHS_SHORT[e.month]+' '+e.day+(e.year?', '+e.year:'');
     const reminder = e.reminderDays!=null ? e.reminderDays : 1;
     const reminderLabel = reminder===0?'Same day':reminder===1?'1 day before':reminder+' days before';
-    return `<div class="evt-card ${catClass}">
+    return `<div class="evt-card evt-occasion ${catClass}">
       <div class="evt-emoji">${icon}</div>
       <div class="evt-info">
         <div class="evt-name-text">${name}</div>
