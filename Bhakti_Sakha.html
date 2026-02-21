@@ -3189,12 +3189,25 @@ body {
 .sk-screen { flex:1; overflow-y:auto; padding-bottom:70px; }
 .sk-header {
   text-align:center; padding:18px 18px 12px;
-  background:linear-gradient(180deg, rgba(180,120,40,0.08) 0%, transparent 100%);
+  background:linear-gradient(180deg, rgba(212,160,23,0.06) 0%, transparent 100%);
 }
-.sk-title { font-family:'Philosopher',serif; font-size:1.36rem; font-weight:700;
-  background:linear-gradient(135deg, #d4a017, #f0d060, #d4a017);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.sk-subtitle { font-size:0.78rem; color:var(--text3); letter-spacing:1.5px; margin-top:2px; }
+.sk-tagline-ornament {
+  font-size:0.7rem; color:rgba(212,160,23,0.35); letter-spacing:8px; margin-bottom:8px;
+}
+.sk-tagline-text {
+  font-family:'Philosopher',serif; font-size:1rem; font-weight:700;
+  background:linear-gradient(135deg, #d4a017 0%, #f0d060 50%, #d4a017 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  letter-spacing:1px;
+}
+.sk-tagline-divider {
+  width:50px; height:2px; margin:10px auto 0;
+  background:linear-gradient(90deg, transparent, rgba(212,160,23,0.4), transparent);
+  border-radius:2px;
+}
+/* Legacy compat */
+.sk-title { display:none; }
+.sk-subtitle { display:none; }
 .sk-search-bar {
   display:flex; gap:8px; padding:8px 18px 12px; align-items:center;
 }
@@ -4303,7 +4316,10 @@ body {
 
 <header class="header">
   <div class="header-date-wrap">
-    <div class="header-date" id="headerDate">18 February 2026</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:7px;">
+      <span id="headerScreenIcon" style="display:none;line-height:0;"></span>
+      <div class="header-date" id="headerDate">18 February 2026</div>
+    </div>
     <div class="header-masa" id="headerMasa"></div>
   </div>
   <div class="header-icons" id="headerIcons">
@@ -5168,8 +5184,9 @@ body {
   <div class="screen" id="screen-sevakart">
     <div class="sk-screen">
       <div class="sk-header">
-        <div class="sk-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>SevaKart</div>
-        <div class="sk-subtitle">Devotees Supporting Devotees</div>
+        <div class="sk-tagline-ornament">✦ ✦ ✦</div>
+        <div class="sk-tagline-text">Devotees Supporting Devotees</div>
+        <div class="sk-tagline-divider"></div>
       </div>
       <div class="sk-actions">
         <button class="sk-action-btn" onclick="skStartListing()">🪔 List Your Service</button>
@@ -12755,6 +12772,7 @@ function switchScreen(name, btn) {
       hdr.style.background = '';
       hdr.style.borderBottomColor = '';
       headerDate.style.color = '';
+      document.getElementById('headerScreenIcon').style.display = 'none';
     } else {
       headerDate.textContent = TITLES[name] || name;
       headerIcons.style.display = 'none';
@@ -12764,6 +12782,16 @@ function switchScreen(name, btn) {
       headerDate.style.color = sc;
       hdr.style.background = `linear-gradient(135deg, ${sc}0a, ${sc}04, var(--bg2))`;
       hdr.style.borderBottomColor = sc + '18';
+
+      // Show screen icon for SevaKart screens
+      const iconEl = document.getElementById('headerScreenIcon');
+      const SK_SCREENS = ['sevakart','sevakart-detail','sevakart-mylistings','admin-sevakart'];
+      if (SK_SCREENS.includes(name)) {
+        iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5ce0f0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>';
+        iconEl.style.display = '';
+      } else {
+        iconEl.style.display = 'none';
+      }
     }
   }
 
