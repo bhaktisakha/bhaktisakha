@@ -6322,7 +6322,8 @@ async function _syncAdminConfigToServer() {
       body: JSON.stringify({
         action: 'saveAdminConfig',
         adminEmails: _getAdminList(),
-        adminPermissions: _getAdminPermissions()
+        adminPermissions: _getAdminPermissions(),
+        imgbbApiKey: _getImgbbKey() || ''
       })
     });
   } catch(e) { console.warn('Admin config sync error:', e); }
@@ -6361,6 +6362,11 @@ async function _fetchAdminConfigFromServer(retryCount) {
     // Update UI everywhere
     updateAdminUI();
     updateHomeGoogleUI();
+
+    // Restore ImgBB API key from server config
+    if (data.imgbbApiKey && !_getImgbbKey()) {
+      _setImgbbKey(data.imgbbApiKey);
+    }
   } catch(e) {
     console.warn('Admin config fetch error:', e);
     // Retry up to 3 times with increasing delay
@@ -14280,6 +14286,60 @@ let _skReviewRating = 0;
 let _skRejectingId = null;
 let _skEditingId = null;
 
+// ---- ImgBB Photo Hosting ----
+// API key stored in admin config, synced to all devices
+// Get your free API key from https://api.imgbb.com/
+function _getImgbbKey() {
+  return localStorage.getItem('imgbbApiKey') || '';
+}
+function _setImgbbKey(key) {
+  localStorage.setItem('imgbbApiKey', key.trim());
+}
+
+async function _skUploadToImgBB(base64Data) {
+  const apiKey = _getImgbbKey();
+  if (!apiKey) {
+    throw new Error('ImgBB API key not configured');
+  }
+  // Strip data:image/jpeg;base64, prefix if present
+  const cleanBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+  const formData = new FormData();
+  formData.append('key', apiKey);
+  formData.append('image', cleanBase64);
+
+  const resp = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: formData
+  });
+  const data = await resp.json();
+  if (!data.success) throw new Error(data.error?.message || 'Upload failed');
+  return data.data.display_url; // permanent public URL
+}
+
+// Upload all photos, returns array of URLs
+async function _skUploadAllPhotos(photoDataArr, onProgress) {
+  const urls = [];
+  const toUpload = photoDataArr.filter(Boolean);
+  for (let i = 0; i < toUpload.length; i++) {
+    if (onProgress) onProgress(i + 1, toUpload.length);
+    const p = toUpload[i];
+    // If already a URL (edit mode), keep it
+    if (p.startsWith('http://') || p.startsWith('https://')) {
+      urls.push(p);
+      continue;
+    }
+    // Upload base64 to ImgBB
+    try {
+      const url = await _skUploadToImgBB(p);
+      urls.push(url);
+    } catch(e) {
+      console.error('Photo upload failed:', e);
+      // Continue with remaining photos
+    }
+  }
+  return urls;
+}
+
 function _skSave() {
   localStorage.setItem('skListings', JSON.stringify(skListings));
   localStorage.setItem('skReviews', JSON.stringify(skReviews));
@@ -14312,8 +14372,12 @@ function _skEmbedMeta(listing) {
   for (const f of SK_META_FIELDS) {
     if (l[f] !== undefined && l[f] !== null) meta[f] = l[f];
   }
-  // Also save photos length (not full base64, too big)
-  if (l.photos && l.photos.length) meta.photoCount = l.photos.length;
+  // Store photo URLs (only URLs, not base64 — safe to embed)
+  if (l.photos && l.photos.length) {
+    const urls = l.photos.filter(p => p && (p.startsWith('http://') || p.startsWith('https://')));
+    if (urls.length) meta.photoUrls = urls;
+    meta.photoCount = l.photos.length;
+  }
   // Embed into fullDesc
   l.fullDesc = desc + '\n<!--SKMETA:' + JSON.stringify(meta) + '-->';
   return l;
@@ -14331,6 +14395,12 @@ function _skExtractMeta(listing) {
       for (const [key, val] of Object.entries(meta)) {
         if ((l[key] === undefined || l[key] === null || l[key] === '') && val !== undefined && val !== null) {
           l[key] = val;
+        }
+      }
+      // Restore photo URLs — always prefer URLs from metadata over empty local
+      if (meta.photoUrls && meta.photoUrls.length) {
+        if (!l.photos || !l.photos.length || l.photos.every(p => !p || (!p.startsWith('http') && p.length > 500))) {
+          l.photos = meta.photoUrls;
         }
       }
     } catch(e) { /* malformed meta, skip */ }
@@ -15116,13 +15186,14 @@ function _skUpdatePhotoSlots() {
   });
 }
 
-function skSubmitListing() {
+async function skSubmitListing() {
   if (!document.getElementById('skTerms').checked) { showToast('Please agree to Terms & Conditions'); return; }
   if (!isSignedIn()) { showToast('Please sign in'); return; }
 
   const mobile = document.getElementById('skMobile').value.trim();
   const waSame = document.getElementById('skWASame').checked;
 
+  // Collect basic listing data
   const listing = {
     id: _skEditingId || ('sk_' + Date.now() + '_' + Math.random().toString(36).substr(2,5)),
     bizName: document.getElementById('skBizName').value.trim(),
@@ -15136,7 +15207,7 @@ function skSubmitListing() {
     fullDesc: document.getElementById('skFullDesc').value.trim(),
     years: document.getElementById('skYears').value || '',
     website: document.getElementById('skWebsite').value.trim(),
-    photos: _skPhotoData.filter(Boolean),
+    photos: [],
     ownerEmail: gUser.email.toLowerCase(),
     ownerName: gUser.name || '',
     status: 'pending',
@@ -15144,12 +15215,39 @@ function skSubmitListing() {
     createdAt: new Date().toISOString(),
   };
 
+  // Upload photos to ImgBB
+  const photosToUpload = _skPhotoData.filter(Boolean);
+  if (photosToUpload.length) {
+    const submitBtn = document.querySelector('#skListModal .f-submit');
+    const origText = submitBtn ? submitBtn.textContent : '';
+    try {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Uploading photos...'; }
+      listing.photos = await _skUploadAllPhotos(photosToUpload, function(current, total) {
+        if (submitBtn) submitBtn.textContent = '⏳ Uploading photo ' + current + '/' + total + '...';
+      });
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; }
+    } catch(e) {
+      console.error('Photo upload error:', e);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; }
+      if (!_getImgbbKey()) {
+        showToast('⚠ Photo hosting not configured — listing saved without photos');
+      } else {
+        showToast('⚠ Photo upload failed — listing saved without photos');
+      }
+      listing.photos = [];
+    }
+  }
+
   if (_skEditingId) {
     const idx = skListings.findIndex(l => l.id === _skEditingId);
     if (idx >= 0) {
       listing.status = skListings[idx].status;
       listing.verified = skListings[idx].verified;
       listing.createdAt = skListings[idx].createdAt;
+      // Keep existing photos if no new ones uploaded
+      if (!listing.photos.length && skListings[idx].photos && skListings[idx].photos.length) {
+        listing.photos = skListings[idx].photos;
+      }
       skListings[idx] = listing;
     }
   } else {
@@ -15321,6 +15419,89 @@ function renderAdminDashboard() {
     container.innerHTML += usersHtml;
     admFetchUserStats();
   }
+
+  // ImgBB API key settings (super admin only)
+  if (isSuperAdmin()) {
+    const currentKey = _getImgbbKey();
+    const masked = currentKey ? currentKey.substring(0,6) + '••••••' + currentKey.substring(currentKey.length-4) : '';
+    const statusText = currentKey ? '✅ Configured' : '⚠️ Not configured — photos won\'t upload';
+    const imgbbHtml = '<div class="adm-section expanded" id="admSec-imgbb" style="margin-top:12px;">' +
+      '<div class="adm-section-header" onclick="admToggleSection(\'imgbb\')">' +
+        '<div class="adm-section-icon" style="background:rgba(80,200,120,0.15);">📸</div>' +
+        '<div class="adm-section-info">' +
+          '<div class="adm-section-name">Photo Hosting (ImgBB)</div>' +
+          '<div class="adm-section-status">' + statusText + '</div>' +
+        '</div>' +
+        '<div class="adm-section-arrow">▼</div>' +
+      '</div>' +
+      '<div class="adm-section-body">' +
+        '<div class="adm-section-content">' +
+          '<div style="font-size:0.78rem;color:var(--text2);margin-bottom:10px;">' +
+            'SevaKart listing photos are uploaded to ImgBB for permanent hosting. ' +
+            'Get a free API key from <a href="https://api.imgbb.com/" target="_blank" rel="noopener" style="color:var(--accent-gold);">api.imgbb.com</a>' +
+          '</div>' +
+          (currentKey ? '<div style="font-size:0.75rem;color:var(--text3);margin-bottom:8px;">Current key: ' + masked + '</div>' : '') +
+          '<div style="display:flex;gap:8px;align-items:center;">' +
+            '<input type="text" id="admImgbbKey" placeholder="Enter ImgBB API key..." value="" ' +
+              'style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:var(--text);font-size:0.82rem;">' +
+            '<button onclick="admSaveImgbbKey()" style="padding:8px 16px;border-radius:8px;background:var(--accent-gold);color:#000;border:none;font-weight:600;font-size:0.8rem;cursor:pointer;">Save</button>' +
+          '</div>' +
+          (currentKey ? '<button onclick="admTestImgbb()" style="margin-top:8px;padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--text2);border:1px solid rgba(255,255,255,0.1);font-size:0.75rem;cursor:pointer;">🔍 Test API Key</button>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+    container.innerHTML += imgbbHtml;
+  }
+}
+
+// ===== ImgBB API Key Admin Functions =====
+function admSaveImgbbKey() {
+  const inp = document.getElementById('admImgbbKey');
+  const key = (inp ? inp.value : '').trim();
+  if (!key) { showToast('Please enter an API key'); return; }
+  _setImgbbKey(key);
+  showToast('✅ ImgBB API key saved');
+  // Also sync to admin config on server so other admins get it
+  _syncImgbbKeyToServer(key);
+  renderAdminDashboard();
+}
+
+async function admTestImgbb() {
+  const key = _getImgbbKey();
+  if (!key) { showToast('No API key configured'); return; }
+  showToast('🔍 Testing API key...');
+  try {
+    // Test with a tiny 1x1 transparent PNG
+    const testBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const formData = new FormData();
+    formData.append('key', key);
+    formData.append('image', testBase64);
+    const resp = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+    const data = await resp.json();
+    if (data.success) {
+      showToast('✅ API key works! Test image uploaded successfully');
+    } else {
+      showToast('❌ API key invalid: ' + (data.error?.message || 'Unknown error'));
+    }
+  } catch(e) {
+    showToast('❌ Connection error: ' + e.message);
+  }
+}
+
+// Sync ImgBB key to server via admin config
+async function _syncImgbbKeyToServer(key) {
+  try {
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveAdminConfig',
+        adminEmails: _getAdminList(),
+        adminPermissions: _getAdminPermissions(),
+        imgbbApiKey: key
+      })
+    });
+  } catch(e) { console.warn('ImgBB key sync error:', e); }
 }
 
 // ===== Admin SevaKart Detail Screen =====
