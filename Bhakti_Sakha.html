@@ -1487,15 +1487,31 @@ body {
   display:flex; align-items:center; gap:8px;
 }
 .sett-section {
-  margin-bottom:16px; background:rgba(255,255,255,0.03);
-  border:1px solid var(--border); border-radius:16px; padding:18px 16px;
-  transition:border-color 0.2s;
+  margin-bottom:12px; background:rgba(255,255,255,0.03);
+  border:1px solid var(--border); border-radius:16px;
+  transition:border-color 0.2s; overflow:hidden;
 }
 .sett-section:hover { border-color:rgba(255,255,255,0.1); }
 .sett-stitle {
   font-size:0.88rem; color:var(--text); font-weight:600;
-  margin-bottom:14px; padding-bottom:10px;
-  border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;
+  padding:16px 16px; margin:0;
+  display:flex; align-items:center; gap:8px;
+  cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+}
+.sett-stitle-arrow {
+  margin-left:auto; width:18px; height:18px; color:var(--text3);
+  transition:transform 0.3s ease; flex-shrink:0;
+}
+.sett-section.open .sett-stitle-arrow { transform:rotate(180deg); }
+.sett-section.open .sett-stitle {
+  border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:14px;
+}
+.sett-body {
+  max-height:0; overflow:hidden; transition:max-height 0.35s ease;
+  padding:0 16px;
+}
+.sett-section.open .sett-body {
+  max-height:2000px; padding:4px 16px 16px;
 }
 .sett-stitle-icon {
   width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center;
@@ -5297,7 +5313,8 @@ body {
       <div class="settings-screen-title">⚙️ Settings</div>
       <!-- GOOGLE ACCOUNT SECTION -->
       <div class="sett-section" id="googleAccountSection">
-        <div class="sett-stitle"><span class="sett-stitle-icon blue">🔑</span> Google Account</div>
+        <div class="sett-stitle" onclick="toggleSettSection(this)"><span class="sett-stitle-icon blue">🔑</span> Google Account<svg class="sett-stitle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sett-body">
         <div id="gSignedOut" class="g-signed-out-box">
           <div class="g-desc">Sign in to automatically sync your <strong>Notes</strong>, <strong>Events</strong> and <strong>Kirtans</strong> across all your devices via Google Drive.</div>
           <div id="g_signin_btn" class="g-signin-btn-wrap"></div>
@@ -5318,11 +5335,13 @@ body {
           <div class="g-sync-details" id="gSyncDetails"></div>
           <button class="g-signout-btn" onclick="gSignOut()">Sign Out</button>
         </div>
+        </div>
       </div>
 
       <!-- ADMIN PANEL (only visible to super admin) -->
       <div class="sett-section admin-section" id="adminPanelSection" style="display:none;">
-        <div class="sett-stitle"><span class="sett-stitle-icon purple">🛡️</span> Admin Panel <span class="admin-badge">Admin</span></div>
+        <div class="sett-stitle" onclick="toggleSettSection(this)"><span class="sett-stitle-icon purple">🛡️</span> Admin Panel <span class="admin-badge">Admin</span><svg class="sett-stitle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sett-body">
         <div style="font-size:0.78rem; color:var(--text3); margin-bottom:10px; line-height:1.5;">
           Admins can edit event descriptions and manage kirtans/bhajans. Only you (super admin) can add or remove other admins.
         </div>
@@ -5349,10 +5368,12 @@ body {
             <label><input type="checkbox" id="permUsers"> 👥 View User Stats</label>
           </div>
         </div>
+        </div>
       </div>
 
       <div class="sett-section">
-        <div class="sett-stitle"><span class="sett-stitle-icon green">📍</span> Location</div>
+        <div class="sett-stitle" onclick="toggleSettSection(this)"><span class="sett-stitle-icon green">📍</span> Location<svg class="sett-stitle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sett-body">
         <div style="font-size:0.78rem;color:var(--text2);margin-bottom:8px;">Currently: <strong id="curLocName" style="color:var(--accent-blue);">Mumbai</strong></div>
         <input class="loc-search" id="locSearchInp" placeholder="🔍  Search city..." oninput="filterLocGrid(this.value,'locGridSettings')" autocomplete="off">
         <div class="loc-grid" id="locGridSettings"></div>
@@ -5365,9 +5386,11 @@ body {
           <div id="geoStatus" class="geo-status"></div>
           <div id="geoResults" class="geo-results"></div>
         </div>
+        </div>
       </div>
       <div class="sett-section">
-        <div class="sett-stitle"><span class="sett-stitle-icon orange">🔔</span> Notifications</div>
+        <div class="sett-stitle" onclick="toggleSettSection(this)"><span class="sett-stitle-icon orange">🔔</span> Notifications<svg class="sett-stitle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sett-body">
 
         <!-- Push notifications toggle -->
         <div class="sett-row" style="margin-bottom:14px;">
@@ -5486,6 +5509,7 @@ body {
             <div class="sett-desc" id="desc-mytodo">Remind at each task's set time on its due date</div>
           </div>
           <label class="toggle tog-todo"><input type="checkbox" id="n-mytodo" checked onchange="saveS()"></label>
+        </div>
         </div>
       </div>
     </div>
@@ -11504,6 +11528,11 @@ function syncTimeFromSelects() {
   const tim = document.getElementById('n-time');
   if (tim) tim.value = String(h24).padStart(2, '0') + ':' + min;
   saveS();
+}
+
+function toggleSettSection(titleEl) {
+  const section = titleEl.closest('.sett-section');
+  if (section) section.classList.toggle('open');
 }
 
 function saveS() {
