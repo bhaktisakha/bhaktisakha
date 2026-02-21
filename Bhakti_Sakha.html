@@ -2915,6 +2915,15 @@ body {
 .more-tray-btn[data-screen="dhamas"]   { color: #f08070; }
 .more-tray-btn[data-screen="sevakart"] { color: #5ce0f0; }
 .more-tray-btn[data-screen="prayer"]   { color: #f0c850; }
+.more-tray-btn.more-active {
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 16px var(--active-glow, rgba(255,255,255,0.1)), inset 0 0 12px rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.more-tray-btn.more-active[data-screen="notes"]    { --active-glow: rgba(206,192,255,0.3); box-shadow: 0 0 16px rgba(206,192,255,0.25), inset 0 0 12px rgba(206,192,255,0.06); border-color: rgba(206,192,255,0.25); }
+.more-tray-btn.more-active[data-screen="dhamas"]   { --active-glow: rgba(240,128,112,0.3); box-shadow: 0 0 16px rgba(240,128,112,0.25), inset 0 0 12px rgba(240,128,112,0.06); border-color: rgba(240,128,112,0.25); }
+.more-tray-btn.more-active[data-screen="sevakart"] { --active-glow: rgba(92,224,240,0.3); box-shadow: 0 0 16px rgba(92,224,240,0.25), inset 0 0 12px rgba(92,224,240,0.06); border-color: rgba(92,224,240,0.25); }
+.more-tray-btn.more-active[data-screen="prayer"]   { --active-glow: rgba(240,200,80,0.3); box-shadow: 0 0 16px rgba(240,200,80,0.25), inset 0 0 12px rgba(240,200,80,0.06); border-color: rgba(240,200,80,0.25); }
 
 /* Remove old scroll area and arrow styles */
 .nav-scroll-area { display:none; }
@@ -12859,10 +12868,15 @@ function switchScreen(name, btn) {
     if (navBtns[idx]) navBtns[idx].classList.add('active');
     updateGlowIndicator(idx, NAV_TAB_COLORS[name === 'songs' ? 'songs' : name]);
   } else {
-    // It's a "More" screen
+    // It's a "More" screen — color the More button with that screen's theme
     const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
-    if (moreBtn) moreBtn.classList.add('active');
-    updateGlowIndicator(4, NAV_TAB_COLORS.more);
+    if (moreBtn) {
+      moreBtn.classList.add('active');
+      const screenColor = MORE_SCREEN_COLORS[name] || MORE_SCREEN_COLORS[name.split('-')[0]] || NAV_TAB_COLORS.more;
+      moreBtn.style.color = screenColor;
+      updateGlowIndicator(4, screenColor);
+      _activeMoreScreen = name.split('-')[0];
+    }
   }
 
   // Push history state for back button (only if navigating forward, not going back)
@@ -13159,7 +13173,9 @@ const NAV_TAB_COLORS = {
   home: '#c4b0ff', calendar: '#6ab0ff', songs: '#f0a848', events: '#5ee8a0', more: '#dcc8ff'
 };
 const MORE_SCREENS = ['notes','dhamas','sevakart','prayer'];
+const MORE_SCREEN_COLORS = { notes:'#cec0ff', dhamas:'#f08070', sevakart:'#5ce0f0', prayer:'#f0c850' };
 let _moreTrayOpen = false;
+let _activeMoreScreen = null;
 
 function updateGlowIndicator(idx, color) {
   const glow = document.getElementById('navGlowIndicator');
@@ -13177,8 +13193,9 @@ function updateGlowIndicator(idx, color) {
 function navTo(screen, btn) {
   closeMoreTray();
   // Update button states
-  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => { b.classList.remove('active'); b.style.color = ''; });
   btn.classList.add('active');
+  _activeMoreScreen = null;
   // Move glow
   const idx = parseInt(btn.dataset.idx);
   updateGlowIndicator(idx, NAV_TAB_COLORS[btn.dataset.tab]);
@@ -13202,7 +13219,16 @@ function openMoreTray() {
   const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
   document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
   moreBtn.classList.add('active');
-  updateGlowIndicator(4, NAV_TAB_COLORS.more);
+  // Use active More screen's color if one is showing, otherwise default
+  const color = _activeMoreScreen ? (MORE_SCREEN_COLORS[_activeMoreScreen] || NAV_TAB_COLORS.more) : NAV_TAB_COLORS.more;
+  if (_activeMoreScreen) moreBtn.style.color = color;
+  updateGlowIndicator(4, color);
+  // Highlight the active screen's button in the tray
+  document.querySelectorAll('.more-tray-btn').forEach(b => b.classList.remove('more-active'));
+  if (_activeMoreScreen) {
+    const activeBtn = document.querySelector(`.more-tray-btn[data-screen="${_activeMoreScreen}"]`);
+    if (activeBtn) activeBtn.classList.add('more-active');
+  }
 }
 
 function closeMoreTray() {
@@ -13213,11 +13239,14 @@ function closeMoreTray() {
 
 function navToMore(screen) {
   closeMoreTray();
-  // Keep More button highlighted for screens in More tray
+  // Keep More button highlighted with the screen's theme color
   const moreBtn = document.querySelector('.nav-btn[data-tab="more"]');
-  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-tabs-row .nav-btn').forEach(b => { b.classList.remove('active'); b.style.color = ''; });
   moreBtn.classList.add('active');
-  updateGlowIndicator(4, NAV_TAB_COLORS.more);
+  const screenColor = MORE_SCREEN_COLORS[screen] || NAV_TAB_COLORS.more;
+  moreBtn.style.color = screenColor;
+  _activeMoreScreen = screen;
+  updateGlowIndicator(4, screenColor);
   switchScreen(screen, moreBtn);
 }
 
