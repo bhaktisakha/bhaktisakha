@@ -4967,55 +4967,103 @@ body {
   transition:all 0.2s; width:100%; text-align:center;
 }
 .pc-report-btn:active { color:#e74c3c; }
+/* ===== DAILY MUSE — TIME-BASED QUOTES ===== */
+:root {
+  --muse-teal: #2dd4a8;
+  --muse-teal-dim: rgba(45,212,168,0.12);
+  --muse-teal-glow: rgba(45,212,168,0.25);
+  --muse-deep: #0a2820;
+  --muse-sage: #7ecdb8;
+}
+@keyframes museGlow {
+  0%, 100% { opacity:0.5; }
+  50% { opacity:1; }
+}
+@keyframes museFadeIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes museShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
 .home-muse {
-  margin:4px 22px 14px; position:relative;
-  opacity:0; animation:homeIn 0.5s ease 0.5s forwards;
-  border-radius:16px; overflow:hidden; cursor:pointer;
-  background:linear-gradient(135deg, rgba(167,139,250,0.07), rgba(212,160,23,0.05));
-  border:1px solid rgba(167,139,250,0.12);
-  transition:transform 0.15s;
+  margin:0 18px 14px; position:relative;
+  opacity:0; animation:homeIn 0.55s ease 0.35s forwards;
+  border-radius:20px; overflow:hidden;
+  background:linear-gradient(155deg, rgba(45,212,168,0.10) 0%, rgba(10,40,32,0.92) 35%, rgba(22,40,71,0.85) 100%);
+  border:1px solid rgba(45,212,168,0.18);
+  box-shadow:0 4px 28px rgba(45,212,168,0.08), 0 1px 0 rgba(45,212,168,0.10) inset;
+  padding:0;
 }
-.home-muse:active { transform:scale(0.98); }
-.home-muse-header {
+.home-muse::before {
+  content:''; position:absolute; top:-50px; right:-50px;
+  width:130px; height:130px; border-radius:50%;
+  background:radial-gradient(circle, rgba(45,212,168,0.18) 0%, transparent 70%);
+  pointer-events:none; filter:blur(6px);
+}
+.home-muse::after {
+  content:''; position:absolute; bottom:-40px; left:-30px;
+  width:100px; height:100px; border-radius:50%;
+  background:radial-gradient(circle, rgba(45,212,168,0.10) 0%, transparent 70%);
+  pointer-events:none; filter:blur(8px);
+}
+.muse-slot-label {
   display:flex; align-items:center; justify-content:center; gap:6px;
-  padding:10px 16px 0; text-align:center;
+  padding:12px 16px 0; text-align:center; position:relative; z-index:1;
 }
-.home-muse-label {
-  font-size:0.82rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
-  background:linear-gradient(135deg, var(--lavender), rgba(212,160,23,0.7));
+.muse-slot-icon {
+  font-size:0.85rem; line-height:1;
+  animation:museGlow 3s ease-in-out infinite;
+}
+.muse-slot-tag {
+  font-size:0.62rem; font-weight:700; letter-spacing:2.2px; text-transform:uppercase;
+  color:var(--muse-sage);
+  opacity:0.85;
+}
+.muse-title-row {
+  text-align:center; padding:4px 16px 0; position:relative; z-index:1;
+}
+.muse-title-text {
+  font-family:'Philosopher', serif;
+  font-size:0.92rem; font-weight:700; letter-spacing:1.2px;
+  background:linear-gradient(135deg, #2dd4a8 0%, #7ecdb8 40%, #b8e8d8 60%, #2dd4a8 100%);
+  background-size:200% auto;
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
+  animation:museShimmer 6s linear infinite;
 }
-.home-muse-body { padding:10px 18px 6px; text-align:center; }
-.home-muse-verse {
-  font-family:'Inter', system-ui, sans-serif;
-  font-size:1.12rem; line-height:1.7; letter-spacing:0.2px;
-  background:linear-gradient(135deg, #e8c800 0%, #f0d860 40%, #d4a84c 70%, #e8c800 100%);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text;
+.muse-quote-body {
+  padding:10px 20px 6px; text-align:center; position:relative; z-index:1;
+  min-height:48px;
+}
+.muse-quote-text {
+  font-family:'Playfair Display', serif;
+  font-size:1.05rem; line-height:1.75; letter-spacing:0.15px;
+  font-style:italic;
+  color:#d8f0e8;
   white-space:pre-line;
+  animation:museFadeIn 0.6s ease both;
 }
-.home-muse-verse::before {
-  display:none;
+.muse-quote-text::before { content:'\201C'; opacity:0.35; font-size:1.5rem; vertical-align:top; margin-right:2px; }
+.muse-quote-text::after { content:'\201D'; opacity:0.35; font-size:1.5rem; vertical-align:bottom; margin-left:2px; }
+.muse-author-row {
+  text-align:center; padding:4px 16px 12px; position:relative; z-index:1;
 }
-.home-muse-pill {
-  display:inline-flex; align-items:center; justify-content:center;
-  min-width:24px; height:20px; border-radius:999px; padding:0 10px;
-  background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3);
-  font-size:0.56rem; font-weight:700; color:var(--accent-gold);
-  letter-spacing:0.3px; margin-top:6px;
+.muse-author-text {
+  font-size:0.72rem; font-weight:600; letter-spacing:0.5px;
+  color:var(--muse-teal); opacity:0.8;
 }
-.home-muse-footer {
-  display:flex; align-items:center; justify-content:center;
-  padding:4px 16px 10px; gap:8px;
+.muse-author-text::before { content:'— '; }
+.muse-divider {
+  width:40px; height:1px; margin:0 auto 2px;
+  background:linear-gradient(90deg, transparent, rgba(45,212,168,0.3), transparent);
 }
-.home-muse-song {
-  font-size:0.65rem; color:var(--text3); line-height:1.35;
-  text-align:center;
+.muse-time-hint {
+  text-align:center; padding:0 16px 10px; position:relative; z-index:1;
 }
-.home-muse-song strong { color:var(--text2); font-weight:600; }
-.home-muse-arrow {
-  display:none;
+.muse-time-hint span {
+  font-size:0.56rem; color:var(--text3); letter-spacing:0.5px; opacity:0.6;
 }
 </style>
   <!-- Google Identity Services -->
@@ -5162,6 +5210,27 @@ body {
         <div class="home-today-text" id="homeTodayText"></div>
       </div>
 
+      <!-- ── Daily Muse (Time-based Quotes) ── -->
+      <div class="home-muse" id="homeMuse">
+        <div class="muse-slot-label">
+          <span class="muse-slot-icon" id="museSlotIcon">🙏</span>
+          <span class="muse-slot-tag" id="museSlotTag">Chanting Inspiration</span>
+        </div>
+        <div class="muse-title-row">
+          <span class="muse-title-text">✦ Your Daily Muse ✦</span>
+        </div>
+        <div class="muse-quote-body">
+          <div class="muse-quote-text" id="museQuoteText">Loading…</div>
+        </div>
+        <div class="muse-divider"></div>
+        <div class="muse-author-row" id="museAuthorRow">
+          <span class="muse-author-text" id="museAuthorText"></span>
+        </div>
+        <div class="muse-time-hint">
+          <span id="museTimeHint"></span>
+        </div>
+      </div>
+
       <!-- ── Feature Grid ── -->
       <div class="home-grid">
         <div class="home-card home-card--calendar" onclick="switchScreen('calendar',document.querySelectorAll('.nav-btn')[1])">
@@ -5242,21 +5311,6 @@ body {
           <div class="home-evt-upcoming" id="homeEvtWidget"></div>
         </div>
 
-      </div>
-
-      <!-- Daily Muse -->
-      <div class="home-muse" id="homeMuse" onclick="_openMuseSong()" style="display:none;">
-        <div class="home-muse-header">
-          <span class="home-muse-label">✦ Your Daily Muse ✦</span>
-        </div>
-        <div class="home-muse-body">
-          <div class="home-muse-verse" id="homeMuseVerse"></div>
-          <div class="home-muse-pill" id="homeMusePill" style="display:none;"></div>
-        </div>
-        <div class="home-muse-footer">
-          <div class="home-muse-song" id="homeMuseSong"></div>
-          <svg class="home-muse-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-        </div>
       </div>
     </div>
   </div>
@@ -5562,6 +5616,16 @@ body {
           </div>
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permUsers"> 👥 View User Stats</label>
+          </div>
+        </div>
+
+        <!-- Daily Muse Admin Controls -->
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:0.78rem; color:var(--text3); margin-bottom:8px; line-height:1.5;">
+            🕉️ <strong style="color:var(--text2);">Daily Muse Settings</strong> — applies globally to all users.
+          </div>
+          <div class="admin-perm-row">
+            <label><input type="checkbox" id="museShowAuthorToggle" checked onchange="_museToggleAuthor(this.checked)"> 📝 Show Author / Source in Daily Muse quotes</label>
           </div>
         </div>
         </div>
@@ -7351,7 +7415,8 @@ async function _syncAdminConfigToServer() {
         action: 'saveAdminConfig',
         adminEmails: _getAdminList(),
         adminPermissions: _getAdminPermissions(),
-        imgbbApiKey: _getImgbbKey() || ''
+        imgbbApiKey: _getImgbbKey() || '',
+        museShowAuthor: _museIsAuthorVisible()
       })
     });
   } catch(e) { console.warn('Admin config sync error:', e); }
@@ -7394,6 +7459,14 @@ async function _fetchAdminConfigFromServer(retryCount) {
     // Restore ImgBB API key from server config
     if (data.imgbbApiKey && !_getImgbbKey()) {
       _setImgbbKey(data.imgbbApiKey);
+    }
+
+    // Restore Daily Muse author visibility setting (global for all users)
+    if (typeof data.museShowAuthor !== 'undefined') {
+      _museSetAuthorVisible(data.museShowAuthor);
+      const toggle = document.getElementById('museShowAuthorToggle');
+      if (toggle) toggle.checked = data.museShowAuthor;
+      _updateDailyMuse();
     }
   } catch(e) {
     console.warn('Admin config fetch error:', e);
@@ -19576,123 +19649,642 @@ function _updateHomeTodoWidget() {
 // ═══════════════════════════════════════════════════════════
 // DAILY MUSE — random verse of the day from songs
 // ═══════════════════════════════════════════════════════════
-let _museSongId = null;
-let _museVerseIdx = null;
+// ═══════════════════════════════════════════════════════════
+// DAILY MUSE — Time-Based Inspirational Quotes
+// ═══════════════════════════════════════════════════════════
 
-function _extractAllVerses() {
-  // Build a flat array of { songId, verseNum, text, songTitle, author } from all songs
-  const all = [];
-  songs.forEach(s => {
-    const lyrics = s.lyrics || (s.lyrics_en) || '';
-    if (!lyrics || lyrics.length < 20) return;
-    const title = s.title || s.title_en || '';
+// ── Chanting Quotes (4 AM – 8 AM) — 500 quotes ──
+const MUSE_CHANTING = [
+{q:"We should chant very attentively, hearing the vibration very distinctly.",a:"Srila Prabhupada"},
+{q:"As you chant, try to hear each word very carefully and always complete your sixteen rounds.",a:"Srila Prabhupada"},
+{q:"Regular and attentive chanting, along with following the four regulative principles, will keep one pure.",a:"Srila Prabhupada"},
+{q:"They must chant 16 rounds a day minimum with attention, clearly chanting the mantra, and listening very carefully.",a:"Srila Prabhupada"},
+{q:"Srila Prabhupada stressed four rules in japa: early morning chanting, full concentration, distinct pronunciation, attentive hearing.",a:"Srila Prabhupada"},
+{q:"Inattentive chanting is the source of all offenses. All offenses are ways of being distracted from Krishna.",a:"HG Mahatma Prabhu"},
+{q:"The most foundational principle for good japa is to turn off your life when you chant — and do nothing else but chant.",a:"HG Mahatma Prabhu"},
+{q:"Inattentive chanting results from not honoring japa as a sacred relationship that deserves our full attention.",a:"HG Mahatma Prabhu"},
+{q:"Japa does not mean a tongue exercise. It is only effective when we put our mind where the sound is.",a:"HH Radhanath Swami"},
+{q:"We cannot deceive Krishna. We have to keep bringing our minds back to Harinam.",a:"HH Radhanath Swami"},
+{q:"Attentively hearing means offering the essence of your life, your consciousness, to the Holy Name.",a:"HH Radhanath Swami"},
+{q:"Our consciousness is the very sustenance of our life. And our consciousness is manifested by our attention.",a:"HH Radhanath Swami"},
+{q:"Chant the Name with good pronunciation, listen to it with full attention, and use your hand in counting the beads.",a:"HH Sacinandana Swami"},
+{q:"Various thoughts will come during chanting. Tell yourself, \'I can deal with everything after chanting.\'",a:"HH Sacinandana Swami"},
+{q:"Whenever the mind goes somewhere, even to nice thoughts, bring it back and just listen to the Holy Name.",a:"HH Sacinandana Swami"},
+{q:"The first step is to bring the mind away from its various thoughts, and just bring it into the mantra.",a:"HH Sacinandana Swami"},
+{q:"When I care about communicating with someone, I avoid inattentive listening behavior. So too in chanting.",a:"HH Sacinandana Swami"},
+{q:"Chanting without attention is like cooking without fire — you go through the motions but nothing is accomplished.",a:"HG Mahatma Prabhu"},
+{q:"The mind is always hankering for some future event and lamenting about something in the past. If we cannot concentrate on japa, we are not in the present.",a:"HH Sacinandana Swami"},
+{q:"Do not interrupt your japa for idle conversation. If this is difficult, start with not interrupting it for one round at a time.",a:"HH Sacinandana Swami"},
+{q:"As long as one is speaking during japa, one\'s japa is considered fruitless.",a:"Hari-bhakti-vilasa"},
+{q:"Create a quiet sacred space where you can chant without interruptions. When you chant, do not do anything else.",a:"HG Mahatma Prabhu"},
+{q:"I turn off my world and turn on Krishna\'s world when I chant my rounds.",a:"HG Mahatma Prabhu"},
+{q:"Chant the Maha-mantra with your tongue and hear with your ear. Feeling the essence of chanting brings you into the present.",a:"HG Mahatma Prabhu"},
+{q:"Be conscious that when chanting, you are present, Krishna is present, and a relationship between you and Krishna is also present.",a:"HG Mahatma Prabhu"},
+{q:"There is no such requirement that japa should be silent and chanting done differently. Loudly or silently, everything is all right. Only thing is we should chant very attentively.",a:"Srila Prabhupada"},
+{q:"Whenever, therefore, offenseless hearing and glorification of God are undertaken, it is to be understood that Lord Krishna is present in the form of transcendental sound.",a:"Srila Prabhupada"},
+{q:"By chanting the holy name of God, you associate with God. God is absolute. He is not different from His name.",a:"Srila Prabhupada"},
+{q:"By chanting more and more, your association with God becomes more and more intimate. Then everything is disclosed to you.",a:"Srila Prabhupada"},
+{q:"If one chants the holy name just to make a show, not knowing the secret of success, he will never attain perfection.",a:"Srila Prabhupada"},
+{q:"The effect of chanting the holy name is perceived by the chanter as liberation from the conception of false egoism.",a:"Srila Prabhupada"},
+{q:"Chanting means accepting oneself as the eternal servant of Krishna.",a:"Srila Prabhupada"},
+{q:"Prabhupada wouldn\'t walk over Krishna\'s names because he saw the name as non-different. Respect the name in this way.",a:"HG Mahatma Prabhu"},
+{q:"Courtesy japa is like shooting a gun with blank bullets — it sounds like the mantra but it\'s just empty sound.",a:"HG Mahatma Prabhu"},
+{q:"We have two choices during japa: go with the flow and let the mind wander, or make a valiant effort to focus on the holy name.",a:"HG Mahatma Prabhu"},
+{q:"Good japa produces inspiration, realization, detachment, increased desire to serve, and attraction to study scripture.",a:"HG Mahatma Prabhu"},
+{q:"Inattentive chanting is said to be the mother of offenses because it gives rise to the other offenses.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Without making a sankalpa (resolution) before chanting to be fully present, we fight a losing battle with the mind.",a:"HG Mahatma Prabhu"},
+{q:"Absorption can be attained by being fully there. The hands counting, the ears hearing, the tongue making the vibration.",a:"HH Sacinandana Swami"},
+{q:"Fix your mind on the sound of the mantra. That is your anchor in the storm of material existence.",a:"Gaudiya Vaishnava Teaching"},
+{q:"So what is the controlling of mind? You just hear. Chant with the tongue and hear — that is all.",a:"Srila Prabhupada"},
+{q:"Quality chanting means chanting where my heart is present, not just my lips.",a:"HG Mahatma Prabhu"},
+{q:"When you chant, Krishna first dances on the tongue, then the ear, then the heart.",a:"HG Mahatma Prabhu"},
+{q:"One who is not very attentive in chanting the holy name of the Lord commits the ninth offense of inattention.",a:"Srila Prabhupada"},
+{q:"The restless fickle mind can only be controlled by putting the mind to the lotus feet of Krishna through chanting.",a:"Srila Prabhupada"},
+{q:"Do not view chanting as a mechanical process you have to complete daily, but rather as a way to deepen your relationship with Krishna.",a:"HG Mahatma Prabhu"},
+{q:"In this age people are attracted to false things, they are very slow, they do not take it seriously. Therefore chanting is the common platform.",a:"Srila Prabhupada"},
+{q:"Chanting Hare Krishna is a meditation. When the meditation is attentive, it purifies; when inattentive, it merely maintains the vow.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Create a \'time-free zone\' early in the morning. Imagine that your day starts only after japa.",a:"HG Mahatma Prabhu"},
+{q:"Bad chanting is unacceptable. Set the bar higher and when you go below the acceptable level, let red flags go off in your mind.",a:"Japa Retreat Reflections"},
+{q:"One of the best indicators of good japa is that when I finish my rounds I want to keep chanting because of the nice taste.",a:"Japa Retreat Reflections"},
+{q:"Good chanting always produces a taste to chant more. If you are relieved to put your bead bag down, the chanting needs improvement.",a:"Japa Retreat Reflections"},
+{q:"When chanting well and relishing Krishna\'s name, then Krishna\'s form, words, and pastimes all become more attractive.",a:"Japa Retreat Reflections"},
+{q:"The holy name does really work — if I chant the holy name the way the holy name is meant to be chanted.",a:"Japa Retreat Reflections"},
+{q:"I have so often neglected to chant well that I feel like I am dying of thirst for the nectar of the name.",a:"Japa Retreat Reflections"},
+{q:"The reason I have so much on my plate taking me away from chanting is simply because I don\'t value chanting enough.",a:"Japa Retreat Reflections"},
+{q:"If we keep practicing the wrong way, we will continue to get wrong results. Down with courtesy japa.",a:"HG Mahatma Prabhu"},
+{q:"The maha-mantra is not asking for your perfection. It is asking for your presence.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Prabhupada said sixteen rounds could be done in one and a half to two hours. It should take five or six minutes per round.",a:"Srila Prabhupada"},
+{q:"When a devotee said it was hard to chant and keep awake, Prabhupada replied they should walk while chanting japa.",a:"Srila Prabhupada"},
+{q:"The Holy Name is saying: \'I am present here, my mercy is here, my love is here; please receive it, please accept it, please feel it.\'",a:"HG Mahatma Prabhu"},
+{q:"Krishna recognizes the sincere endeavor to work very hard according to our capacity in hearing and chanting.",a:"HH Radhanath Swami"},
+{q:"We must approach the Holy Name as Krishna Himself and with great attention and devotion chant.",a:"HH Radhanath Swami"},
+{q:"Chanting is the cry of the soul for its beloved Lord. When the cry is genuine, the Lord responds.",a:"Gaudiya Vaishnava Teaching"},
+{q:"With our lips we should be chanting, with our ears we should be hearing, and with our heart we should be crying out for the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"If I am finding it difficult to finish my rounds, I am ultimately the one who chose to do all the activities getting in the way.",a:"Japa Retreat Reflections"},
+{q:"Hear the holy name with rapt attention. Let the sound of the maha-mantra enter your ears and go straight to the heart.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every round of japa is an audience with the Supreme Lord. Treat it with the reverence it deserves.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Your japa is your private appointment with God. Don\'t let the world intrude.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Don\'t count your rounds. Make your rounds count.",a:"Gaudiya Vaishnava Teaching"},
+{q:"By attentively chanting our japa every day we can find the pleasure of the spiritual world even in this very life.",a:"HH Radhanath Swami"},
+{q:"Krishna reveals Himself according to our humility and according to our sincerity and attentiveness in chanting.",a:"HH Radhanath Swami"},
+{q:"It is very relaxing to let our minds coast along upon the waves of maya during japa. But we cannot be lazy — we must keep bringing our minds back.",a:"HH Radhanath Swami"},
+{q:"The simple process of offenselessly chanting and hearing the holy name will gradually promote one to the stage of emancipation.",a:"Srila Prabhupada"},
+{q:"There are three stages in chanting: offensive chanting, reflective chanting, and offenseless chanting. In the second stage, one automatically attains emancipation.",a:"Srila Prabhupada"},
+{q:"In the offenseless stage, one actually enters into the kingdom of God, although physically still in the material world.",a:"Srila Prabhupada"},
+{q:"Prabhupada said the highest realization is to save yourself. Give yourself the gift of sixteen good rounds every day.",a:"Japa Retreat Reflections"},
+{q:"The chanting of the holy name is called shravana-mangala — one receives everything auspicious simply by hearing the holy name.",a:"Srila Prabhupada"},
+{q:"The goal of japa is not to finish our quota of rounds. The goal is to chant quality rounds.",a:"HG Mahatma Prabhu"},
+{q:"The symptom of good japa is that we like to chant. The symptom of poor japa is lack of taste and a struggle to complete rounds.",a:"HG Mahatma Prabhu"},
+{q:"I fully honor my sacred relationship with the Holy Name during japa.",a:"HG Mahatma Prabhu"},
+{q:"I happily and enthusiastically welcome the Holy Name every japa session.",a:"HG Mahatma Prabhu"},
+{q:"Start chanting with a natural inclination to focus. Before chanting, believe that you will be able to focus on the Holy Name.",a:"HG Mahatma Prabhu"},
+{q:"All kinds of poor or offensive chanting stem from not properly relating to and honoring the holy names as Radha and Krishna.",a:"HG Mahatma Prabhu"},
+{q:"So if you chant the Lord\'s name and pray to Him, \'What service can I render?\', then soon you will advance.",a:"Srila Prabhupada"},
+{q:"Every mantra that comes out of your mouth should feel like a fresh prayer — not a stale repetition.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Japa is not something we do — it is someone we meet. We meet Krishna every morning through His holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A person who does not chant attentively is offering Krishna empty words, like offering an empty plate.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The difference between attentive and inattentive chanting is the difference between living and dead.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When you feel the urge to put down your beads, that is precisely when you should keep chanting with greater attention.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The first round is for waking up. The second round is for settling in. By the third round, let the name carry you.",a:"Gaudiya Vaishnava Teaching"},
+{q:"I get to chant, I want to chant, and I love to chant. Remind yourself before every session.",a:"HG Mahatma Prabhu"},
+{q:"What you appreciate, appreciates. Appreciate the holy name and its value will grow in your life.",a:"HG Mahatma Prabhu"},
+{q:"Make every mantra a prayer. Make every round a meditation. Make every japa session a meeting with Krishna.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Pray before you chant: \'Dear Lord, please let me taste the nectar of Your holy name today.\'",a:"Gaudiya Vaishnava Teaching"},
+{q:"Today, take a deep breath, hold your beads with reverence, and chant as if this is the most important thing you will do.",a:"Gaudiya Vaishnava Teaching"},
+{q:"One of the greatest discoveries I\'ve made regarding chanting is that you have to attain the state of absorption — totally involved, completely engrossed, fully present.",a:"HH Sacinandana Swami"},
+{q:"When you are totally absorbed, totally immersed in the holy name, you will emerge a spiritually charged person.",a:"HH Sacinandana Swami"},
+{q:"Absorption is the art of bringing us to a state where all mental noise does not exist and where Krishna is fully present.",a:"HH Sacinandana Swami"},
+{q:"Take your mind out of the thoughts and problems. Problems only exist in the mind. Bring it to the mantra.",a:"HH Sacinandana Swami"},
+{q:"The mantra will have an effect on the mind and after chanting you will feel very relieved — you were in the no-material-mind zone.",a:"HH Sacinandana Swami"},
+{q:"The mind is not you — it happens to you, like your heartbeat and your breath. Through proper meditation you learn to dis-identify from the mind.",a:"HH Sacinandana Swami"},
+{q:"The mind will become silent if you don\'t fuel it with more energy, and then so many divine realizations follow.",a:"HH Sacinandana Swami"},
+{q:"Generally it is the process to simply chant and hear. If Krishna\'s lila comes into remembrance, that is very good. It should come automatically.",a:"Srila Prabhupada"},
+{q:"I want to encourage you to chant the Holy Name with taste. Coming to the higher states of blissful chanting is not easy, but it is worth the investment.",a:"HH Sacinandana Swami"},
+{q:"Absorption in the holy name is the key. When we absorb ourselves in the sound of the maha-mantra, Krishna reveals Himself from within the name.",a:"HG Radheshyam Prabhu"},
+{q:"Absorb yourself in the holy name the whole day. Let the vibration of the maha-mantra be the constant companion of your heart.",a:"HG Radheshyam Prabhu"},
+{q:"Use the prayers of the acharyas to help you absorb in the holy names. Their words carry the potency to awaken our dormant love.",a:"HG Radheshyam Prabhu"},
+{q:"In kirtan and japa we surrender to the Lord by expressing our heart: \'I belong only to You.\'",a:"HH Sacinandana Swami"},
+{q:"Chanting the holy name means to associate with Krishna. In japa we are concerned with the One relationship — our relationship with Krishna.",a:"HH Sacinandana Swami"},
+{q:"The nature of the Lord is such that whenever He sees someone taking shelter of His Divine Names, He turns toward that devotee.",a:"HH Sacinandana Swami"},
+{q:"During your japa, stay with that inner feeling: \'Krishna, please accept me in your service. Oh Radha, please accept me.\'",a:"HH Sacinandana Swami"},
+{q:"Bhaktivinoda Thakura advises us to meditate on the meaning of the mantra. Every meaning is a prayer for coming closer to Radha and Krishna.",a:"Srila Bhaktivinoda Thakura"},
+{q:"I meditate on the meaning of the Holy Name as I chant. In order to connect deeply, cultivate an appropriate mood.",a:"HG Mahatma Prabhu"},
+{q:"Chanting is not just moving the lips. It is a meditation, a prayer, a surrender to the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The maha-mantra contains the complete spiritual world. When we chant attentively, we are transported there.",a:"Gaudiya Vaishnava Teaching"},
+{q:"This sound vibration is not material, it is spiritual, and powerful beyond our conception.",a:"Srila Prabhupada"},
+{q:"Chanting is the waxing moon that spreads the white lotus of good fortune for all living entities.",a:"Srila Prabhupada"},
+{q:"The holy name of Krishna is so attractive that anyone who chants it becomes imbued with love of Krishna.",a:"Srila Prabhupada"},
+{q:"Simply by chanting the Hare Krishna mantra one revives his original relationship with God.",a:"Srila Prabhupada"},
+{q:"Chanting the holy name immediately renovates the transcendental relationship of the living being with the Supreme Lord.",a:"Srila Prabhupada"},
+{q:"Krishna and His name are non-different. When we chant, we are in direct contact with the Supreme Personality of Godhead.",a:"Srila Prabhupada"},
+{q:"Krishna is present fully in His holy name and this is realized by the humility and sincerity in our chanting.",a:"HH Radhanath Swami"},
+{q:"Chanting the Lord\'s name cleanses our selfish ego and allows the true light of love within our soul to shine.",a:"HH Radhanath Swami"},
+{q:"The sound of Krishna\'s name possesses all the power of the supreme truth, God Himself.",a:"HH Radhanath Swami"},
+{q:"I do not know how much nectar the two syllables \'Krishna\' have produced. When the Holy Name is chanted, it appears to dance within the mouth.",a:"Sri Rupa Goswami"},
+{q:"When the holy name descends and touches the tongue, the eyes overflow with tears. The desire to chant increases unlimitedly.",a:"Sri Rupa Goswami"},
+{q:"Only by the wonderful mercy of the Lord is the charming sweetness of chanting the holy name manifest. It does not appear by one\'s own efforts.",a:"Brihad-bhagavatamrita"},
+{q:"When you chant with your fingers on the mala, you should feel that your fingers are touching the lotus feet of Krishna.",a:"Srila Bhaktivinoda Thakura"},
+{q:"The two syllables \'Ha\' and \'ri\' are a mine of varieties of devotional mellows. Every ecstasy of devotion has taken shelter in them.",a:"Srila Bhaktivinoda Thakura"},
+{q:"The holy name, character, pastimes and activities of Krishna are all transcendentally sweet like sugar candy.",a:"Sri Rupa Goswami"},
+{q:"Although the tongue afflicted by ignorance cannot taste sweetness, simply by carefully chanting these sweet names every day, a natural relish awakens.",a:"Sri Rupa Goswami"},
+{q:"The sun of the holy name rises in the sky of the heart and destroys the darkness of ignorance with brilliant rays of divine love.",a:"Srila Bhaktivinoda Thakura"},
+{q:"Let the holy name be your only shelter, your life and soul, your everything.",a:"Srila Narottama dasa Thakura"},
+{q:"Even a moment\'s association with a pure devotee — through hearing the holy name from him — can bestow all success.",a:"Caitanya Caritamrta"},
+{q:"In this age of Kali, the Supreme Lord incarnates with all of His powers in the sound vibration of the Holy Name.",a:"HH Radhanath Swami"},
+{q:"When we chant purely, even for a moment, the entire creation celebrates, for one more soul has found its way home.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting is the beginning, the middle, and the end of spiritual life. It is the alpha and omega of bhakti.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When we chant the holy name with love, Krishna dances on the tip of our tongue.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is not material sound — it is descended from the spiritual world.",a:"Srila Prabhupada"},
+{q:"Krishna lives where the chanting of Hare Krishna is going on.",a:"Srila Prabhupada"},
+{q:"I do not reside in Vaikuntha, nor in the hearts of the yogis, but where My pure devotees chant My holy name.",a:"Lord Sri Krishna"},
+{q:"Whenever Prabhupada would say the words of the Hare Krishna mantra, the whole audience would repeat it in unison — understanding this was the summum bonum.",a:"srilaprabhupadalila.org"},
+{q:"Krishna and all His power are present in His holy name.",a:"Srila Prabhupada"},
+{q:"The chanting of the Hare Krishna mantra is always fresh and new.",a:"Srila Prabhupada"},
+{q:"Chanting Hare Krishna is direct association with Krishna.",a:"Srila Prabhupada"},
+{q:"When we approach chanting as a sacred meeting with God, the quality of our japa is transformed entirely.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In every name of Krishna, the entire spiritual world is contained. Chant with this understanding.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The river of the holy name flows from Goloka Vrindavana into our hearts. We simply need to open ourselves to receive it.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the incarnation of God in the form of transcendental sound.",a:"Padma Purana"},
+{q:"There is no vow like chanting the holy name, no knowledge superior to it, no meditation which comes anywhere near it.",a:"Vishnu-dharmottara Purana"},
+{q:"What one cannot achieve in thousands of years of meditation, one achieves immediately by chanting the holy name.",a:"Vishnu Purana"},
+{q:"The holy name is the spiritually blissful giver of all benedictions, for it is Krishna Himself, the reservoir of all pleasure.",a:"Padma Purana"},
+{q:"All the scriptures proclaim — of all forms of worship, the chanting of the holy name is the highest.",a:"Hari-bhakti-vilasa"},
+{q:"Those who have tasted the nectar of the holy name consider all material pleasures as insignificant as water in a calf\'s hoofprint.",a:"Srimad Bhagavatam"},
+{q:"Chanting together in the association of devotees co-creates a devotional energy and atmosphere that inspires absorption.",a:"HH Sacinandana Swami"},
+{q:"Find the place where you can be enthusiastic and strengthen that. The flood of bhakti will flow in and raise all the ships — including your japa.",a:"HH Sacinandana Swami"},
+{q:"Sankirtana — chanting performed with others — can create such extraordinary delight that one easily remains focused on the holy name.",a:"HH Sacinandana Swami"},
+{q:"The holy name is the elixir of immortality. Drink deeply from the fountain of Hare Krishna.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The maha-mantra is not just words. It is the concentrated mercy of Radha and Krishna, offered freely to all.",a:"Gaudiya Vaishnava Teaching"},
+{q:"As the rising sun immediately dissipates the darkness, the holy name, chanted once without offenses, dissipates all sinful reactions.",a:"Srimad Bhagavatam"},
+{q:"The holy name can deliver even a person who falls down, stumbles, is forced to chant, or chants jokingly.",a:"Srimad Bhagavatam"},
+{q:"A person fully engaged in chanting the maha-mantra is already living in the spiritual world, even while in the material body.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When we chant, we invoke the presence of Radha and Krishna. They come through Their name, which is Themselves.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting is the torchlight that illuminates the path through the dark forest of material existence.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The process of chanting cleanses the heart. And when the heart is clean, one can see God everywhere.",a:"Srila Prabhupada"},
+{q:"Our prayer of the Hare Krishna Mantra means addressing Radha and Krishna for being engaged in Their service.",a:"Srila Prabhupada"},
+{q:"Hare Krishna means \'Oh Hare, Oh Radharani! Oh Krishna! Please engage me in Your service.\'",a:"Srila Prabhupada"},
+{q:"The name of Krishna is the key that unlocks the treasure house of divine love. Turn the key through sincere chanting.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Each bead you turn is a step closer to Krishna. Each round you complete is a milestone on the path back to Godhead.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When you chant, you declare to the universe that you belong to Krishna and Krishna belongs to you.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let every Hare Krishna you chant be a love letter to the Supreme Lord, written with the ink of your devotion.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The end of all knowledge, all searching, all longing — is found in the holy name of Krishna.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In one moment of pure chanting, we touch eternity.",a:"Gaudiya Vaishnava Teaching"},
+{q:"No one ever saw Krishnadas Babaji Maharaja not chanting. At all times, the Hare Krishna mantra was dancing from his tongue.",a:"HH Radhanath Swami"},
+{q:"Prabhupada would sometimes, instead of talking on morning walks, just chant — and everyone would eagerly join him.",a:"srilaprabhupadalila.org"},
+{q:"In the early morning, after completing his translation work, Srila Prabhupada would sit back and chant japa with great feeling.",a:"srilaprabhupadalila.org"},
+{q:"Prabhupada would spontaneously utter \'Hare Krishna\' or state \'harer nama harer nama harer namaiva kevalam\' with great feeling and expression.",a:"srilaprabhupadalila.org"},
+{q:"Haridas Thakura chanted three hundred thousand names daily. His example shows us what is possible when absorbed in the name.",a:"Caitanya Caritamrta"},
+{q:"He was so absorbed in prayer at the airport that he missed his flight. Imagine if our japa could carry us to such depths.",a:"HH Sacinandana Swami"},
+{q:"The more sincerely we chant, the more clearly we see that Krishna has been with us all along.",a:"Gaudiya Vaishnava Teaching"},
+{q:"There is nothing in this world so pure, so powerful, so sublime as the holy name of the Lord chanted in love.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The more you chant, the more you will want to chant. This is the nature of the holy name — it creates its own appetite.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting Hare Krishna is the most revolutionary act in this world — it alone can change the consciousness of humanity.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name waited for you for countless lifetimes. Now that you have found it, hold on with all your strength.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Remember always: the holy name is not just a practice — it is a person. When you chant, you are calling the Lord Himself.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting transforms the ordinary into the extraordinary. An ordinary person becomes extraordinary by chanting Hare Krishna.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Make your japa a love affair with the holy name. Approach each session with eagerness, not obligation.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In the deep recesses of the heart, the holy name is waiting patiently for us to turn inward and receive its gift.",a:"Gaudiya Vaishnava Teaching"},
+{q:"If you can perfect your chanting, everything else in spiritual life will follow naturally.",a:"Srila Prabhupada"},
+{q:"The power of the holy name is not theoretical. It is practical, tangible, and available to anyone who chants.",a:"Srila Prabhupada"},
+{q:"One can chant the Holy Name in a humble state of mind, thinking oneself lower than the straw in the street.",a:"Sri Caitanya Mahaprabhu"},
+{q:"One should be more tolerant than a tree, devoid of all sense of false prestige and ready to offer all respects to others.",a:"Sri Caitanya Mahaprabhu"},
+{q:"In such a state of mind one can chant the Holy Name of the Lord constantly.",a:"Sri Caitanya Mahaprabhu"},
+{q:"I am so unfortunate that I have no attraction for chanting Your Holy Names.",a:"Sri Caitanya Mahaprabhu"},
+{q:"O almighty Lord, I have no desire to accumulate wealth, nor do I desire beautiful women, nor any number of followers.",a:"Sri Caitanya Mahaprabhu"},
+{q:"I only want Your causeless devotional service birth after birth.",a:"Sri Caitanya Mahaprabhu"},
+{q:"O son of Maharaja Nanda, I am Your eternal servant, but somehow I have fallen into this ocean of birth and death.",a:"Sri Caitanya Mahaprabhu"},
+{q:"Please pick me up and fix me as an atom at Your lotus feet.",a:"Sri Caitanya Mahaprabhu"},
+{q:"Whether You crush me under Your feet or embrace me, whether You neglect me or make me brokenhearted, You are still my Lord.",a:"Sri Caitanya Mahaprabhu"},
+{q:"By chanting without offenses, the devotee cries to Radharani and Krishna to please lift him out of the material energy.",a:"Srila Prabhupada"},
+{q:"Simply our prayer should be, \'My dear Krishna, please remind me to always chant Your Holy Name, do not put me into forgetfulness.\'",a:"Srila Prabhupada"},
+{q:"Please always remind me to chant, even if You send me into hell, just so long as I can always chant Hare Krishna.",a:"Srila Prabhupada"},
+{q:"By humility and meekness one attracts the attention of Krishna. That is the verdict of all the Vedas.",a:"Sri Jiva Goswami"},
+{q:"Chanting the holy name is the chief means of attaining love of Godhead. It does not depend on paraphernalia or good birth.",a:"Sri Jiva Goswami"},
+{q:"We chant in appreciation of Krishna\'s kindness, love and mercy for us. As our father, Krishna cannot but love us.",a:"HG Mahatma Prabhu"},
+{q:"Falling at the lotus feet of the holy name, Bhaktivinoda says, \'O Harinama, I pray for residence at Your lotus feet.\'",a:"Srila Bhaktivinoda Thakura"},
+{q:"Confront your fears of surrender. Realize that such fears are holding your chanting back.",a:"HG Mahatma Prabhu"},
+{q:"I chant to be accepted by Krishna, and to repair my broken relationship with Him.",a:"HG Mahatma Prabhu"},
+{q:"I chant to please Radha and Krishna, not to gain anything material.",a:"HG Mahatma Prabhu"},
+{q:"I chant with no other motive than to render pure devotional service.",a:"HG Mahatma Prabhu"},
+{q:"I am totally dependent on Guru and Krishna to chant quality japa every day.",a:"HG Mahatma Prabhu"},
+{q:"Mercy comes in proportion to your efforts. When you endeavor to improve your japa, Guru and Krishna reciprocate.",a:"HG Mahatma Prabhu"},
+{q:"Without the mercy of the holy name, no one can approach Krishna.",a:"Sri Haridasa Thakura"},
+{q:"O how glorious are those whose tongues are chanting the Holy Name — such persons must have executed all kinds of austerities.",a:"Srimad Bhagavatam"},
+{q:"A person who chants the holy name, even if born in the family of dog-eaters, is worshipable.",a:"Srimad Bhagavatam"},
+{q:"Fierce determination and gentle humility are the ornaments which make one attractive in the eyes of the Lord.",a:"HH Radhanath Swami"},
+{q:"We should chant in a humble mood, understanding that we are worshipping the Supreme Personality of Godhead in His most merciful incarnation.",a:"HH Radhanath Swami"},
+{q:"God encourages those who try their best. He is pleased with whatever is done sincerely. So there is no reason to be dejected.",a:"HH Sacinandana Swami"},
+{q:"When you are angry or dejected, you are only with yourself, but not with God. Practice non-dejection.",a:"HH Sacinandana Swami"},
+{q:"The holy name does not consider morning or night, purity or impurity — it delivers anyone who chants sincerely.",a:"Padma Purana"},
+{q:"God has invested all His transcendental potencies in His holy names. There are no hard and fast rules for chanting.",a:"Sri Caitanya Mahaprabhu"},
+{q:"The holy name is the most merciful manifestation of God. It does not discriminate between the qualified and unqualified.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting with humility opens the door to the spiritual world. Pride keeps it shut.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Krishna has made it easy in this age. Just chant. He has not asked for great austerities — just chant sincerely.",a:"Srila Prabhupada"},
+{q:"The holy name asks only one thing of us: sincerity. Give it sincerity and it will give you everything.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The devotee who chants sincerely, even with imperfections, is dearer to Krishna than the yogi who meditates for centuries.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Without wearing this verse around our necks — trinad api sunicena — strung by the holy name, there can be no real cooperation.",a:"HH Radhanath Swami"},
+{q:"Humility is a natural symptom of those who love God.",a:"HH Radhanath Swami"},
+{q:"The greatest surrender is sacrificing our entire consciousness to Krishna through attentive chanting.",a:"HH Radhanath Swami"},
+{q:"Distraction during chanting is a result of our eternal conditioning to compete with and envy Krishna.",a:"HG Mahatma Prabhu"},
+{q:"\'I have to chant\' sends a message to Krishna that we don\'t like spending time with Him.",a:"HG Mahatma Prabhu"},
+{q:"Those who are really advanced in spiritual life are always thinking of how to spread the Holy Name of Krishna.",a:"Srila Prabhupada"},
+{q:"He loves us so much that He makes it possible for us to attain the highest perfection just by chanting His name.",a:"HG Mahatma Prabhu"},
+{q:"Do not try to see God. Serve Him and chant His holy name — and He will reveal Himself to you.",a:"Srila Bhaktisiddhanta Sarasvati Thakura"},
+{q:"Those who chant Hare Krishna regularly are the real aristocrats of the world.",a:"Srila Bhaktisiddhanta Sarasvati Thakura"},
+{q:"Renunciation doesn\'t mean giving up things externally but rather diligently pulling out the weeds from the heart.",a:"HH Radhanath Swami"},
+{q:"One may be born in a family of dog-eaters, but if he chants the holy name, he is the best of brahmanas.",a:"Srimad Bhagavatam"},
+{q:"When we understand that the holy name is non-different from Krishna, our chanting transforms from routine to rapture.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chant with gratitude. You have received the most rare gift in all of creation — the maha-mantra.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every saint has a past and every sinner has a future — the holy name is what transforms one into the other.",a:"Gaudiya Vaishnava Teaching"},
+{q:"If one is infested with the ten offenses, despite endeavoring to chant for many births, one will not get love of Godhead.",a:"Srila Prabhupada"},
+{q:"One must follow strictly the instruction of trinad api sunicena. Without this, although one goes on chanting, there is no possibility of attaining pure devotion.",a:"Srila Prabhupada"},
+{q:"The potency of the holy name is so great that it can deliver even those who chant unintentionally or in jest.",a:"Srila Prabhupada"},
+{q:"Chanting is not a burden but a privilege. The greatest souls in history have spent their lives immersed in the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Praying for Krishna\'s mercy is a good way to overcome distraction: \'Please Krishna! I don\'t chant very well. Please help me!\'",a:"Gaudiya Vaishnava Teaching"},
+{q:"Without Your mercy, there is no hope at all for such a fool as me.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When someone is overwhelmed with lamentation or anger, there is no possibility of Krishna being manifest in the heart.",a:"Padma Purana"},
+{q:"Haridas Thakura said, \'My body is alright but spiritually I am in a diseased condition because I cannot complete my vow of chanting.\'",a:"Caitanya Caritamrta"},
+{q:"If we cannot complete our prescribed number of mantras each day, it is considered a seriously diseased spiritual condition.",a:"HH Radhanath Swami"},
+{q:"Haridas Thakura would not even take prasadam until he completed his vow of chanting.",a:"Caitanya Caritamrta"},
+{q:"When Lord Caitanya saw Haridas could not complete his rounds, He told him to simply chant one name, for all perfections already reside in the pure devotee.",a:"Caitanya Caritamrta"},
+{q:"Chanting is not about perfection. It is about connection. Connect with Krishna and perfection will come in time.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the mother who never abandons her child, no matter how far the child wanders.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Make a solemn promise to the holy name: \'I will never abandon you, and I trust that you will never abandon me.\'",a:"Gaudiya Vaishnava Teaching"},
+{q:"Do not be discouraged by your inattention. The very fact that you notice it is a sign of spiritual progress.",a:"HH Sacinandana Swami"},
+{q:"Don\'t give up chanting even if you feel no taste. The taste will come. Krishna rewards perseverance.",a:"Srila Prabhupada"},
+{q:"The holy name will reveal its sweetness in its own time. Our job is to keep chanting with faith and patience.",a:"HH Sacinandana Swami"},
+{q:"Don\'t compare your chanting to others. Compare your chanting today to yesterday, and strive to improve.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Your japa tells the story of your relationship with Krishna. Make it a beautiful story.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When your chanting improves, everything improves — your relationships, your clarity, your peace, your devotion.",a:"HG Mahatma Prabhu"},
+{q:"The nama-aparadhas are not meant to discourage us. They are signposts showing us how to chant better.",a:"Gaudiya Vaishnava Teaching"},
+{q:"An offender at the feet of the holy name can still be saved — by taking more and more shelter of the holy name.",a:"Srila Prabhupada"},
+{q:"Krishna\'s name is like the sun. It does not need our help to shine. We simply need to remove the clouds of our offenses.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Even if there may be some problems, always try to remain in Krishna Consciousness. Do not give up chanting.",a:"Srila Prabhupada"},
+{q:"But even if there may be some problems, always try to remain in Krishna Consciousness. Do not give up chanting due to external difficulties.",a:"Srila Prabhupada"},
+{q:"Treat the Holy Names as Radha and Krishna. It is inconceivable that God and His name are identical, but realize it by relating to the name.",a:"HG Mahatma Prabhu"},
+{q:"We often become depressed when we cannot engage in the quantity of sadhana we would like. But Krishna wants genuine moments of devotion.",a:"HH Sacinandana Swami"},
+{q:"Egoism and laziness is our downfall. The chanting of the holy names and serving Vaishnavas is our basis.",a:"HH Radhanath Swami"},
+{q:"The price of Krishna Consciousness is the eagerness to know about Krishna, to hear about Krishna, to chant His glories.",a:"HH Radhanath Swami"},
+{q:"Adequacy and insecurity are both overcome by taking deep shelter of the holy name.",a:"HG Radheshyam Prabhu"},
+{q:"You are a devotee, and so Krishna will protect you. Always think that Krishna is with you. He is present in His name.",a:"Srila Prabhupada"},
+{q:"Anyone who voluntarily cooperates with Krishna\'s desire — He responds to his call very eagerly.",a:"Srila Prabhupada"},
+{q:"If you are sincere, your faith will be strengthened and purified in the face of testing circumstances.",a:"HH Radhanath Swami"},
+{q:"The holy name is the shelter for those who have no other shelter in this material world.",a:"Gaudiya Vaishnava Teaching"},
+{q:"We should chant the Holy Name with great respect and faith and without offense. All our desires will be fulfilled.",a:"Srila Bhaktisiddhanta Sarasvati Thakura"},
+{q:"A grateful heart is not one that is selective about what to be grateful for. Be grateful for the holy name above all.",a:"HH Radhanath Swami"},
+{q:"Whoever is chanting the holy name must have bathed at holy places, studied the Vedas, and fulfilled everything required.",a:"Srimad Bhagavatam"},
+{q:"The chanting of Hare Krishna is the only remedy in this age of quarrel. The holy name is the yuga-dharma.",a:"Srila Prabhupada"},
+{q:"Chanting Hare Krishna is not a matter of Hindu or Muslim or Christian. The holy name belongs to everyone.",a:"Srila Prabhupada"},
+{q:"Becoming advanced in spiritual life is not a question of birthright but of accepting the mercy of the Supreme Lord.",a:"HH Radhanath Swami"},
+{q:"Whatever our qualifications or disqualifications, Krishna recognizes the sincere endeavor.",a:"HH Radhanath Swami"},
+{q:"On the path of bhakti, the holy name is the beginning, the sustainer, and the perfection. Chant with all your heart.",a:"Gaudiya Vaishnava Teaching"},
+{q:"All glories to the holy name! All glories to the chanters! All glories to Sri Caitanya Mahaprabhu who gave us this gift!",a:"Gaudiya Vaishnava Teaching"},
+{q:"The real regulated life is that if sixteen rounds is not completed, then we have to forego sleeping.",a:"Srila Prabhupada"},
+{q:"So you have to spend two hours for Krishna out of twenty-four.",a:"Srila Prabhupada"},
+{q:"In order to remain fixed in spiritual strength, always be sure to chant the prescribed sixteen rounds daily without fail.",a:"Srila Prabhupada"},
+{q:"Be careful never to decrease but increase the number of rounds and you will become more strong in Krishna Consciousness.",a:"Srila Prabhupada"},
+{q:"It is very good news that you are regularly chanting your 16 rounds; try to increase the rounds, but don\'t decrease.",a:"Srila Prabhupada"},
+{q:"You should try to chant at least 2 or 3 hours every day. We have got 24 hours at our disposal.",a:"Srila Prabhupada"},
+{q:"Your only business is to follow the regulative principles and chant Hare Krishna sixteen rounds.",a:"Srila Prabhupada"},
+{q:"There may be sometimes mistake. That will be corrected automatically. Just follow the principles and chant.",a:"Srila Prabhupada"},
+{q:"In the beginning there will be tests by Maya, and we shall feel many disturbances. But if we chant regularly as prescribed, we shall remain steady.",a:"Srila Prabhupada"},
+{q:"One must chant the holy name with a strict vow. Therefore upon initiation you make a strict vow to chant the minimum each day.",a:"HH Radhanath Swami"},
+{q:"Haridas Thakura considered that if he could not complete his vow of chanting, he was in a spiritually diseased condition.",a:"HH Radhanath Swami"},
+{q:"According to time and circumstances, the spiritual master adjusts the discipline. But whatever is prescribed must be completed with great care.",a:"HH Radhanath Swami"},
+{q:"I chant my rounds as daily vow. It\'s not so hard to find two hours when you have decided it\'s a must.",a:"Kadamba Kanana Swami"},
+{q:"Two hours out of twenty-four as a promise made long ago to the spiritual master. \'I can do it, I will do it.\'",a:"Kadamba Kanana Swami"},
+{q:"I may not be doing much else in my spiritual life, but I keep this vow with faith. It\'s Kali Yuga\'s antidote to hopelessness.",a:"Kadamba Kanana Swami"},
+{q:"I organize my life to make my japa the most important activity of the day.",a:"HG Mahatma Prabhu"},
+{q:"Be aware of how your lifestyle, attitude and activities are supporting your chanting.",a:"HG Mahatma Prabhu"},
+{q:"Chanting in the early morning, during the brahma-muhurta, is most auspicious and brings the greatest spiritual benefit.",a:"Srila Prabhupada"},
+{q:"If you have got some time, the best thing would be to chant Hare Krishna more and more. Because our life is very short.",a:"Srila Prabhupada"},
+{q:"We should forego sleeping even. You should take out hours from sleeping to complete sixteen rounds.",a:"Srila Prabhupada"},
+{q:"Ninety percent of our advancement is dependent on chanting. All other processes of bhakti are contained in chanting.",a:"HH Sacinandana Swami"},
+{q:"Chanting is the pole that supports the other processes of bhakti.",a:"HH Sacinandana Swami"},
+{q:"One has to continue chanting the Hare Krishna mantra and preaching — this constitutes the perfection of life.",a:"Srila Prabhupada"},
+{q:"The goal is to always remember Krishna. The best way to do this is by chanting.",a:"HH Sacinandana Swami"},
+{q:"Krishna says: from Me come knowledge, remembrance and forgetfulness. If you want to improve your japa, He will show you how.",a:"HG Mahatma Prabhu"},
+{q:"Wake up early. Sit down with determination. Pick up your beads. And let the maha-mantra carry you to a higher consciousness.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Your sixteen rounds are your daily connection to the infinite. Protect this connection at all costs.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Perseverance in chanting is the secret of all success in spiritual life. Never give up the holy name.",a:"Srila Prabhupada"},
+{q:"The tongue has two functions: tasting and vibrating. Use it for chanting Hare Krishna and tasting Krishna-prasadam — conquer all senses.",a:"Srila Prabhupada"},
+{q:"A sincere chanter will find that Krishna personally guides him from within the heart.",a:"Srila Prabhupada"},
+{q:"Don\'t waste a single moment without chanting. Time is the most valuable commodity.",a:"Srila Prabhupada"},
+{q:"Harinama sankirtana — the congregational chanting — is the most sublime gift of Sri Caitanya Mahaprabhu to the world.",a:"Srila Prabhupada"},
+{q:"Lord Caitanya has given the greatest boon: in this age one simply has to chant the holy name to attain perfection.",a:"Srila Prabhupada"},
+{q:"In this age one can achieve spiritual progress only by chanting the holy name of the Lord.",a:"Srila Prabhupada"},
+{q:"In this age of quarrel and hypocrisy, the only means of deliverance is chanting. There is no other way.",a:"Brihan-naradiya Purana"},
+{q:"The Hare Krishna mantra is the great chant for deliverance — maha-mantra — recommended by all Vedic scriptures.",a:"Srila Prabhupada"},
+{q:"Even if you cannot understand the philosophy, simply chant Hare Krishna. The name will teach you everything.",a:"Srila Prabhupada"},
+{q:"Whatever problems you face in life, the answer is the same: chant Hare Krishna.",a:"Srila Prabhupada"},
+{q:"If you want peace in the world, chant Hare Krishna. If you want peace in your heart, chant Hare Krishna.",a:"Srila Prabhupada"},
+{q:"The holy name is the medicine and the disease is material attachment. Take the medicine regularly and the disease will be cured.",a:"Srila Prabhupada"},
+{q:"The holy name is the remedy for the disease of repeated birth and death. Take the medicine faithfully.",a:"Srila Prabhupada"},
+{q:"This is the age of the holy name. All other processes are dependent on it and subordinate to it.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let the maha-mantra be the first sound on your lips in the morning and the last sound at night.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting Hare Krishna is the surest and simplest path to the highest perfection of life.",a:"Srila Prabhupada"},
+{q:"The holy name purifies the chanter, the listener, and even the atmosphere where it is chanted.",a:"Srila Prabhupada"},
+{q:"If you chant Hare Krishna, your life is sublime. If you don\'t, your life is simply trouble.",a:"Srila Prabhupada"},
+{q:"Chanting destroys the reactions of all sinful activities and awakens transcendental loving devotional service.",a:"Srila Prabhupada"},
+{q:"The sign of a mature devotee is deep taste for chanting the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting without offenses is the highway to love of God. Remove the offenses and the path becomes clear.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the seed of the creeper of devotion. Water it with faith and it becomes a tree bearing the fruit of love of God.",a:"Sri Caitanya Mahaprabhu"},
+{q:"The holy name delivered Ajamila, who was the worst of sinners. It can certainly deliver you.",a:"Srila Prabhupada"},
+{q:"Chanting, dancing, and taking prasadam are the universal formula, and we have experienced this everywhere in the world.",a:"Srila Prabhupada"},
+{q:"The process of chanting is like lighting a fire. At first it may flicker, but if we fan it with devotion, it becomes a blazing fire.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Constant chanting of the Holy Name will make one free of offenses and elevate one to the transcendental platform.",a:"Srila Prabhupada"},
+{q:"When we sincerely chant Hare Krishna, we water the root of the tree of our existence, and all branches are nourished.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Just as fire has the power to burn regardless of who lights it, the holy name purifies regardless of who chants it.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Harinama — the congregational chanting of the holy name — can save the whole world from destruction.",a:"Srila Prabhupada"},
+{q:"All the austerities, penances, and sacrifices of previous ages are contained in the simple act of chanting Hare Krishna.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Sankirtana — the congregational chanting — is the religion for this age. Everything else is supplementary.",a:"Srila Prabhupada"},
+{q:"The holy name is like rain falling on dry land. Each mantra nourishes the parched soul back to life.",a:"Gaudiya Vaishnava Teaching"},
+{q:"If you can do nothing else, just chant. Chanting is everything.",a:"Srila Prabhupada"},
+{q:"Sri Caitanya Mahaprabhu did not invent the chanting of Hare Krishna. He revealed the treasure already present in the Vedas.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The world is searching for happiness in the wrong places. Real happiness is found in the sound vibration of the maha-mantra.",a:"Srila Prabhupada"},
+{q:"When we chant the holy name, we should feel like a drowning man clutching a rope. It will pull us out of material suffering.",a:"Gaudiya Vaishnava Teaching"},
+{q:"There is no knowledge more confidential, no practice more powerful, and no path more direct than chanting the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every moment spent in chanting is a moment invested in eternity. No effort in chanting is ever wasted.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting Hare Krishna is the one investment that yields eternal returns. Invest generously.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The maha-mantra is the lifeline thrown by Lord Caitanya to the drowning souls of Kali-yuga.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The tulasi beads in your hand and the holy name on your lips — this is the uniform of a soldier in Lord Caitanya\'s army.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A devotee\'s most intimate possession is his bead bag. It carries the most valuable gems — the holy names of the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Your beads are your connection to Krishna. Your beads are your ticket back to Godhead.",a:"Srila Prabhupada"},
+{q:"This chanting is the essence of our philosophy.",a:"Srila Prabhupada"},
+{q:"The best way to remember Krishna is to always chant Hare Krishna.",a:"Srila Prabhupada"},
+{q:"If we can perfect our chanting, everything else in spiritual life will follow naturally.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Krishna consciousness means being conscious of Krishna. The direct means is chanting of His holy names.",a:"Srila Prabhupada"},
+{q:"Srila Prabhupada said we can do without temples, without money, without everything — but one thing we always need: the holy name.",a:"HH Radhanath Swami"},
+{q:"We always need for our spiritual survival the association of devotees and the regular chanting of the holy names.",a:"HH Radhanath Swami"},
+{q:"The culmination of all our preaching is to induce people to wholeheartedly chant the holy names.",a:"HH Radhanath Swami"},
+{q:"A life without chanting is a life without purpose. A life filled with chanting is a life fulfilled.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let the last thought at the end of every day be the holy name. Let the first thought of every day be the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"From this day forward, let the holy name be your life\'s compass, your heart\'s anchor, and your soul\'s wings.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The chanting of the holy name awards all that the devotee needs — peace, happiness, knowledge, and ultimately love of God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Hare Krishna Hare Krishna Krishna Krishna Hare Hare, Hare Rama Hare Rama Rama Rama Hare Hare — the supreme benediction for all.",a:"Sri Caitanya Mahaprabhu"},
+{q:"The journey of a thousand miles begins with a single step. The journey back to Godhead begins with a sincere chanting of the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Never underestimate the power of one sincere maha-mantra. It can move mountains of karma and open oceans of mercy.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let there be all victory for the chanting of the holy name of Lord Krishna, which can cleanse the mirror of the heart.",a:"Sri Caitanya Mahaprabhu"},
+{q:"The chanting of the holy name stops the miseries of the blazing fire of material existence.",a:"Sri Caitanya Mahaprabhu"},
+{q:"The chanting of the maha-mantra increases the ocean of transcendental bliss.",a:"Sri Caitanya Mahaprabhu"},
+{q:"O my Lord, Your holy name alone can render all benediction to living beings, and thus You have hundreds and millions of names.",a:"Sri Caitanya Mahaprabhu"},
+{q:"In these transcendental names You have invested all Your transcendental energies.",a:"Sri Caitanya Mahaprabhu"},
+{q:"There are no strict rules and regulations for chanting these names. O my Lord, You are so kind.",a:"Sri Caitanya Mahaprabhu"},
+{q:"My dear Krishna, please remind me to always chant Your Holy Name, please do not put me into forgetfulness.",a:"Srila Prabhupada"},
+{q:"You are sitting within me as Supersoul, so You can put me into forgetfulness or into remembering You.",a:"Srila Prabhupada"},
+{q:"Please always remind me to chant, even if You send me into hell, just so long as I can always chant Hare Krishna.",a:"Srila Prabhupada"},
+{q:"We shall be able to cross hundreds of dangerous pits simply by chanting the Holy Names of the Lord.",a:"Srila Prabhupada"},
+{q:"The holy name can lift one from any depth of degradation to the highest platform of spiritual perfection.",a:"Srila Prabhupada"},
+{q:"When we chant the holy name, we should feel like a crying child calling for its mother. That intensity attracts the Lord.",a:"Srila Prabhupada"},
+{q:"The whole idea of chanting is that it gives us a chance to fix our mind on the all-attractive features of Krishna.",a:"Srila Prabhupada"},
+{q:"When the devotee chants Hare Krishna with tears in his eyes, Krishna cannot resist his call.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The most important aspect of chanting is sincerity. Krishna sees the heart of the chanter.",a:"Srila Prabhupada"},
+{q:"The holy name brings peace where there is anxiety, hope where there is despair, and love where there is emptiness.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the bridge between the material world and the spiritual world.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is a wish-fulfilling gem. It gives liberation to those who seek liberation and love to those who seek love.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Each name of Krishna is a jewel. String them together on the thread of devotion and you have the most precious necklace.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the boat, the ocean is material existence, and the far shore is the spiritual world. Board the boat.",a:"Gaudiya Vaishnava Teaching"},
+{q:"One day your chanting will bring you face to face with Krishna. On that day, all your perseverance will be vindicated.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When the holy name enters the ears and touches the heart, all doubts are destroyed and the bondage of karma is cut.",a:"Srimad Bhagavatam"},
+{q:"You simply chant Hare Krishna and come with me. This much I want. I don\'t want anything else.",a:"Srila Bhaktivinoda Thakura"},
+{q:"The process of chanting is the most recommended way to realize the Supreme Personality of Godhead.",a:"Srila Prabhupada"},
+{q:"There is no distance between you and Krishna when you chant His name. The name dissolves all separation.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When we chant, we are not alone. All the great acharyas are with us in the vibration of the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The most powerful mantra in the universe is the Hare Krishna maha-mantra. It has the power to awaken love for God.",a:"Srila Prabhupada"},
+{q:"Those who chant the holy name will never be alone. Krishna accompanies them as friend, guide, and protector.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chant with feeling. Let each Hare Krishna be a genuine call to the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting with humility, we approach the Lord not as masters but as servants, eager for His grace.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Even if one distributes ten million cows in charity, he cannot reap one hundredth part of the benefits from chanting.",a:"Caitanya Caritamrta"},
+{q:"The holy name is the concentrated mercy of Radha and Krishna, offered freely to all.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A moment of pure chanting is worth more than a lifetime of other religious activities.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting is an art. Like any art, it requires practice, patience, and devotion to the craft.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The greatest treasure in the three worlds is the holy name of the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"As the Ganges purifies everything it touches, the holy name purifies the consciousness of whoever vibrates it.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A person who chants the holy name constantly is to be considered a first-class Vaishnava.",a:"Caitanya Caritamrta"},
+{q:"When the Lord sees that a devotee is completely sincere, He acts from within so that the devotee may easily go back to Him.",a:"Srila Prabhupada"},
+{q:"The Lord is more anxious to take us back into His kingdom than we can desire.",a:"Srila Prabhupada"},
+{q:"By the grace of God, a sincere devotee gets sufficient strength to defend himself from disturbances.",a:"Srila Prabhupada"},
+{q:"The devotee who is completely sincere in getting admittance to the Lord\'s service — the Lord acts from within.",a:"Srila Prabhupada"},
+{q:"When He sees our sincerity, Krishna reveals Himself from within the name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The action of the mind follows the quality of our association. Associate deeply with the holy name and be transformed.",a:"HG Radheshyam Prabhu"},
+{q:"Surrender to the process of chanting. When we chant with faith and patience, the holy name gradually reveals all spiritual truths.",a:"HH Romapada Swami Maharaj"},
+{q:"The power of the holy name is that it can transform the heart — not just purify it, but transform it into a vessel of divine love.",a:"HH Romapada Swami Maharaj"},
+{q:"Krishna consciousness is awakened by the regular and attentive chanting of the holy names. There is no shortcut.",a:"HH Romapada Swami Maharaj"},
+{q:"When we approach the holy name with humility and earnestness, the holy name reciprocates by revealing the sweetness of Krishna.",a:"HH Romapada Swami Maharaj"},
+{q:"If you want to lose your ignorance and actually experience the sweetness of Krishna\'s name, you need to chant regularly and with affectionate respect.",a:"HH Sacinandana Swami"},
+{q:"The chanting of the holy name in good company is easier than doing so alone.",a:"HH Sacinandana Swami"},
+{q:"Chanting the holy name in the association of devotees co-creates a devotional energy that inspires us all.",a:"HH Sacinandana Swami"},
+{q:"The sweet names of Krishna — Govinda, Gopala, Vasudeva — each one is a doorway to the spiritual world.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the torchlight of spiritual knowledge. In its light, all illusions are dispelled.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When we feel hopeless, chant. When joyful, chant. When we feel nothing, chant. The name is our constant companion.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the rope that Lord Caitanya throws to us. Grab hold and don\'t let go.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting is not a tax we pay to God. It is the love letter He has asked us to write daily.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Japa is the foundation of the house of bhakti. If the foundation is weak, everything else crumbles.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name does not require any qualification. The only qualification is the desire to chant.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When you forget everything else but remember Krishna\'s name, you have found the essence of spiritual life.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chanting is the simplest thing in the world, yet it contains the deepest mystery — God\'s love for His creation.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every great devotee in history has been sustained by the chanting of the holy name. Follow in their footsteps.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name has no beginning and no end. It is the eternal sound vibration of the spiritual world.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When life gets difficult, chant more. When life is easy, chant more. The prescription is always the same.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Nama Prabhu — the Lord of the holy name — personally appears whenever a sincere soul calls out in chanting.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Access Krishna\'s mercy through the holy name. The name is not different from Krishna Himself.",a:"HG Radheshyam Prabhu"},
+{q:"The difference between material sound and the holy name is the difference between a mirror and the sun.",a:"Gaudiya Vaishnava Teaching"},
+{q:"One name of Krishna equals chanting one thousand names of Vishnu — such is the supreme potency of Krishna\'s name.",a:"Brahmanda Purana"},
+{q:"Every syllable of the maha-mantra is an invitation to return home, back to Godhead.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In kirtana, the devotee offers his voice. In japa, he offers his heart. Both are pleasing to the Lord.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is the ocean of mercy, and we are simply asked to take a dip. Dive deep today.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The perfection of chanting is to chant purely — without offense and without material desire.",a:"Srila Prabhupada"},
+{q:"Krishna has invested all His potencies in the holy name. When you chant, you access the infinite treasury of God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"May the Hare Krishna maha-mantra be your constant meditation, your unfailing shelter, and your eternal source of joy.",a:"Gaudiya Vaishnava Teaching"},
+{q:"There is nothing higher, nothing deeper, nothing more sublime than the chanting of the holy names. Chant and be happy.",a:"Srila Prabhupada"},
+{q:"The mind will always try to steal you away from the holy name. Your job is to gently but firmly bring it back, again and again.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When you notice your mind has drifted, do not be angry with yourself. Simply return to hearing the name — that return is itself a victory.",a:"HH Sacinandana Swami"},
+{q:"The tongue is chanting, but is the ear hearing? This is the question every serious chanter must ask in every round.",a:"HG Mahatma Prabhu"},
+{q:"Prabhupada said if we can simply hear each word of the mantra clearly, that alone is sufficient to bring us to the spiritual platform.",a:"Srila Prabhupada"},
+{q:"When the heart is absorbed in the holy name, material anxieties cannot enter — just as darkness cannot exist where the sun shines.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Haridas Thakura was so absorbed in chanting that even the most beautiful temptations of Maya could not disturb his concentration.",a:"Caitanya Caritamrta"},
+{q:"The acharyas teach that absorption in the holy name naturally leads to remembrance of Krishna\'s form, qualities, and pastimes.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When the name fully captures the heart, one experiences such joy that all material pleasures become tasteless in comparison.",a:"Sri Rupa Goswami"},
+{q:"Deep chanting is like diving into an ocean of nectar. On the surface there is turbulence, but in the depths there is infinite peace.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A truly humble chanter does not advertise his rounds or his realizations. He quietly serves the holy name in his heart.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name is more merciful than we can imagine. Even our failed attempts to chant well are accepted by Krishna.",a:"HH Sacinandana Swami"},
+{q:"Humility before the holy name means recognizing that we are completely dependent on its mercy for spiritual advancement.",a:"HG Radheshyam Prabhu"},
+{q:"When Bhaktivinoda Thakura chanted, he would weep, considering himself the most fallen. This mood attracted the mercy of the name.",a:"Srila Bhaktivinoda Thakura"},
+{q:"Do not think you are a great chanter. Think you are a beggar at the door of the holy name, praying for a drop of mercy.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The qualification for chanting is not scholarship or purity — it is humility. The humbler the chanter, the sweeter the name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Krishna does not look at how many rounds we chant. He looks at how much heart we put into each name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"If you can rise early and chant your rounds before the world wakes up, you have won the battle for the day.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The brahma-muhurta hours before sunrise are specially charged for spiritual practice. Use them for your best chanting.",a:"Srila Prabhupada"},
+{q:"Make a non-negotiable commitment: my sixteen rounds will be complete before I attend to any other duty.",a:"HG Mahatma Prabhu"},
+{q:"The six Goswamis of Vrindavana minimized sleeping, eating, and idle talk. They maximized their chanting.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In the morning, before maya has had a chance to attack, fortify yourself with the armor of the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Make a daily schedule and stick to it. Fixed-up devotees who chant at the same time daily make the fastest progress.",a:"Srila Prabhupada"},
+{q:"When you protect your japa time, Krishna protects everything else in your life. This is the reciprocation of devotion.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The morning hours are the gateway to spiritual advancement. A devotee who misses the morning program has missed the greatest opportunity.",a:"Srila Prabhupada"},
+{q:"Do not negotiate with the mind about when to chant. The mind will always find excuses. Just chant.",a:"HG Mahatma Prabhu"},
+{q:"Regularity is the mother of success in chanting. An irregular chanter will never taste the nectar of the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Even if you sleep less, even if you eat less — never chant less. Chanting is the non-negotiable foundation of spiritual life.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Bhaktisiddhanta Sarasvati Thakura said that if we have any idle time, it should be used for chanting, not for gossip.",a:"Srila Bhaktisiddhanta Sarasvati Thakura"},
+{q:"A fixed vow of chanting creates a spiritual anchor. Without it, we are adrift on the ocean of material existence.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The daily vow of sixteen rounds is the minimum investment for maximum spiritual returns.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Treat your japa like a sacred appointment that cannot be rescheduled or cancelled.",a:"Gaudiya Vaishnava Teaching"},
+{q:"O Hare! O energy of the Lord! O Krishna! Please engage me in Your service. I have wandered in this material world for so long.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every Hare Krishna I chant is a prayer: \'Please let me serve You. Please let me love You. Please never let me forget You.\'",a:"Gaudiya Vaishnava Teaching"},
+{q:"The maha-mantra is the sweetest prayer ever composed. It contains the entire relationship between the soul and God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When all other prayers fail, the maha-mantra succeeds. It is the ultimate prayer for the ultimate need — love of God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chant as if your next breath depends on it. Chant as if your eternal destiny depends on it — because it does.",a:"Gaudiya Vaishnava Teaching"},
+{q:"O Lord, I have no qualification, no purity, no knowledge. All I have is Your holy name. Please accept this offering of sound.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The maha-mantra is the prayer of prayers — it contains within it every possible supplication the soul can make to God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"O Radharani, You are the most compassionate. Please recommend me to Krishna. Please help me chant with love.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Each time we chant Hare, we call upon Srimati Radharani. Each time we chant Krishna, we call upon the Lord. This is our eternal prayer.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The most effective prayer is the maha-mantra chanted with a broken heart. Krishna cannot resist such a call.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let my japa be a daily conversation with God — honest, vulnerable, and full of longing for His mercy.",a:"Gaudiya Vaishnava Teaching"},
+{q:"O Krishna, please purify my heart so that I may chant Your name with love. Remove the obstacles of lust, anger, and greed.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Prayer is the soul of japa. Without prayer, chanting is mechanical. With prayer, chanting becomes a river of devotion.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Before you pick up your beads, pick up your humility. Before you open your mouth, open your heart.",a:"Gaudiya Vaishnava Teaching"},
+{q:"O holy name, please dance on my tongue today. Please enter my ears and descend into the depths of my heart.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Let today\'s chanting bring me one step closer to You, O Krishna. Even one step — that is all I ask.",a:"Gaudiya Vaishnava Teaching"},
+{q:"A single tear shed while chanting the holy name is worth more than all the gold in the fourteen worlds.",a:"Gaudiya Vaishnava Teaching"},
+{q:"When we finally realize the holy name is a person — not a practice — our entire approach to japa is revolutionized.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The realization that Krishna\'s name is Krishna Himself is not intellectual — it is experiential. It comes through sincere chanting.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The greatest miracle is that God has made Himself available to everyone through His holy name. No qualification needed, no fee required.",a:"Gaudiya Vaishnava Teaching"},
+{q:"One who has tasted the nectar of the holy name will never exchange it for anything in the material world.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The holy name gradually reveals its sweetness — first cleansing the heart, then awakening devotion, then bestowing love of God.",a:"Gaudiya Vaishnava Teaching"},
+{q:"True advancement is measured not by the number of rounds but by the depth of our relationship with the holy name.",a:"Gaudiya Vaishnava Teaching"},
+{q:"In the holy name, everything is present — knowledge, bliss, eternity, relationship, and the full sweetness of Vrindavana.",a:"Gaudiya Vaishnava Teaching"},
+{q:"The chanting of Hare Krishna is not a religious ritual. It is the awakening of the soul from the sleep of material existence.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Every mantra is a seed of bhakti. Plant it with faith, water it with sincerity, and it will grow into the tree of divine love.",a:"Gaudiya Vaishnava Teaching"},
+{q:"Chant and be happy.",a:"Srila Prabhupada"}
+];
 
-    // Try to split into verses
-    let verses = [];
-    if (s.cat === 'gita') {
-      const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)/);
-      for (const part of bgParts) {
-        const trimmed = part.trim();
-        if (!trimmed) continue;
-        const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\s*([\s\S]*)/);
-        if (m) verses.push({ num: 'Bg ' + m[1], text: m[2].trim() });
-      }
-    }
-    if (!verses.length) {
-      const parts = lyrics.split(/(?<!\d)(?=\(\d+\))/);
-      for (const part of parts) {
-        const trimmed = part.trim();
-        if (!trimmed) continue;
-        const m = trimmed.match(/^\((\d+)\)\s*([\s\S]*)/);
-        if (m) verses.push({ num: m[1], text: m[2].trim() });
-        else if (parts.length === 1) verses.push({ num: null, text: trimmed });
-      }
-    }
-    verses.forEach((v, i) => {
-      // Skip very short or very long
-      const t = v.text.replace(/\n/g, ' ').trim();
-      if (t.length < 15 || t.length > 500) return;
-      all.push({ songId: s.id, verseNum: v.num, verseIdx: i, text: v.text, songTitle: title, book: s.book || '', author: s.author || '' });
-    });
-  });
-  return all;
+// ── Srila Prabhupada Quotes (8 AM – 12 PM) — placeholder ──
+const MUSE_PRABHUPADA = [
+  {q:"In this age of quarrel and hypocrisy the only means of deliverance is chanting the holy name of the Lord. There is no other way.", a:"Srila Prabhupada"},
+  {q:"The chanting of the Hare Krishna mantra is the most effective means for self-realization in this age.", a:"Srila Prabhupada"},
+  {q:"We are not this body. We are spirit soul. The aim of human life is to understand this.", a:"Srila Prabhupada"},
+  {q:"Krishna consciousness is not an artificial imposition on the mind. It is the original energy of the living entity.", a:"Srila Prabhupada"},
+  {q:"By serving Krishna, all other purposes are automatically served.", a:"Srila Prabhupada"}
+];
+
+// ── ISKCON Gurus Quotes (12 PM – 8 PM) — placeholder ──
+const MUSE_GURUS = [
+  {q:"The Holy Name is our best friend. It will never let us down if we hold on to it sincerely.", a:"HH Radhanath Swami"},
+  {q:"Gratitude is the foundation of all spiritual progress.", a:"HH Radhanath Swami"},
+  {q:"Real happiness is not found in the objects of this world but in the depths of our own soul connected to God.", a:"HH Bhakti Tirtha Swami"},
+  {q:"The more we serve with love, the more love grows in our heart.", a:"HH Sivarama Swami"},
+  {q:"Devotional service is the art of keeping Krishna in the center of everything we do.", a:"HH Tamal Krishna Goswami"}
+];
+
+// ── Prayers for Meditation (8 PM – 4 AM) — placeholder ──
+const MUSE_PRAYERS = [
+  {q:"O my Lord, I do not have any love for You, nor am I qualified for discharging devotional service. But still I am longing for Your lotus feet.", a:"Rupa Goswami"},
+  {q:"O almighty Lord, I have no desire to accumulate wealth, nor do I desire beautiful women, nor do I want any number of followers. I only want Your causeless devotional service.", a:"Lord Chaitanya Mahaprabhu"},
+  {q:"O Lord, let me not desire anything but Your service. Please engage me as You wish, for I am Your eternal servant.", a:"Bhaktivinoda Thakura"},
+  {q:"When will that day come when tears will flow from my eyes by chanting the holy name of the Lord?", a:"Lord Chaitanya Mahaprabhu"},
+  {q:"O Lord of the universe, I do not desire material wealth, materialistic followers, a beautiful wife or fruitive activities. I only pray for Your causeless devotional service birth after birth.", a:"Siksastakam, Verse 4"}
+];
+
+// ── Determine current time slot ──
+function _museGetSlot() {
+  const hr = new Date().getHours();
+  if (hr >= 4 && hr < 8)   return { key:'chanting',    data:MUSE_CHANTING,    icon:'📿', tag:'Chanting Inspiration',       hint:'4:00 AM – 8:00 AM' };
+  if (hr >= 8 && hr < 12)  return { key:'prabhupada',  data:MUSE_PRABHUPADA,  icon:'🙏', tag:'Srila Prabhupada\'s Words',  hint:'8:00 AM – 12:00 PM' };
+  if (hr >= 12 && hr < 20) return { key:'gurus',       data:MUSE_GURUS,       icon:'🙏', tag:'Wisdom of the Acharyas',      hint:'12:00 PM – 8:00 PM' };
+  return                           { key:'prayer',      data:MUSE_PRAYERS,     icon:'🙏', tag:'Evening Meditation',          hint:'8:00 PM – 4:00 AM' };
 }
 
-function _dailyMuseSeed() {
-  // Deterministic seed from today's date
+// ── Deterministic daily seed (same quote for a whole day in a slot) ──
+function _museDailySeed() {
   const d = new Date();
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 
+// ── Get admin setting: show author? ──
+function _museIsAuthorVisible() {
+  const v = localStorage.getItem('museShowAuthor');
+  return v === null ? true : v === '1';
+}
+function _museSetAuthorVisible(val) {
+  localStorage.setItem('museShowAuthor', val ? '1' : '0');
+}
+
+// ── Admin toggle handler ──
+function _museToggleAuthor(checked) {
+  _museSetAuthorVisible(checked);
+  // Sync to server globally
+  _museAdminSyncAuthorSetting(checked);
+  // Update UI immediately
+  _updateDailyMuse();
+}
+
+// ── Sync author visibility setting to server (global) ──
+async function _museAdminSyncAuthorSetting(show) {
+  try {
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveAdminConfig',
+        adminEmails: _getAdminList(),
+        adminPermissions: _getAdminPermissions(),
+        imgbbApiKey: _getImgbbKey() || '',
+        museShowAuthor: show ? true : false
+      })
+    });
+  } catch(e) { console.warn('Muse author sync error:', e); }
+}
+
+// ── Main update function ──
 function _updateDailyMuse() {
   const box = document.getElementById('homeMuse');
   if (!box) return;
-  if (!songs || !songs.length) return;
 
-  const todayKey = _tdToday();
-  let cached = null;
-  try { cached = JSON.parse(localStorage.getItem('dailyMuse') || 'null'); } catch(e) {}
+  const slot = _museGetSlot();
+  if (!slot.data || !slot.data.length) { box.style.display = 'none'; return; }
 
-  let muse = null;
+  // Pick quote deterministically by day + slot
+  const seed = _museDailySeed();
+  // Use slot key as secondary hash to get different quotes per slot
+  let slotHash = 0;
+  for (let i = 0; i < slot.key.length; i++) slotHash += slot.key.charCodeAt(i);
+  const idx = (seed + slotHash) % slot.data.length;
+  const pick = slot.data[idx];
 
-  if (cached && cached.date === todayKey) {
-    // Verify the song still exists
-    const s = songs.find(x => x.id === cached.songId);
-    if (s) muse = cached;
+  // Update UI
+  const iconEl    = document.getElementById('museSlotIcon');
+  const tagEl     = document.getElementById('museSlotTag');
+  const quoteEl   = document.getElementById('museQuoteText');
+  const authorRow = document.getElementById('museAuthorRow');
+  const authorEl  = document.getElementById('museAuthorText');
+  const hintEl    = document.getElementById('museTimeHint');
+
+  if (iconEl) iconEl.textContent = slot.icon;
+  if (tagEl)  tagEl.textContent  = slot.tag;
+  if (quoteEl) {
+    quoteEl.textContent = pick.q;
+    // Re-trigger animation
+    quoteEl.style.animation = 'none';
+    quoteEl.offsetHeight;
+    quoteEl.style.animation = '';
   }
 
-  if (!muse) {
-    // Pick a new random verse for today
-    const allVerses = _extractAllVerses();
-    if (!allVerses.length) return;
-    const seed = _dailyMuseSeed();
-    const idx = seed % allVerses.length;
-    const pick = allVerses[idx];
-    muse = {
-      date: todayKey,
-      songId: pick.songId,
-      verseNum: pick.verseNum,
-      verseIdx: pick.verseIdx,
-      text: pick.text,
-      songTitle: pick.songTitle,
-      book: pick.book,
-      author: pick.author
-    };
-    try { localStorage.setItem('dailyMuse', JSON.stringify(muse)); } catch(e) {}
+  // Show/hide author based on admin setting
+  const showAuthor = _museIsAuthorVisible();
+  if (authorRow) {
+    if (showAuthor && pick.a) {
+      authorEl.textContent = pick.a;
+      authorRow.style.display = '';
+    } else {
+      authorRow.style.display = 'none';
+    }
   }
 
-  _museSongId = muse.songId;
-  _museVerseIdx = muse.verseIdx;
-
-  // Render
-  const verseEl = document.getElementById('homeMuseVerse');
-  const pillEl = document.getElementById('homeMusePill');
-  const songEl = document.getElementById('homeMuseSong');
-
-  // Show full verse - no truncation
-  let displayText = muse.text;
-
-  verseEl.textContent = displayText;
-
-  if (muse.verseNum) {
-    pillEl.textContent = muse.verseNum;
-    pillEl.style.display = 'inline-flex';
-  } else {
-    pillEl.style.display = 'none';
-  }
-
-  let footerHtml = '';
-  if (muse.songTitle) footerHtml += `<strong>${muse.songTitle}</strong>`;
-  if (muse.book) footerHtml += `<br>${muse.book}`;
-  if (muse.author) footerHtml += `<br>${muse.author}`;
-  songEl.innerHTML = footerHtml;
-
+  if (hintEl) hintEl.textContent = slot.hint;
   box.style.display = '';
-}
 
-function _openMuseSong() {
-  if (!_museSongId) return;
-  openSongDetail(_museSongId);
+  // Update admin toggle state if visible
+  const toggle = document.getElementById('museShowAuthorToggle');
+  if (toggle) toggle.checked = showAuthor;
 }
 
 // ═══════════════════════════════════════════════════════════
