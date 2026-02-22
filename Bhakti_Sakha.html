@@ -8376,11 +8376,12 @@ function updateHeaderDate() {
   const calLocEl = document.getElementById('calLocName');
   if (calLocEl) calLocEl.textContent = curLoc.name + ', ' + curLoc.country;
   document.getElementById('headerDate').textContent = `${day} ${mo} ${yr}`;
-  // Show lunar month for this date
+  // Show lunar month, tithi, and paksha for this date
   try {
     const masa = getVaishnavaMasa(td);
     const gau = getGaurabda(td);
-    document.getElementById('headerMasa').textContent = `${masa.masaTraditional}, Gaurabda ${gau}`;
+    const tithiInfo = getTithi(td, curLoc.lat, curLoc.lon, curLoc.tz);
+    document.getElementById('headerMasa').textContent = `${tithiInfo.tithi}, ${masa.masaTraditional}, ${tithiInfo.paksha} Paksha, Gaurabda ${gau}`;
   } catch(e) {
     document.getElementById('headerMasa').textContent = '';
   }
