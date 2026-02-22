@@ -9451,30 +9451,41 @@ function _decodeUrlMatch(a, b) {
   try { return decodeURIComponent(a) === decodeURIComponent(b); } catch(e) { return false; }
 }
 
-// ---- Count verses in a song (mirrors _extractAllVerses logic exactly) ----
+// ---- Count verses in a song: find last verse marker and read its number ----
 function _countSongVerses(s) {
   const lyrics = s.lyrics || s.lyrics_en || '';
   if (!lyrics || lyrics.length < 20) return 0;
-  let verses = [];
+
+  // Gita-style: BG 1.46 → take 46 (digits after first decimal)
   if (s.cat === 'gita') {
-    const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)/);
-    for (const part of bgParts) {
-      const trimmed = part.trim();
-      if (!trimmed) continue;
-      const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\s*([\s\S]*)/);
-      if (m && m[2].trim().length >= 15) verses.push(1);
+    const bgMatches = lyrics.match(/[Bb][Gg]\s*\d+\.(\d+)/g);
+    if (bgMatches && bgMatches.length > 0) {
+      const last = bgMatches[bgMatches.length - 1];
+      const m = last.match(/[Bb][Gg]\s*\d+\.(\d+)/);
+      return m ? parseInt(m[1]) : 0;
+    }
+    return 0;
+  }
+
+  // Bhagavatam-style: SB 1.1.39 → take 39 (digits after second decimal)
+  if (s.cat === 'bhagavatam') {
+    const sbMatches = lyrics.match(/[Ss][Bb]\s*\d+\.\d+\.(\d+)/g);
+    if (sbMatches && sbMatches.length > 0) {
+      const last = sbMatches[sbMatches.length - 1];
+      const m = last.match(/[Ss][Bb]\s*\d+\.\d+\.(\d+)/);
+      return m ? parseInt(m[1]) : 0;
     }
   }
-  if (!verses.length) {
-    const parts = lyrics.split(/(?<!\d)(?=\(\d+\))/);
-    for (const part of parts) {
-      const trimmed = part.trim();
-      if (!trimmed) continue;
-      const m = trimmed.match(/^\((\d+)\)\s*([\s\S]*)/);
-      if (m && m[2].trim().length >= 15) verses.push(1);
-    }
+
+  // Regular songs: find the last (N) marker and take N
+  const numbered = lyrics.match(/\((\d+)\)/g);
+  if (numbered && numbered.length > 0) {
+    const last = numbered[numbered.length - 1];
+    const m = last.match(/\((\d+)\)/);
+    return m ? parseInt(m[1]) : 0;
   }
-  return verses.length;
+
+  return 0;
 }
 
 function _buildSongCard(s, idx, searchQuery) {
