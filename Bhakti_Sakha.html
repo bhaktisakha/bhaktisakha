@@ -4081,6 +4081,106 @@ body {
 .home-card--prayer .home-card-icon { background:rgba(232,168,56,0.2); color:#f0c850; box-shadow:0 0 12px rgba(232,168,56,0.2); }
 .home-card--prayer .home-card-title { color:#f0c850; }
 
+/* ── New & Happening Badges ── */
+@keyframes nhPulseGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 14px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.25); }
+}
+@keyframes nhBellSwing {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-12deg); }
+  30% { transform: rotate(8deg); }
+  40% { transform: rotate(-4deg); }
+  50%, 100% { transform: rotate(0deg); }
+}
+@keyframes nhPopIn {
+  from { opacity:0; transform:translateY(-6px) scale(0.95); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.nh-badge-wrap {
+  position:absolute; top:10px; right:10px; z-index:10; cursor:pointer;
+}
+/* "NEW" text pill badge (for SevaKart, Prayer, Songs) */
+.nh-pill {
+  display:inline-flex; align-items:center; gap:4px;
+  background:linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius:8px; padding:3px 8px 3px 6px;
+  box-shadow:0 2px 10px rgba(239,68,68,0.4);
+  animation: nhPulseGlow 2.5s infinite;
+  user-select:none;
+}
+.nh-pill-text {
+  font-size:0.5rem; font-weight:800; color:white;
+  letter-spacing:1px; line-height:1;
+}
+.nh-pill-count {
+  width:16px; height:16px; border-radius:50%;
+  background:rgba(255,255,255,0.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.48rem; font-weight:800; color:white;
+}
+
+/* Bell badge (for Calendar) */
+.nh-bell {
+  position:relative; padding:2px; user-select:none;
+}
+.nh-bell-icon {
+  font-size:1rem;
+  filter:drop-shadow(0 0 4px rgba(61,127,212,0.5));
+  animation: nhBellSwing 2.5s ease-in-out infinite;
+  display:block;
+}
+.nh-bell-count {
+  position:absolute; top:-3px; right:-5px;
+  min-width:15px; height:15px; border-radius:8px;
+  background:#ef4444; border:2px solid var(--bg2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.48rem; font-weight:800; color:white;
+  padding:0 3px;
+}
+
+/* Popup dropdown */
+.nh-popup-overlay {
+  position:fixed; inset:0; z-index:99; background:transparent;
+}
+.nh-popup {
+  position:absolute; top:calc(100% + 6px); right:0; z-index:100;
+  background:linear-gradient(135deg, #162847, var(--card));
+  border:1px solid rgba(167,139,250,0.2);
+  border-radius:12px; padding:6px 0;
+  min-width:220px; max-width:260px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(167,139,250,0.1);
+  animation: nhPopIn 0.2s ease-out;
+}
+.nh-popup-title {
+  font-size:0.58rem; color:var(--text3); padding:4px 12px 6px;
+  letter-spacing:1.5px; text-transform:uppercase; font-weight:700;
+}
+.nh-popup-item {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; cursor:pointer;
+  transition:background 0.15s;
+}
+.nh-popup-item:not(:first-of-type) {
+  border-top:1px solid rgba(90,122,153,0.06);
+}
+.nh-popup-item:active { background:rgba(255,255,255,0.04); }
+.nh-popup-icon {
+  font-size:0.9rem; width:22px; text-align:center; flex-shrink:0;
+}
+.nh-popup-info { flex:1; min-width:0; }
+.nh-popup-name {
+  font-size:0.72rem; color:var(--text); font-weight:500; line-height:1.3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.nh-popup-sub {
+  font-size:0.6rem; color:var(--text3); margin-top:1px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.nh-popup-arrow { color:var(--text3); font-size:0.65rem; flex-shrink:0; }
+
 /* ── My Events full-width bottom card ── */
 .home-card--events.home-card--fullwidth {
   grid-column: 1 / -1;
@@ -5065,6 +5165,7 @@ body {
       <!-- ── Feature Grid ── -->
       <div class="home-grid">
         <div class="home-card home-card--calendar" onclick="switchScreen('calendar',document.querySelectorAll('.nav-btn')[1])">
+          <div class="nh-badge-wrap" id="nhBadgeCal" style="display:none;" onclick="event.stopPropagation();nhTogglePopup('Cal')"></div>
           <div class="home-card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
@@ -5073,6 +5174,7 @@ body {
         </div>
 
         <div class="home-card home-card--audio" onclick="switchScreen('songs',document.querySelectorAll('.nav-btn')[2])">
+          <div class="nh-badge-wrap" id="nhBadgeSB" style="display:none;" onclick="event.stopPropagation();nhTogglePopup('SB')"></div>
           <div class="home-card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10h6"/><path d="M9 14h4"/></svg>
           </div>
@@ -5089,6 +5191,7 @@ body {
         </div>
 
         <div class="home-card home-card--sevakart" onclick="switchScreen('sevakart',document.querySelectorAll('.nav-btn')[6])">
+          <div class="nh-badge-wrap" id="nhBadgeSK" style="display:none;" onclick="event.stopPropagation();nhTogglePopup('SK')"></div>
           <div class="home-card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>
           </div>
@@ -5105,6 +5208,7 @@ body {
         </div>
 
         <div class="home-card home-card--prayer" onclick="switchScreen('prayer',document.querySelectorAll('.nav-btn')[7])">
+          <div class="nh-badge-wrap" id="nhBadgePC" style="display:none;" onclick="event.stopPropagation();nhTogglePopup('PC')"></div>
           <div class="home-card-icon">
             <svg viewBox="0 0 48 48" width="20" height="20" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5" fill="none" opacity="0.5"/><g transform="translate(24,25)" fill="currentColor"><path d="M-1,-14 C-1,-11 -1.5,-8 -3,-5 C-4.5,-2 -6,1 -7,3.5 C-7.5,5 -7.5,6.5 -6.5,7.5 C-5.5,8.5 -4,8.5 -3,7.5 C-1.5,6 -0.5,3 -0.3,0 L-0.3,-14Z"/><path d="M1,-14 C1,-11 1.5,-8 3,-5 C4.5,-2 6,1 7,3.5 C7.5,5 7.5,6.5 6.5,7.5 C5.5,8.5 4,8.5 3,7.5 C1.5,6 0.5,3 0.3,0 L0.3,-14Z"/><rect x="-9.5" y="7" width="5" height="6" rx="1.2" transform="rotate(-25,-7,10)"/><rect x="4.5" y="7" width="5" height="6" rx="1.2" transform="rotate(25,7,10)"/></g></svg>
           </div>
@@ -14243,6 +14347,9 @@ function updateHomeScreen() {
 
   // Daily muse verse on home
   _updateDailyMuse();
+
+  // New & Happening badges
+  nhUpdateBadges();
 }
 
 function _updateHomeEvtWidget() {
@@ -19546,6 +19653,163 @@ function _openMuseSong() {
   openSongDetail(_museSongId);
 }
 
+// ═══════════════════════════════════════════════════════════
+// NEW & HAPPENING — Notification Badges on Home Cards
+// ═══════════════════════════════════════════════════════════
+let _nhOpenPopup = null;
+
+function _nhTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ── Get new (unseen) items for each section ──
+function _nhGetNewSongs() {
+  const seen = JSON.parse(localStorage.getItem('nhSeenSongs') || '[]');
+  return songs.filter(s => !seen.includes(s.id));
+}
+function _nhGetNewPrayers() {
+  const seen = JSON.parse(localStorage.getItem('nhSeenPrayers') || '[]');
+  return pcRequests.filter(r => r.status === 'approved' && !seen.includes(r.id));
+}
+function _nhGetNewListings() {
+  const seen = JSON.parse(localStorage.getItem('nhSeenListings') || '[]');
+  return (typeof skListings !== 'undefined' ? skListings : []).filter(l => l.status === 'approved' && !seen.includes(l.id));
+}
+function _nhGetTodayEvents() {
+  const key = _nhTodayKey();
+  return EVENTS.filter(e => e.d === key);
+}
+
+// ── Render badges on home cards ──
+function nhUpdateBadges() {
+  // Song Book — NEW pill
+  const newSongs = _nhGetNewSongs();
+  const sbBadge = document.getElementById('nhBadgeSB');
+  if (sbBadge) {
+    if (newSongs.length > 0) {
+      sbBadge.style.display = '';
+      sbBadge.innerHTML = `<div class="nh-pill"><span class="nh-pill-text">NEW</span><span class="nh-pill-count">${newSongs.length}</span></div>`;
+    } else { sbBadge.style.display = 'none'; sbBadge.innerHTML = ''; }
+  }
+  // Prayer Circle — NEW pill
+  const newPrayers = _nhGetNewPrayers();
+  const pcBadge = document.getElementById('nhBadgePC');
+  if (pcBadge) {
+    if (newPrayers.length > 0) {
+      pcBadge.style.display = '';
+      pcBadge.innerHTML = `<div class="nh-pill"><span class="nh-pill-text">NEW</span><span class="nh-pill-count">${newPrayers.length}</span></div>`;
+    } else { pcBadge.style.display = 'none'; pcBadge.innerHTML = ''; }
+  }
+  // SevaKart — NEW pill
+  const newListings = _nhGetNewListings();
+  const skBadge = document.getElementById('nhBadgeSK');
+  if (skBadge) {
+    if (newListings.length > 0) {
+      skBadge.style.display = '';
+      skBadge.innerHTML = `<div class="nh-pill"><span class="nh-pill-text">NEW</span><span class="nh-pill-count">${newListings.length}</span></div>`;
+    } else { skBadge.style.display = 'none'; skBadge.innerHTML = ''; }
+  }
+  // Calendar — Bell badge
+  const todayEvts = _nhGetTodayEvents();
+  const calBadge = document.getElementById('nhBadgeCal');
+  if (calBadge) {
+    if (todayEvts.length > 0) {
+      calBadge.style.display = '';
+      calBadge.innerHTML = `<div class="nh-bell"><span class="nh-bell-icon">🔔</span><span class="nh-bell-count">${todayEvts.length}</span></div>`;
+    } else { calBadge.style.display = 'none'; calBadge.innerHTML = ''; }
+  }
+}
+
+// ── Toggle popup dropdown ──
+function nhTogglePopup(type) {
+  if (_nhOpenPopup === type) { nhClosePopup(); return; }
+  nhClosePopup();
+  _nhOpenPopup = type;
+  const badgeEl = document.getElementById('nhBadge' + type);
+  if (!badgeEl) return;
+
+  let items = [];
+  if (type === 'SB') {
+    items = _nhGetNewSongs().slice(0, 8).map(s => ({
+      icon: '🎵', title: s.title || 'New Song', sub: s.author || '',
+      action: () => { nhMarkSeen('nhSeenSongs', s.id); openSongDetail(s.id); }
+    }));
+  } else if (type === 'PC') {
+    items = _nhGetNewPrayers().slice(0, 8).map(r => ({
+      icon: '🙏', title: r.title || 'Prayer Request', sub: r.name || 'A Devotee',
+      action: () => { nhMarkSeen('nhSeenPrayers', r.id); pcOpenDetail(r.id, 'home'); }
+    }));
+  } else if (type === 'SK') {
+    items = _nhGetNewListings().slice(0, 8).map(l => ({
+      icon: '🛒', title: l.bizName || l.shortDesc || 'New Listing', sub: l.category || '',
+      action: () => { nhMarkSeen('nhSeenListings', l.id); skOpenDetail(l.id, 'home'); }
+    }));
+  } else if (type === 'Cal') {
+    items = _nhGetTodayEvents().map(e => ({
+      icon: e.i || '📅', title: e.n, sub: (e.desc || '').substring(0, 60),
+      action: () => { nhClosePopup(); switchScreen('calendar', document.querySelectorAll('.nav-btn')[1]); }
+    }));
+  }
+  if (!items.length) return;
+
+  // Build popup HTML
+  let h = '<div class="nh-popup"><div class="nh-popup-title">What\'s New</div>';
+  items.forEach((item, i) => {
+    h += `<div class="nh-popup-item" onclick="event.stopPropagation();nhItemClick('${type}',${i})">
+      <span class="nh-popup-icon">${item.icon}</span>
+      <div class="nh-popup-info"><div class="nh-popup-name">${item.title}</div><div class="nh-popup-sub">${item.sub}</div></div>
+      <span class="nh-popup-arrow">›</span></div>`;
+  });
+  h += '</div>';
+  badgeEl._nhItems = items;
+  badgeEl.insertAdjacentHTML('beforeend', h);
+
+  // Overlay to close on outside tap
+  const ov = document.createElement('div');
+  ov.className = 'nh-popup-overlay';
+  ov.onclick = () => nhClosePopup();
+  document.body.appendChild(ov);
+  badgeEl._nhOverlay = ov;
+}
+
+function nhItemClick(type, idx) {
+  const badgeEl = document.getElementById('nhBadge' + type);
+  if (badgeEl && badgeEl._nhItems && badgeEl._nhItems[idx]) {
+    const action = badgeEl._nhItems[idx].action;
+    nhClosePopup();
+    if (action) action();
+    setTimeout(nhUpdateBadges, 300);
+  }
+}
+
+function nhClosePopup() {
+  _nhOpenPopup = null;
+  ['SB', 'PC', 'SK', 'Cal'].forEach(t => {
+    const el = document.getElementById('nhBadge' + t);
+    if (el) {
+      const p = el.querySelector('.nh-popup'); if (p) p.remove();
+      if (el._nhOverlay) { el._nhOverlay.remove(); el._nhOverlay = null; }
+    }
+  });
+}
+
+// ── Mark an item as seen ──
+function nhMarkSeen(key, id) {
+  const seen = JSON.parse(localStorage.getItem(key) || '[]');
+  if (!seen.includes(id)) { seen.push(id); localStorage.setItem(key, JSON.stringify(seen)); }
+}
+
+// ── First-run: mark all existing items as seen so only truly new items show badges ──
+function nhInitFirstRun() {
+  if (localStorage.getItem('nhInitDone')) return;
+  localStorage.setItem('nhSeenSongs', JSON.stringify(songs.map(s => s.id)));
+  localStorage.setItem('nhSeenPrayers', JSON.stringify(pcRequests.map(r => r.id)));
+  const listings = (typeof skListings !== 'undefined') ? skListings : [];
+  localStorage.setItem('nhSeenListings', JSON.stringify(listings.map(l => l.id)));
+  localStorage.setItem('nhInitDone', '1');
+}
+
 function init() {
   // Load settings
   const s = JSON.parse(localStorage.getItem('settings')||'{}');
@@ -19567,6 +19831,10 @@ function init() {
   // Start on home screen — hide header, show brand bar
   const header = document.querySelector('.header');
   if (header) header.style.display = 'none';
+
+  // Initialize New & Happening badges
+  nhInitFirstRun();
+
   updateHomeScreen();
 }
 
