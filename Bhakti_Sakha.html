@@ -968,46 +968,52 @@ body {
 .sd-cat-opt.current { border-color:var(--accent-gold); color:var(--accent-gold); background:rgba(201,168,76,0.1); }
 .sd-lyrics { white-space:pre-line; line-height:1.6; color:var(--text); margin-bottom:20px; }
 .sd-trans { white-space:pre-line; line-height:1.5; color:var(--text2); text-align:justify; }
-.sd-trans-cards { display:flex; flex-direction:column; gap:16px; }
+.sd-trans-cards { display:flex; flex-direction:column; gap:20px; }
 .sd-trans-card {
   background:rgba(61,127,212,0.04);
   border:1px solid rgba(61,127,212,0.12);
-  border-radius:14px; padding:14px 16px;
+  border-radius:14px; padding:18px 16px 14px;
   box-shadow:0 0 12px rgba(61,127,212,0.06), 0 2px 8px rgba(0,0,0,0.15);
   transition:box-shadow 0.3s;
   display:flex; flex-direction:column; align-items:center; gap:6px;
+  position:relative;
 }
 .sd-trans-card:hover { box-shadow:0 0 18px rgba(61,127,212,0.12), 0 4px 12px rgba(0,0,0,0.2); }
 .sd-trans-num {
   display:inline-flex; align-items:center; justify-content:center;
   min-width:28px; height:24px; border-radius:999px; padding:0 12px;
-  background:rgba(61,127,212,0.15); border:1px solid rgba(61,127,212,0.35);
+  background:var(--bg2); border:1px solid rgba(61,127,212,0.45);
   font-size:0.62rem; font-weight:700; color:var(--accent-blue);
   font-style:normal; letter-spacing:0.3px; white-space:nowrap;
-  align-self:center; margin-bottom:4px; flex-shrink:0;
+  flex-shrink:0;
+  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  z-index:1;
 }
 .sd-trans-text {
   font-size:0.84rem; color:var(--text2); line-height:1.65;
   width:100%; text-align:justify; padding:0 4px;
 }
 /* Lyrics verse cards */
-.sd-verse-cards { display:flex; flex-direction:column; gap:16px; }
+.sd-verse-cards { display:flex; flex-direction:column; gap:20px; }
 .sd-verse-card {
   background:rgba(201,168,76,0.04);
   border:1px solid rgba(201,168,76,0.12);
-  border-radius:14px; padding:14px 16px;
+  border-radius:14px; padding:18px 16px 14px;
   box-shadow:0 0 12px rgba(201,168,76,0.06), 0 2px 8px rgba(0,0,0,0.15);
   transition:box-shadow 0.3s;
   display:flex; flex-direction:column; align-items:center; gap:6px;
+  position:relative;
 }
 .sd-verse-card:hover { box-shadow:0 0 18px rgba(201,168,76,0.12), 0 4px 12px rgba(0,0,0,0.2); }
 .sd-verse-num {
   display:inline-flex; align-items:center; justify-content:center;
   min-width:28px; height:24px; border-radius:999px; padding:0 12px;
-  background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.35);
+  background:var(--bg2); border:1px solid rgba(201,168,76,0.45);
   font-size:0.62rem; font-weight:700; color:var(--accent-gold);
   letter-spacing:0.3px; white-space:nowrap;
-  align-self:center; margin-bottom:4px; flex-shrink:0;
+  flex-shrink:0;
+  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  z-index:1;
 }
 .sd-verse-text {
   font-size:0.88rem; color:var(--text); line-height:1.6;
@@ -8876,7 +8882,7 @@ function defaultSongs() {
 let songSortMode = 'cat';  // 'cat' | 'author'
 const SONG_FONT_SIZES = [0.76, 0.82, 0.88, 0.96, 1.05, 1.16, 1.28, 1.42, 1.58];
 const SONG_FONT_LABELS = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
-let songFontIdx = 4; // default XL
+let songFontIdx = 5; // default — bumped up one step
 
 function setSongSort(mode, btn) {
   songSortMode = mode;
