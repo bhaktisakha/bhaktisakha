@@ -19415,7 +19415,7 @@ function _extractAllVerses() {
       // Skip very short or very long
       const t = v.text.replace(/\n/g, ' ').trim();
       if (t.length < 15 || t.length > 500) return;
-      all.push({ songId: s.id, verseNum: v.num, verseIdx: i, text: v.text, songTitle: title, author: s.author || '' });
+      all.push({ songId: s.id, verseNum: v.num, verseIdx: i, text: v.text, songTitle: title, book: s.book || '', author: s.author || '' });
     });
   });
   return all;
@@ -19458,6 +19458,7 @@ function _updateDailyMuse() {
       verseIdx: pick.verseIdx,
       text: pick.text,
       songTitle: pick.songTitle,
+      book: pick.book,
       author: pick.author
     };
     try { localStorage.setItem('dailyMuse', JSON.stringify(muse)); } catch(e) {}
@@ -19485,6 +19486,7 @@ function _updateDailyMuse() {
 
   let footerHtml = '';
   if (muse.songTitle) footerHtml += `<strong>${muse.songTitle}</strong>`;
+  if (muse.book) footerHtml += `<br>${muse.book}`;
   if (muse.author) footerHtml += `<br>${muse.author}`;
   songEl.innerHTML = footerHtml;
 
