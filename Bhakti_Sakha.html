@@ -12103,7 +12103,10 @@ async function registerUpcomingEvents() {
       // My To-Do tasks (if enabled)
       const todoOn = document.getElementById('n-mytodo')?.checked || s['n-mytodo'] !== false;
       if (todoOn && typeof tdTasks !== 'undefined') {
-        tdTasks.filter(t => !t.done && t.date === dateStr && t.reminder).forEach(t => {
+        tdTasks.filter(t => {
+          if (t.recur) return _tdRecurFallsOn(t, dateStr) && !_tdIsDoneForDate(t, dateStr) && t.reminder;
+          return !t.done && t.date === dateStr && t.reminder;
+        }).forEach(t => {
           upcoming.push({
             date: dateStr, name: `📝 ${t.title}`,
             type: 'todo', icon: '📝', time: t.time || ''
@@ -18341,6 +18344,7 @@ function _tdFormatTime(t) {
 
 function _tdIsOverdue(task) {
   if (task.done) return false;
+  if (task.recur) return false; // recurring tasks are never "overdue" — they re-appear
   const today = _tdToday();
   if (task.date && task.date < today) return true;
   if (task.date === today && task.time) {
@@ -18349,6 +18353,41 @@ function _tdIsOverdue(task) {
     if (now.getHours() > parseInt(h) || (now.getHours() === parseInt(h) && now.getMinutes() > parseInt(m))) return true;
   }
   return false;
+}
+
+// ── Recurring-task helpers ──
+// Is a recurring task scheduled to appear on a given date?
+function _tdRecurFallsOn(task, dateStr) {
+  if (!task.recur || !task.date) return false;
+  if (dateStr < task.date) return false;          // before start date
+  if (dateStr === task.date) return true;          // start date always matches
+  const d = new Date(dateStr + 'T00:00:00');
+  const start = new Date(task.date + 'T00:00:00');
+  switch (task.recur) {
+    case 'daily':   return true;
+    case 'weekly':  return d.getDay() === start.getDay();
+    case 'monthly': return d.getDate() === start.getDate();
+    case 'custom':  return !!(task.customDays && task.customDays.includes(d.getDay()));
+    default:        return false;
+  }
+}
+
+// Has a recurring task been completed for a specific date?
+function _tdIsDoneForDate(task, dateStr) {
+  if (!task.recur) return !!task.done;
+  return !!(task.completedDates && task.completedDates.includes(dateStr));
+}
+
+// Should this task show as active on today's list?
+function _tdIsActiveToday(task) {
+  const today = _tdToday();
+  if (task.recur) {
+    // Recurring: show if it falls on today AND not completed for today
+    return _tdRecurFallsOn(task, today) && !_tdIsDoneForDate(task, today);
+  }
+  // Non-recurring
+  if (task.done) return false;
+  return (task.date === today || _tdIsOverdue(task) || !task.date);
 }
 
 function _tdTimeSection(t) {
@@ -18398,29 +18437,45 @@ function tdRenderTab() {
   }
 }
 
-// ── Process recurring tasks ──
+// ── Process recurring tasks — migrate old data & housekeep ──
 function _tdProcessRecurring() {
+  let changed = false;
   const today = _tdToday();
+
   tdTasks.forEach(t => {
-    if (!t.recur || !t.done || !t.doneDate) return;
-    // Check if we need to create next occurrence
-    let nextDate = _tdNextRecurDate(t.doneDate, t.recur, t.customDays);
-    if (nextDate && nextDate <= today) {
-      // Check if task for this date already exists
-      const exists = tdTasks.some(x => x.recurParent === t.id && x.date === nextDate && !x.done);
-      if (!exists) {
-        tdTasks.push({
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-          title: t.title, notes: t.notes, date: nextDate, time: t.time,
-          category: t.category, recur: t.recur, customDays: t.customDays || [],
-          priority: t.priority,
-          reminder: t.reminder, project: t.project,
-          done: false, created: Date.now(), recurParent: t.id
-        });
-        _tdSave();
+    if (!t.recur) return;
+
+    // ── Migration: if an old recurring task was marked permanently done,
+    //    un-do it and move the completion into the new completedDates[] array
+    if (t.done) {
+      if (!t.completedDates) t.completedDates = [];
+      if (t.doneDate) {
+        const doneDay = new Date(t.doneDate).toISOString().slice(0, 10);
+        if (!t.completedDates.includes(doneDay)) t.completedDates.push(doneDay);
       }
+      t.done = false;
+      t.doneDate = null;
+      changed = true;
     }
+
+    // Ensure completedDates array exists
+    if (!t.completedDates) { t.completedDates = []; changed = true; }
+
+    // Housekeep: drop entries older than 90 days to prevent storage bloat
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+    const before = t.completedDates.length;
+    t.completedDates = t.completedDates.filter(d => d >= cutoffStr);
+    if (t.completedDates.length !== before) changed = true;
   });
+
+  // ── Migration: remove orphan "recurParent" clone tasks created by old logic
+  const beforeLen = tdTasks.length;
+  tdTasks = tdTasks.filter(t => !t.recurParent);
+  if (tdTasks.length !== beforeLen) changed = true;
+
+  if (changed) _tdSave();
 }
 
 function _tdNextRecurDate(fromDate, recur, customDays) {
@@ -18448,13 +18503,13 @@ function _tdNextRecurDate(fromDate, recur, customDays) {
 // ── Render: Today ──
 function _tdRenderToday(c) {
   const today = _tdToday();
-  let tasks = tdTasks.filter(t => !t.done && (t.date === today || _tdIsOverdue(t) || !t.date));
+  let tasks = tdTasks.filter(t => _tdIsActiveToday(t));
   if (!tasks.length) {
     c.innerHTML = '<div class="todo-empty"><div class="todo-empty-icon">🪷</div><div class="todo-empty-text">Nothing for today — enjoy the peace!</div><div class="todo-empty-sub">Tap + to add a task</div></div>';
     return;
   }
-  const overdue = tasks.filter(t => _tdIsOverdue(t) && t.date !== today);
-  const todayTasks = tasks.filter(t => t.date === today || !t.date);
+  const overdue = tasks.filter(t => !t.recur && _tdIsOverdue(t) && t.date !== today);
+  const todayTasks = tasks.filter(t => !overdue.includes(t));
   const morning = _tdSortTasks(todayTasks.filter(t => _tdTimeSection(t.time) === 'morning'));
   const afternoon = _tdSortTasks(todayTasks.filter(t => _tdTimeSection(t.time) === 'afternoon'));
   const evening = _tdSortTasks(todayTasks.filter(t => _tdTimeSection(t.time) === 'evening'));
@@ -18474,7 +18529,24 @@ function _tdRenderToday(c) {
 // ── Render: Upcoming ──
 function _tdRenderUpcoming(c) {
   const today = new Date(); today.setHours(0,0,0,0);
-  const tasks = tdTasks.filter(t => !t.done && t.date);
+  const todayStr = _tdToday();
+
+  // Non-recurring undone tasks with a date
+  let tasks = tdTasks.filter(t => !t.recur && !t.done && t.date)
+                     .map(t => ({ ...t })); // shallow clone for display
+
+  // Recurring tasks: project next 14 days of occurrences
+  const recurMasters = tdTasks.filter(t => t.recur && !t.done);
+  for (let i = 0; i <= 14; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    const ds = d.toISOString().slice(0, 10);
+    recurMasters.forEach(t => {
+      if (_tdRecurFallsOn(t, ds) && !_tdIsDoneForDate(t, ds)) {
+        tasks.push({ ...t, date: ds, _virtualDate: true });
+      }
+    });
+  }
   if (!tasks.length) {
     c.innerHTML = '<div class="todo-empty"><div class="todo-empty-icon">📅</div><div class="todo-empty-text">No upcoming tasks</div></div>';
     return;
@@ -18590,7 +18662,7 @@ function _tdRenderSpiritual(c) {
     });
   }
   // Spiritual tasks
-  const spTasks = tdTasks.filter(t => !t.done && t.category === 'Spiritual' && (t.date === today || !t.date));
+  const spTasks = tdTasks.filter(t => t.category === 'Spiritual' && _tdIsActiveToday(t));
   if (spTasks.length) {
     html += _tdSectionHdr('🙏 Spiritual Tasks Today', spTasks.length);
     html += _tdSortTasks(spTasks).map(t => _tdItemHTML(t)).join('');
@@ -18604,16 +18676,30 @@ function _tdRenderSpiritual(c) {
 
 // ── Render: Completed ──
 function _tdRenderCompleted(c) {
-  const done = tdTasks.filter(t => t.done).sort((a,b) => (b.doneDate||0) - (a.doneDate||0));
-  if (!done.length) {
+  // Collect all completion entries:
+  //  – non-recurring: task.done === true
+  //  – recurring: each date in task.completedDates[]
+  let entries = [];
+  tdTasks.forEach(t => {
+    if (t.recur && t.completedDates && t.completedDates.length) {
+      t.completedDates.forEach(d => {
+        entries.push({ title: t.title, ts: new Date(d + 'T12:00:00').getTime(), isRecur: true, taskId: t.id });
+      });
+    } else if (!t.recur && t.done) {
+      entries.push({ title: t.title, ts: t.doneDate || 0, isRecur: false, taskId: t.id });
+    }
+  });
+  entries.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+  if (!entries.length) {
     c.innerHTML = '<div class="todo-empty"><div class="todo-empty-icon">✨</div><div class="todo-empty-text">No completed tasks yet</div></div>';
     return;
   }
-  let html = done.slice(0,50).map(t => {
-    const dDate = t.doneDate ? new Date(t.doneDate).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '';
+  let html = entries.slice(0, 50).map(e => {
+    const dDate = e.ts ? new Date(e.ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
     return `<div class="todo-completed-item">
       <div class="todo-completed-check"></div>
-      <div class="todo-completed-title">${t.title}</div>
+      <div class="todo-completed-title">${e.title}${e.isRecur ? ' <span style="font-size:0.62rem;color:var(--accent-blue);">🔄</span>' : ''}</div>
       <div class="todo-completed-date">${dDate}</div>
     </div>`;
   }).join('');
@@ -18627,12 +18713,14 @@ function _tdSectionHdr(label, count) {
 }
 
 function _tdItemHTML(task, isOverdue) {
-  const overdue = isOverdue || _tdIsOverdue(task);
+  const today = _tdToday();
+  const isDone = _tdIsDoneForDate(task, today);
+  const overdue = !isDone && (isOverdue || _tdIsOverdue(task));
   const priClass = task.priority ? 'pri-' + task.priority : '';
   const metaParts = [];
   if (task.category) metaParts.push(`<span class="todo-meta-cat">${task.category}</span>`);
   if (task.time) metaParts.push(`<span class="todo-meta-time">⏰ ${_tdFormatTime(task.time)}</span>`);
-  if (task.date && task.date !== _tdToday()) metaParts.push(`<span class="todo-meta-time">📅 ${_tdFormatDate(task.date)}</span>`);
+  if (task.date && task.date !== today) metaParts.push(`<span class="todo-meta-time">📅 ${_tdFormatDate(task.date)}</span>`);
   if (task.recur) {
     let recurLabel = task.recur;
     if (task.recur === 'custom' && task.customDays && task.customDays.length) {
@@ -18640,8 +18728,8 @@ function _tdItemHTML(task, isOverdue) {
     }
     metaParts.push(`<span class="todo-meta-recur">🔄 ${recurLabel}</span>`);
   }
-  return `<div class="todo-item ${task.done?'done':''} ${overdue?'overdue':''}" data-id="${task.id}">
-    <div class="todo-item-check ${task.done?'checked':''}" onclick="event.stopPropagation();tdOpenDetailPopup('${task.id}')"></div>
+  return `<div class="todo-item ${isDone?'done':''} ${overdue?'overdue':''}" data-id="${task.id}">
+    <div class="todo-item-check ${isDone?'checked':''}" onclick="event.stopPropagation();tdOpenDetailPopup('${task.id}')"></div>
     <div class="todo-item-body" onclick="tdOpenDetailPopup('${task.id}')">
       <div class="todo-item-title">${task.title}</div>
       ${metaParts.length ? '<div class="todo-item-meta">' + metaParts.join('') + '</div>' : ''}
@@ -18727,7 +18815,8 @@ function tdOpenDetailPopup(id) {
   html += `<button style="width:100%;padding:10px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.04);color:var(--text2);font-size:0.8rem;cursor:pointer;font-family:inherit;margin-top:4px;" onclick="closeModal('todoDetailModal');tdEditTask('${t.id}')">✎ Edit Task</button>`;
   c.innerHTML = html;
   // Toggle buttons based on done state
-  document.getElementById('tdDetailCompleteBtn').textContent = t.done ? '↩ Reopen Task' : '✓ Completed';
+  const isDoneToday = _tdIsDoneForDate(t, _tdToday());
+  document.getElementById('tdDetailCompleteBtn').textContent = isDoneToday ? '↩ Reopen Task' : '✓ Completed';
   document.getElementById('todoDetailModal').classList.add('open');
 }
 
@@ -18735,58 +18824,105 @@ function tdCompleteFromDetail() {
   if (!_tdDetailId) return;
   const t = tdTasks.find(x => x.id === _tdDetailId);
   if (!t) return;
-  t.done = !t.done;
-  t.doneDate = t.done ? Date.now() : null;
-  _tdSave();
-  closeModal('todoDetailModal');
-  tdRenderTab();
-  _updateHomeTodoWidget();
-  showToast(t.done ? '✓ Task completed! Hare Krishna!' : 'Task reopened');
+  const today = _tdToday();
+
+  if (t.recur) {
+    // Recurring: toggle today in completedDates[]
+    if (!t.completedDates) t.completedDates = [];
+    const idx = t.completedDates.indexOf(today);
+    if (idx === -1) { t.completedDates.push(today); }
+    else { t.completedDates.splice(idx, 1); }
+    _tdSave();
+    closeModal('todoDetailModal');
+    tdRenderTab();
+    _updateHomeTodoWidget();
+    showToast(t.completedDates.includes(today) ? '✓ Done for today! Hare Krishna!' : 'Task reopened for today');
+  } else {
+    t.done = !t.done;
+    t.doneDate = t.done ? Date.now() : null;
+    _tdSave();
+    closeModal('todoDetailModal');
+    tdRenderTab();
+    _updateHomeTodoWidget();
+    showToast(t.done ? '✓ Task completed! Hare Krishna!' : 'Task reopened');
+  }
 }
 
 function tdRepeatTomorrow() {
   if (!_tdDetailId) return;
   const t = tdTasks.find(x => x.id === _tdDetailId);
   if (!t) return;
-  // Mark current as done
-  t.done = true;
-  t.doneDate = Date.now();
-  // Create copy for tomorrow
-  const tmr = new Date();
-  tmr.setDate(tmr.getDate() + 1);
-  const newTask = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-    title: t.title, notes: t.notes,
-    date: tmr.toISOString().slice(0,10),
-    time: t.time, category: t.category, recur: t.recur,
-    customDays: t.customDays || [],
-    priority: t.priority, reminder: t.reminder, project: t.project,
-    done: false, created: Date.now()
-  };
-  tdTasks.push(newTask);
-  _tdSave();
-  closeModal('todoDetailModal');
-  tdRenderTab();
-  _updateHomeTodoWidget();
-  showToast('✓ Completed & repeated for tomorrow');
+  const today = _tdToday();
+
+  if (t.recur) {
+    // Recurring: just mark today done; it auto-appears on its next scheduled date
+    if (!t.completedDates) t.completedDates = [];
+    if (!t.completedDates.includes(today)) t.completedDates.push(today);
+    _tdSave();
+    closeModal('todoDetailModal');
+    tdRenderTab();
+    _updateHomeTodoWidget();
+    showToast('✓ Done for today! Will reappear on next scheduled date.');
+  } else {
+    // Non-recurring: mark current as done, create copy for tomorrow
+    t.done = true;
+    t.doneDate = Date.now();
+    const tmr = new Date();
+    tmr.setDate(tmr.getDate() + 1);
+    const newTask = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      title: t.title, notes: t.notes,
+      date: tmr.toISOString().slice(0,10),
+      time: t.time, category: t.category, recur: t.recur,
+      customDays: t.customDays || [],
+      priority: t.priority, reminder: t.reminder, project: t.project,
+      done: false, created: Date.now()
+    };
+    tdTasks.push(newTask);
+    _tdSave();
+    closeModal('todoDetailModal');
+    tdRenderTab();
+    _updateHomeTodoWidget();
+    showToast('✓ Completed & repeated for tomorrow');
+  }
 }
 
 function tdToggleTask(id) {
   const t = tdTasks.find(x => x.id === id);
   if (!t) return;
-  t.done = !t.done;
-  t.doneDate = t.done ? Date.now() : null;
-  _tdSave();
-  // Animate
-  const el = document.querySelector(`.todo-item[data-id="${id}"]`);
-  if (el && t.done) {
-    el.classList.add('completing');
-    setTimeout(() => tdRenderTab(), 500);
+  const today = _tdToday();
+
+  if (t.recur) {
+    // Recurring: toggle today's completion in completedDates[]
+    if (!t.completedDates) t.completedDates = [];
+    const idx = t.completedDates.indexOf(today);
+    if (idx === -1) { t.completedDates.push(today); }
+    else { t.completedDates.splice(idx, 1); }
+    _tdSave();
+    const el = document.querySelector(`.todo-item[data-id="${id}"]`);
+    if (el && t.completedDates.includes(today)) {
+      el.classList.add('completing');
+      setTimeout(() => tdRenderTab(), 500);
+    } else {
+      tdRenderTab();
+    }
+    _updateHomeTodoWidget();
+    showToast(t.completedDates.includes(today) ? '✓ Done for today!' : 'Task reopened for today');
   } else {
-    tdRenderTab();
+    // Non-recurring: original behaviour
+    t.done = !t.done;
+    t.doneDate = t.done ? Date.now() : null;
+    _tdSave();
+    const el = document.querySelector(`.todo-item[data-id="${id}"]`);
+    if (el && t.done) {
+      el.classList.add('completing');
+      setTimeout(() => tdRenderTab(), 500);
+    } else {
+      tdRenderTab();
+    }
+    _updateHomeTodoWidget();
+    showToast(t.done ? '✓ Task completed!' : 'Task reopened');
   }
-  _updateHomeTodoWidget();
-  showToast(t.done ? '✓ Task completed!' : 'Task reopened');
 }
 
 // ── Custom Days Picker ──
@@ -18945,6 +19081,7 @@ function tdSaveTask() {
     if (idx >= 0) {
       task.done = tdTasks[idx].done;
       task.doneDate = tdTasks[idx].doneDate;
+      task.completedDates = tdTasks[idx].completedDates || [];
       tdTasks[idx] = task;
     }
   } else {
@@ -19126,7 +19263,10 @@ async function tdDeleteSpGoal(goalId) {
 // ── Completed ──
 async function tdClearCompleted() {
   if (!(await bsConfirm('Clear all completed tasks?'))) return;
-  tdTasks = tdTasks.filter(t => !t.done);
+  // Remove non-recurring done tasks
+  tdTasks = tdTasks.filter(t => !(!t.recur && t.done));
+  // Clear completedDates on recurring tasks
+  tdTasks.forEach(t => { if (t.recur && t.completedDates) t.completedDates = []; });
   _tdSave();
   tdRenderTab();
   showToast('Completed tasks cleared');
@@ -19162,19 +19302,28 @@ function _updateHomeTodoWidget() {
   const w = document.getElementById('homeTodoWidget');
   if (!w) return;
   const today = _tdToday();
-  let tasks = tdTasks.filter(t => !t.done && (t.date === today || _tdIsOverdue(t) || !t.date));
+
+  // ONLY tasks active for today — no overdue, no future, no completed
+  let tasks = tdTasks.filter(t => {
+    if (t.recur) {
+      return _tdRecurFallsOn(t, today) && !_tdIsDoneForDate(t, today);
+    }
+    // Non-recurring: today's date or no-date tasks, not done
+    if (t.done) return false;
+    return (t.date === today || !t.date);
+  });
   tasks = _tdSortTasks(tasks);
+
   if (!tasks.length) {
     w.innerHTML = '<div class="home-todo-empty">No tasks for today. Tap to add one!</div>';
     return;
   }
-  // Show max 3 inline, rest scrollable
   w.innerHTML = tasks.slice(0, 6).map(t => {
     const priClass = t.priority ? 'pri-' + t.priority : '';
     const timeStr = t.time ? _tdFormatTime(t.time) : '';
     return `<div class="home-todo-row">
-      <div class="home-todo-check ${t.done?'checked':''}" onclick="event.stopPropagation();tdToggleTask('${t.id}')"></div>
-      <div class="home-todo-name ${t.done?'done':''}">${t.title}</div>
+      <div class="home-todo-check" onclick="event.stopPropagation();tdToggleTask('${t.id}')"></div>
+      <div class="home-todo-name">${t.title}</div>
       ${timeStr ? `<div class="home-todo-time">${timeStr}</div>` : ''}
       ${priClass ? `<div class="home-todo-pri ${priClass}"></div>` : ''}
     </div>`;
