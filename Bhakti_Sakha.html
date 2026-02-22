@@ -4858,30 +4858,61 @@ body {
   transition:all 0.2s; width:100%; text-align:center;
 }
 .pc-report-btn:active { color:#e74c3c; }
-.home-quote {
-  margin:4px 22px 14px; padding:16px 18px;
-  position:relative; text-align:center;
+.home-muse {
+  margin:4px 22px 14px; position:relative;
   opacity:0; animation:homeIn 0.5s ease 0.5s forwards;
-  background:linear-gradient(135deg, rgba(167,139,250,0.06), rgba(212,160,23,0.04));
-  border-radius:14px;
-  border:1px solid rgba(167,139,250,0.1);
+  border-radius:16px; overflow:hidden; cursor:pointer;
+  background:linear-gradient(135deg, rgba(167,139,250,0.07), rgba(212,160,23,0.05));
+  border:1px solid rgba(167,139,250,0.12);
+  transition:transform 0.15s;
 }
-.home-quote-text {
-  font-family:'Inter', system-ui, sans-serif;
-  font-size:0.97rem; line-height:1.7; letter-spacing:0.2px;
-  background:linear-gradient(135deg, #e8c800 0%, #f0d860 40%, #d4a84c 70%, #e8c800 100%);
+.home-muse:active { transform:scale(0.98); }
+.home-muse-header {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 16px 0; text-align:center;
+}
+.home-muse-label {
+  font-size:0.58rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+  background:linear-gradient(135deg, var(--lavender), rgba(212,160,23,0.7));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
 }
-.home-quote-text::before {
+.home-muse-body { padding:10px 18px 6px; text-align:center; }
+.home-muse-verse {
+  font-family:'Inter', system-ui, sans-serif;
+  font-size:0.92rem; line-height:1.7; letter-spacing:0.2px;
+  background:linear-gradient(135deg, #e8c800 0%, #f0d860 40%, #d4a84c 70%, #e8c800 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  white-space:pre-line;
+}
+.home-muse-verse::before {
   content:'\201C'; display:block;
-  font-family:'Inter', system-ui, sans-serif; font-size:1.8rem;
+  font-family:'Inter', system-ui, sans-serif; font-size:1.6rem;
   background:linear-gradient(135deg, var(--lavender), rgba(167,139,250,0.4));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
   line-height:1; margin-bottom:2px;
 }
-.home-quote-text::after { content:none; }
+.home-muse-pill {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:24px; height:20px; border-radius:999px; padding:0 10px;
+  background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3);
+  font-size:0.56rem; font-weight:700; color:var(--accent-gold);
+  letter-spacing:0.3px; margin-top:6px;
+}
+.home-muse-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:4px 16px 10px; gap:8px;
+}
+.home-muse-song {
+  font-size:0.65rem; color:var(--text3); line-height:1.35;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
+}
+.home-muse-song strong { color:var(--text2); font-weight:600; }
+.home-muse-arrow {
+  flex-shrink:0; width:16px; height:16px; color:var(--text3); opacity:0.5;
+}
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -5105,9 +5136,19 @@ body {
 
       </div>
 
-      <!-- Quote -->
-      <div class="home-quote">
-        <div class="home-quote-text" id="homeQuote">We should not only be thankful for what we have been given, but also for the opportunity for giving.</div>
+      <!-- Daily Muse -->
+      <div class="home-muse" id="homeMuse" onclick="_openMuseSong()" style="display:none;">
+        <div class="home-muse-header">
+          <span class="home-muse-label">✦ Your Daily Muse ✦</span>
+        </div>
+        <div class="home-muse-body">
+          <div class="home-muse-verse" id="homeMuseVerse"></div>
+          <div class="home-muse-pill" id="homeMusePill" style="display:none;"></div>
+        </div>
+        <div class="home-muse-footer">
+          <div class="home-muse-song" id="homeMuseSong"></div>
+          <svg class="home-muse-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
       </div>
     </div>
   </div>
@@ -8192,6 +8233,7 @@ async function fetchSharedSongs() {
       localStorage.setItem('songs', newJSON);
       _skipFolderAnimation = true;
       renderSongs();
+      _updateDailyMuse(); // Refresh muse with fresh songs data
     }
   } catch(e) {
     // Silently fall back to localStorage cache (normal when offline or in preview)
@@ -14155,6 +14197,9 @@ function updateHomeScreen() {
 
   // Todo widget on home
   _updateHomeTodoWidget();
+
+  // Daily muse verse on home
+  _updateDailyMuse();
 }
 
 function _updateHomeEvtWidget() {
@@ -19334,6 +19379,128 @@ function _updateHomeTodoWidget() {
       ${priClass ? `<div class="home-todo-pri ${priClass}"></div>` : ''}
     </div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DAILY MUSE — random verse of the day from songs
+// ═══════════════════════════════════════════════════════════
+let _museSongId = null;
+let _museVerseIdx = null;
+
+function _extractAllVerses() {
+  // Build a flat array of { songId, verseNum, text, songTitle, author } from all songs
+  const all = [];
+  songs.forEach(s => {
+    const lyrics = s.lyrics || (s.lyrics_en) || '';
+    if (!lyrics || lyrics.length < 20) return;
+    const title = s.title || s.title_en || '';
+
+    // Try to split into verses
+    let verses = [];
+    if (s.cat === 'gita') {
+      const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+\.\d+)/);
+      for (const part of bgParts) {
+        const trimmed = part.trim();
+        if (!trimmed) continue;
+        const m = trimmed.match(/^[Bb][Gg]\s*(\d+\.\d+)\s*([\s\S]*)/);
+        if (m) verses.push({ num: 'Bg ' + m[1], text: m[2].trim() });
+      }
+    }
+    if (!verses.length) {
+      const parts = lyrics.split(/(?<!\d)(?=\(\d+\))/);
+      for (const part of parts) {
+        const trimmed = part.trim();
+        if (!trimmed) continue;
+        const m = trimmed.match(/^\((\d+)\)\s*([\s\S]*)/);
+        if (m) verses.push({ num: m[1], text: m[2].trim() });
+        else if (parts.length === 1) verses.push({ num: null, text: trimmed });
+      }
+    }
+    verses.forEach((v, i) => {
+      // Skip very short or very long
+      const t = v.text.replace(/\n/g, ' ').trim();
+      if (t.length < 15 || t.length > 500) return;
+      all.push({ songId: s.id, verseNum: v.num, verseIdx: i, text: v.text, songTitle: title, author: s.author || '' });
+    });
+  });
+  return all;
+}
+
+function _dailyMuseSeed() {
+  // Deterministic seed from today's date
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+function _updateDailyMuse() {
+  const box = document.getElementById('homeMuse');
+  if (!box) return;
+  if (!songs || !songs.length) return;
+
+  const todayKey = _tdToday();
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem('dailyMuse') || 'null'); } catch(e) {}
+
+  let muse = null;
+
+  if (cached && cached.date === todayKey) {
+    // Verify the song still exists
+    const s = songs.find(x => x.id === cached.songId);
+    if (s) muse = cached;
+  }
+
+  if (!muse) {
+    // Pick a new random verse for today
+    const allVerses = _extractAllVerses();
+    if (!allVerses.length) return;
+    const seed = _dailyMuseSeed();
+    const idx = seed % allVerses.length;
+    const pick = allVerses[idx];
+    muse = {
+      date: todayKey,
+      songId: pick.songId,
+      verseNum: pick.verseNum,
+      verseIdx: pick.verseIdx,
+      text: pick.text,
+      songTitle: pick.songTitle,
+      author: pick.author
+    };
+    try { localStorage.setItem('dailyMuse', JSON.stringify(muse)); } catch(e) {}
+  }
+
+  _museSongId = muse.songId;
+  _museVerseIdx = muse.verseIdx;
+
+  // Render
+  const verseEl = document.getElementById('homeMuseVerse');
+  const pillEl = document.getElementById('homeMusePill');
+  const songEl = document.getElementById('homeMuseSong');
+
+  // Trim verse to max ~4 lines for display
+  let displayText = muse.text;
+  const lines = displayText.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length > 5) displayText = lines.slice(0, 5).join('\n') + ' …';
+
+  verseEl.textContent = displayText;
+
+  if (muse.verseNum) {
+    pillEl.textContent = muse.verseNum;
+    pillEl.style.display = 'inline-flex';
+  } else {
+    pillEl.style.display = 'none';
+  }
+
+  let footerHtml = '';
+  if (muse.songTitle) footerHtml += `<strong>${muse.songTitle}</strong>`;
+  if (muse.author) footerHtml += ` · ${muse.author}`;
+  songEl.innerHTML = footerHtml;
+
+  box.style.display = '';
+}
+
+function _openMuseSong() {
+  if (!_museSongId) return;
+  openSongDetail(_museSongId);
 }
 
 function init() {
