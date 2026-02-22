@@ -4975,53 +4975,26 @@ body {
   --muse-deep: #0a2820;
   --muse-sage: #7ecdb8;
 }
-@keyframes museGlow {
-  0%, 100% { opacity:0.5; }
-  50% { opacity:1; }
-}
-@keyframes museFadeIn {
-  from { opacity:0; transform:translateY(12px); }
-  to { opacity:1; transform:translateY(0); }
-}
 @keyframes museShimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
 .home-muse {
   margin:10px 18px 8px; position:relative;
-  opacity:0; animation:homeIn 0.55s ease 0.35s forwards;
   border-radius:20px; overflow:hidden;
   background:linear-gradient(155deg, rgba(45,212,168,0.10) 0%, rgba(10,40,32,0.92) 35%, rgba(22,40,71,0.85) 100%);
   border:1px solid rgba(45,212,168,0.18);
   box-shadow:0 4px 28px rgba(45,212,168,0.08), 0 1px 0 rgba(45,212,168,0.10) inset;
   padding:0;
 }
-.home-muse::before {
-  content:''; position:absolute; top:-50px; right:-50px;
-  width:130px; height:130px; border-radius:50%;
-  background:radial-gradient(circle, rgba(45,212,168,0.18) 0%, transparent 70%);
-  pointer-events:none; filter:blur(6px);
-}
-.home-muse::after {
-  content:''; position:absolute; bottom:-40px; left:-30px;
-  width:100px; height:100px; border-radius:50%;
-  background:radial-gradient(circle, rgba(45,212,168,0.10) 0%, transparent 70%);
-  pointer-events:none; filter:blur(8px);
-}
-.muse-slot-label {
-  display:none;
-}
-.muse-slot-icon {
-  font-size:0.85rem; line-height:1;
-  animation:museGlow 3s ease-in-out infinite;
-}
+.muse-slot-label { display:none; }
+.muse-slot-icon { font-size:0.85rem; line-height:1; }
 .muse-slot-tag {
   font-size:0.62rem; font-weight:700; letter-spacing:2.2px; text-transform:uppercase;
-  color:var(--muse-sage);
-  opacity:0.85;
+  color:var(--muse-sage); opacity:0.85;
 }
 .muse-title-row {
-  text-align:center; padding:14px 16px 0; position:relative; z-index:1;
+  text-align:center; padding:14px 16px 0; position:relative; z-index:2;
 }
 .muse-title-text {
   font-family:'Philosopher', serif;
@@ -5033,7 +5006,7 @@ body {
   animation:museShimmer 6s linear infinite;
 }
 .muse-quote-body {
-  padding:8px 20px 4px; text-align:center; position:relative; z-index:1;
+  padding:8px 20px 4px; text-align:center; position:relative; z-index:2;
   min-height:44px;
 }
 .muse-quote-text {
@@ -5041,12 +5014,11 @@ body {
   font-size:1.1rem; line-height:1.55; letter-spacing:0.15px;
   color:#d8f0e8;
   white-space:pre-line;
-  animation:museFadeIn 0.6s ease both;
 }
 .muse-quote-text::before { content:'\201C'; opacity:0.35; font-size:1.1rem; line-height:0; vertical-align:baseline; margin-right:1px; }
 .muse-quote-text::after { content:'\201D'; opacity:0.35; font-size:1.1rem; line-height:0; vertical-align:baseline; margin-left:1px; }
 .muse-author-row {
-  text-align:center; padding:2px 16px 10px; position:relative; z-index:1;
+  text-align:center; padding:2px 16px 10px; position:relative; z-index:2;
 }
 .muse-author-text {
   font-size:0.72rem; font-weight:600; letter-spacing:0.5px;
@@ -5054,15 +5026,101 @@ body {
 }
 .muse-author-text::before { content:'— '; }
 .muse-divider {
-  width:40px; height:1px; margin:0 auto 2px;
+  width:40px; height:1px; margin:0 auto 2px; position:relative; z-index:2;
   background:linear-gradient(90deg, transparent, rgba(45,212,168,0.3), transparent);
 }
 .muse-time-hint {
-  text-align:center; padding:0 16px 10px; position:relative; z-index:1;
+  text-align:center; padding:0 16px 10px; position:relative; z-index:2;
 }
 .muse-time-hint span {
   font-size:0.65rem; color:var(--muse-sage); letter-spacing:0.8px; opacity:0.7; font-weight:500;
 }
+/* FX layer container */
+.muse-fx-layer { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; border-radius:20px; }
+
+/* ── FX 1: Floating Orbs ── */
+.muse-fx-layer.fx-orbs .m-orb {
+  position:absolute; border-radius:50%; filter:blur(20px); opacity:0.15;
+}
+.muse-fx-layer.fx-orbs .m-orb:nth-child(1) { width:80px; height:80px; background:#2dd4a8; top:-20px; right:-10px; animation:mOrbF1 8s ease-in-out infinite; }
+.muse-fx-layer.fx-orbs .m-orb:nth-child(2) { width:60px; height:60px; background:#a78bfa; bottom:-15px; left:-5px; animation:mOrbF2 10s ease-in-out infinite; }
+.muse-fx-layer.fx-orbs .m-orb:nth-child(3) { width:40px; height:40px; background:#e8c800; top:50%; left:60%; animation:mOrbF3 12s ease-in-out infinite; }
+@keyframes mOrbF1 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(-15px,10px)} 66%{transform:translate(10px,-8px)} }
+@keyframes mOrbF2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(12px,-12px)} }
+@keyframes mOrbF3 { 0%,100%{transform:translate(0,0) scale(1);opacity:.12} 50%{transform:translate(-20px,8px) scale(1.3);opacity:.18} }
+
+/* ── FX 2: Breathing Glow ── */
+.muse-fx-layer.fx-breathe .m-glow {
+  position:absolute; inset:-2px; border-radius:22px;
+  background:linear-gradient(135deg, rgba(45,212,168,0.12), rgba(167,139,250,0.08));
+  animation:mBreathe 4s ease-in-out infinite;
+}
+@keyframes mBreathe { 0%,100%{opacity:.3;filter:blur(8px)} 50%{opacity:.7;filter:blur(15px)} }
+
+/* ── FX 3: Gentle Aurora ── */
+.muse-fx-layer.fx-aurora .m-aurora {
+  position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+  background:conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg, rgba(45,212,168,0.06) 60deg,
+    transparent 120deg, rgba(167,139,250,0.05) 180deg,
+    transparent 240deg, rgba(45,212,168,0.04) 300deg,
+    transparent 360deg);
+  animation:mAurora 20s linear infinite;
+}
+@keyframes mAurora { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* ── FX 4: Sparkle Particles ── */
+.muse-fx-layer.fx-sparkle .m-spark {
+  position:absolute; width:2px; height:2px; border-radius:50%; background:#7ecdb8;
+}
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(1) { top:15%; left:10%; animation:mSparkle 3s ease-in-out infinite 0s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(2) { top:30%; right:15%; animation:mSparkle 4s ease-in-out infinite .8s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(3) { bottom:25%; left:25%; animation:mSparkle 3.5s ease-in-out infinite 1.5s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(4) { top:60%; right:20%; animation:mSparkle 5s ease-in-out infinite .3s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(5) { bottom:15%; right:35%; animation:mSparkle 4.5s ease-in-out infinite 2s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(6) { top:20%; left:50%; animation:mSparkle 3.8s ease-in-out infinite 1s; }
+.muse-fx-layer.fx-sparkle .m-spark:nth-child(7) { bottom:40%; left:8%; animation:mSparkle 4.2s ease-in-out infinite 2.5s; }
+@keyframes mSparkle { 0%,100%{opacity:0;transform:scale(.5)} 50%{opacity:.8;transform:scale(1.8)} }
+
+/* ── FX 5: Horizontal Shimmer Wave ── */
+.muse-fx-layer.fx-shimmer .m-shimmer {
+  position:absolute; top:0; left:-100%; width:50%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(45,212,168,0.06), rgba(255,255,255,0.03), transparent);
+  animation:mShimmer 6s ease-in-out infinite;
+}
+@keyframes mShimmer { 0%{left:-100%} 100%{left:200%} }
+
+/* ── FX 6: Rising Petals ── */
+.muse-fx-layer.fx-petals .m-petal {
+  position:absolute; width:3px; height:3px; border-radius:50%; opacity:0;
+}
+.muse-fx-layer.fx-petals .m-petal:nth-child(1) { left:12%; background:rgba(45,212,168,0.4); animation:mPetal 7s ease-in infinite 0s; }
+.muse-fx-layer.fx-petals .m-petal:nth-child(2) { left:30%; background:rgba(167,139,250,0.35); animation:mPetal 9s ease-in infinite 1.5s; }
+.muse-fx-layer.fx-petals .m-petal:nth-child(3) { left:55%; background:rgba(45,212,168,0.3); animation:mPetal 8s ease-in infinite 3s; }
+.muse-fx-layer.fx-petals .m-petal:nth-child(4) { left:75%; background:rgba(232,200,0,0.3); animation:mPetal 10s ease-in infinite 2s; }
+.muse-fx-layer.fx-petals .m-petal:nth-child(5) { left:90%; background:rgba(45,212,168,0.35); animation:mPetal 7.5s ease-in infinite 4s; }
+@keyframes mPetal { 0%{bottom:-5px;opacity:0;transform:translateX(0) scale(1)} 10%{opacity:.6} 80%{opacity:.3} 100%{bottom:110%;opacity:0;transform:translateX(15px) scale(.5)} }
+
+/* ── FX 7: Pulsing Border Ring ── */
+.muse-fx-layer.fx-pulse .m-ring {
+  position:absolute; inset:-1px; border-radius:21px;
+  border:1.5px solid transparent;
+  background:linear-gradient(var(--bg), var(--bg)) padding-box, linear-gradient(135deg, rgba(45,212,168,0.35), rgba(167,139,250,0.2), rgba(45,212,168,0.35)) border-box;
+  animation:mPulse 3s ease-in-out infinite;
+}
+@keyframes mPulse { 0%,100%{opacity:.3} 50%{opacity:.85} }
+
+/* ── FX 8: Drifting Stars ── */
+.muse-fx-layer.fx-stars .m-star {
+  position:absolute; font-size:6px; opacity:0; color:#7ecdb8;
+}
+.muse-fx-layer.fx-stars .m-star:nth-child(1) { top:10%; left:8%; animation:mStar 6s linear infinite 0s; }
+.muse-fx-layer.fx-stars .m-star:nth-child(2) { top:25%; left:85%; animation:mStar 8s linear infinite 1s; }
+.muse-fx-layer.fx-stars .m-star:nth-child(3) { top:55%; left:15%; animation:mStar 7s linear infinite 2.5s; }
+.muse-fx-layer.fx-stars .m-star:nth-child(4) { top:70%; left:70%; animation:mStar 9s linear infinite .5s; }
+.muse-fx-layer.fx-stars .m-star:nth-child(5) { top:40%; left:45%; animation:mStar 5.5s linear infinite 3.5s; }
+.muse-fx-layer.fx-stars .m-star:nth-child(6) { top:85%; left:30%; animation:mStar 7.5s linear infinite 1.8s; }
+@keyframes mStar { 0%{opacity:0;transform:translate(0,0) scale(.6)} 15%{opacity:.7} 85%{opacity:.5} 100%{opacity:0;transform:translate(20px,-30px) scale(1.2)} }
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -5210,6 +5268,7 @@ body {
 
       <!-- ── Daily Muse (Time-based Quotes) ── -->
       <div class="home-muse" id="homeMuse">
+        <div class="muse-fx-layer" id="museFxLayer"></div>
         <div class="muse-slot-label">
           <span class="muse-slot-icon" id="museSlotIcon">🙏</span>
           <span class="muse-slot-tag" id="museSlotTag">Chanting Inspiration</span>
@@ -20233,6 +20292,42 @@ async function _museAdminSyncAuthorSetting(show) {
 }
 
 // ── Main update function ──
+// ── FX definitions: innerHTML for each effect ──
+const MUSE_FX = [
+  { cls:'fx-orbs',    html:'<div class="m-orb"></div><div class="m-orb"></div><div class="m-orb"></div>' },
+  { cls:'fx-breathe', html:'<div class="m-glow"></div>' },
+  { cls:'fx-aurora',  html:'<div class="m-aurora"></div>' },
+  { cls:'fx-sparkle', html:'<span class="m-spark"></span><span class="m-spark"></span><span class="m-spark"></span><span class="m-spark"></span><span class="m-spark"></span><span class="m-spark"></span><span class="m-spark"></span>' },
+  { cls:'fx-shimmer', html:'<div class="m-shimmer"></div>' },
+  { cls:'fx-petals',  html:'<span class="m-petal"></span><span class="m-petal"></span><span class="m-petal"></span><span class="m-petal"></span><span class="m-petal"></span>' },
+  { cls:'fx-pulse',   html:'<div class="m-ring"></div>' },
+  { cls:'fx-stars',   html:'<span class="m-star">✦</span><span class="m-star">✦</span><span class="m-star">✦</span><span class="m-star">✦</span><span class="m-star">✦</span><span class="m-star">✦</span>' }
+];
+
+let _museCurrentFxCls = '';
+
+function _musePickFx(slotKey) {
+  // Deterministic random per day + slot — different effect for each slot
+  const seed = _museDailySeed();
+  let h = 0;
+  for (let i = 0; i < slotKey.length; i++) h = h * 37 + slotKey.charCodeAt(i);
+  return MUSE_FX[Math.abs(seed + h * 7) % MUSE_FX.length];
+}
+
+function _museApplyFx(slotKey) {
+  const layer = document.getElementById('museFxLayer');
+  if (!layer) return;
+  const fx = _musePickFx(slotKey);
+  // Only re-apply if effect changed
+  if (_museCurrentFxCls === fx.cls) return;
+  // Remove old
+  if (_museCurrentFxCls) layer.classList.remove(_museCurrentFxCls);
+  // Apply new
+  layer.className = 'muse-fx-layer ' + fx.cls;
+  layer.innerHTML = fx.html;
+  _museCurrentFxCls = fx.cls;
+}
+
 function _updateDailyMuse() {
   const box = document.getElementById('homeMuse');
   if (!box) return;
@@ -20242,7 +20337,6 @@ function _updateDailyMuse() {
 
   // Pick quote deterministically by day + slot
   const seed = _museDailySeed();
-  // Use slot key as secondary hash to get different quotes per slot
   let slotHash = 0;
   for (let i = 0; i < slot.key.length; i++) slotHash += slot.key.charCodeAt(i);
   const idx = (seed + slotHash) % slot.data.length;
@@ -20258,13 +20352,7 @@ function _updateDailyMuse() {
 
   if (iconEl) iconEl.textContent = slot.icon;
   if (tagEl)  tagEl.textContent  = slot.tag;
-  if (quoteEl) {
-    quoteEl.textContent = pick.q;
-    // Re-trigger animation
-    quoteEl.style.animation = 'none';
-    quoteEl.offsetHeight;
-    quoteEl.style.animation = '';
-  }
+  if (quoteEl) quoteEl.textContent = pick.q;
 
   // Show/hide author based on admin setting
   const showAuthor = _museIsAuthorVisible();
@@ -20279,6 +20367,9 @@ function _updateDailyMuse() {
 
   if (hintEl) hintEl.textContent = slot.hint;
   box.style.display = '';
+
+  // Apply dynamic effect for this time slot
+  _museApplyFx(slot.key);
 
   // Update admin toggle state if visible
   const toggle = document.getElementById('museShowAuthorToggle');
