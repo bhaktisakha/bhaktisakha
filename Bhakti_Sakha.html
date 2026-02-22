@@ -4872,7 +4872,7 @@ body {
   padding:10px 16px 0; text-align:center;
 }
 .home-muse-label {
-  font-size:0.58rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+  font-size:0.82rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
   background:linear-gradient(135deg, var(--lavender), rgba(212,160,23,0.7));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
@@ -4880,19 +4880,14 @@ body {
 .home-muse-body { padding:10px 18px 6px; text-align:center; }
 .home-muse-verse {
   font-family:'Inter', system-ui, sans-serif;
-  font-size:0.92rem; line-height:1.7; letter-spacing:0.2px;
+  font-size:1.12rem; line-height:1.7; letter-spacing:0.2px;
   background:linear-gradient(135deg, #e8c800 0%, #f0d860 40%, #d4a84c 70%, #e8c800 100%);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text;
   white-space:pre-line;
 }
 .home-muse-verse::before {
-  content:'\201C'; display:block;
-  font-family:'Inter', system-ui, sans-serif; font-size:1.6rem;
-  background:linear-gradient(135deg, var(--lavender), rgba(167,139,250,0.4));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text;
-  line-height:1; margin-bottom:2px;
+  display:none;
 }
 .home-muse-pill {
   display:inline-flex; align-items:center; justify-content:center;
@@ -4902,16 +4897,16 @@ body {
   letter-spacing:0.3px; margin-top:6px;
 }
 .home-muse-footer {
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex; align-items:center; justify-content:center;
   padding:4px 16px 10px; gap:8px;
 }
 .home-muse-song {
   font-size:0.65rem; color:var(--text3); line-height:1.35;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
+  text-align:center;
 }
 .home-muse-song strong { color:var(--text2); font-weight:600; }
 .home-muse-arrow {
-  flex-shrink:0; width:16px; height:16px; color:var(--text3); opacity:0.5;
+  display:none;
 }
 </style>
   <!-- Google Identity Services -->
@@ -9630,12 +9625,12 @@ function _buildVerseCards(lyrics, sz, cat) {
 
   if (cat === 'gita') {
     // For Bhagavad Gita: split by "BgX.Y" or "Bg X.Y" markers (case-insensitive)
-    const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+\.\d+)/);
+    const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)/);
     let useBgFormat = false;
     for (const part of bgParts) {
       const trimmed = part.trim();
       if (!trimmed) continue;
-      const m = trimmed.match(/^[Bb][Gg]\s*(\d+\.\d+)\s*([\s\S]*)/);
+      const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\s*([\s\S]*)/);
       if (m) {
         useBgFormat = true;
         cards.push({ num: 'Bg ' + m[1], text: m[2].trim() });
@@ -9692,12 +9687,12 @@ function _buildTransCards(trans, sz, cat) {
 
   if (cat === 'gita') {
     // For Bhagavad Gita: try splitting by "BgX.Y)" or "Bg X.Y)" markers
-    const bgParts = trans.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+\.\d+\)\s)/);
+    const bgParts = trans.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?\)\s)/);
     let useBgFormat = false;
     for (const part of bgParts) {
       const trimmed = part.trim();
       if (!trimmed) continue;
-      const m = trimmed.match(/^[Bb][Gg]\s*(\d+\.\d+)\)\s*([\s\S]*)/);
+      const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\)\s*([\s\S]*)/);
       if (m) {
         useBgFormat = true;
         cards.push({ num: 'Bg ' + m[1], text: m[2].trim() });
@@ -19398,11 +19393,11 @@ function _extractAllVerses() {
     // Try to split into verses
     let verses = [];
     if (s.cat === 'gita') {
-      const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+\.\d+)/);
+      const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)/);
       for (const part of bgParts) {
         const trimmed = part.trim();
         if (!trimmed) continue;
-        const m = trimmed.match(/^[Bb][Gg]\s*(\d+\.\d+)\s*([\s\S]*)/);
+        const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\s*([\s\S]*)/);
         if (m) verses.push({ num: 'Bg ' + m[1], text: m[2].trim() });
       }
     }
@@ -19476,10 +19471,8 @@ function _updateDailyMuse() {
   const pillEl = document.getElementById('homeMusePill');
   const songEl = document.getElementById('homeMuseSong');
 
-  // Trim verse to max ~4 lines for display
+  // Show full verse - no truncation
   let displayText = muse.text;
-  const lines = displayText.split('\n').map(l => l.trim()).filter(Boolean);
-  if (lines.length > 5) displayText = lines.slice(0, 5).join('\n') + ' …';
 
   verseEl.textContent = displayText;
 
@@ -19492,7 +19485,7 @@ function _updateDailyMuse() {
 
   let footerHtml = '';
   if (muse.songTitle) footerHtml += `<strong>${muse.songTitle}</strong>`;
-  if (muse.author) footerHtml += ` · ${muse.author}`;
+  if (muse.author) footerHtml += `<br>${muse.author}`;
   songEl.innerHTML = footerHtml;
 
   box.style.display = '';
