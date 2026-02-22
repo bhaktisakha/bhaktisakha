@@ -4143,10 +4143,10 @@ body {
 
 /* Popup dropdown */
 .nh-popup-overlay {
-  position:fixed; inset:0; z-index:99; background:transparent;
+  position:fixed; inset:0; z-index:999; background:transparent;
 }
 .nh-popup {
-  position:absolute; top:calc(100% + 6px); right:0; z-index:100;
+  position:fixed; z-index:1000;
   background:linear-gradient(135deg, #162847, var(--card));
   border:1px solid rgba(167,139,250,0.2);
   border-radius:12px; padding:6px 0;
@@ -11238,6 +11238,8 @@ function onGoogleSignIn(response) {
       if (tokenResp.error) { showGoogleError('Drive access denied: ' + tokenResp.error); return; }
       gAccessToken = tokenResp.access_token;
       updateGoogleUI(true);
+      // Track user visit on server
+      _trackUserVisit();
       // Auto-sync on first sign-in
       gSyncAll();
     }
@@ -17577,20 +17579,33 @@ function renderAdminPrayer() {
 
 // Fetch user stats for admin dashboard summary
 let _admCachedUsers = null;
+
+function _nhSafeDate(val) {
+  if (!val) return 0;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
 async function admFetchUserStats() {
   try {
     const resp = await fetch(SONGS_API_URL + '?type=userStats');
     const data = await resp.json();
     if (!data.success) return;
 
-    _admCachedUsers = data.users || [];
+    _admCachedUsers = (data.users || []).filter(u => u && u.email);
     const now = Date.now();
     const h24 = 24 * 60 * 60 * 1000;
     const d7 = 7 * 24 * 60 * 60 * 1000;
     const total = _admCachedUsers.length;
-    const active = _admCachedUsers.filter(u => (now - new Date(u.lastSeen).getTime()) < h24).length;
+    const active = _admCachedUsers.filter(u => {
+      const ls = _nhSafeDate(u.lastSeen);
+      return ls > 0 && (now - ls) < h24;
+    }).length;
     const inactive = total - active;
-    const newUsers = _admCachedUsers.filter(u => (now - new Date(u.registered).getTime()) < d7).length;
+    const newUsers = _admCachedUsers.filter(u => {
+      const reg = _nhSafeDate(u.registered || u.createdAt || u.firstSeen);
+      return reg > 0 && (now - reg) < d7;
+    }).length;
 
     document.getElementById('admUsTotal').textContent = total;
     document.getElementById('admUsActive').textContent = active;
@@ -17602,6 +17617,24 @@ async function admFetchUserStats() {
   } catch(e) {
     document.getElementById('admUsersStatus').textContent = 'Failed to load';
   }
+}
+
+// Track user visit — registers/updates user on the server every app open
+async function _trackUserVisit() {
+  if (!gUser || !gUser.email) return;
+  try {
+    await fetch(SONGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'trackUser',
+        email: gUser.email.toLowerCase(),
+        name: gUser.name || '',
+        picture: gUser.picture || '',
+        timestamp: new Date().toISOString()
+      })
+    });
+  } catch(e) { /* silent — offline is fine */ }
 }
 
 // ===== USER LIST SCREEN =====
@@ -17639,9 +17672,9 @@ function ulRenderList() {
 
   // Classify users
   let users = _ulUsers.map(u => {
-    const lastSeenMs = new Date(u.lastSeen).getTime();
-    const registeredMs = new Date(u.registered).getTime();
-    const isActive = (now - lastSeenMs) < h24;
+    const lastSeenMs = _nhSafeDate(u.lastSeen);
+    const registeredMs = _nhSafeDate(u.registered || u.createdAt || u.firstSeen);
+    const isActive = lastSeenMs > 0 && (now - lastSeenMs) < h24;
     return { ...u, isActive, lastSeenMs, registeredMs };
   });
 
@@ -17662,7 +17695,10 @@ function ulRenderList() {
   });
 
   // Update summary counts (always from full list)
-  const allActive = _ulUsers.filter(u => (now - new Date(u.lastSeen).getTime()) < h24).length;
+  const allActive = _ulUsers.filter(u => {
+    const ls = _nhSafeDate(u.lastSeen);
+    return ls > 0 && (now - ls) < h24;
+  }).length;
   document.getElementById('ulTotal').textContent = _ulUsers.length;
   document.getElementById('ulActive').textContent = allActive;
   document.getElementById('ulInactive').textContent = _ulUsers.length - allActive;
@@ -17713,7 +17749,9 @@ function ulFilterList() {
 }
 
 function _ulTimeAgo(ms) {
+  if (!ms || isNaN(ms)) return 'Unknown';
   const diff = Date.now() - ms;
+  if (diff < 0) return 'Just now';
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'Just now';
   if (mins < 60) return mins + 'm ago';
@@ -19758,16 +19796,32 @@ function nhTogglePopup(type) {
   if (!items.length) return;
 
   // Build popup HTML
-  let h = '<div class="nh-popup"><div class="nh-popup-title">What\'s New</div>';
+  let h = '<div class="nh-popup-title">What\'s New</div>';
   items.forEach((item, i) => {
     h += `<div class="nh-popup-item" onclick="event.stopPropagation();nhItemClick('${type}',${i})">
       <span class="nh-popup-icon">${item.icon}</span>
       <div class="nh-popup-info"><div class="nh-popup-name">${item.title}</div><div class="nh-popup-sub">${item.sub}</div></div>
       <span class="nh-popup-arrow">›</span></div>`;
   });
-  h += '</div>';
+
+  // Create popup as fixed-position element on body
+  const popup = document.createElement('div');
+  popup.className = 'nh-popup';
+  popup.id = 'nhPopup_' + type;
+  popup.innerHTML = h;
+  document.body.appendChild(popup);
+
+  // Position relative to badge
+  const rect = badgeEl.getBoundingClientRect();
+  let top = rect.bottom + 6;
+  let right = window.innerWidth - rect.right;
+  // Ensure popup stays on screen
+  if (top + 200 > window.innerHeight) top = rect.top - popup.offsetHeight - 6;
+  if (right < 8) right = 8;
+  popup.style.top = top + 'px';
+  popup.style.right = right + 'px';
+
   badgeEl._nhItems = items;
-  badgeEl.insertAdjacentHTML('beforeend', h);
 
   // Overlay to close on outside tap
   const ov = document.createElement('div');
@@ -19790,11 +19844,10 @@ function nhItemClick(type, idx) {
 function nhClosePopup() {
   _nhOpenPopup = null;
   ['SB', 'PC', 'SK', 'Cal'].forEach(t => {
+    const popup = document.getElementById('nhPopup_' + t);
+    if (popup) popup.remove();
     const el = document.getElementById('nhBadge' + t);
-    if (el) {
-      const p = el.querySelector('.nh-popup'); if (p) p.remove();
-      if (el._nhOverlay) { el._nhOverlay.remove(); el._nhOverlay = null; }
-    }
+    if (el && el._nhOverlay) { el._nhOverlay.remove(); el._nhOverlay = null; }
   });
 }
 
@@ -19830,6 +19883,10 @@ function init() {
   setTimeout(() => {
     if (typeof gAccessToken !== 'undefined' && gAccessToken) {
       try { gSyncAll(); } catch(e) {}
+    }
+    // Track user visit (works even without Drive token, just needs gUser)
+    if (gUser && gUser.email) {
+      try { _trackUserVisit(); } catch(e) {}
     }
   }, 3000);
 
