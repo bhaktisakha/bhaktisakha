@@ -9451,21 +9451,30 @@ function _decodeUrlMatch(a, b) {
   try { return decodeURIComponent(a) === decodeURIComponent(b); } catch(e) { return false; }
 }
 
-// ---- Count verses in a song ----
+// ---- Count verses in a song (mirrors _extractAllVerses logic exactly) ----
 function _countSongVerses(s) {
   const lyrics = s.lyrics || s.lyrics_en || '';
-  if (!lyrics || lyrics.length < 10) return 0;
-  // Gita-style: BG x.y
+  if (!lyrics || lyrics.length < 20) return 0;
+  let verses = [];
   if (s.cat === 'gita') {
-    const matches = lyrics.match(/(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+/g);
-    if (matches && matches.length > 0) return matches.length;
+    const bgParts = lyrics.split(/(?=(?:^|\n)\s*[Bb][Gg]\s*\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)/);
+    for (const part of bgParts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const m = trimmed.match(/^[Bb][Gg]\s*(\d+(?:\.\d+)+(?:\s*[-–]\s*\d+)?)\s*([\s\S]*)/);
+      if (m && m[2].trim().length >= 15) verses.push(1);
+    }
   }
-  // Numbered verses: (1), (2), etc.
-  const numbered = lyrics.match(/(?<!\d)\((\d+)\)/g);
-  if (numbered && numbered.length > 0) return numbered.length;
-  // Fallback: count stanza breaks (double newlines)
-  const stanzas = lyrics.split(/\n\s*\n/).filter(p => p.trim().length > 10);
-  return stanzas.length > 1 ? stanzas.length : 0;
+  if (!verses.length) {
+    const parts = lyrics.split(/(?<!\d)(?=\(\d+\))/);
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const m = trimmed.match(/^\((\d+)\)\s*([\s\S]*)/);
+      if (m && m[2].trim().length >= 15) verses.push(1);
+    }
+  }
+  return verses.length;
 }
 
 function _buildSongCard(s, idx, searchQuery) {
