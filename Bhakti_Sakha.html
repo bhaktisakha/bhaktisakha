@@ -910,6 +910,21 @@ body {
 .song-detail-body {
   flex:1; overflow-y:auto; padding:20px 18px 100px;
 }
+.sd-next-chapter-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; margin:32px 0 20px; padding:14px 20px;
+  background:linear-gradient(135deg, rgba(163,230,53,0.15), rgba(132,204,22,0.08));
+  border:1px solid rgba(163,230,53,0.35);
+  border-radius:14px; cursor:pointer;
+  font-family:inherit; font-size:0.92rem; font-weight:600;
+  color:#d9f99d; letter-spacing:0.3px;
+  transition:all 0.2s ease;
+}
+.sd-next-chapter-btn:active {
+  background:linear-gradient(135deg, rgba(163,230,53,0.25), rgba(132,204,22,0.15));
+  transform:scale(0.97);
+}
+.sd-next-chapter-btn svg { flex-shrink:0; }
 .sd-title { font-size:1.3rem; font-weight:700; color:var(--text); line-height:1.3; margin-bottom:4px; }
 .sd-official { font-size:0.85rem; color:var(--accent-gold); font-style:italic; margin-bottom:10px; }
 .sd-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
@@ -9589,6 +9604,25 @@ function _buildTransCards(trans, sz, cat) {
     </div>`).join('')}</div>`;
 }
 
+function _getNextGitaChapter(currentSongId) {
+  const gitaSongs = songs.filter(s => s.cat === 'gita').sort(_naturalSongSort);
+  const currentIdx = gitaSongs.findIndex(s => s.id === currentSongId);
+  if (currentIdx === -1 || currentIdx >= gitaSongs.length - 1) return null;
+  return gitaSongs[currentIdx + 1];
+}
+
+function _getGitaChapterNumber(songId) {
+  const gitaSongs = songs.filter(s => s.cat === 'gita').sort(_naturalSongSort);
+  const idx = gitaSongs.findIndex(s => s.id === songId);
+  return idx === -1 ? null : idx + 1;
+}
+
+function goToNextGitaChapter(nextSongId) {
+  openSongDetail(nextSongId);
+  const body = document.getElementById('songDetailBody');
+  if (body) body.scrollTop = 0;
+}
+
 function openSongDetail(id) {
   const s = songs.find(s => s.id === id);
   if (!s) return;
@@ -9646,6 +9680,20 @@ function openSongDetail(id) {
       <div class="sd-section-lbl">${transLabel}</div>
       ${_buildTransCards(trans, sz, s.cat)}
     ` : ''}
+    ${(() => {
+      if (s.cat === 'gita') {
+        const nextSong = _getNextGitaChapter(id);
+        if (nextSong) {
+          const nextChNum = _getGitaChapterNumber(nextSong.id);
+          const nextLabel = nextChNum ? 'Go to Chapter ' + nextChNum : 'Go to Next Chapter';
+          return `<button class="sd-next-chapter-btn" onclick="goToNextGitaChapter(${nextSong.id})">
+            <span>📗 ${nextLabel}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>`;
+        }
+      }
+      return '';
+    })()}
   `;
 
   // Sync language dropdown
