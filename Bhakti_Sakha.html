@@ -8489,11 +8489,12 @@ function updateHeaderDate() {
   const calLocEl = document.getElementById('calLocName');
   if (calLocEl) calLocEl.textContent = curLoc.name + ', ' + curLoc.country;
   document.getElementById('headerDate').textContent = `${day} ${mo} ${yr}`;
-  // Show lunar month for this date
+  // Show lunar month, tithi, and paksha for this date
   try {
     const masa = getVaishnavaMasa(td);
     const gau = getGaurabda(td);
-    document.getElementById('headerMasa').textContent = `${masa.masaTraditional}, Gaurabda ${gau}`;
+    const tithiInfo = getTithi(td, curLoc.lat, curLoc.lon, curLoc.tz);
+    document.getElementById('headerMasa').textContent = `${tithiInfo.tithi}, ${masa.masaTraditional}, ${tithiInfo.paksha} Paksha, Gaurabda ${gau}`;
   } catch(e) {
     document.getElementById('headerMasa').textContent = '';
   }
@@ -11038,6 +11039,7 @@ function saveEvt() {
     showToast('Event saved! ✨');
   }
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
+  nfTriggerSync(); // Auto-sync events to Google Drive
   closeModal('addEvtModal');
   renderEvts();
   renderCalendar();
@@ -11071,7 +11073,7 @@ async function delEvt(id) {
   if (!(await bsConfirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?'))) return;
   customEvts = customEvts.filter(e => e.id!==id);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
-  renderEvts();
+  nfTriggerSync(); // Auto-sync events to Google Drive
   // Re-render active tab
   const activeTab = document.querySelector('.evt-tab-btn.active');
   if (activeTab) {
@@ -11088,6 +11090,7 @@ async function delEvtFromModal() {
   if (!(await bsConfirm('⚠️ This event will be permanently deleted and cannot be recovered. Continue?'))) return;
   customEvts = customEvts.filter(e => e.id !== editingEvtId);
   localStorage.setItem('customEvts', JSON.stringify(customEvts));
+  nfTriggerSync(); // Auto-sync events to Google Drive
   editingEvtId = null;
   closeModal('addEvtModal');
   renderEvts();
@@ -11138,6 +11141,7 @@ function importEvts() {
         if (validated.length === 0) { showToast('No valid events in file'); return; }
         customEvts = validated;
         localStorage.setItem('customEvts', JSON.stringify(customEvts));
+        nfTriggerSync(); // Auto-sync events to Google Drive
         try { renderEvts(); } catch(re) { console.warn('renderEvts after import:', re); }
         showToast(`Imported ${validated.length} events ✅`);
       } catch(err) { showToast('Import error: ' + err.message); }
@@ -19821,6 +19825,13 @@ function init() {
   // Restore Google session and update admin UI
   restoreGoogleSession();
   updateAdminUI();
+
+  // Auto-sync from Google Drive on startup (if signed in)
+  setTimeout(() => {
+    if (typeof gAccessToken !== 'undefined' && gAccessToken) {
+      try { gSyncAll(); } catch(e) {}
+    }
+  }, 3000);
 
   // Select today
   const td = new Date();
