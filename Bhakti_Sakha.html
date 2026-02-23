@@ -5283,6 +5283,165 @@ body {
 }
 .jt-info-close:hover { background:rgba(45,212,168,0.22); }
 
+/* ===== KRSNA BOOK AUDIO PLAYER (8PM-4AM) ===== */
+.kb-talk-row {
+  display:none;
+  align-items:center; justify-content:flex-end; gap:8px;
+  padding:4px 16px 12px; position:relative; z-index:3;
+}
+.kb-talk-row.kb-visible { display:flex; }
+
+.kb-play-btn {
+  width:42px; height:42px; border-radius:50%;
+  background:linear-gradient(135deg, rgba(167,139,250,0.25) 0%, rgba(167,139,250,0.10) 100%);
+  border:1.5px solid rgba(167,139,250,0.35);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s ease;
+  box-shadow:0 2px 12px rgba(167,139,250,0.15);
+  position:relative; flex-shrink:0;
+}
+.kb-play-btn:hover { background:linear-gradient(135deg, rgba(167,139,250,0.35) 0%, rgba(167,139,250,0.18) 100%); transform:scale(1.08); }
+.kb-play-btn:active { transform:scale(0.95); }
+.kb-play-btn svg { width:18px; height:18px; fill:#a78bfa; transition:all 0.2s; }
+.kb-play-btn.kb-playing { border-color:rgba(167,139,250,0.6); animation:kbPulseGlow 2s ease-in-out infinite; }
+.kb-play-btn.kb-loading { opacity:0.6; pointer-events:none; }
+
+@keyframes kbPulseGlow {
+  0%,100% { box-shadow:0 2px 12px rgba(167,139,250,0.15); }
+  50% { box-shadow:0 2px 24px rgba(167,139,250,0.4), 0 0 8px rgba(167,139,250,0.2); }
+}
+
+.kb-info-btn {
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(167,139,250,0.08);
+  border:1px solid rgba(167,139,250,0.2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; flex-shrink:0;
+  font-size:0.7rem; font-weight:700; color:#c4b5fd; font-style:italic;
+  font-family:'Philosopher', serif;
+}
+.kb-info-btn:hover { background:rgba(167,139,250,0.18); border-color:rgba(167,139,250,0.4); }
+
+.kb-now-playing {
+  flex:1; min-width:0; overflow:hidden;
+  font-size:0.62rem; color:#c4b5fd; opacity:0.85;
+  letter-spacing:0.4px; font-weight:500;
+  white-space:nowrap; text-overflow:ellipsis;
+  display:none;
+}
+.kb-now-playing.kb-show { display:block; }
+.kb-now-playing .kb-np-label { color:#a78bfa; font-weight:700; margin-right:4px; }
+
+/* Krsna Book Info / Chapter Select Modal */
+.kb-info-overlay {
+  display:none; position:fixed; inset:0; z-index:100000;
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.kb-info-overlay.kb-open { display:flex; }
+.kb-info-card {
+  background:linear-gradient(160deg, #1a1040 0%, #0d1b2a 40%, #162847 100%);
+  border:1px solid rgba(167,139,250,0.25);
+  border-radius:20px; max-width:400px; width:100%;
+  max-height:85vh; display:flex; flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(167,139,250,0.08);
+  overflow:hidden;
+  animation:jtPopIn 0.3s ease-out;
+}
+.kb-info-header {
+  padding:16px 20px 12px; text-align:center;
+  border-bottom:1px solid rgba(167,139,250,0.12);
+  flex-shrink:0;
+}
+.kb-info-header-icon { font-size:1.6rem; display:block; margin-bottom:4px; }
+.kb-info-header-title {
+  font-family:'Philosopher', serif; font-size:1rem; font-weight:700;
+  color:#a78bfa; letter-spacing:0.5px;
+}
+.kb-info-header-sub {
+  font-size:0.65rem; color:#c4b5fd; opacity:0.7;
+  letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; font-weight:600;
+}
+.kb-info-now {
+  padding:10px 20px 8px; text-align:center;
+  border-bottom:1px solid rgba(167,139,250,0.08);
+  flex-shrink:0;
+}
+.kb-info-now-label {
+  font-size:0.58rem; text-transform:uppercase; letter-spacing:1.5px;
+  color:#a78bfa; opacity:0.7; font-weight:700; margin-bottom:3px;
+}
+.kb-info-now-title {
+  font-family:'Philosopher', serif; font-size:0.88rem; font-weight:600;
+  color:#e0d8f8; line-height:1.4;
+}
+.kb-info-desc {
+  font-size:0.72rem; color:rgba(196,181,253,0.65); line-height:1.5;
+  text-align:center; padding:8px 20px 4px; flex-shrink:0;
+}
+.kb-info-progress {
+  padding:8px 20px 4px; text-align:center; flex-shrink:0;
+}
+.kb-info-progress-bar {
+  width:100%; height:4px; background:rgba(167,139,250,0.1); border-radius:2px; overflow:hidden; margin-bottom:5px;
+}
+.kb-info-progress-fill {
+  height:100%; background:linear-gradient(90deg, #a78bfa, #c4b5fd);
+  border-radius:2px; transition:width 0.5s ease;
+}
+.kb-info-progress-text {
+  font-size:0.58rem; color:#c4b5fd; opacity:0.6; letter-spacing:0.5px;
+}
+
+/* Chapter list */
+.kb-chapter-list-wrap {
+  flex:1; overflow-y:auto; min-height:0;
+  padding:6px 12px 10px;
+}
+.kb-chapter-list-title {
+  font-size:0.6rem; text-transform:uppercase; letter-spacing:1.8px;
+  color:#a78bfa; opacity:0.65; font-weight:700; padding:6px 8px 4px;
+}
+.kb-chapter-item {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 10px; border-radius:12px; cursor:pointer;
+  transition:background 0.2s; margin-bottom:2px;
+}
+.kb-chapter-item:hover { background:rgba(167,139,250,0.08); }
+.kb-chapter-item.kb-ch-active { background:rgba(167,139,250,0.15); }
+.kb-chapter-item.kb-ch-playing { background:rgba(167,139,250,0.18); }
+.kb-ch-num {
+  width:26px; height:26px; border-radius:50%;
+  background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.62rem; font-weight:700; color:#c4b5fd; flex-shrink:0;
+}
+.kb-chapter-item.kb-ch-active .kb-ch-num {
+  background:rgba(167,139,250,0.25); border-color:rgba(167,139,250,0.4); color:#a78bfa;
+}
+.kb-ch-title {
+  flex:1; font-size:0.76rem; color:#d8d0f0; line-height:1.35;
+  min-width:0; overflow:hidden; text-overflow:ellipsis;
+}
+.kb-ch-play-icon {
+  flex-shrink:0; font-size:0.7rem; opacity:0.5;
+}
+.kb-chapter-item.kb-ch-active .kb-ch-play-icon,
+.kb-chapter-item.kb-ch-playing .kb-ch-play-icon { opacity:1; color:#a78bfa; }
+
+.kb-info-footer {
+  padding:10px 20px 14px; text-align:center;
+  border-top:1px solid rgba(167,139,250,0.08);
+  flex-shrink:0;
+}
+.kb-info-close {
+  background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.25);
+  color:#a78bfa; border-radius:12px; padding:8px 28px;
+  font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;
+  letter-spacing:0.5px; font-family:inherit;
+}
+.kb-info-close:hover { background:rgba(167,139,250,0.22); }
+
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -5465,6 +5624,18 @@ body {
             <svg id="jtIconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
           </div>
         </div>
+        <!-- Krsna Book Audio Player (8PM-4AM) -->
+        <div class="kb-talk-row" id="kbRow">
+          <div class="kb-now-playing" id="kbNowPlaying">
+            <span class="kb-np-label">♫ Now Playing:</span>
+            <span id="kbNowTitle">—</span>
+          </div>
+          <div class="kb-info-btn" id="kbInfoBtn" onclick="kbShowInfo()" title="Browse chapters">i</div>
+          <div class="kb-play-btn" id="kbPlayBtn" onclick="kbTogglePlay()" title="Krsna Book — Tonight's Chapter">
+            <svg id="kbIconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            <svg id="kbIconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+          </div>
+        </div>
       </div>
 
       <!-- Japa Talk Info Popup -->
@@ -5490,6 +5661,34 @@ body {
           </div>
           <div class="jt-info-footer">
             <button class="jt-info-close" onclick="jtCloseInfo()">Hare Krishna 🙏</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Krsna Book Chapter Select Popup -->
+      <div class="kb-info-overlay" id="kbInfoOverlay" onclick="if(event.target===this)kbCloseInfo()">
+        <div class="kb-info-card">
+          <div class="kb-info-header">
+            <span class="kb-info-header-icon">📖</span>
+            <div class="kb-info-header-title">Krsna — The Supreme Personality of Godhead</div>
+            <div class="kb-info-header-sub">Srimad Bhagavatam · Canto 10 Audio Book</div>
+          </div>
+          <div class="kb-info-now">
+            <div class="kb-info-now-label">Tonight's Chapter</div>
+            <div class="kb-info-now-title" id="kbInfoNowTitle">—</div>
+          </div>
+          <div class="kb-info-desc">
+            Listen to the divine pastimes of Lord Krishna from Srimad Bhagavatam Canto 10, narrated by HH Amala Bhakta Swami Maharaj. A new chapter plays each evening during <strong style="color:#a78bfa">8 PM – 4 AM</strong>. You can also choose any chapter below.
+          </div>
+          <div class="kb-info-progress">
+            <div class="kb-info-progress-bar"><div class="kb-info-progress-fill" id="kbProgressFill" style="width:0%"></div></div>
+            <div class="kb-info-progress-text" id="kbProgressText">Chapter 1 of 90</div>
+          </div>
+          <div class="kb-chapter-list-wrap" id="kbChapterList">
+            <div class="kb-chapter-list-title">All Chapters</div>
+          </div>
+          <div class="kb-info-footer">
+            <button class="kb-info-close" onclick="kbCloseInfo()">Hare Krishna 🙏</button>
           </div>
         </div>
       </div>
@@ -14690,6 +14889,7 @@ function updateHomeScreen() {
   // Daily muse verse on home
   _updateDailyMuse();
   jtInit(); // Japa Talk player (4AM-8AM)
+  kbInit(); // Krsna Book player (8PM-4AM)
 
   // New & Happening badges
   nhUpdateBadges();
@@ -20807,6 +21007,284 @@ function jtShowInfo() {
 
 function jtCloseInfo() {
   document.getElementById('jtInfoOverlay').classList.remove('jt-open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KRSNA BOOK AUDIO PLAYER — 8 PM to 4 AM Nightly Listening
+// ═══════════════════════════════════════════════════════════
+const KRSNA_BOOK = [
+{c:1,t:"Advent of Lord Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-01-Advent_of_Lord_Krishna.mp3"},
+{c:2,t:"Prayers by the Demigods for Lord Krishna in the Womb",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-02-Prayers_by_the_Demigods_for_Lord_Krishna_in_the_Womb.mp3"},
+{c:3,t:"Birth of Lord Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-03-Birth_of_Lord_Krishna.mp3"},
+{c:4,t:"The Atrocities of King Kamsa",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-04-The_Atrocities_of_King_Kamsa.mp3"},
+{c:5,t:"The Meeting of Nanda Maharaja and Vasudeva",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-05-The_Meeting_of_Nanda_Maharaja_and_Vasudeva.mp3"},
+{c:6,t:"The Killing of the Demon Putana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-06-The_Killing_of_the_Demon_Putana.mp3"},
+{c:7,t:"The Killing of the Demon Trinavarta",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-07-The_Killing_of_the_Demon_Trinavarta.mp3"},
+{c:8,t:"Krishna Shows the Universal Form Within His Mouth",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-08-Krishna_Shows_the_Universal_Form_Within_His_Mouth.mp3"},
+{c:9,t:"Mother Yasoda Binds Lord Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-09-Mother_Yasoda_Binds_Lord_Krishna_bd8MDp5.mp3"},
+{c:10,t:"Deliverance of the Yamala-arjuna Trees",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-10-Deliverance_of_the_Yamala-arjuna_Trees.mp3"},
+{c:11,t:"The Childhood Pastimes of Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-11-The_Childhood_Pastimes_of_Krishna.mp3"},
+{c:12,t:"Killing of the Demon Aghasura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-12-Killing_of_the_Demon_Aghasura.mp3"},
+{c:13,t:"The Stealing of the Boys and Calves by Brahma",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-13-The_Stealing_of_the_Boys_and_Calves_by_Brahma.mp3"},
+{c:14,t:"Brahma's Prayers to Lord Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-14-Brahmas_Prayers_to_Lord_Krishna.mp3"},
+{c:15,t:"The Killing of Dhenuka the Ass Demon",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-15-The_Killing_of_Dhenuka_the_Ass_Demon.mp3"},
+{c:16,t:"Krishna Chastises the Serpent Kaliya",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-16-Krishna_Chastises_the_Serpent_Kaliya.mp3"},
+{c:17,t:"The History of Kaliya",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-17-The_History_of_Kaliya.mp3"},
+{c:18,t:"Lord Balarama Slays the Demon Pralamba",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-18-Lord_Balarama_Slays_the_Demon_Pralamba.mp3"},
+{c:19,t:"Swallowing the Forest Fire",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-19-Swallowing_the_Forest_Fire.mp3"},
+{c:20,t:"The Rainy Season and Autumn in Vrndavana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-20-The_Rainy_Season_and_Autumn_in_Vrndavana.mp3"},
+{c:21,t:"The Gopis Glorify the Song of Krishna's Flute",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-21-The_Gopis_Glorify_the_Song_of_Krishnas_Flute.mp3"},
+{c:22,t:"Krishna Steals the Garments of the Unmarried Gopis",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-22-Krishna_Steals_the_Garments_of_the_Unmarried_Gopis.mp3"},
+{c:23,t:"The Brahmana's Wives Blessed",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-23-The_Brahmanas_Wives_Blessed.mp3"},
+{c:24,t:"Worshiping Govardhana Hill",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-24-Worshiping_Govardhana_Hill.mp3"},
+{c:25,t:"Lord Krishna Lifts Govardhana Hill",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-25-Lord_Krishna_Lifts_Govardhana_Hill.mp3"},
+{c:26,t:"Wonderful Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-26-Wonderful_Krishna.mp3"},
+{c:27,t:"Lord Indra and Mother Surabhi Offer Prayers",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-27-Lord_Indra_and_Mother_Surabhi_Offer_Prayers.mp3"},
+{c:28,t:"Krishna Rescues Nanda Maharaja from the Abode of Varuna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-28-Krishna_Rescues_Nanda_Maharaja_from_the_Abode_of_Varuna.mp3"},
+{c:29,t:"Krishna and the Gopis Meet for the Rasa Dance",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-29-Krishna_and_the_Gopis_Meet_for_the_Rasa_Dance.mp3"},
+{c:30,t:"The Gopis Search for Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-30-The_Gopis_Search_for_Krishna.mp3"},
+{c:31,t:"The Gopis' Songs of Separation",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-31-The_Gopis_Songs_of_Separation.mp3"},
+{c:32,t:"The Reunion",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-32-The_Reunion.mp3"},
+{c:33,t:"The Rasa Dance",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-33-The_Rasa_Dance.mp3"},
+{c:34,t:"Nanda Maharaja Saved and Sankhacuda Slain",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-34-Nanda_Maharaja_Saved_and_Sankhacuda_Slain.mp3"},
+{c:35,t:"The Gopis Sing of Krishna as He Wanders in the Forest",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-35-The_Gopis_Sing_of_Krishna_as_He_Wanders_in_the_Forest.mp3"},
+{c:36,t:"The Slaying of Arista the Bull Demon",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-36-The_Slaying_of_Arista_the_Bull_Demon.mp3"},
+{c:37,t:"The Killing of the Demons Kesi and Vyoma",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-37-The_Killing_of_the_Demons_Kesi_and_Vyoma.mp3"},
+{c:38,t:"Akrura's Arrival in Vrndavana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-38-Akruras_Arrival_in_Vrndavana.mp3"},
+{c:39,t:"Akrura's Vision",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-39-Akruras_vision.mp3"},
+{c:40,t:"The Prayers of Akrura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-40-The_Prayers_of_Akrura.mp3"},
+{c:41,t:"Krishna and Balarama Enter Mathura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-41-Krishna_and_Balarama_Enter_Mathura.mp3"},
+{c:42,t:"The Breaking of the Sacrificial Bow",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-42-The_Breaking_of_the_Sacrificial_Bow.mp3"},
+{c:43,t:"Krishna Kills the Elephant Kuvalayapida",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-43-Krishna_Kills_the_Elephant_Kuvalayapida.mp3"},
+{c:44,t:"The Killing of Kamsa",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-44-The_Killing_of_Kamsa.mp3"},
+{c:45,t:"Krishna Rescues His Teacher's Son",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-45-Krishna_Rescues_His_Teachers_Son.mp3"},
+{c:46,t:"Uddhava Visits Vrndavana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-46-Uddhava_Visits_Vrndavana.mp3"},
+{c:47,t:"The Song of the Bee",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-47-The_Song_of_the_Bee.mp3"},
+{c:48,t:"Krishna Pleases His Devotees",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-48-Krishna_Pleases_His_Devotees.mp3"},
+{c:49,t:"Akrura's Mission in Hastinapura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-49-Akruras_Mission_in_Hastinapura.mp3"},
+{c:50,t:"Krishna Establishes the City of Dvaraka",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-50-Krishna_Establishes_the_City_of_Dvaraka.mp3"},
+{c:51,t:"The Deliverance of Mucukunda",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-51-The_Deliverance_of_Mucukunda.mp3"},
+{c:52,t:"Rukmini's Message to Lord Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-52-Rukminis_Message_to_Lord_Krishna.mp3"},
+{c:53,t:"Krishna Kidnaps Rukmini",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-53-Krishna_Kidnaps_Rukmini.mp3"},
+{c:54,t:"The Marriage of Krishna and Rukmini",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-54-The_Marriage_of_Krishna_and_Rukmini.mp3"},
+{c:55,t:"The History of Pradyumna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-55-The_History_of_Pradyumna.mp3"},
+{c:56,t:"The Syamantaka Jewel",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-56-The_Syamantaka_Jewel.mp3"},
+{c:57,t:"Satrajit Murdered, the Jewel Returned",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-57-Satrajit_Murdered_the_Jewel_Returned.mp3"},
+{c:58,t:"Krishna Marries Five Princesses",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-58-Krishna_Marries_Five_Princesses.mp3"},
+{c:59,t:"The Killing of the Demon Naraka",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-59-The_Killing_of_the_Demon_Naraka.mp3"},
+{c:60,t:"Lord Krishna Teases Queen Rukmini",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-60-Lord_Krishna_Teases_Queen_Rukmini.mp3"},
+{c:61,t:"Lord Balarama Slays Rukmi",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-61-Lord_Balarama_Slays_Rukmi.mp3"},
+{c:62,t:"The Meeting of Usa and Aniruddha",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-62-The_Meeting_of_Usa_and_Aniruddha.mp3"},
+{c:63,t:"Lord Krishna Fights with Banasura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-63-Lord_Krishna_Fights_with_Banasura.mp3"},
+{c:64,t:"The Deliverance of King Nrga",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-64-The_Deliverance_of_King_Nrga.mp3"},
+{c:65,t:"Lord Balarama Visits Vrndavana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-65-Lord_Balarama_Visits_Vrndavana.mp3"},
+{c:66,t:"Paundraka the False Vasudeva",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-66-Paundraka_the_False_Vasudeva.mp3"},
+{c:67,t:"Lord Balarama Slays Dvivida Gorilla",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-67-Lord_Balarama_Slays_Dvivida_Gorilla.mp3"},
+{c:68,t:"The Marriage of Samba",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-68-The_Marriage_of_Samba.mp3"},
+{c:69,t:"Narada Muni Visits Lord Krishna's Palaces in Dvaraka",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-69-Narada_Muni_Visits_Lord_Krishnas_Palaces_in_Dvaraka.mp3"},
+{c:70,t:"Lord Krishna's Daily Activities",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-70-Lord_Krishnas_Daily_Activities.mp3"},
+{c:71,t:"The Lord Travels to Indraprastha",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-71-The_Lord_Travels_to_Indraprastha.mp3"},
+{c:72,t:"The Slaying of the Demon Jarasandha",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-72-The_Slaying_of_the_Demon_Jarasandha.mp3"},
+{c:73,t:"Lord Krishna Blesses the Liberated Kings",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-73-Lord_Krishna_Blesses_the_Liberated_Kings.mp3"},
+{c:74,t:"The Deliverance of Sisupala at the Rajasuya Sacrifice",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-74-The_Deliverance_of_Sisupala_at_the_Rajasuya_Sacrifice.mp3"},
+{c:75,t:"Duryodhana Humiliated",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-75-Duryodhana_Humiliated.mp3"},
+{c:76,t:"The Battle Between Salva and the Vrsnis",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-76-The_Battle_Between_Salva_and_the_Vrsnis.mp3"},
+{c:77,t:"Lord Krishna Slays the Demon Salva",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-77-Lord_Krishna_Slays_the_Demon_Salva.mp3"},
+{c:78,t:"The Killing of Dantavakra, Viduratha and Romaharsana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-78-The_Killing_of_Dantavakra_Viduratha_and_Romaharsana.mp3"},
+{c:79,t:"Lord Balarama Goes on Pilgrimage",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-79-Lord_Balarama_Goes_on_Pilgrimage.mp3"},
+{c:80,t:"The Brahmana Sudama Visits Lord Krishna in Dvaraka",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-80-The_Brahmana_Sudama_Visits_Lord_Krishna_in_Dvaraka.mp3"},
+{c:81,t:"The Lord Blesses Sudama Brahmana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-81-The_Lord_Blesses_Sudama_Brahmana.mp3"},
+{c:82,t:"Krishna and Balarama Meet the Inhabitants of Vrndavana",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-82-Krishna_and_Balarama_Meet_the_Inhabitants_of_Vrndavana.mp3"},
+{c:83,t:"Draupadi Meets the Queens of Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-83-Draupadi_Meets_the_Queens_of_Krishna.mp3"},
+{c:84,t:"The Sages' Teachings at Kuruksetra",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-84-The_Sages_Teachings_at_Kuruksetra.mp3"},
+{c:85,t:"Lord Krishna Instructs Vasudeva and Retrieves Devaki's Sons",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-85-Lord_Krishna_Instructs_Vasudeva_and_Retrieves_Devakis_Sons.mp3"},
+{c:86,t:"Arjuna Kidnaps Subhadra and Krishna Blesses His Devotees",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-86-Arjuna_Kidnaps_Subhadra_and_Krishna_Blesses_His_Devotees.mp3"},
+{c:87,t:"Prayers By the Personified Vedas",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-87-Prayers_By_the_Personaified_Vedas.mp3"},
+{c:88,t:"Lord Siva Saved from Vrkasura",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-88-Lord_Siva_Saved_from_Vrkasura.mp3"},
+{c:89,t:"Krishna and Arjuna Retrieve a Brahmana's Sons",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-89-Krishna_and_Arjuna_Retrieve_a_Brahmanas_Sons.mp3"},
+{c:90,t:"Summary of Lord Krishna's Glories",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HH%20Amala%20Bhakta%20Swami%20Maharaj%20Krsna%20Audio%20Book/10-90-Summary_of_Lord_Krishnas_Glories.mp3"}
+];
+
+let _kbAudio = null;
+let _kbIsPlaying = false;
+let _kbManualIdx = null; // set when user picks a chapter manually
+
+// Get tonight's chapter index — cycles through all 90 progressively
+function _kbGetTodayIndex() {
+  if (_kbManualIdx !== null) return _kbManualIdx;
+  const stored = localStorage.getItem('kbProgress');
+  let progress = stored ? JSON.parse(stored) : { idx: 0, playedDates: [] };
+  const d = new Date();
+  const todayKey = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  if (progress.lastDate === todayKey) return progress.idx;
+  if (progress.lastDate) {
+    progress.idx = (progress.idx + 1) % KRSNA_BOOK.length;
+  }
+  progress.lastDate = todayKey;
+  if (!progress.playedDates) progress.playedDates = [];
+  if (!progress.playedDates.includes(todayKey)) {
+    progress.playedDates.push(todayKey);
+  }
+  localStorage.setItem('kbProgress', JSON.stringify(progress));
+  return progress.idx;
+}
+
+function _kbGetProgress() {
+  const stored = localStorage.getItem('kbProgress');
+  let progress = stored ? JSON.parse(stored) : { idx: 0, playedDates: [] };
+  const totalPlayed = progress.playedDates ? progress.playedDates.length : 0;
+  const currentIdx = _kbManualIdx !== null ? _kbManualIdx : progress.idx;
+  return { current: currentIdx + 1, total: KRSNA_BOOK.length, played: totalPlayed };
+}
+
+// Check if current time is 8 PM - 4 AM (evening/night)
+function _kbIsEveningTime() {
+  const hr = new Date().getHours();
+  return hr >= 20 || hr < 4;
+}
+
+// Initialize — show/hide based on time
+function kbInit() {
+  const row = document.getElementById('kbRow');
+  if (!row) return;
+  if (_kbIsEveningTime()) {
+    row.classList.add('kb-visible');
+    _kbGetTodayIndex();
+  } else {
+    row.classList.remove('kb-visible');
+    if (_kbAudio && _kbIsPlaying) {
+      _kbAudio.pause();
+      _kbIsPlaying = false;
+      _kbUpdateUI(false);
+    }
+  }
+}
+
+function _kbUpdateUI(playing) {
+  const playIcon = document.getElementById('kbIconPlay');
+  const pauseIcon = document.getElementById('kbIconPause');
+  const btn = document.getElementById('kbPlayBtn');
+  const npDiv = document.getElementById('kbNowPlaying');
+  const npTitle = document.getElementById('kbNowTitle');
+  if (playing) {
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = '';
+    btn.classList.add('kb-playing');
+    btn.classList.remove('kb-loading');
+    npDiv.classList.add('kb-show');
+    const idx = _kbGetTodayIndex();
+    npTitle.textContent = 'Ch.' + KRSNA_BOOK[idx].c + ' — ' + KRSNA_BOOK[idx].t;
+  } else {
+    playIcon.style.display = '';
+    pauseIcon.style.display = 'none';
+    btn.classList.remove('kb-playing');
+    btn.classList.remove('kb-loading');
+    npDiv.classList.remove('kb-show');
+  }
+}
+
+function kbPlayChapter(idx) {
+  _kbManualIdx = idx;
+  // Stop current if playing
+  if (_kbAudio && _kbIsPlaying) {
+    _kbAudio.pause();
+    _kbIsPlaying = false;
+  }
+  const chapter = KRSNA_BOOK[idx];
+  const btn = document.getElementById('kbPlayBtn');
+  btn.classList.add('kb-loading');
+  if (!_kbAudio) {
+    _kbAudio = new Audio();
+    _kbAudio.addEventListener('ended', function() {
+      _kbIsPlaying = false;
+      _kbUpdateUI(false);
+      _kbUpdateChapterListHighlight();
+    });
+    _kbAudio.addEventListener('error', function() {
+      _kbIsPlaying = false;
+      btn.classList.remove('kb-loading');
+      _kbUpdateUI(false);
+    });
+    _kbAudio.addEventListener('canplay', function() {
+      btn.classList.remove('kb-loading');
+    });
+  }
+  _kbAudio.src = chapter.u;
+  _kbAudio.load();
+  _kbAudio.play().then(() => {
+    _kbIsPlaying = true;
+    _kbUpdateUI(true);
+    _kbUpdateChapterListHighlight();
+    // Update info popup if open
+    _kbUpdateInfoPopup();
+  }).catch(e => { console.warn('KB audio play error:', e); btn.classList.remove('kb-loading'); });
+}
+
+function kbTogglePlay() {
+  if (_kbIsPlaying && _kbAudio) {
+    _kbAudio.pause();
+    _kbIsPlaying = false;
+    _kbUpdateUI(false);
+    return;
+  }
+  const idx = _kbGetTodayIndex();
+  kbPlayChapter(idx);
+}
+
+function _kbUpdateInfoPopup() {
+  const idx = _kbGetTodayIndex();
+  const chapter = KRSNA_BOOK[idx];
+  const prog = _kbGetProgress();
+  const nowTitle = document.getElementById('kbInfoNowTitle');
+  if (nowTitle) nowTitle.textContent = 'Chapter ' + chapter.c + ': ' + chapter.t;
+  const progText = document.getElementById('kbProgressText');
+  if (progText) progText.textContent = 'Chapter ' + prog.current + ' of ' + prog.total + (prog.played > 0 ? ' \u2022 ' + prog.played + ' evenings listened' : '');
+  const progFill = document.getElementById('kbProgressFill');
+  if (progFill) progFill.style.width = ((prog.current / prog.total) * 100).toFixed(1) + '%';
+}
+
+function _kbUpdateChapterListHighlight() {
+  const items = document.querySelectorAll('.kb-chapter-item');
+  const activeIdx = _kbGetTodayIndex();
+  items.forEach((item, i) => {
+    item.classList.remove('kb-ch-active', 'kb-ch-playing');
+    if (i === activeIdx) {
+      item.classList.add(_kbIsPlaying ? 'kb-ch-playing' : 'kb-ch-active');
+    }
+  });
+}
+
+function kbShowInfo() {
+  const idx = _kbGetTodayIndex();
+  _kbUpdateInfoPopup();
+
+  // Build chapter list
+  const listWrap = document.getElementById('kbChapterList');
+  if (listWrap) {
+    let h = '<div class="kb-chapter-list-title">All 90 Chapters — Tap to Play</div>';
+    KRSNA_BOOK.forEach((ch, i) => {
+      const isActive = (i === idx);
+      const isPlaying = (i === idx && _kbIsPlaying);
+      const cls = isPlaying ? 'kb-ch-playing' : (isActive ? 'kb-ch-active' : '');
+      h += '<div class="kb-chapter-item ' + cls + '" onclick="kbPlayChapter(' + i + ')">' +
+        '<div class="kb-ch-num">' + ch.c + '</div>' +
+        '<div class="kb-ch-title">' + ch.t + '</div>' +
+        '<div class="kb-ch-play-icon">' + (isPlaying ? '🔊' : '▶') + '</div>' +
+      '</div>';
+    });
+    listWrap.innerHTML = h;
+    // Scroll active chapter into view
+    setTimeout(() => {
+      const activeItem = listWrap.querySelector('.kb-ch-active, .kb-ch-playing');
+      if (activeItem) activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 100);
+  }
+
+  document.getElementById('kbInfoOverlay').classList.add('kb-open');
+}
+
+function kbCloseInfo() {
+  document.getElementById('kbInfoOverlay').classList.remove('kb-open');
 }
 
 // Re-check visibility every minute (in case time crosses 4 AM or 8 AM boundary)
