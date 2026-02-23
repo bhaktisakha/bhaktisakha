@@ -5283,6 +5283,106 @@ body {
 }
 .jt-info-close:hover { background:rgba(45,212,168,0.22); }
 
+/* ===== CHANT WITH PRABHUPADA PLAYER (4AM-8AM) ===== */
+.cp-talk-row {
+  display:none;
+  align-items:center; justify-content:flex-start; gap:8px;
+  padding:0 16px 12px; position:relative; z-index:3;
+}
+.cp-talk-row.cp-visible { display:flex; }
+
+.cp-play-btn {
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg, rgba(232,180,40,0.25) 0%, rgba(232,180,40,0.10) 100%);
+  border:1.5px solid rgba(232,180,40,0.35);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s ease;
+  box-shadow:0 2px 12px rgba(232,180,40,0.12);
+  position:relative; flex-shrink:0;
+}
+.cp-play-btn:hover { background:linear-gradient(135deg, rgba(232,180,40,0.38) 0%, rgba(232,180,40,0.18) 100%); transform:scale(1.08); }
+.cp-play-btn:active { transform:scale(0.95); }
+.cp-play-btn svg { width:16px; height:16px; fill:#e8c028; transition:all 0.2s; }
+.cp-play-btn.cp-playing { border-color:rgba(232,180,40,0.65); animation:cpPulseGlow 2s ease-in-out infinite; }
+.cp-play-btn.cp-loading { opacity:0.6; pointer-events:none; }
+
+@keyframes cpPulseGlow {
+  0%,100% { box-shadow:0 2px 12px rgba(232,180,40,0.12); }
+  50% { box-shadow:0 2px 24px rgba(232,180,40,0.45), 0 0 10px rgba(232,180,40,0.2); }
+}
+
+.cp-label {
+  flex:1; min-width:0; overflow:hidden;
+  font-size:0.66rem; color:#e8c028; opacity:0.9;
+  letter-spacing:0.4px; font-weight:600;
+  white-space:nowrap; text-overflow:ellipsis;
+  font-family:'Philosopher', serif;
+}
+.cp-label .cp-sub {
+  display:block; font-size:0.56rem; color:var(--muse-sage); opacity:0.65;
+  font-weight:500; letter-spacing:0.3px; margin-top:1px;
+  font-family:system-ui, sans-serif;
+}
+.cp-label.cp-now-playing .cp-sub { color:#e8c028; opacity:0.7; }
+
+.cp-info-btn {
+  width:24px; height:24px; border-radius:50%;
+  background:rgba(232,180,40,0.08);
+  border:1px solid rgba(232,180,40,0.2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; flex-shrink:0;
+  font-size:0.6rem; font-weight:700; color:#e8c028; font-style:italic;
+  font-family:'Philosopher', serif; opacity:0.7;
+}
+.cp-info-btn:hover { background:rgba(232,180,40,0.18); border-color:rgba(232,180,40,0.4); opacity:1; }
+
+/* Chant with Prabhupada Info Popup */
+.cp-info-overlay {
+  display:none; position:fixed; inset:0; z-index:100000;
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.cp-info-overlay.cp-open { display:flex; }
+.cp-info-card {
+  background:linear-gradient(160deg, #2a2008 0%, #0a1628 40%, #1a1800 100%);
+  border:1px solid rgba(232,180,40,0.25);
+  border-radius:20px; max-width:360px; width:100%;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(232,180,40,0.08);
+  overflow:hidden;
+  animation:cpPopIn 0.3s ease-out;
+}
+@keyframes cpPopIn { from { opacity:0; transform:scale(0.92) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
+.cp-info-header {
+  padding:18px 20px 14px; text-align:center;
+  border-bottom:1px solid rgba(232,180,40,0.12);
+}
+.cp-info-header-icon { font-size:1.8rem; display:block; margin-bottom:6px; }
+.cp-info-header-title {
+  font-family:'Philosopher', serif; font-size:1.05rem; font-weight:700;
+  color:#e8c028; letter-spacing:0.5px;
+}
+.cp-info-header-sub {
+  font-size:0.65rem; color:var(--muse-sage); opacity:0.7;
+  letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; font-weight:600;
+}
+.cp-info-body { padding:16px 20px 14px; }
+.cp-info-desc {
+  font-size:0.8rem; color:rgba(216,240,232,0.78); line-height:1.65;
+  text-align:center;
+}
+.cp-info-desc strong { color:#e8c028; }
+.cp-info-footer {
+  padding:10px 20px 18px; text-align:center;
+}
+.cp-info-close {
+  background:rgba(232,180,40,0.12); border:1px solid rgba(232,180,40,0.25);
+  color:#e8c028; border-radius:12px; padding:8px 28px;
+  font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;
+  letter-spacing:0.5px;
+}
+.cp-info-close:hover { background:rgba(232,180,40,0.25); }
+
 /* ===== KRSNA BOOK AUDIO PLAYER (8PM-4AM) ===== */
 .kb-talk-row {
   display:none;
@@ -5612,6 +5712,18 @@ body {
         <div class="muse-time-hint">
           <span id="museTimeHint"></span>
         </div>
+        <!-- Chant with Srila Prabhupada (4AM-8AM only) -->
+        <div class="cp-talk-row" id="cpRow">
+          <div class="cp-play-btn" id="cpPlayBtn" onclick="cpTogglePlay()" title="Chant with Srila Prabhupada">
+            <svg id="cpIconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            <svg id="cpIconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+          </div>
+          <div class="cp-label" id="cpLabel">
+            Chant with Srila Prabhupada
+            <span class="cp-sub">Japa by Example · Looping</span>
+          </div>
+          <div class="cp-info-btn" id="cpInfoBtn" onclick="cpShowInfo()" title="About this audio">i</div>
+        </div>
         <!-- Japa Talk Audio Player (4AM-8AM only) -->
         <div class="japa-talk-row" id="jtRow">
           <div class="jt-now-playing" id="jtNowPlaying">
@@ -5661,6 +5773,27 @@ body {
           </div>
           <div class="jt-info-footer">
             <button class="jt-info-close" onclick="jtCloseInfo()">Hare Krishna 🙏</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chant with Prabhupada Info Popup -->
+      <div class="cp-info-overlay" id="cpInfoOverlay" onclick="if(event.target===this)cpCloseInfo()">
+        <div class="cp-info-card">
+          <div class="cp-info-header">
+            <span class="cp-info-header-icon">📿</span>
+            <div class="cp-info-header-title">Chant with Srila Prabhupada</div>
+            <div class="cp-info-header-sub">Japa by Example</div>
+          </div>
+          <div class="cp-info-body">
+            <div class="cp-info-desc">
+              Join <strong>His Divine Grace A.C. Bhaktivedanta Swami Prabhupada</strong> in chanting the Hare Krishna Maha-mantra. This recording lets you chant along with Srila Prabhupada's own japa, following his pace and rhythm.<br><br>
+              The audio <strong>loops continuously</strong> so you can chant as many rounds as you like without interruption. Simply press play and immerse yourself in the Holy Name.<br><br>
+              Available during <strong>Brahma Muhurta</strong> (4 AM – 8 AM) — the most auspicious time for chanting.
+            </div>
+          </div>
+          <div class="cp-info-footer">
+            <button class="cp-info-close" onclick="cpCloseInfo()">Hare Krishna 🙏</button>
           </div>
         </div>
       </div>
@@ -14888,6 +15021,7 @@ function updateHomeScreen() {
 
   // Daily muse verse on home
   _updateDailyMuse();
+  cpInit(); // Chant with Prabhupada player (4AM-8AM)
   jtInit(); // Japa Talk player (4AM-8AM)
   kbInit(); // Krsna Book player (8PM-4AM)
 
@@ -21007,6 +21141,93 @@ function jtShowInfo() {
 
 function jtCloseInfo() {
   document.getElementById('jtInfoOverlay').classList.remove('jt-open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHANT WITH SRILA PRABHUPADA — 4 AM to 8 AM Looping Japa
+// ═══════════════════════════════════════════════════════════
+const CP_AUDIO_URL = 'https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/Srila%20Prabhupada/Japa_-_by_Example_Srila_Prabhupada.mp3';
+let _cpAudio = null;
+let _cpIsPlaying = false;
+
+function cpInit() {
+  const row = document.getElementById('cpRow');
+  if (!row) return;
+  if (_jtIsBrahmaMuhurta()) {
+    row.classList.add('cp-visible');
+  } else {
+    row.classList.remove('cp-visible');
+    if (_cpAudio && _cpIsPlaying) {
+      _cpAudio.pause();
+      _cpIsPlaying = false;
+      _cpUpdateUI(false);
+    }
+  }
+}
+
+function _cpUpdateUI(playing) {
+  const playIcon = document.getElementById('cpIconPlay');
+  const pauseIcon = document.getElementById('cpIconPause');
+  const btn = document.getElementById('cpPlayBtn');
+  const label = document.getElementById('cpLabel');
+  if (playing) {
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = '';
+    btn.classList.add('cp-playing');
+    btn.classList.remove('cp-loading');
+    label.classList.add('cp-now-playing');
+    label.innerHTML = '♫ Chanting with Prabhupada<span class="cp-sub">Looping · Tap pause to stop</span>';
+  } else {
+    playIcon.style.display = '';
+    pauseIcon.style.display = 'none';
+    btn.classList.remove('cp-playing');
+    btn.classList.remove('cp-loading');
+    label.classList.remove('cp-now-playing');
+    label.innerHTML = 'Chant with Srila Prabhupada<span class="cp-sub">Japa by Example · Looping</span>';
+  }
+}
+
+function cpTogglePlay() {
+  if (_cpIsPlaying && _cpAudio) {
+    _cpAudio.pause();
+    _cpIsPlaying = false;
+    _cpUpdateUI(false);
+    return;
+  }
+  const btn = document.getElementById('cpPlayBtn');
+  btn.classList.add('cp-loading');
+  if (!_cpAudio) {
+    _cpAudio = new Audio();
+    _cpAudio.loop = true;
+    _cpAudio.addEventListener('error', function() {
+      _cpIsPlaying = false;
+      btn.classList.remove('cp-loading');
+      _cpUpdateUI(false);
+      console.warn('Chant with Prabhupada audio error');
+    });
+    _cpAudio.addEventListener('canplay', function() {
+      btn.classList.remove('cp-loading');
+    });
+  }
+  if (_cpAudio.src !== CP_AUDIO_URL) {
+    _cpAudio.src = CP_AUDIO_URL;
+    _cpAudio.load();
+  }
+  _cpAudio.play().then(function() {
+    _cpIsPlaying = true;
+    _cpUpdateUI(true);
+  }).catch(function(e) {
+    console.warn('CP play failed:', e);
+    btn.classList.remove('cp-loading');
+  });
+}
+
+function cpShowInfo() {
+  document.getElementById('cpInfoOverlay').classList.add('cp-open');
+}
+
+function cpCloseInfo() {
+  document.getElementById('cpInfoOverlay').classList.remove('cp-open');
 }
 
 // ═══════════════════════════════════════════════════════════
