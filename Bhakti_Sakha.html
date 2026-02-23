@@ -5164,6 +5164,125 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== JAPA TALK AUDIO PLAYER (4AM-8AM) ===== */
+.japa-talk-row {
+  display:none; /* shown via JS only 4-8 AM */
+  align-items:center; justify-content:flex-end; gap:8px;
+  padding:4px 16px 12px; position:relative; z-index:3;
+}
+.japa-talk-row.jt-visible { display:flex; }
+
+/* Play button */
+.jt-play-btn {
+  width:42px; height:42px; border-radius:50%;
+  background:linear-gradient(135deg, rgba(45,212,168,0.25) 0%, rgba(45,212,168,0.10) 100%);
+  border:1.5px solid rgba(45,212,168,0.35);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s ease;
+  box-shadow:0 2px 12px rgba(45,212,168,0.15);
+  position:relative; flex-shrink:0;
+}
+.jt-play-btn:hover { background:linear-gradient(135deg, rgba(45,212,168,0.35) 0%, rgba(45,212,168,0.18) 100%); transform:scale(1.08); }
+.jt-play-btn:active { transform:scale(0.95); }
+.jt-play-btn svg { width:18px; height:18px; fill:var(--muse-teal); transition:all 0.2s; }
+.jt-play-btn.jt-playing { border-color:rgba(45,212,168,0.6); animation:jtPulseGlow 2s ease-in-out infinite; }
+.jt-play-btn.jt-loading { opacity:0.6; pointer-events:none; }
+
+@keyframes jtPulseGlow {
+  0%,100% { box-shadow:0 2px 12px rgba(45,212,168,0.15); }
+  50% { box-shadow:0 2px 24px rgba(45,212,168,0.4), 0 0 8px rgba(45,212,168,0.2); }
+}
+
+/* Info button */
+.jt-info-btn {
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(45,212,168,0.08);
+  border:1px solid rgba(45,212,168,0.2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; flex-shrink:0;
+  font-size:0.7rem; font-weight:700; color:var(--muse-sage); font-style:italic;
+  font-family:'Philosopher', serif;
+}
+.jt-info-btn:hover { background:rgba(45,212,168,0.18); border-color:rgba(45,212,168,0.4); }
+
+/* Now-playing label */
+.jt-now-playing {
+  flex:1; min-width:0; overflow:hidden;
+  font-size:0.62rem; color:var(--muse-sage); opacity:0.85;
+  letter-spacing:0.4px; font-weight:500;
+  white-space:nowrap; text-overflow:ellipsis;
+  display:none;
+}
+.jt-now-playing.jt-show { display:block; }
+.jt-now-playing .jt-np-label { color:var(--muse-teal); font-weight:700; margin-right:4px; }
+
+/* Japa Info Popup / Modal */
+.jt-info-overlay {
+  display:none; position:fixed; inset:0; z-index:100000;
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.jt-info-overlay.jt-open { display:flex; }
+.jt-info-card {
+  background:linear-gradient(160deg, #0d2b22 0%, #0a1628 40%, #162847 100%);
+  border:1px solid rgba(45,212,168,0.25);
+  border-radius:20px; max-width:380px; width:100%;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(45,212,168,0.08);
+  overflow:hidden;
+  animation:jtPopIn 0.3s ease-out;
+}
+@keyframes jtPopIn { from { opacity:0; transform:scale(0.92) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
+.jt-info-header {
+  padding:18px 20px 12px; text-align:center;
+  border-bottom:1px solid rgba(45,212,168,0.12);
+}
+.jt-info-header-icon { font-size:1.8rem; display:block; margin-bottom:6px; }
+.jt-info-header-title {
+  font-family:'Philosopher', serif; font-size:1.05rem; font-weight:700;
+  color:var(--muse-teal); letter-spacing:0.5px;
+}
+.jt-info-header-sub {
+  font-size:0.68rem; color:var(--muse-sage); opacity:0.7;
+  letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; font-weight:600;
+}
+.jt-info-body { padding:16px 20px; }
+.jt-info-topic {
+  font-family:'Philosopher', serif; font-size:0.95rem; font-weight:600;
+  color:#d8f0e8; line-height:1.5; margin-bottom:12px; text-align:center;
+}
+.jt-info-topic .jt-topic-label {
+  font-size:0.6rem; text-transform:uppercase; letter-spacing:1.5px;
+  color:var(--muse-teal); opacity:0.7; font-weight:700; display:block; margin-bottom:4px;
+}
+.jt-info-desc {
+  font-size:0.78rem; color:rgba(216,240,232,0.75); line-height:1.6;
+  text-align:center;
+}
+.jt-info-progress {
+  padding:12px 20px 6px; text-align:center;
+}
+.jt-info-progress-bar {
+  width:100%; height:4px; background:rgba(45,212,168,0.1); border-radius:2px; overflow:hidden; margin-bottom:6px;
+}
+.jt-info-progress-fill {
+  height:100%; background:linear-gradient(90deg, var(--muse-teal), var(--muse-sage));
+  border-radius:2px; transition:width 0.5s ease;
+}
+.jt-info-progress-text {
+  font-size:0.6rem; color:var(--muse-sage); opacity:0.65; letter-spacing:0.5px;
+}
+.jt-info-footer {
+  padding:10px 20px 16px; text-align:center;
+}
+.jt-info-close {
+  background:rgba(45,212,168,0.12); border:1px solid rgba(45,212,168,0.25);
+  color:var(--muse-teal); border-radius:12px; padding:8px 28px;
+  font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;
+  letter-spacing:0.5px;
+}
+.jt-info-close:hover { background:rgba(45,212,168,0.22); }
+
 </style>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -5333,6 +5452,45 @@ body {
         </div>
         <div class="muse-time-hint">
           <span id="museTimeHint"></span>
+        </div>
+        <!-- Japa Talk Audio Player (4AM-8AM only) -->
+        <div class="japa-talk-row" id="jtRow">
+          <div class="jt-now-playing" id="jtNowPlaying">
+            <span class="jt-np-label">♫ Now Playing:</span>
+            <span id="jtNowTitle">—</span>
+          </div>
+          <div class="jt-info-btn" id="jtInfoBtn" onclick="jtShowInfo()" title="About this talk">i</div>
+          <div class="jt-play-btn" id="jtPlayBtn" onclick="jtTogglePlay()" title="Japa Talk of the Day">
+            <svg id="jtIconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            <svg id="jtIconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Japa Talk Info Popup -->
+      <div class="jt-info-overlay" id="jtInfoOverlay" onclick="if(event.target===this)jtCloseInfo()">
+        <div class="jt-info-card">
+          <div class="jt-info-header">
+            <span class="jt-info-header-icon">📿</span>
+            <div class="jt-info-header-title">Japa Talk of the Day</div>
+            <div class="jt-info-header-sub">By HG Radhe Shyam Prabhu</div>
+          </div>
+          <div class="jt-info-body">
+            <div class="jt-info-topic">
+              <span class="jt-topic-label">Today's Topic</span>
+              <span id="jtInfoTopic">—</span>
+            </div>
+            <div class="jt-info-desc">
+              These short Japa talks by HG Radhe Shyam Prabhu are meant to inspire and deepen your morning chanting practice during <strong style="color:var(--muse-teal)">Brahma Muhurta</strong> (4 AM – 8 AM). Each day features a fresh talk on the glories and practice of chanting the Holy Name — listen while you chant or just before, to set the right mood for your Japa.
+            </div>
+          </div>
+          <div class="jt-info-progress">
+            <div class="jt-info-progress-bar"><div class="jt-info-progress-fill" id="jtProgressFill" style="width:0%"></div></div>
+            <div class="jt-info-progress-text" id="jtProgressText">Talk 1 of 67</div>
+          </div>
+          <div class="jt-info-footer">
+            <button class="jt-info-close" onclick="jtCloseInfo()">Hare Krishna 🙏</button>
+          </div>
         </div>
       </div>
 
@@ -14531,6 +14689,7 @@ function updateHomeScreen() {
 
   // Daily muse verse on home
   _updateDailyMuse();
+  jtInit(); // Japa Talk player (4AM-8AM)
 
   // New & Happening badges
   nhUpdateBadges();
@@ -20423,6 +20582,235 @@ function _updateDailyMuse() {
   const toggle = document.getElementById('museShowAuthorToggle');
   if (toggle) toggle.checked = showAuthor;
 }
+
+// ═══════════════════════════════════════════════════════════
+// JAPA TALK AUDIO PLAYER — 4 AM to 8 AM Daily Inspiration
+// ═══════════════════════════════════════════════════════════
+const JAPA_TALKS = [
+{t:"Absorption key for chanting Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Absorption_key_for_chanting_Holyname.mp3"},
+{t:"All Devouring time-Seriously take the medicine of holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_All_Devouring_time-Seriously_take_the_medicine_of_holyname_-_2011-03-08.mp3"},
+{t:"Allow Holyname to purify by stoping Sense Gratification",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Allow_Holyname_to_purify_by_stoping_Sense_Gratification_-_2007-06-12.mp3"},
+{t:"Antarang satsang and its importance in Chanting the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Antarang_satsang_and_its_importance_in_Chanting_the_Holyname_-_2012-01-14.mp3"},
+{t:"Approach the Holyname in mood of Improving",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Approach_the_Holyname_in_mood_of_Improving_-_2007-10-02.mp3"},
+{t:"Attention Awareness and Absorbtion and for Chanting Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Attention_Awareness_and_Absorbtion_and_for_Chanting_Holyname_-_2007-10-03.mp3"},
+{t:"Attitude in Approaching Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Attitude_in_Approaching_Holyname_-_2008-02-05.mp3"},
+{t:"Beware of Offences against Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Beware_of_Offences_against_Holyname_-_2009-06-10.mp3"},
+{t:"Body is the temple of God install Holyname to make it auspicious",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Body_is_the_temple_of_God_install_Holyname_to_make_it_auspicious_-_2011-05-25.mp3"},
+{t:"Call out Holyname Unpretentiously",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Call_out_Holyname_Unpretentiously_-_2009-04-22.mp3"},
+{t:"Chanting holyname in Worshipful and Prayerful mood",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Chanting_holyname_in_Worshipful_and_Prayerful_mood_-_2009-12-19.mp3"},
+{t:"Chanting of Holyname must be done in Rememberance of Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Chanting_of_Holyname_must_be_done_in_Rememberance_of_Krishna.mp3"},
+{t:"Chanting the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Chanting_the_Holyname.mp3"},
+{t:"Clean up the heart and then call out the holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Clean_up_the_heart_and_then_call_out_the_holyname_-_2011-04-09.mp3"},
+{t:"Constantly Repent to Chant Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Constantly_Repent_to_Chant_Holyname_-_2007-02-19.mp3"},
+{t:"Conviction and Purity Essential needs to Chant Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Conviction_and_Purity_Essential_needs_to_Chant_Holyname_-_2007-03-07.mp3"},
+{t:"Convince the mind to chant Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Convince_the_mind_to_chant_Holyname_-_2007-10-31.mp3"},
+{t:"Count Collect and Remember the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Count_Collect_and_Remember_the_Holyname_-_2007-07-15.mp3"},
+{t:"Culmination of Knowledge is Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Culmination_of_Knowledge_is_Holyname_-_2006-10-16.mp3"},
+{t:"Develop Genuine faith in the glories of Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Develop_Genuine_faith_in_the_glories_of_Holyname_-_2009-04-26.mp3"},
+{t:"Devotee is Characteristiced by chanting Holyname and Serving",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Devotee_is_Characteristiced_by_chanting_Holyname_and_Serving_-_2007-11-28.mp3"},
+{t:"Engaging Mind and Intelligence into Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Engaging_Mind_and_Intelligence_into_Holyname_-_2009-12-09.mp3"},
+{t:"Every thing just for developing taste for Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Every_thing_just_for_developing_taste_for_Holyname_-_2007-07-01.mp3"},
+{t:"Everything comes through Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Everything_comes_through_Holyname_-_2008-04-16.mp3"},
+{t:"Faith in Glories of Holyname of Lord",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Faith_in_Glories_of_Holyname_of_Lord_-_2010-02-20.mp3"},
+{t:"Four Qualities required for Chanting the Holyname Constantly",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Four_Qualities_required_for_Chanting_the_Holyname_Constantly_-_2011-12-02.mp3"},
+{t:"Give time to Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Give_time_to_Holyname_-_2009-02-26.mp3"},
+{t:"Hold on to Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Hold_on_to_Holyname_-_2010-11-13.mp3"},
+{t:"Holyname-Awakening the Original Consciousness",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname-Awakening_the_Original_Consciousness_-_2007-03-31.mp3"},
+{t:"Holyname-Fully independent and potent guide of sincere chanter",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname-Fully_independent_and_potent_guide_of_sincere_chanter_-_2010-02-09.mp3"},
+{t:"Holyname-Solution to all Problems",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname-Solution_to_all_Problems_-_2007-03-04.mp3"},
+{t:"Holyname-The greatest disinfectant",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname-The_greatest_disinfectant_-_2014-09-20.MP3"},
+{t:"Holyname-Transformer of Heart",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname-Transformer_of_Heart_-_2007-03-31.mp3"},
+{t:"Holyname Consciousness in services matters a lot in preparing for chanting",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_Consciousness_in_services_matters_a_lot_in_preparing_for_chanting.mp3"},
+{t:"Holyname Key to Spiritual World",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_Key_to_Spiritual_World_-_2007-04-13.mp3"},
+{t:"Holyname a Powerful Vaccine",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_a_Powerful_Vaccine_-_2010-11-08.mp3"},
+{t:"Holyname and Controlling Senses",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_and_Controlling_Senses_-_2007-04-01.mp3"},
+{t:"Holyname and krishna one of the same",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_and_krishna_one_of_the_same_-_2008-09-23_Shantipur.mp3"},
+{t:"Holyname brings us closer to Krishna",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_brings_us_closer_to_Krishna_-_2009-03-12.mp3"},
+{t:"Holyname can free us from all Lamentation",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_can_free_us_from_all_Lamentation_-_2007-10-08.mp3"},
+{t:"Holyname eradicates disease even without our knowledge",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_eradicates_disease_even_without_our_knowledge_-_2010-09-14.mp3"},
+{t:"Holyname gives life",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_gives_life_-_2009-09-14.mp3"},
+{t:"Holyname has purified Great Personalities",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_has_purified_Great_Personalities_-_2007-01-24.mp3"},
+{t:"Holyname is Transdental",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_is_Transdental_-_2007-12-13.mp3"},
+{t:"Holyname is the Best of 14 Planetrary System",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_is_the_Best_of_14_Planetrary_System_-_2008-04-02.mp3"},
+{t:"Holyname is the only Way",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_is_the_only_Way_-_2008-02-07.mp3"},
+{t:"Holyname reveles proposnate to faith",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holyname_reveles_proposnate_to_faith_-_2007-01-10.mp3"},
+{t:"Holynames on Material and Spiritual Worlds",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Holynames_on_Material_and_Spiritual_Worlds_-_2009-02-19.mp3"},
+{t:"Know the Value of Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Know_the_Value_of_Holyname_-_2006-08-19.mp3"},
+{t:"Never fear Holyname is there",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Never_fear_Holyname_is_there_-_2007-07-07.mp3"},
+{t:"Perceiving the Holiness of the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Perceiving_the_Holiness_of_the_Holyname_-_2011-12-27.mp3"},
+{t:"Power of Pure Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Power_of_Pure_Holyname_-_2013-05-28.mp3"},
+{t:"Respecting the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Respecting_the_Holyname_-_2009-01-28.mp3"},
+{t:"Right Conceptions and mood is needed to chant Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Right_Conceptions_and_mood_is_needed_to_chant_Holyname_-_2007-01-29.mp3"},
+{t:"Seeing Krishna in the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Seeing_Krishna_in_the_Holyname_-_2012-01-06.mp3"},
+{t:"Sense of belonging and dependence is necessary to call out the holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Sense_of_belonging_and_dependence_is_necessary_to_call_out_the_holyname_-_2010-11-14.mp3"},
+{t:"Simple and Grateful heart for Chanting Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Simple_and_Grateful_heart_for_Chanting_Holyname_-_2007-03-05.mp3"},
+{t:"Suffering due to forgetfulness of Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Suffering_due_to_forgetfulness_of_Holyname_-_2009-12-02.mp3"},
+{t:"Sweetes of all-The Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Sweetes_of_all-The_Holyname_-_2006-06-07.mp3"},
+{t:"Ten Offences against Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Ten_Offences_against_Holyname_-_2009-07-05.mp3"},
+{t:"The Reason for the mind getting distracted while chanting the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_The_Reason_for_the_mind_getting_distracted_while_chanting_the_Holyname_-_2012-02-26.mp3"},
+{t:"The Supreme Master satisfied by Tulasi and Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_The_Supreme_Master_satisfied_by_Tulasi_and_Holyname_-_2013-05-25.mp3"},
+{t:"Thinking feeling and willing for holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Thinking_feeling_and_willing_for_holyname_-_2011-01-20.mp3"},
+{t:"Two qualifications essential to benifit from the holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Two_qualifications_essential_to_benifit_from_the_holyname_-_2013-06-25.MP3"},
+{t:"Understanding the rarety of the Precious Gift of Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_Understanding_the_rarety_of_the_Precious_Gift_of_Holyname_-_2005-12-20.mp3"},
+{t:"We should Surender to Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_We_should_Surender_to_Holyname_-_2008-04-03.mp3"},
+{t:"When can the soul be bathed by the Holyname",u:"https://pub-ef74d38c9f9040bbb016e9ec4b9553f1.r2.dev/HG%20Radhe%20SHyam%20Pr%20Japa%20Talks/Radhe_Shyam_Pr_Japa_Talk_-_When_can_the_soul_be_bathed_by_the_Holyname_-_2011-12-21.mp3"}
+];
+
+let _jtAudio = null;
+let _jtIsPlaying = false;
+
+// Get today's talk index — cycles through all 67 without repeating
+function _jtGetTodayIndex() {
+  const stored = localStorage.getItem('jtProgress');
+  let progress = stored ? JSON.parse(stored) : { idx: 0, playedDates: [] };
+  
+  // Get today's date key
+  const d = new Date();
+  const todayKey = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  
+  // If already assigned a talk today, return same index
+  if (progress.lastDate === todayKey) return progress.idx;
+  
+  // New day — advance to next talk
+  if (progress.lastDate) {
+    progress.idx = (progress.idx + 1) % JAPA_TALKS.length;
+  }
+  // If we've completed a full cycle, it starts over
+  progress.lastDate = todayKey;
+  
+  // Track how many unique plays
+  if (!progress.playedDates) progress.playedDates = [];
+  if (!progress.playedDates.includes(todayKey)) {
+    progress.playedDates.push(todayKey);
+  }
+  
+  localStorage.setItem('jtProgress', JSON.stringify(progress));
+  return progress.idx;
+}
+
+function _jtGetProgress() {
+  const stored = localStorage.getItem('jtProgress');
+  let progress = stored ? JSON.parse(stored) : { idx: 0, playedDates: [] };
+  const totalPlayed = progress.playedDates ? progress.playedDates.length : 0;
+  return { current: progress.idx + 1, total: JAPA_TALKS.length, played: totalPlayed };
+}
+
+// Check if current time is 4 AM - 8 AM
+function _jtIsBrahmaMuhurta() {
+  const hr = new Date().getHours();
+  return hr >= 4 && hr < 8;
+}
+
+// Initialize — show/hide based on time
+function jtInit() {
+  const row = document.getElementById('jtRow');
+  if (!row) return;
+  
+  if (_jtIsBrahmaMuhurta()) {
+    row.classList.add('jt-visible');
+    // Pre-load today's talk index
+    _jtGetTodayIndex();
+  } else {
+    row.classList.remove('jt-visible');
+    // Stop audio if playing and time changed
+    if (_jtAudio && _jtIsPlaying) {
+      _jtAudio.pause();
+      _jtIsPlaying = false;
+      _jtUpdateUI(false);
+    }
+  }
+}
+
+function _jtUpdateUI(playing) {
+  const playIcon = document.getElementById('jtIconPlay');
+  const pauseIcon = document.getElementById('jtIconPause');
+  const btn = document.getElementById('jtPlayBtn');
+  const npDiv = document.getElementById('jtNowPlaying');
+  const npTitle = document.getElementById('jtNowTitle');
+  
+  if (playing) {
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = '';
+    btn.classList.add('jt-playing');
+    btn.classList.remove('jt-loading');
+    npDiv.classList.add('jt-show');
+    const idx = _jtGetTodayIndex();
+    npTitle.textContent = JAPA_TALKS[idx].t;
+  } else {
+    playIcon.style.display = '';
+    pauseIcon.style.display = 'none';
+    btn.classList.remove('jt-playing');
+    btn.classList.remove('jt-loading');
+    npDiv.classList.remove('jt-show');
+  }
+}
+
+function jtTogglePlay() {
+  if (_jtIsPlaying && _jtAudio) {
+    _jtAudio.pause();
+    _jtIsPlaying = false;
+    _jtUpdateUI(false);
+    return;
+  }
+  
+  const idx = _jtGetTodayIndex();
+  const talk = JAPA_TALKS[idx];
+  
+  // Show loading state
+  const btn = document.getElementById('jtPlayBtn');
+  btn.classList.add('jt-loading');
+  
+  if (!_jtAudio) {
+    _jtAudio = new Audio();
+    _jtAudio.addEventListener('ended', function() {
+      _jtIsPlaying = false;
+      _jtUpdateUI(false);
+    });
+    _jtAudio.addEventListener('error', function() {
+      _jtIsPlaying = false;
+      btn.classList.remove('jt-loading');
+      _jtUpdateUI(false);
+      console.warn('Japa Talk audio error');
+    });
+    _jtAudio.addEventListener('canplay', function() {
+      btn.classList.remove('jt-loading');
+    });
+  }
+  
+  // If same URL already loaded, just play
+  if (_jtAudio.src === talk.u) {
+    _jtAudio.play().then(() => {
+      _jtIsPlaying = true;
+      _jtUpdateUI(true);
+    }).catch(e => { console.warn('Audio play error:', e); btn.classList.remove('jt-loading'); });
+    return;
+  }
+  
+  _jtAudio.src = talk.u;
+  _jtAudio.load();
+  _jtAudio.play().then(() => {
+    _jtIsPlaying = true;
+    _jtUpdateUI(true);
+  }).catch(e => { console.warn('Audio play error:', e); btn.classList.remove('jt-loading'); });
+}
+
+function jtShowInfo() {
+  const idx = _jtGetTodayIndex();
+  const talk = JAPA_TALKS[idx];
+  const prog = _jtGetProgress();
+  
+  document.getElementById('jtInfoTopic').textContent = talk.t;
+  document.getElementById('jtProgressText').textContent = 'Talk ' + prog.current + ' of ' + prog.total + (prog.played > 0 ? ' \u2022 ' + prog.played + ' days listened' : '');
+  document.getElementById('jtProgressFill').style.width = ((prog.current / prog.total) * 100).toFixed(1) + '%';
+  document.getElementById('jtInfoOverlay').classList.add('jt-open');
+}
+
+function jtCloseInfo() {
+  document.getElementById('jtInfoOverlay').classList.remove('jt-open');
+}
+
+// Re-check visibility every minute (in case time crosses 4 AM or 8 AM boundary)
+setInterval(jtInit, 60000);
 
 // ═══════════════════════════════════════════════════════════
 // NEW & HAPPENING — Notification Badges on Home Cards
