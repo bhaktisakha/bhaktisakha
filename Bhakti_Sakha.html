@@ -86,11 +86,10 @@ body {
   position:relative; z-index:1;
 }
 .app-brand-sub {
-  font-size:0.62rem; color:var(--muse-sage);
-  letter-spacing:1.5px;
+  font-size:0.55rem; color:var(--text3);
+  letter-spacing:2px; text-transform:uppercase;
   position:relative; z-index:1;
-  opacity:0.85;
-  font-style:italic;
+  margin-left:2px;
 }
 
 /* ===== HEADER ===== */
@@ -1689,6 +1688,8 @@ body {
 .ipill-sevakart .info-pill-icon { background:rgba(92,224,240,0.12); } .ipill-sevakart .info-pill-title { color:#5ce0f0; }
 .ipill-prayer { --pill-glow:#f0c850; background:rgba(240,200,80,0.06); border-color:rgba(240,200,80,0.15); }
 .ipill-prayer .info-pill-icon { background:rgba(240,200,80,0.12); } .ipill-prayer .info-pill-title { color:#f0c850; }
+.ipill-dhamas { --pill-glow:#f08070; background:rgba(240,128,112,0.06); border-color:rgba(240,128,112,0.15); }
+.ipill-dhamas .info-pill-icon { background:rgba(240,128,112,0.12); } .ipill-dhamas .info-pill-title { color:#f08070; }
 .ipill-notif { --pill-glow:#f472b6; background:rgba(244,114,182,0.06); border-color:rgba(244,114,182,0.15); }
 .ipill-notif .info-pill-icon { background:rgba(244,114,182,0.12); } .ipill-notif .info-pill-title { color:#f472b6; }
 .ipill-google { --pill-glow:#60a5fa; background:rgba(96,165,250,0.06); border-color:rgba(96,165,250,0.15); }
@@ -2684,6 +2685,281 @@ body {
 .notif-advance-sel:focus { border-color:var(--accent-blue); }
 .notif-divider { height:1px; background:var(--border); margin:10px 0 14px; }
 
+/* ===== HOLY DHAMAS ===== */
+.dhamas-screen { overflow-y:auto; padding:0 0 80px; }
+.dhamas-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px 10px; position:sticky; top:0; z-index:5;
+  background:var(--bg);
+}
+.dhamas-search {
+  display:block; padding:10px 14px; margin:0 16px 10px;
+  width:calc(100% - 32px);
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-size:0.85rem;
+  font-family:inherit; outline:none; box-sizing:border-box;
+}
+.dhamas-search:focus { border-color:var(--accent-blue); }
+.dhamas-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; padding:0 16px 16px;
+}
+.dham-card {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; cursor:pointer;
+  transition:border-color 0.2s, transform 0.1s;
+  position:relative;
+}
+.dham-card:active { transform:scale(0.97); border-color:rgba(167,139,250,0.4); }
+.dham-card-del {
+  position:absolute; top:6px; right:6px; z-index:3;
+  width:22px; height:22px; border-radius:6px;
+  background:rgba(231,76,100,0.8); border:none; color:white;
+  font-size:0.65rem; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+.dham-card-img {
+  width:100%; height:90px; object-fit:cover;
+  background:linear-gradient(160deg, rgba(167,139,250,0.12), rgba(61,127,212,0.06), rgba(232,200,0,0.05));
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem;
+  position:relative;
+}
+.dham-card-img::after {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:20px; background:linear-gradient(transparent, rgba(15,15,35,0.8));
+}
+.dham-card-body { padding:10px 12px; }
+.dham-card-name {
+  font-size:0.82rem; font-weight:700; color:var(--text);
+  margin-bottom:3px; line-height:1.3;
+}
+.dham-card-loc {
+  font-size:0.68rem; color:var(--text3); line-height:1.3;
+}
+.dham-card-tag {
+  display:inline-block; margin-top:6px;
+  font-size:0.6rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.5px; padding:2px 7px; border-radius:4px;
+}
+.dham-card-tag.char-dham { background:rgba(232,200,0,0.12); color:#e8c800; }
+.dham-card-tag.divya-desam { background:rgba(77,219,110,0.12); color:#4ddb6e; }
+.dham-card-tag.iskcon { background:rgba(167,139,250,0.12); color:var(--lavender); }
+.dham-card-tag.shakti-peetha { background:rgba(240,140,26,0.12); color:#f08c1a; }
+
+/* Dham detail screen */
+.dham-detail-screen { display:flex; flex-direction:column; height:100%; }
+.dham-detail-header {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px; background:var(--bg);
+  position:sticky; top:0; z-index:5;
+  border-bottom:1px solid var(--border);
+}
+.dham-back-btn {
+  display:flex; align-items:center; gap:4px;
+  background:rgba(61,127,212,0.12); border:1px solid rgba(61,127,212,0.25); color:var(--accent-blue);
+  font-family:inherit; font-size:0.78rem; font-weight:500; cursor:pointer;
+  padding:5px 10px 5px 6px; border-radius:10px; transition:all 0.2s ease;
+}
+.dham-back-btn:active { background:rgba(61,127,212,0.22); transform:scale(0.96); }
+.dham-detail-title { font-size:1rem; font-weight:700; color:var(--text); flex:1; }
+.dham-detail-body {
+  overflow-y:auto; flex:1; padding:0 0 100px;
+}
+/* Hero banner */
+.dham-hero {
+  width:100%; height:180px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  background:linear-gradient(160deg, rgba(167,139,250,0.18) 0%, rgba(61,127,212,0.10) 50%, rgba(232,200,0,0.08) 100%);
+  border-bottom:1px solid rgba(167,139,250,0.15);
+  position:relative; overflow:hidden;
+}
+.dham-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 80%, rgba(167,139,250,0.12) 0%, transparent 70%);
+}
+.dham-hero-icon { font-size:3.8rem; position:relative; z-index:1;
+  filter:drop-shadow(0 0 20px rgba(167,139,250,0.3)); }
+.dham-hero-name { font-size:1.15rem; font-weight:700; color:var(--text);
+  letter-spacing:0.3px; position:relative; z-index:1; text-align:center; padding:0 20px; }
+.dham-hero-loc { font-size:0.75rem; color:var(--text3); position:relative; z-index:1;
+  display:flex; align-items:center; gap:4px; }
+
+/* Section cards */
+.dham-sections-wrap { padding:12px 14px; display:flex; flex-direction:column; gap:12px; }
+
+.dham-section {
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px; padding:0; overflow:hidden;
+  transition:border-color 0.3s;
+}
+.dham-section:last-child { border-bottom:1px solid rgba(255,255,255,0.06); }
+
+/* Section-specific accent glow on the left border */
+.dham-section[data-accent="purple"]  { border-left:3px solid rgba(167,139,250,0.5); box-shadow:inset 3px 0 12px -4px rgba(167,139,250,0.08); }
+.dham-section[data-accent="gold"]    { border-left:3px solid rgba(232,200,0,0.5);   box-shadow:inset 3px 0 12px -4px rgba(232,200,0,0.08); }
+.dham-section[data-accent="blue"]    { border-left:3px solid rgba(61,127,212,0.5);   box-shadow:inset 3px 0 12px -4px rgba(61,127,212,0.08); }
+.dham-section[data-accent="green"]   { border-left:3px solid rgba(77,219,110,0.5);   box-shadow:inset 3px 0 12px -4px rgba(77,219,110,0.08); }
+.dham-section[data-accent="orange"]  { border-left:3px solid rgba(240,140,26,0.5);   box-shadow:inset 3px 0 12px -4px rgba(240,140,26,0.08); }
+.dham-section[data-accent="rose"]    { border-left:3px solid rgba(231,76,100,0.5);   box-shadow:inset 3px 0 12px -4px rgba(231,76,100,0.08); }
+.dham-section[data-accent="teal"]    { border-left:3px solid rgba(45,212,191,0.5);   box-shadow:inset 3px 0 12px -4px rgba(45,212,191,0.08); }
+
+/* Section header (collapsible) */
+.dham-section-hdr {
+  display:flex; align-items:center; gap:8px;
+  padding:14px 16px; cursor:pointer;
+  transition:background 0.2s;
+}
+.dham-section-hdr:active { background:rgba(255,255,255,0.03); }
+.dham-section-icon {
+  width:32px; height:32px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.05rem; flex-shrink:0;
+}
+.dham-section[data-accent="purple"] .dham-section-icon  { background:rgba(167,139,250,0.12); }
+.dham-section[data-accent="gold"] .dham-section-icon    { background:rgba(232,200,0,0.12); }
+.dham-section[data-accent="blue"] .dham-section-icon    { background:rgba(61,127,212,0.12); }
+.dham-section[data-accent="green"] .dham-section-icon   { background:rgba(77,219,110,0.12); }
+.dham-section[data-accent="orange"] .dham-section-icon  { background:rgba(240,140,26,0.12); }
+.dham-section[data-accent="rose"] .dham-section-icon    { background:rgba(231,76,100,0.12); }
+.dham-section[data-accent="teal"] .dham-section-icon    { background:rgba(45,212,191,0.12); }
+
+.dham-section-title {
+  font-size:0.8rem; font-weight:700; color:var(--text);
+  flex:1; letter-spacing:0.2px; line-height:1.3;
+}
+.dham-section-chevron {
+  color:var(--text3); font-size:0.75rem; transition:transform 0.3s;
+  flex-shrink:0;
+}
+.dham-section.open .dham-section-chevron { transform:rotate(180deg); }
+
+/* Section body */
+.dham-section-body {
+  max-height:0; overflow:hidden;
+  transition:max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.25s;
+  padding:0 16px;
+}
+.dham-section.open .dham-section-body {
+  max-height:2000px; padding:0 16px 16px;
+}
+
+.dham-section-text {
+  font-size:0.84rem; color:var(--text2); line-height:1.75;
+  white-space:pre-wrap; word-wrap:break-word;
+}
+.dham-section-text strong { color:var(--text); font-weight:600; }
+/* Styled bullet points */
+.dham-bullet {
+  display:flex; gap:8px; padding:4px 0; line-height:1.65;
+}
+.dham-bullet::before {
+  content:''; flex-shrink:0; width:6px; height:6px;
+  border-radius:50%; margin-top:7px;
+  background:var(--lavender); opacity:0.7;
+}
+.dham-section[data-accent="gold"] .dham-bullet::before { background:#e8c800; }
+.dham-section[data-accent="blue"] .dham-bullet::before { background:#3d7fd4; }
+.dham-section[data-accent="green"] .dham-bullet::before { background:#4ddb6e; }
+.dham-section[data-accent="orange"] .dham-bullet::before { background:#f08c1a; }
+.dham-section[data-accent="rose"] .dham-bullet::before { background:#e74c64; }
+.dham-section[data-accent="teal"] .dham-bullet::before { background:#2dd4bf; }
+/* Timing lines */
+.dham-time-line {
+  display:flex; gap:8px; padding:3px 0; font-size:0.83rem; line-height:1.6;
+}
+.dham-time-badge {
+  flex-shrink:0; background:rgba(61,127,212,0.12);
+  color:var(--accent-blue); font-size:0.72rem; font-weight:700;
+  padding:2px 8px; border-radius:6px; white-space:nowrap;
+  min-width:64px; text-align:center; margin-top:1px;
+}
+.dham-time-desc { color:var(--text2); }
+/* Info label (like "City:", "Airport:") */
+.dham-info-label { color:var(--text); font-weight:600; }
+/* Paragraph gaps */
+.dham-para { margin-bottom:10px; font-size:0.84rem; color:var(--text2); line-height:1.75; }
+.dham-para:last-child { margin-bottom:0; }
+.dham-tip-box {
+  background:rgba(232,200,0,0.06); border:1px solid rgba(232,200,0,0.12);
+  border-radius:8px; padding:8px 12px; margin-top:8px;
+  font-size:0.8rem; color:#e8c800; line-height:1.6;
+}
+
+/* Key places list */
+.dham-place-item {
+  display:flex; gap:10px; padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.dham-place-item:last-child { border-bottom:none; }
+.dham-place-num {
+  flex-shrink:0; width:24px; height:24px; border-radius:8px;
+  background:rgba(167,139,250,0.15); color:var(--lavender);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700; margin-top:2px;
+}
+.dham-place-text { font-size:0.83rem; color:var(--text2); line-height:1.6; }
+.dham-place-text strong { color:var(--text); font-weight:600; display:block; margin-bottom:2px; }
+
+/* Itinerary days */
+.dham-itinerary-day {
+  background:rgba(61,127,212,0.06); border:1px solid rgba(61,127,212,0.12);
+  border-radius:12px; padding:14px 16px; margin-top:10px;
+}
+.dham-itinerary-day:first-child { margin-top:0; }
+.dham-itinerary-label {
+  font-size:0.72rem; font-weight:700; color:var(--accent-blue);
+  text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;
+  padding-bottom:6px; border-bottom:1px dashed rgba(61,127,212,0.2);
+}
+
+/* Admin add dham button */
+.dham-add-btn {
+  background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.25);
+  border-radius:12px; padding:10px 20px; font-size:0.84rem; font-weight:600;
+  color:var(--lavender); cursor:pointer; transition:background 0.15s;
+  width:100%; font-family:inherit;
+}
+.dham-add-btn:active { background:rgba(167,139,250,0.25); }
+/* Admin edit dham button */
+.dham-card-edit {
+  position:absolute; top:6px; left:6px; z-index:3;
+  width:24px; height:24px; border-radius:7px;
+  background:rgba(61,127,212,0.85); border:none; color:white;
+  font-size:0.7rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Add Dham Modal */
+.dham-form-section { margin-bottom:16px; }
+.dham-form-label {
+  font-size:0.7rem; font-weight:600; color:var(--text3);
+  text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; display:block;
+}
+.dham-form-input {
+  width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px; font-size:0.85rem;
+  color:var(--text); font-family:inherit; outline:none;
+}
+.dham-form-input:focus { border-color:var(--lavender); }
+.dham-form-textarea {
+  width:100%; min-height:100px; background:rgba(255,255,255,0.05);
+  border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+  font-size:0.84rem; color:var(--text); font-family:inherit; outline:none;
+  resize:vertical; line-height:1.6;
+}
+.dham-form-textarea:focus { border-color:var(--lavender); }
+.dham-form-help { font-size:0.68rem; color:var(--text3); margin-top:4px; }
+.dham-form-save {
+  background:var(--lavender); border:none; border-radius:10px;
+  padding:12px 24px; font-size:0.9rem; font-weight:700;
+  color:#1a1a2e; cursor:pointer; width:100%; margin-top:10px;
+}
+.dham-form-save:active { opacity:0.8; }
+
 /* ===== BOTTOM NAV ===== */
 .bottom-nav {
   position:fixed; bottom:0; left:0; right:0; max-width:430px; margin:0 auto;
@@ -2820,6 +3096,7 @@ body {
 }
 /* More tray item colors */
 .more-tray-btn[data-screen="notes"]    { color: #cec0ff; }
+.more-tray-btn[data-screen="dhamas"]   { color: #f08070; }
 .more-tray-btn[data-screen="sevakart"] { color: #5ce0f0; }
 .more-tray-btn[data-screen="prayer"]   { color: #f0c850; }
 .more-tray-btn[data-screen="todo"]     { color: #f8a4bc; }
@@ -2829,6 +3106,7 @@ body {
   border: 1px solid rgba(255,255,255,0.12);
 }
 .more-tray-btn.more-active[data-screen="notes"]    { --active-glow: rgba(206,192,255,0.3); box-shadow: 0 0 16px rgba(206,192,255,0.25), inset 0 0 12px rgba(206,192,255,0.06); border-color: rgba(206,192,255,0.25); }
+.more-tray-btn.more-active[data-screen="dhamas"]   { --active-glow: rgba(240,128,112,0.3); box-shadow: 0 0 16px rgba(240,128,112,0.25), inset 0 0 12px rgba(240,128,112,0.06); border-color: rgba(240,128,112,0.25); }
 .more-tray-btn.more-active[data-screen="sevakart"] { --active-glow: rgba(92,224,240,0.3); box-shadow: 0 0 16px rgba(92,224,240,0.25), inset 0 0 12px rgba(92,224,240,0.06); border-color: rgba(92,224,240,0.25); }
 .more-tray-btn.more-active[data-screen="prayer"]   { --active-glow: rgba(240,200,80,0.3); box-shadow: 0 0 16px rgba(240,200,80,0.25), inset 0 0 12px rgba(240,200,80,0.06); border-color: rgba(240,200,80,0.25); }
 .more-tray-btn.more-active[data-screen="todo"]     { --active-glow: rgba(248,164,188,0.3); box-shadow: 0 0 16px rgba(248,164,188,0.25), inset 0 0 12px rgba(248,164,188,0.06); border-color: rgba(248,164,188,0.25); }
@@ -3182,6 +3460,7 @@ body {
   background: rgba(61,127,212,0.12); color: var(--accent-blue); font-weight: 500;
 }
 .admin-perm-tag.perm-songs { background: rgba(167,139,250,0.12); color: var(--lavender); }
+.admin-perm-tag.perm-dhamas { background: rgba(212,175,55,0.12); color: var(--accent-gold); }
 .admin-perm-tag.perm-sevakart { background: rgba(180,120,40,0.12); color: #d4a017; }
 .admin-perm-tag.perm-prayer { background: rgba(232,168,56,0.12); color: #f0c850; }
 .admin-perm-tag.perm-users { background: rgba(52,152,219,0.12); color: #3498db; }
@@ -3754,6 +4033,14 @@ body {
 }
 .home-card--sevakart::after { background:rgba(6,182,212,0.25); }
 
+/* ── Dhamas ── */
+.home-card--dhamas {
+  background:linear-gradient(145deg, rgba(192,57,43,0.18) 0%, rgba(50,20,20,0.95) 60%, var(--card) 100%);
+  border:1px solid rgba(192,57,43,0.3);
+  box-shadow:0 4px 20px rgba(192,57,43,0.1), inset 0 1px 0 rgba(192,57,43,0.15);
+}
+.home-card--dhamas::after { background:rgba(192,57,43,0.25); }
+
 /* ── My Events ── */
 .home-card--events {
   background:linear-gradient(145deg, rgba(39,174,96,0.18) 0%, rgba(15,45,28,0.95) 60%, var(--card) 100%);
@@ -3772,6 +4059,7 @@ body {
 .home-card--audio    .home-card-icon { background:rgba(230,140,50,0.2); color:#f0a848; box-shadow:0 0 12px rgba(230,140,50,0.2); }
 .home-card--notes    .home-card-icon { background:rgba(167,139,250,0.2); color:#c4b0ff; box-shadow:0 0 12px rgba(167,139,250,0.2); }
 .home-card--sevakart .home-card-icon { background:rgba(6,182,212,0.2); color:#5ce0f0; box-shadow:0 0 12px rgba(6,182,212,0.2); }
+.home-card--dhamas   .home-card-icon { background:rgba(192,57,43,0.2); color:#f06858; box-shadow:0 0 12px rgba(192,57,43,0.2); }
 .home-card--events   .home-card-icon { background:rgba(39,174,96,0.2); color:#5ee8a0; box-shadow:0 0 12px rgba(39,174,96,0.2); }
 
 .home-card-title { font-size:0.92rem; font-weight:600; color:var(--text); letter-spacing:0.2px; }
@@ -3779,6 +4067,7 @@ body {
 .home-card--audio    .home-card-title { color:#f0a848; }
 .home-card--notes    .home-card-title { color:#cec0ff; }
 .home-card--sevakart .home-card-title { color:#5ce0f0; }
+.home-card--dhamas   .home-card-title { color:#f08070; }
 .home-card--events   .home-card-title { color:#70eaaa; }
 .home-card-desc  { font-size:0.72rem; color:var(--text2); line-height:1.4; flex:1; }
 
@@ -5292,9 +5581,9 @@ body {
 
 <!-- App Brand Bar -->
 <div class="app-brand">
-  <div style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;gap:2px;">
+  <img class="app-brand-logo" src="data:image/png;base64,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" alt="Bhakti Sakha" style="width:36px;height:36px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 8px rgba(167,139,250,0.4));">
+  <div style="display:flex;flex-direction:column;position:relative;z-index:1;">
     <span class="app-brand-name">Bhakti Sakha</span>
-    <span class="app-brand-sub">Your Friend on the Path of Devotional Service</span>
   </div>
 </div>
 
@@ -5378,6 +5667,13 @@ body {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Tab Tagline -->
+      <div class="tab-tagline tab-tagline--gold">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Your Friend on the Path of Devotional Service</div>
+        <div class="tab-tagline-divider"></div>
       </div>
 
       <!-- ── Greeting ── -->
@@ -5566,14 +5862,6 @@ body {
           <div class="home-card-desc">Community services — find & offer seva opportunities</div>
         </div>
 
-        <div class="home-card home-card--events" onclick="switchScreen('events',document.querySelectorAll('.nav-btn')[3])">
-          <div class="home-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="home-card-title">My Events</div>
-          <div class="home-card-desc">Personal reminders, custom events and alerts</div>
-        </div>
-
         <div class="home-card home-card--prayer" onclick="switchScreen('prayer',document.querySelectorAll('.nav-btn')[7])">
           <div class="nh-badge-wrap" id="nhBadgePC" style="display:none;" onclick="event.stopPropagation();nhTogglePopup('PC')"></div>
           <div class="home-card-icon">
@@ -5596,6 +5884,18 @@ body {
           <div class="home-todo-upcoming" id="homeTodoWidget"></div>
         </div>
 
+        <div class="home-card home-card--events home-card--fullwidth" onclick="switchScreen('events',document.querySelectorAll('.nav-btn')[3])">
+          <div class="home-evt-top">
+            <div class="home-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="home-card-title">My Events</div>
+              <div class="home-card-desc" style="margin-top:2px;">Personal reminders, custom events and alerts</div>
+            </div>
+          </div>
+          <div class="home-evt-upcoming" id="homeEvtWidget"></div>
+        </div>
 
       </div>
     </div>
@@ -5892,6 +6192,7 @@ body {
             <label><input type="checkbox" id="permSongs" checked> 🎵 Add / Edit Songs & Kirtans</label>
           </div>
           <div class="admin-perm-row">
+            <label><input type="checkbox" id="permDhamas" checked> 🛕 Add Dhamas</label>
           </div>
           <div class="admin-perm-row">
             <label><input type="checkbox" id="permSevakart" checked> 🪔 SevaKart Admin</label>
@@ -6062,6 +6363,37 @@ body {
 
 </div>
 
+  <!-- HOLY DHAMAS -->
+  <div class="screen" id="screen-dhamas">
+    <div class="dhamas-screen">
+      <!-- Tagline -->
+      <div class="tab-tagline tab-tagline--coral">
+        <div class="tab-tagline-ornament">✦ ✦ ✦</div>
+        <div class="tab-tagline-text">Journeys to Places of Divine Mercy</div>
+        <div class="tab-tagline-divider"></div>
+      </div>
+      <div class="dhamas-hdr">
+        <div class="screen-title" style="margin:0;border:none;padding:0;display:none;">Holy Dhamas</div>
+      </div>
+      <input class="dhamas-search" id="dhamSearchInp" placeholder="🔍  Search dhamas..." oninput="renderDhamas(this.value)">
+      <div class="dhamas-grid" id="dhamasGrid"></div>
+      <div style="padding:10px 16px 20px;text-align:center;">
+        <button class="dham-add-btn" id="dhamAddBtn" onclick="openAddDham()" style="display:none;">＋ Add Dham</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DHAM DETAIL -->
+  <div class="screen" id="screen-dham-detail">
+    <div class="dham-detail-screen">
+      <div class="dham-detail-header">
+        <button class="dham-back-btn" onclick="closeDhamDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="dham-detail-title" id="dhamDetailTitle"></div>
+        <button class="dham-card-edit" id="dhamDetailEditBtn" style="position:static;width:30px;height:30px;font-size:0.8rem;display:none;" onclick="openEditDham(_currentDhamId)">✏️</button>
+      </div>
+      <div class="dham-detail-body" id="dhamDetailBody"></div>
+    </div>
+  </div>
 
   <!-- INFO SCREEN (Redesigned) -->
   <div class="screen" id="screen-info">
@@ -6178,6 +6510,18 @@ body {
         </div>
       </div></div>
 
+      <!-- ===== HOLY DHAMAS SUB-PAGE ===== -->
+      <div class="info-page" id="infoPage-dhamas"><div class="info-page-content">
+        <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="info-sub-hero"><div class="info-sub-icon">🛕</div><div class="info-sub-title" style="color:#f08070;">Holy Dhamas</div><div class="info-sub-tagline">Journeys to Places of Divine Mercy</div></div>
+        <div class="info-acc-list">
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">🗺️</div><div class="info-acc-title">Browse Sacred Places</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Explore <strong>sacred pilgrimage destinations</strong> — Vrindavan, Mayapur, Jagannath Puri, Dwarka, and more. Each has a card with icon, name, and location. Use search to find specific dhamas.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📖</div><div class="info-acc-title">Detailed Pilgrimage Guides</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Each dham has sections covering:<ul><li><strong>Overview</strong> — spiritual significance &amp; main deity</li><li><strong>Scriptural references</strong> — pastimes &amp; Acharya connections</li><li><strong>How to reach</strong> — airports, railways &amp; local transport</li><li><strong>Temple timings</strong> — darshan schedule &amp; aarti</li><li><strong>Festivals</strong> — special celebrations</li><li><strong>Accommodation &amp; Prasadam</strong></li><li><strong>Key places</strong> — must-visit spots</li></ul></div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">📝</div><div class="info-acc-title">Itineraries &amp; Tips</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Many dhamas include <strong>suggested itineraries</strong> with day-by-day plans, <strong>do's &amp; don'ts</strong>, <strong>best time to visit</strong>, and <strong>devotee tips</strong> from experienced pilgrims.</div></div></div>
+          <div class="info-acc-item" onclick="infoToggleAcc(this)"><div class="info-acc-header"><div class="info-acc-icon">➕</div><div class="info-acc-title">Adding New Dhamas (Admin)</div><div class="info-acc-chevron">▼</div></div><div class="info-acc-body"><div class="info-acc-inner">Admins can add new dhamas with a comprehensive form covering all sections. Added dhamas sync across all users.</div></div></div>
+        </div>
+      </div></div>
+
       <!-- ===== NOTIFICATIONS SUB-PAGE ===== -->
       <div class="info-page" id="infoPage-notif"><div class="info-page-content">
         <button class="info-back-btn" onclick="infoGoPage('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
@@ -6205,6 +6549,46 @@ body {
 
     </div>
   </div>
+
+<!-- Add Dham Modal -->
+<div class="modal-overlay" id="addDhamModal">
+  <div class="modal-sheet" style="max-height:92vh;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🛕 Add Holy Dham</div>
+    <div style="overflow-y:auto;max-height:calc(92vh - 120px);padding-bottom:20px;">
+      <div class="dham-form-section">
+        <label class="dham-form-label">Name *</label>
+        <input class="dham-form-input" id="dhamFName" placeholder="e.g. Sri Vrindavan Dham">
+      </div>
+      <div class="dham-form-section">
+        <label class="dham-form-label">Location *</label>
+        <input class="dham-form-input" id="dhamFLoc" placeholder="e.g. Mathura, Uttar Pradesh, India">
+      </div>
+      <div class="dham-form-section" style="display:flex;gap:10px;">
+        <div style="flex:1"><label class="dham-form-label">Icon (emoji)</label><input class="dham-form-input" id="dhamFIcon" placeholder="🛕" maxlength="4"></div>
+        <div style="flex:1"><label class="dham-form-label">Tag</label>
+          <select class="dham-form-input" id="dhamFTag"><option value="">None</option><option value="char-dham">Char Dham</option><option value="divya-desam">Divya Desam</option><option value="iskcon">ISKCON</option><option value="shakti-peetha">Shakti Peetha</option></select>
+        </div>
+      </div>
+      <div class="dham-form-section"><label class="dham-form-label">Overview *</label><textarea class="dham-form-textarea" id="dhamFOverview" placeholder="Brief introduction, spiritual significance, main deity..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Scriptural & Historical Significance</label><textarea class="dham-form-textarea" id="dhamFScript" placeholder="References from scriptures, important pastimes, connection to acharyas..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Location & How to Reach</label><textarea class="dham-form-textarea" id="dhamFReach" placeholder="Nearest airport, railway, road options, local transport tips..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Temple Timings & Darshan</label><textarea class="dham-form-textarea" id="dhamFDarshan" placeholder="Daily darshan timings, aarti schedule, best time for darshan..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Festivals & Special Days</label><textarea class="dham-form-textarea" id="dhamFFest" placeholder="Major festivals, unique celebrations, best time of year..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Accommodation</label><textarea class="dham-form-textarea" id="dhamFAccom" placeholder="Temple guest houses, hotels, booking tips..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Prasadam & Food</label><textarea class="dham-form-textarea" id="dhamFFood" placeholder="Temple prasadam, sattvik food options, annadan..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Seva & Donations</label><textarea class="dham-form-textarea" id="dhamFSeva" placeholder="Available sevas, how to book or participate..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Key Places (one per line: Name | Description)</label><textarea class="dham-form-textarea" id="dhamFPlaces" placeholder="Main Temple | Description of the temple&#10;Sacred Lake | Description of the lake"></textarea><div class="dham-form-help">Format: Place Name | Short description (one per line)</div></div>
+      <div class="dham-form-section"><label class="dham-form-label">Suggested Itinerary</label><textarea class="dham-form-textarea" id="dhamFItin" placeholder="Day 1 — Title&#10;6:00 AM — Activity&#10;..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Do's & Don'ts</label><textarea class="dham-form-textarea" id="dhamFDos" placeholder="Do's and Don'ts for visitors..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Best Time to Visit</label><textarea class="dham-form-textarea" id="dhamFBest" placeholder="Weather guidance, peak vs peaceful times..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Important Contacts</label><textarea class="dham-form-textarea" id="dhamFContacts" placeholder="Temple office numbers, websites..."></textarea></div>
+      <div class="dham-form-section"><label class="dham-form-label">Devotee Tips</label><textarea class="dham-form-textarea" id="dhamFTips" placeholder="Practical tips from experience..."></textarea></div>
+      <button class="dham-form-save" onclick="saveNewDham()">Save Dham</button>
+      <button class="f-cancel" onclick="closeModal('addDhamModal')" style="margin-top:8px;">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- Persistent Audio Container (hidden, keeps audio playing across screens) -->
 <div id="persistentAudioWrap"></div>
@@ -6778,7 +7162,6 @@ body {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
     <span class="more-tray-lbl">Notes</span>
   </button>
-
   <button class="more-tray-btn" data-screen="sevakart" onclick="navToMore('sevakart')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>
     <span class="more-tray-lbl">SevaKart</span>
@@ -11588,6 +11971,8 @@ function updateAdminUI() {
   if (songEditBtn) songEditBtn.style.display = hasPermission('songs') ? '' : 'none';
   const songDelBtns = document.querySelectorAll('.song-del-btn');
   songDelBtns.forEach(b => b.style.display = hasPermission('songs') ? '' : 'none');
+  // Update dham admin UI
+  updateDhamAdminUI();
 }
 
 function renderAdminList() {
@@ -11601,6 +11986,7 @@ function renderAdminList() {
     let permTags = '';
     if (!isSelf) {
       if (!userPerms || userPerms.includes('songs')) permTags += '<span class="admin-perm-tag perm-songs">Songs</span>';
+      if (!userPerms || userPerms.includes('dhamas')) permTags += '<span class="admin-perm-tag perm-dhamas">Dhamas</span>';
       if (!userPerms || userPerms.includes('sevakart')) permTags += '<span class="admin-perm-tag perm-sevakart">SevaKart</span>';
       if (!userPerms || userPerms.includes('prayer')) permTags += '<span class="admin-perm-tag perm-prayer">Prayer</span>';
       if (userPerms && userPerms.includes('users')) permTags += '<span class="admin-perm-tag perm-users">Users</span>';
@@ -11628,6 +12014,7 @@ function addAdmin() {
   // Get selected permissions
   const selectedPerms = [];
   if (document.getElementById('permSongs').checked) selectedPerms.push('songs');
+  if (document.getElementById('permDhamas').checked) selectedPerms.push('dhamas');
   if (document.getElementById('permSevakart').checked) selectedPerms.push('sevakart');
   if (document.getElementById('permPrayer').checked) selectedPerms.push('prayer');
   if (document.getElementById('permUsers').checked) selectedPerms.push('users');
@@ -14431,7 +14818,7 @@ function switchScreen(name, btn) {
   // Screen animation map
   const SCREEN_ANIM = {
     home:'slidedown', sevakart:'slidedown', prayer:'slidedown', 'prayer-detail':'slidedown', 'prayer-my':'slidedown',
-    settings:'slidedown', 'song-detail':'slidedown', todo:'slidedown',
+    dhamas:'slidedown', settings:'slidedown', 'song-detail':'slidedown', todo:'slidedown',
     songs:'zoomin',
     notes:'circleexpand', events:'circleexpand',
     calendar:'blur', search:'blur',
@@ -14488,12 +14875,13 @@ function switchScreen(name, btn) {
     const headerDate = document.getElementById('headerDate');
     const headerMasa = document.getElementById('headerMasa');
     const headerIcons = document.getElementById('headerIcons');
-    const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', 'admin-sevakart':'SevaKart Admin', 'admin-prayer':'Prayer Circle Admin', userlist:'App Users', todo:'My To-Do'};
-    const SCREEN_COLORS = {songs:'#f0a848', events:'#5ee8a0', notes:'#cec0ff', sevakart:'#5ce0f0', 'sevakart-detail':'#5ce0f0', 'sevakart-mylistings':'#5ce0f0', prayer:'#f0c850', 'prayer-detail':'#f0c850', 'prayer-my':'#f0c850', settings:'#a0b8d0', info:'#a0b8d0', search:'#6ab0ff', admin:'#f0c850', 'admin-sevakart':'#5ce0f0', 'admin-prayer':'#f0c850', userlist:'#a0b8d0', todo:'#f8a4bc'};
+    const TITLES = {calendar:null, search:'Search Calendar', songs:'Song Book', events:'My Events', notes:'My Notes', settings:'Settings', dhamas:'Holy Dhamas', info:'About Bhakti Sakha', sevakart:'SevaKart', 'sevakart-detail':'SevaKart', 'sevakart-mylistings':'My Listings', prayer:'Prayer Circle', 'prayer-detail':'Prayer Request', 'prayer-my':'My Prayer Requests', admin:'Admin Dashboard', 'admin-sevakart':'SevaKart Admin', 'admin-prayer':'Prayer Circle Admin', userlist:'App Users', todo:'My To-Do'};
+    const SCREEN_COLORS = {songs:'#f0a848', events:'#5ee8a0', notes:'#cec0ff', dhamas:'#f08070', sevakart:'#5ce0f0', 'sevakart-detail':'#5ce0f0', 'sevakart-mylistings':'#5ce0f0', prayer:'#f0c850', 'prayer-detail':'#f0c850', 'prayer-my':'#f0c850', settings:'#a0b8d0', info:'#a0b8d0', search:'#6ab0ff', admin:'#f0c850', 'admin-sevakart':'#5ce0f0', 'admin-prayer':'#f0c850', userlist:'#a0b8d0', todo:'#f8a4bc'};
     const SCREEN_ICONS = {
       songs:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       events:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
       notes:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+      dhamas:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 10h.01"/><path d="M14 10h.01"/></svg>',
       sevakart:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>',
       'sevakart-detail':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>',
       'sevakart-mylistings':'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3 C10.5,6 10,9 10.5,11.5 C11,13 11.5,13.5 12,13.5 C12.5,13.5 13,13 13.5,11.5 C14,9 13.5,6 12,3Z"/><path d="M7.5,6 C6,9 6,11.5 7,13 C7.8,14 9,14.2 10,13.5 C10.8,12.8 10.8,11.5 10.2,10 C9.2,7.5 8.2,6.5 7.5,6Z"/><path d="M16.5,6 C18,9 18,11.5 17,13 C16.2,14 15,14.2 14,13.5 C13.2,12.8 13.2,11.5 13.8,10 C14.8,7.5 15.8,6.5 16.5,6Z"/><path d="M3.5,12 C3,14 4,15.5 6,16 C8,16.5 9.5,15.8 10,14.5 C10.3,13.5 9.5,12.5 8,12 C6,11.2 4.5,11.5 3.5,12Z"/><path d="M20.5,12 C21,14 20,15.5 18,16 C16,16.5 14.5,15.8 14,14.5 C13.7,13.5 14.5,12.5 16,12 C18,11.2 19.5,11.5 20.5,12Z"/></svg>',
@@ -14540,6 +14928,7 @@ function switchScreen(name, btn) {
   if (name==='songs') { renderSongs(); setTimeout(() => _updateSongListIndicator(), 50); }
   if (name==='events') renderEvts();
   if (name==='notes') { nfRenderFolders(); if (_nfCurrentFolder) nfRenderFolderNotes(); }
+  if (name==='dhamas') renderDhamas();
   if (name==='sevakart') { skRenderHome(); _skFetchFromServer(); }
   if (name==='prayer') pcRenderFeed();
   if (name==='todo') tdRenderTab();
@@ -14605,25 +14994,25 @@ function updateHomeScreen() {
   }
 
   // Update Google account UI on home
-  try { updateHomeGoogleUI(); } catch(e) {}
+  updateHomeGoogleUI();
 
   // Today's events
-  try { updateHomeTodayCard(); } catch(e) {}
+  updateHomeTodayCard();
 
   // Upcoming events widget on home
-  try { _updateHomeEvtWidget(); } catch(e) {}
+  _updateHomeEvtWidget();
 
   // Todo widget on home
-  try { _updateHomeTodoWidget(); } catch(e) {}
+  _updateHomeTodoWidget();
 
-  // Daily muse verse on home — wrapped in try-catch so it ALWAYS runs
-  try { _updateDailyMuse(); } catch(e) {}
-  try { cpInit(); } catch(e) {} // Chant with Prabhupada player (4AM-8AM)
-  try { jtInit(); } catch(e) {} // Japa Talk player (4AM-8AM)
-  try { kbInit(); } catch(e) {} // Krsna Book player (8PM-4AM)
+  // Daily muse verse on home
+  _updateDailyMuse();
+  cpInit(); // Chant with Prabhupada player (4AM-8AM)
+  jtInit(); // Japa Talk player (4AM-8AM)
+  kbInit(); // Krsna Book player (8PM-4AM)
 
   // New & Happening badges
-  try { nhUpdateBadges(); } catch(e) {}
+  nhUpdateBadges();
 }
 
 function _updateHomeEvtWidget() {
@@ -14765,8 +15154,8 @@ function updateHomeTodayCard() {
 const NAV_TAB_COLORS = {
   home: '#c4b0ff', calendar: '#6ab0ff', songs: '#f0a848', events: '#5ee8a0', more: '#dcc8ff'
 };
-const MORE_SCREENS = ['notes','sevakart','todo','prayer'];
-const MORE_SCREEN_COLORS = { notes:'#cec0ff', sevakart:'#5ce0f0', prayer:'#f0c850', todo:'#f8a4bc' };
+const MORE_SCREENS = ['notes','dhamas','sevakart','todo','prayer'];
+const MORE_SCREEN_COLORS = { notes:'#cec0ff', dhamas:'#f08070', sevakart:'#5ce0f0', prayer:'#f0c850', todo:'#f8a4bc' };
 let _moreTrayOpen = false;
 let _activeMoreScreen = null;
 
@@ -15056,6 +15445,1669 @@ function startAlertTicker() {
       checkRahuAlert();
     }, 60000);
   }, msToNextMin);
+}
+
+// ===================================================================
+// HOLY DHAMAS
+// ===================================================================
+const DHAMAS = [
+{
+  id:'vrindavan', name:'Sri Vrindavan Dham', icon:'🦚',
+  location:'Mathura, Uttar Pradesh, India', tag:'iskcon', tagLabel:'ISKCON HQ',
+  overview: `Vrindavan is the most sacred land where Lord Sri Krishna performed His childhood pastimes (lilas) 5,000 years ago. It is considered non-different from Goloka Vrindavan, the eternal spiritual abode of the Lord.
+
+The main deity at ISKCON's Krishna-Balaram Mandir is Sri Sri Krishna-Balaram, along with Sri Sri Radha-Shyamasundara and Sri Sri Gaura-Nitai.
+
+Vrindavan is one of the most important pilgrimage destinations for all Vaishnavas. The entire land is considered sacred — every dust particle is worshippable.`,
+  scriptural: `• Srimad Bhagavatam (10th Canto) extensively describes Krishna's Vrindavan pastimes — the Rasa Lila, lifting Govardhan Hill, killing of demons like Putana, Aghasura, and more.
+• Chaitanya Charitamrita describes how Sri Chaitanya Mahaprabhu visited Vrindavan and rediscovered the lost holy places.
+• The Six Goswamis of Vrindavan — Rupa, Sanatana, Jiva, Raghunatha Das, Raghunatha Bhatta, and Gopala Bhatta — established temples and wrote foundational Gaudiya Vaishnava literature here.
+• Srila Prabhupada established the Krishna-Balaram Mandir in 1975, fulfilling his spiritual master's vision.`,
+  howToReach: `City: Vrindavan, District Mathura, Uttar Pradesh, India
+Nearest Airport: Agra (Kheria) — ~70 km; Delhi IGI — ~150 km
+Nearest Railway: Mathura Junction — ~12 km
+From Delhi: 3–4 hours by road (NH-44), frequent buses and trains
+Local Transport: Auto-rickshaws, e-rickshaws, cycle rickshaws available everywhere
+Tip: Pre-book a cab from Delhi for comfort. Within Vrindavan, e-rickshaws are the most convenient.`,
+  darshan: `ISKCON Krishna-Balaram Mandir:
+• Mangala Aarti: 4:30 AM
+• Darshan: 4:30 AM – 1:00 PM, 4:30 PM – 8:30 PM
+• Rajbhog Aarti: 12:25 PM
+• Sandhya Aarti: 7:15 PM
+• Shayana Aarti: 8:30 PM
+
+Best time for peaceful darshan: Early morning (4:30–6:00 AM) or late evening.
+Special: Janmashtami has 24-hour darshan.
+
+Other major temples: Banke Bihari (opens ~7:45 AM), Radha Raman, Radha Damodar, Radha Vallabh — each has its own schedule.`,
+  festivals: `• Janmashtami (Aug/Sep) — Grand celebration, 24hr darshan, massive crowds
+• Radhashtami (Sep) — Appearance of Srimati Radharani
+• Holi (Mar) — Famous Vrindavan/Barsana Holi celebrations, Lathmar Holi
+• Kartik Month (Oct/Nov) — Damodar month, Govardhan Puja, Diwali
+• Rasa Purnima — Full moon of Kartik, commemorating Rasa Lila
+• Jhulan Yatra (Jul/Aug) — Swing festival
+Best time to visit: Oct–Mar (pleasant weather, Kartik month is ideal)`,
+  accommodation: `ISKCON Guesthouse: Book at krishnabalaram.com or call temple office. Clean rooms, prasadam included.
+MVT (Mayapur Vrindavan Trust) Guesthouse: Popular with devotees, advance booking essential during festivals.
+Budget Hotels: Numerous options on Bhaktivedanta Swami Marg and Parikrama Marg (₹500–2000/night).
+OYO/Hotels: Many available on booking apps.
+Tip: Book 2–3 months ahead for Janmashtami and Kartik.`,
+  prasadam: `ISKCON Temple: Breakfast (8:30 AM), Lunch Prasadam (1:00 PM), Dinner (7:30 PM) — donation basis
+MVT Restaurant: Excellent sattvik food, no onion/garlic
+Govinda's Restaurant: Near ISKCON temple, pure veg
+Brajwasi Mithai: Famous for sweets and pedas
+Tip: Most restaurants in Vrindavan are pure vegetarian. Ask specifically for "no onion, no garlic" at non-temple restaurants.
+Annadan: ISKCON temple serves free meals daily.`,
+  seva: `Available Sevas at ISKCON:
+• Abhishek Seva
+• Go Seva (cow service)
+• Annadan (food distribution)
+• Deity dress sponsorship
+• Bhoga offering
+Book at the temple office or online at iskconvrindavan.com`,
+  keyPlaces: [
+    {name:'ISKCON Krishna-Balaram Mandir', desc:'Founded by Srila Prabhupada. Sri Sri Krishna-Balaram, Radha-Shyamasundara, Gaura-Nitai.'},
+    {name:'Banke Bihari Temple', desc:'Most popular temple. Deity appeared from Nidhivan. Unique — no aarti bell, curtain darshan.'},
+    {name:'Radha Damodar Temple', desc:'Established by Jiva Goswami. Srila Prabhupada\'s rooms and bhajan kutir are preserved here.'},
+    {name:'Radha Raman Temple', desc:'Self-manifested deity of Lord Krishna. Established by Gopala Bhatta Goswami.'},
+    {name:'Govardhan Hill', desc:'~25 km. Krishna lifted this hill for 7 days. Govardhan Parikrama is 21 km.'},
+    {name:'Seva Kunj & Nidhivan', desc:'Groves where Radha-Krishna perform eternal pastimes. Closes at sunset — no one stays overnight.'},
+    {name:'Keshi Ghat', desc:'Where Krishna killed the demon Keshi. Beautiful sunset spot on Yamuna.'},
+    {name:'Prem Mandir', desc:'Modern marble temple by Jagadguru Kripalu Maharaj. Stunning light show at night.'},
+    {name:'Radha Vallabh Temple', desc:'One of the ancient temples. Only Radharani\'s deity — Krishna is represented by a flute.'},
+    {name:'Barsana', desc:'~45 km. Radharani\'s birthplace. Famous Lathmar Holi. Ladli Ji temple.'},
+  ],
+  itinerary: `Day 1 — Vrindavan:
+4:15 AM — Mangala Aarti at ISKCON Krishna-Balaram Mandir
+7:30 AM — Breakfast prasadam
+8:30 AM — Banke Bihari Temple, Radha Damodar Temple
+11:00 AM — Radha Raman Temple, Radha Vallabh Temple
+1:00 PM — Lunch prasadam at ISKCON
+4:00 PM — Seva Kunj, Nidhivan
+5:30 PM — Keshi Ghat (sunset on Yamuna)
+7:15 PM — Sandhya Aarti at ISKCON
+8:00 PM — Prem Mandir light show
+
+Day 2 — Govardhan & Mathura:
+5:00 AM — Start Govardhan Parikrama (21 km, 5-6 hours)
+12:00 PM — Lunch at Govardhan
+2:00 PM — Krishna Janmabhoomi, Mathura
+4:00 PM — Dwarkadhish Temple, Vishram Ghat, Mathura
+6:00 PM — Return to Vrindavan, evening aarti`,
+  dos: `Do's:
+• Dress modestly — cover shoulders and knees
+• Remove shoes before entering temples
+• Carry water and sun protection (summers are harsh)
+• Respect Yamuna river — don't pollute
+
+Don'ts:
+• No non-vegetarian food, alcohol, or tobacco in Vrindavan
+• Don't touch deities or temple items without permission
+• Don't photograph where prohibited (Banke Bihari bans phones)
+• Avoid visiting Nidhivan/Seva Kunj after sunset`,
+  bestTime: `Oct–Mar: Best weather (15–28°C). Kartik month (Oct/Nov) is spiritually the best.
+Apr–Jun: Very hot (40–47°C). Avoid unless for specific festivals.
+Jul–Sep: Monsoon. Janmashtami falls in this period — crowded but ecstatic.
+Weekdays are far less crowded than weekends.`,
+  contacts: `ISKCON Krishna-Balaram Mandir: +91-565-254-0021
+ISKCON Guesthouse: +91-565-254-0022
+Website: iskconvrindavan.com
+Mathura Railway Enquiry: 139`,
+  devoteeTips: `• Start early — 4:15 AM Mangala Aarti sets the tone for the day
+• Carry a small bag with water, prasadam snacks, and a hand fan (summers)
+• Keep valuables safe — crowded temples attract pickpockets
+• Vrindavan is best experienced barefoot on Parikrama — many devotees walk barefoot
+• If visiting Govardhan, start very early to avoid midday heat
+• The dust of Vrindavan is sacred — offer obeisances to the Dham upon arrival
+• Buy Tulsi mala and japa beads from shops near ISKCON temple`
+},
+{
+  id:'mayapur', name:'Sri Mayapur Dham', icon:'🌕',
+  location:'Nadia, West Bengal, India', tag:'iskcon', tagLabel:'ISKCON World HQ',
+  overview: `Sri Mayapur Dham is the birthplace of Sri Chaitanya Mahaprabhu (1486 CE), the Supreme Lord appearing in the mood of His greatest devotee. It is the spiritual headquarters of ISKCON worldwide.
+
+The main deity is Sri Sri Radha-Madhava with the Ashta-Sakhis, along with Sri Sri Pancha-Tattva. The magnificent Temple of the Vedic Planetarium (TOVP), nearing completion, will be one of the largest religious structures in the world.
+
+Mayapur is located on the sacred confluence of the Ganga and Jalangi rivers in the Navadvipa area of West Bengal.`,
+  scriptural: `• Chaitanya Charitamrita (Adi Lila) describes the appearance of Lord Chaitanya on Phalguna Purnima, 1486 CE.
+• Chaitanya Bhagavata by Vrindavan Das Thakura details the early pastimes in Navadvipa.
+• Navadvipa Dham Mahatmya by Bhaktivinoda Thakura describes the nine islands of Navadvipa and their spiritual significance.
+• Srila Prabhupada declared Mayapur as ISKCON's world headquarters. He envisioned the TOVP as a beacon for spiritual education.
+• Bhaktivinoda Thakura rediscovered the exact birthplace of Lord Chaitanya in the 1890s.`,
+  howToReach: `City: Mayapur, District Nadia, West Bengal, India
+Nearest Airport: Netaji Subhash Chandra Bose International Airport, Kolkata — ~130 km
+Nearest Railway: Krishnanagar City Junction — ~25 km; Nabadwip Dham Station — ~8 km (across the river)
+From Kolkata: 3.5–4 hours by road (NH-12). ISKCON runs buses from Kolkata.
+Local Transport: Auto-rickshaws, toto (e-rickshaws), cycle rickshaws
+Tip: Take the ISKCON bus from Kolkata Yatri Niwas for a comfortable direct ride.`,
+  darshan: `ISKCON Sri Chandrodaya Mandir:
+• Mangala Aarti: 4:30 AM
+• Darshan: 4:30 AM – 1:00 PM, 4:00 PM – 8:30 PM
+• Guru Puja: 7:15 AM
+• Rajbhog Aarti: 12:30 PM
+• Sandhya Aarti: 6:30 PM (varies by season)
+• Shayana Aarti: 8:15 PM
+
+Pancha Tattva darshan is particularly mesmerizing.
+Best time for peaceful darshan: 4:30–6:00 AM and 4:00–5:00 PM on weekdays.`,
+  festivals: `• Sri Gaura Purnima (Feb/Mar) — Grand appearance festival of Lord Chaitanya. Devotees worldwide gather.
+• Jagannath Rath Yatra (Jun/Jul) — Massive chariot procession
+• Janmashtami (Aug/Sep) — Sri Krishna's appearance
+• Kartik Month (Oct/Nov) — Damodar vrata, special aartis
+• Nabadwip Mandal Parikrama (Mar) — 9-day circumambulation of Navadvipa's 9 islands
+Best time to visit: Oct–Mar (pleasant weather). Gaura Purnima is the ultimate experience.`,
+  accommodation: `ISKCON Mayapur Guest House (Gada Bhavan): Multiple categories, book online at mayapur.com
+Lotus Building Guesthouse: Budget option within campus
+Chakra Building: Premium rooms
+Outside options: Limited. Temple campus accommodation is strongly recommended.
+Tip: Book well in advance for Gaura Purnima — rooms sell out months ahead.`,
+  prasadam: `ISKCON Prasadam Hall: Serves breakfast, lunch, and dinner — world-class pure Vaishnava food.
+Govinda's Restaurant: On campus, excellent variety
+Various food stalls: Near the market area
+All food on campus is sattvik — no onion, no garlic.
+Annadan: Free prasadam distribution daily.`,
+  seva: `• Deity worship sponsorship
+• Annadan (feeds thousands daily)
+• TOVP construction donation
+• Go-Seva (Goshala)
+• Gurukul/education sponsorship
+Book at the temple office or online at mayapur.com`,
+  keyPlaces: [
+    {name:'Sri Chandrodaya Mandir', desc:'Main ISKCON temple with Sri Sri Radha-Madhava and Pancha-Tattva deities.'},
+    {name:'Temple of the Vedic Planetarium (TOVP)', desc:'Magnificent structure nearing completion. Will house a Vedic cosmology exhibition.'},
+    {name:'Srila Prabhupada\'s Pushpa Samadhi', desc:'Beautiful memorial and museum dedicated to Srila Prabhupada.'},
+    {name:'Yogapitha', desc:'Exact birthplace of Sri Chaitanya Mahaprabhu. Small but extremely sacred.'},
+    {name:'Chand Kazi\'s Samadhi', desc:'Tomb of the magistrate who tried to stop the Sankirtan movement but became a devotee.'},
+    {name:'Srivas Angan', desc:'Courtyard of Srivas Thakur where the first Sankirtan was performed.'},
+    {name:'Jagannath Mandir', desc:'Within campus. Beautiful Jagannath, Baladeva, Subhadra deities.'},
+    {name:'Goshala', desc:'ISKCON cow shelter. Devotees can do Go-Seva here.'},
+  ],
+  itinerary: `Day 1 — ISKCON Campus:
+4:15 AM — Mangala Aarti
+7:15 AM — Guru Puja, breakfast prasadam
+9:00 AM — Srila Prabhupada Pushpa Samadhi & Museum
+10:30 AM — TOVP visit
+12:30 PM — Rajbhog Aarti, lunch prasadam
+4:00 PM — Afternoon darshan, Goshala
+6:30 PM — Sandhya Aarti, evening walk along Ganga
+8:15 PM — Shayana Aarti, dinner
+
+Day 2 — Navadvipa Holy Places:
+6:00 AM — Mangala Aarti, breakfast
+8:00 AM — Yogapitha (Lord Chaitanya's birthplace)
+9:30 AM — Srivas Angan
+10:30 AM — Chand Kazi's Samadhi & Neem tree
+12:00 PM — Lunch prasadam
+3:00 PM — Visit Navadvipa town, Dhameswar Mahaprabhu temple
+6:00 PM — Return for evening programme`,
+  dos: `Do's:
+• Dress in devotional attire — dhoti/kurta for men, sari/salwar for women is appreciated
+• Attend Mangala Aarti at least once — it's transformative
+• Offer obeisances upon entering the Dham
+
+Don'ts:
+• No non-veg, intoxicants, or tobacco on campus
+• Don't swim in the Ganga without guidance — currents can be strong
+• Don't miss the Pancha-Tattva darshan
+• Avoid rainy season (Jun–Aug) — flooding is common`,
+  bestTime: `Oct–Mar: Ideal weather (15–28°C). Gaura Purnima (Feb/Mar) is peak spiritual season.
+Apr–May: Hot and humid.
+Jun–Sep: Monsoon — heavy rains, possible flooding. Avoid unless for Rath Yatra.
+Weekdays are much more peaceful than weekends.`,
+  contacts: `ISKCON Mayapur: +91-3472-245-400
+Guesthouse Booking: mayapur.com
+ISKCON Kolkata (for bus): +91-33-2287-3757`,
+  devoteeTips: `• Bring mosquito repellent — essential especially during monsoon
+• Carry light cotton clothes — Bengal is humid
+• The campus is huge — comfortable walking shoes are a must
+• Attend the morning and evening programmes for the full experience
+• Buy books and devotional items from the campus bookstore — best prices
+• The Ganga here is called Bhagirathi — take a dip if possible (ghat near campus)`
+},
+{
+  id:'puri', name:'Jagannath Puri Dham', icon:'🛕',
+  location:'Puri, Odisha, India', tag:'char-dham', tagLabel:'Char Dham',
+  overview: `Sri Jagannath Puri is one of the four sacred Char Dhams and one of the most important pilgrimage sites in India. The main deity is Lord Jagannath (Krishna), along with Baladeva and Subhadra Devi.
+
+The Jagannath Temple, built in the 12th century by King Anantavarman Chodaganga Deva, is one of the most magnificent temple structures in India.
+
+Sri Chaitanya Mahaprabhu spent the last 18 years of His manifest pastimes in Puri, making it supremely sacred for Gaudiya Vaishnavas.`,
+  scriptural: `• Skanda Purana extensively glorifies Purushottama Kshetra (Puri) as the abode of Lord Vishnu.
+• Chaitanya Charitamrita (Madhya & Antya Lila) describes Mahaprabhu's ecstatic pastimes in Puri — His Ratha Yatra celebrations, meetings with Raya Ramananda and Sarvabhauma Bhattacharya.
+• The Ratha Yatra festival has been celebrated for centuries and was a key event in Mahaprabhu's life.
+• Srila Prabhupada was inspired by the Puri Ratha Yatra and introduced it worldwide through ISKCON.`,
+  howToReach: `City: Puri, Odisha, India
+Nearest Airport: Biju Patnaik International Airport, Bhubaneswar — ~60 km
+Nearest Railway: Puri Railway Station — ~3 km from Jagannath Temple
+From Bhubaneswar: 1.5 hours by road or train
+Local Transport: Auto-rickshaws, cycle rickshaws, taxis
+Tip: Puri is well connected by train. Book Bhubaneswar-Puri trains in advance.`,
+  darshan: `Jagannath Temple:
+• Mangala Aarti: 5:00 AM
+• Abakasha: 6:00 AM (morning meal offering)
+• Madhyanha Dhupa: 11:00 AM–12:00 PM (main offering)
+• Sandhya Dhupa: 7:00 PM
+• Chandana Lagi: 8:00 PM
+
+Note: Non-Hindu visitors may face entry restrictions at the main Jagannath Temple. ISKCON temple in Puri welcomes everyone.
+Best darshan: Early morning 5:30–7:00 AM. Avoid weekends and festivals for crowd-free darshan.`,
+  festivals: `• Rath Yatra (Jun/Jul) — The most famous festival. Massive chariots pulled through Grand Road. Millions attend.
+• Return Rath Yatra (Bahuda Yatra) — 9 days after Rath Yatra
+• Snana Yatra (May/Jun) — Deities' bathing ceremony before Rath Yatra
+• Chandan Yatra — 42-day summer festival
+• Kartik celebrations
+Best time to visit: Oct–Mar for weather. Rath Yatra for the ultimate experience (but extremely crowded).`,
+  accommodation: `ISKCON Puri Guesthouse: On the beachfront, clean rooms
+Nilachala Hotel (Temple Trust): Near the temple
+Numerous hotels: Along the beach road (CT Road) — ₹500–3000/night
+Tip: Book early for Rath Yatra — the entire city fills up.`,
+  prasadam: `Jagannath Temple Mahaprasad: Famous worldwide. Available at Ananda Bazar inside the temple. Called "Abadha" — rice, dal, vegetables cooked in earthen pots.
+ISKCON Temple Prasadam: Available for all visitors
+Wildcraft/Chappan Bhog: Restaurants on CT Road serve pure veg
+Tip: Mahaprasad from Jagannath temple is considered supremely sacred — even prasadam from the ground is worshippable.`,
+  seva: `At Jagannath Temple:
+• Various sevas available through temple administration
+At ISKCON Puri:
+• Deity sponsorship, Annadan, book distribution
+Contact the respective temple offices.`,
+  keyPlaces: [
+    {name:'Jagannath Temple', desc:'Main temple — 12th century, 65m tall. One of the Char Dhams. Jagannath, Baladeva, Subhadra.'},
+    {name:'Gambhira (Tota Gopinath Temple)', desc:'Where Sri Chaitanya Mahaprabhu spent His last years in ecstatic devotion.'},
+    {name:'Gundicha Temple', desc:'Destination of Rath Yatra. Lord Jagannath stays here for 7 days.'},
+    {name:'Siddha Bakul', desc:'Where Haridas Thakur chanted 300,000 names daily. His samadhi is nearby.'},
+    {name:'Tota Gopinath Temple', desc:'Deity of Gopinath associated with Gadadhara Pandit.'},
+    {name:'ISKCON Puri', desc:'Beautiful temple on the beachfront. Welcomes all visitors.'},
+    {name:'Puri Beach', desc:'Sacred beach. Mahaprabhu bathed here. Sunrise is spectacular.'},
+    {name:'Narendra Sarovar', desc:'Sacred lake where Chandan Yatra takes place.'},
+    {name:'Sakshi Gopal Temple', desc:'~20 km. Famous deity who walked as a witness. Fascinating pastime.'},
+    {name:'Konark Sun Temple', desc:'~35 km. UNESCO World Heritage site. 13th century architectural marvel.'},
+  ],
+  itinerary: `Day 1 — Puri:
+5:00 AM — Early morning Jagannath Temple darshan
+7:30 AM — Breakfast
+8:30 AM — Gambhira, Siddha Bakul, Haridas Thakur Samadhi
+10:30 AM — Tota Gopinath Temple
+12:00 PM — Mahaprasad at Ananda Bazar
+3:00 PM — ISKCON Puri temple
+4:30 PM — Narendra Sarovar
+6:00 PM — Sunset at Puri Beach
+7:00 PM — Sandhya Aarti
+
+Day 2 — Surroundings:
+6:00 AM — Sunrise at beach, Gundicha Temple
+9:00 AM — Sakshi Gopal Temple
+11:00 AM — Konark Sun Temple
+2:00 PM — Return to Puri, lunch
+4:00 PM — Revisit Jagannath Temple or explore local markets`,
+  dos: `Do's:
+• Dress conservatively for temple visits
+• Accept Mahaprasad with respect — it is non-different from Lord Jagannath
+• Visit Gambhira with a devotional mood
+
+Don'ts:
+• Non-Hindu entry restrictions apply at the main Jagannath Temple — plan accordingly
+• Don't take photos inside Jagannath Temple
+• Avoid beach swimming during monsoon — strong undertows
+• Don't bargain aggressively at Mahaprasad stalls — these are offerings`,
+  bestTime: `Oct–Mar: Pleasant (20–30°C), ideal for visiting
+Jun/Jul: Rath Yatra season — hot and crowded but spiritually ecstatic
+Apr–May: Hot and humid (35–40°C)
+Jul–Sep: Heavy monsoon rains`,
+  contacts: `Jagannath Temple Office: +91-6752-222-002
+ISKCON Puri: +91-6752-231-440
+Puri Railway Station: 139`,
+  devoteeTips: `• If you're not allowed in the main temple, the rooftop of Raghunandan Library opposite the temple offers a view of the Chakra on the shikhara
+• Carry cash — many temple area shops don't accept cards
+• The Mahaprasad from Ananda Bazar is a must-experience — buy extra to bring home
+• Puri pandas (priests) may approach — politely decline if you don't need their services
+• Walk on the Grand Road (Bada Danda) — it's the Rath Yatra route`
+},
+{
+  id:'dwarka', name:'Sri Dwarka Dham', icon:'🏛️',
+  location:'Dwarka, Gujarat, India', tag:'char-dham', tagLabel:'Char Dham',
+  overview: `Dwarka is the legendary kingdom of Lord Krishna, one of the four Char Dhams of India. It is believed that Krishna established this city after leaving Mathura, and it was submerged in the sea after His departure from the world.
+
+The main deity at the Dwarkadhish Temple is Lord Dwarkadhish (Krishna as the King of Dwarka). The temple is an architectural masterpiece, believed to be originally established by Krishna's grandson Vajranabha.
+
+Dwarka sits on the western tip of Gujarat, where the Gomti River meets the Arabian Sea.`,
+  scriptural: `• Srimad Bhagavatam (10th & 11th Canto) describes Krishna's pastimes in Dwarka — His 16,108 queens, Rukmini Swayamvar, Sudama's visit, and the Yadava dynasty's final days.
+• Mahabharata references Dwarka extensively as Krishna's kingdom.
+• Harivamsha Purana describes the construction of Dwarka by Vishwakarma.
+• Marine archaeological surveys have found submerged structures off the Dwarka coast, supporting the ancient descriptions.`,
+  howToReach: `City: Dwarka, Gujarat, India
+Nearest Airport: Jamnagar Airport — ~130 km; Rajkot Airport — ~220 km
+Nearest Railway: Dwarka Railway Station — ~2 km from main temple
+From Ahmedabad: ~8 hours by road or overnight train
+Local Transport: Auto-rickshaws, taxis
+Tip: Overnight trains from Ahmedabad/Rajkot are convenient. Book in advance.`,
+  darshan: `Dwarkadhish Temple:
+• Mangala Aarti: 6:30 AM
+• Darshan: 7:00 AM – 12:30 PM, 5:00 PM – 9:00 PM
+• Sandhya Aarti: 7:30 PM
+
+ISKCON Dwarka Temple also has regular darshan.
+Best time: Early morning right after opening.
+Special: Janmashtami celebrations are grand.`,
+  festivals: `• Janmashtami (Aug/Sep) — Grand celebration
+• Holi — Colorful celebrations
+• Diwali — Festival of lights
+• Shivratri at Nageshwar
+Best time to visit: Oct–Mar (pleasant weather, 20–32°C)`,
+  accommodation: `Temple Trust Guest Houses: Basic, affordable
+ISKCON Dwarka: Guesthouse available
+Hotels: Several options in town (₹500–2500/night)
+Tip: Limited luxury options — Dwarka is a small town. Book ahead in peak season.`,
+  prasadam: `Temple Prasadam: Available at Dwarkadhish temple
+ISKCON Prasadam: Pure sattvik meals
+Local Restaurants: Gujarati thali restaurants are abundant — naturally vegetarian
+Tip: Gujarati food is generally no onion/garlic in traditional preparation.`,
+  seva: `• Dwarkadhish Temple: Various abhishek and archana sevas
+• ISKCON Dwarka: Deity sponsorship, annadan
+Contact temple offices for details.`,
+  keyPlaces: [
+    {name:'Dwarkadhish Temple', desc:'Main temple. Ancient 5-storey structure. Lord Dwarkadhish deity.'},
+    {name:'Bet Dwarka', desc:'Island ~30 km. Believed to be Krishna\'s personal residence. Boat ride from Okha.'},
+    {name:'Rukmini Temple', desc:'~2 km from main temple. Dedicated to Krishna\'s principal queen.'},
+    {name:'Nageshwar Jyotirlinga', desc:'~16 km. One of 12 Jyotirlingas. Important Shiva temple.'},
+    {name:'Gopi Talav', desc:'Sacred lake where the Gopis are said to have come searching for Krishna.'},
+    {name:'Sudama Setu', desc:'Bridge over Gomti river. Named after Krishna\'s friend Sudama.'},
+    {name:'Gomti Ghat', desc:'Where Gomti meets the sea. Sacred bathing spot. Sunset views.'},
+    {name:'ISKCON Dwarka', desc:'Beautiful temple with daily programs.'},
+  ],
+  itinerary: `Day 1 — Dwarka:
+6:30 AM — Mangala Aarti at Dwarkadhish Temple
+8:00 AM — Breakfast, Gomti Ghat bath
+9:30 AM — Rukmini Temple, Gopi Talav
+11:00 AM — ISKCON Dwarka darshan
+12:30 PM — Lunch
+4:00 PM — Sudama Setu, Sunset at Gomti Ghat
+7:30 PM — Sandhya Aarti at Dwarkadhish
+
+Day 2 — Bet Dwarka & Nageshwar:
+6:00 AM — Early start to Okha (~30 km)
+7:00 AM — Boat to Bet Dwarka, temple darshan
+10:00 AM — Return, visit Nageshwar Jyotirlinga
+12:30 PM — Return to Dwarka, lunch
+Afternoon — Free / revisit favourite spots`,
+  dos: `Do's:
+• Dress modestly for all temple visits
+• Take a dip at Gomti Ghat — considered sacred
+• Carry ID for Bet Dwarka boat
+
+Don'ts:
+• Don't litter at the ghats or beaches
+• Don't swim in the sea without local guidance — strong currents
+• Photography restrictions inside main temple`,
+  bestTime: `Oct–Mar: Best weather (20–32°C), clear skies
+Apr–Jun: Very hot (35–42°C), harsh sun
+Jul–Sep: Monsoon — some areas may be inaccessible
+Janmashtami (Aug/Sep) is the best festival to experience here.`,
+  contacts: `Dwarkadhish Temple Trust: +91-2892-234-032
+ISKCON Dwarka: Contact through ISKCON website
+Dwarka Railway Station: 139`,
+  devoteeTips: `• Bet Dwarka boat timing depends on tides — check locally before going
+• Carry sunscreen and a hat — the western coast sun is intense
+• Combine with Somnath (~230 km) if doing a Gujarat pilgrimage
+• Dwarka is small — 2 full days is sufficient
+• The evening aarti at Dwarkadhish with the sea breeze is magical`
+},
+{
+  id:'tirupati', name:'Tirumala Tirupati', icon:'⛰️',
+  location:'Tirupati, Andhra Pradesh, India', tag:'divya-desam', tagLabel:'Divya Desam',
+  overview: `Tirumala Tirupati is the most visited religious site in the world. The presiding deity is Lord Sri Venkateswara (Balaji), a form of Lord Vishnu, standing on the seven hills of Tirumala in the Seshachalam range.
+
+The temple is one of the 108 Divya Desams (holy abodes of Vishnu) praised by the Alvar saints. It attracts 60,000–100,000 pilgrims daily, making it the richest and most visited temple on earth.
+
+The deity is self-manifested (Swayambhu) and is considered extraordinarily merciful — devotees from all traditions visit seeking blessings.`,
+  scriptural: `• Varaha Purana and Brahma Purana describe the glories of Venkatachala (Tirumala hills).
+• The Alvars (Tamil Vaishnava saints) composed hymns glorifying Lord Venkateswara, compiled in the Divya Prabandham.
+• According to tradition, Lord Vishnu took a loan from Kubera to marry Padmavati, and devotees "repay" this by donating — hence the immense wealth.
+• Ramanujacharya, the great Vaishnava acharya, established many worship practices still followed at this temple.
+• Srila Prabhupada visited Tirupati and acknowledged Lord Venkateswara as Lord Vishnu Himself.`,
+  howToReach: `City: Tirupati, Andhra Pradesh, India
+Nearest Airport: Tirupati Airport (Renigunta) — ~15 km from Tirupati city
+Nearest Railway: Tirupati Railway Station — well connected to Chennai, Bangalore, Hyderabad
+From Chennai: ~3 hours by road (NH-48), frequent trains
+From Bangalore: ~5 hours by road
+Tirupati to Tirumala: Free bus service by TTD (~22 km ghat road), or walk up via foot path (~14 km, 3-4 hours)
+Tip: Book darshan online at ttdevasthanams.ap.gov.in well in advance.`,
+  darshan: `Sri Venkateswara Temple:
+• Suprabhatam: 3:00 AM (wake-up hymns)
+• Thomala Seva: 3:30 AM
+• Archana: 4:00 AM onwards
+• General darshan: Throughout the day (queue times vary: 2–12+ hours)
+• Special Entry Darshan (₹300): ~2-3 hour wait
+• VIP Break Darshan: Through TTD advance booking
+• Temple closes briefly: 1:00–2:00 PM (Ekanta Seva)
+
+Best approach: Book ₹300 Special Entry online, arrive early morning.
+Tip: Sarva Darshan (free) can mean 8–15 hour waits on weekends/festivals.`,
+  festivals: `• Brahmotsavam (Sep/Oct) — 9-day grand festival, celestial vahana processions. Most important.
+• Vaikunta Ekadashi (Dec/Jan) — Vaikunta Dwaram opens. Lakhs of devotees. Extremely crowded.
+• Rathasapthami (Jan/Feb) — Surya Jayanti celebrated with great fervor
+• Annual Teppotsavam — Float festival on Swami Pushkarini
+• Ugadi — Telugu New Year
+Best time to visit: Weekdays outside festival season for shorter queues. Brahmotsavam for the ultimate experience.`,
+  accommodation: `TTD Guest Houses: Multiple options on Tirumala hill (book at ttdevasthanams.ap.gov.in)
+TTD Cottages: AC/Non-AC categories available
+Tirupati city hotels: Abundant options near railway station (₹500–3000/night)
+ISKCON Tirupati: Guesthouse available
+Tip: Stay on Tirumala hill if possible. Book TTD accommodation online 2-3 weeks ahead.`,
+  prasadam: `TTD Laddu Prasadam: World-famous! Available after darshan. Additional laddus can be purchased.
+TTD Annaprasadam: Free meals served 24/7 at Matrusri Tarigonda Vengamamba Annaprasadam complex — feeds thousands daily.
+Meals on Tirumala: Several TTD canteens and the Annaprasadam hall
+Tip: The TTD free meal system is extraordinary — no pilgrim goes hungry on Tirumala.`,
+  seva: `TTD offers numerous sevas (book online):
+• Suprabhatam Seva (3:00 AM — most premium)
+• Thomala Seva
+• Archana (various types)
+• Kalyanotsavam (celestial wedding enactment)
+• Unjal Seva (swing festival)
+• Sahasra Deepalankara Seva
+Book at ttdevasthanams.ap.gov.in — slots open 2 weeks to 3 months in advance depending on the seva.`,
+  keyPlaces: [
+    {name:'Sri Venkateswara Temple', desc:'Main temple on Tirumala hill. Self-manifested Lord Venkateswara (Balaji). Dravidian architecture.'},
+    {name:'Swami Pushkarini', desc:'Sacred tank in front of the temple. Bath here before darshan is recommended.'},
+    {name:'Sri Padmavathi Temple (Tiruchanur)', desc:'~5 km from Tirupati. Temple of Lord Venkateswara\'s consort. Visit before going to Tirumala.'},
+    {name:'ISKCON Tirupati', desc:'Beautiful temple with Radha-Govinda deities. Excellent prasadam.'},
+    {name:'Akasha Ganga', desc:'Natural waterfall on Tirumala hills. Considered sacred — water from Lord\'s feet.'},
+    {name:'Japali Teertham', desc:'Cave and water body associated with Ramayana. Peaceful spot on the hills.'},
+    {name:'Silathoranam', desc:'Natural rock arch formation — geological wonder on Tirumala hills.'},
+    {name:'Sri Kalyana Venkateswara Temple (Srinivasa Mangapuram)', desc:'~12 km. Beautiful temple depicting the wedding of the Lord.'},
+    {name:'Kanipakam Vinayaka Temple', desc:'~70 km. Famous self-growing Ganesha idol.'},
+  ],
+  itinerary: `Day 1 — Tirumala:
+3:00 AM — If you have Suprabhatam Seva, report at Supadham
+OR 5:00 AM — Join Special Entry Darshan queue
+After darshan — Collect Laddu Prasadam
+9:00 AM — Breakfast at Annaprasadam hall
+10:00 AM — Swami Pushkarini, Silathoranam walk
+12:00 PM — Lunch at TTD canteen
+3:00 PM — Akasha Ganga, Japali Teertham
+6:00 PM — Evening rest / revisit temple area
+
+Day 2 — Tirupati & Surroundings:
+7:00 AM — Sri Padmavathi Temple, Tiruchanur
+9:00 AM — ISKCON Tirupati
+11:00 AM — Srinivasa Mangapuram
+1:00 PM — Lunch, depart`,
+  dos: `Do's:
+• Book darshan online well in advance — walk-in queues are very long
+• Dress conservatively — men often wear dhoti, women wear sari/churidar
+• Tonsure (head shaving) is a common offering — dedicated kalyanakatta available
+• Keep phones/cameras in lockers — not allowed inside main temple
+
+Don'ts:
+• Don't carry electronics, bags, or food into the temple
+• Don't wear leather items (belts, wallets) inside the temple
+• Don't try to rush through the queue — it's an exercise in patience and devotion
+• Don't skip meals — the free food infrastructure is excellent`,
+  bestTime: `Oct–Feb: Best weather on the hills (15–28°C), pleasant darshan experience
+Mar–May: Hot in Tirupati city but cooler on the hill
+Jun–Sep: Monsoon — hills are green and beautiful but can be slippery
+Weekdays (Tue–Thu): Shortest queues. Avoid Saturdays, Sundays, and public holidays.
+Brahmotsavam (Sep/Oct): Spectacular but extremely crowded.`,
+  contacts: `TTD Information: +91-877-2277-777
+TTD Online Booking: ttdevasthanams.ap.gov.in
+Tirupati Railway: 139
+ISKCON Tirupati: +91-877-2230-009`,
+  devoteeTips: `• The most important tip: BOOK ONLINE. Don't arrive hoping for walk-in darshan.
+• If doing Sarva Darshan (free), come on a weekday, arrive by 2:00 AM
+• The walk up to Tirumala via foot path is a beautiful spiritual experience — carry water
+• Ladies with small children can use the special line
+• Lockers (free) are available at multiple points before the temple entrance
+• Buy laddus at the counter after darshan — you can buy additional boxes
+• The hill breeze in the evening is divine — take a walk around the temple campus`
+},
+{
+  id:'ayodhya', name:'Sri Ayodhya Dham', icon:'🏹',
+  location:'Ayodhya, Uttar Pradesh, India', tag:'iskcon', tagLabel:'Sapta Puri',
+  overview: `Ayodhya is the sacred birthplace of Lord Sri Ramachandra, the seventh avatara of Lord Vishnu. It is one of the seven holiest cities (Sapta Puri) in Hinduism that grant liberation.
+
+The newly constructed Sri Ram Janmabhoomi Temple (consecrated January 2024) marks the exact birthplace of Lord Rama and is now the centerpiece of Ayodhya pilgrimage.
+
+ISKCON has a beautiful temple in Ayodhya dedicated to Sita-Rama-Lakshmana-Hanuman. Ayodhya sits on the banks of the sacred Sarayu River.`,
+  scriptural: `• Valmiki Ramayana describes Ayodhya as the capital of the Ikshvaku dynasty, ruled by Maharaja Dasharatha, where Lord Rama appeared.
+• Srimad Bhagavatam (9th Canto) narrates the dynasty of Lord Rama and glorifies Ayodhya.
+• Skanda Purana describes Ayodhya as one of the Moksha-puris — cities that grant liberation.
+• Sri Chaitanya Mahaprabhu visited Ayodhya during His travels.
+• Tulsidas composed Ramcharitmanas in nearby Varanasi, immortalizing Rama's Ayodhya pastimes in Hindi.
+• The site has been a center of devotion for thousands of years with multiple ancient temples.`,
+  howToReach: `City: Ayodhya, Uttar Pradesh, India
+Nearest Airport: Maharishi Valmiki International Airport, Ayodhya — newly opened, domestic flights
+Nearest Railway: Ayodhya Junction & Ayodhya Dham Junction — well connected
+From Lucknow: ~130 km, ~3 hours by road, frequent trains
+From Varanasi: ~200 km, ~5 hours by road
+Local Transport: Auto-rickshaws, e-rickshaws, cycle rickshaws
+Tip: New airport has made Ayodhya much more accessible. Direct flights from Delhi, Mumbai, and other cities.`,
+  darshan: `Sri Ram Janmabhoomi Temple:
+• Morning darshan: 7:00 AM – 11:30 AM
+• Afternoon: 12:00 PM – 4:00 PM (may vary)
+• Evening: 4:00 PM – 9:00 PM
+(Timings are subject to change — check before visiting)
+
+Hanuman Garhi:
+• Open: 5:00 AM – 10:00 PM
+
+ISKCON Ayodhya:
+• Standard ISKCON darshan timings
+
+Best time: Arrive early morning for peaceful darshan at Ram Janmabhoomi. Expect queues on weekends.`,
+  festivals: `• Ram Navami (Mar/Apr) — Grand celebration of Lord Rama's appearance. Massive gathering.
+• Diwali (Oct/Nov) — Ayodhya's Deepotsav is world-famous — millions of diyas lit along the Sarayu
+• Vivah Panchami (Nov/Dec) — Celebration of Sita-Rama's wedding
+• Parikrama on Purnima days — Circumambulation of Ayodhya
+• Kartik month celebrations
+Best time to visit: Oct–Mar. Diwali Deepotsav is a once-in-a-lifetime experience.`,
+  accommodation: `Temple Trust Dharamshalas: Multiple options at affordable rates
+ISKCON Ayodhya Guesthouse: Clean, prasadam included
+Hotels: Growing number of new hotels (₹500–5000/night)
+Srijanm Bhumi Trust Accommodation: Near the main temple
+Tip: Ayodhya's infrastructure is rapidly improving. New hotels opening regularly. Book ahead for Ram Navami and Diwali.`,
+  prasadam: `Ram Janmabhoomi Prasadam: Available after darshan
+ISKCON Temple: Excellent sattvik meals, no onion/garlic
+Local Restaurants: Many pure vegetarian options along the main roads
+Ayodhya Chaat: Famous street food (pure veg)
+Tip: Most of Ayodhya is vegetarian. The city respects the sanctity of Ram's birthplace.`,
+  seva: `Ram Janmabhoomi Trust:
+• Various seva options — check sriramjanmbhoomi.org
+ISKCON Ayodhya:
+• Deity worship sponsorship, Annadan, book distribution
+• Contact temple for details`,
+  keyPlaces: [
+    {name:'Sri Ram Janmabhoomi Temple', desc:'Newly built grand temple at Lord Rama\'s exact birthplace. Magnificent Nagara-style architecture.'},
+    {name:'Hanuman Garhi', desc:'Fortress-like temple atop a hill. Most visited temple in Ayodhya. Believed Hanuman guards Ayodhya from here.'},
+    {name:'Kanak Bhawan', desc:'Temple gifted to Sita by Kaikeyi. Beautiful Sita-Rama deities adorned with gold ornaments.'},
+    {name:'ISKCON Ayodhya', desc:'Beautiful temple with Sita-Rama-Lakshmana-Hanuman deities.'},
+    {name:'Dashrath Mahal', desc:'Palace of King Dasharatha, Rama\'s father. Ancient temple with historical significance.'},
+    {name:'Sarayu Ghat', desc:'Sacred river. Ram Paidi ghat is the main bathing spot. Beautiful evening aarti.'},
+    {name:'Nageshwarnath Temple', desc:'One of the oldest temples, believed established by Kush (Rama\'s son). Shiva temple.'},
+    {name:'Treta Ke Thakur', desc:'Temple marking the spot where Rama performed Ashwamedha Yajna.'},
+    {name:'Gulab Bari', desc:'Mughal-era garden with beautiful rose gardens and tombs. Historical interest.'},
+  ],
+  itinerary: `Day 1 — Ayodhya:
+6:00 AM — Morning bath at Sarayu Ghat (Ram Paidi)
+7:00 AM — Sri Ram Janmabhoomi Temple darshan
+10:00 AM — Hanuman Garhi
+11:30 AM — Kanak Bhawan, Dashrath Mahal
+1:00 PM — Lunch
+3:00 PM — ISKCON Ayodhya
+5:00 PM — Nageshwarnath Temple, Treta Ke Thakur
+6:30 PM — Evening Sarayu Aarti at the ghat
+8:00 PM — Dinner, rest
+
+Day 2 (Optional):
+7:00 AM — Ayodhya Parikrama (~14 km circumambulation)
+OR visit Naimisharanya (~90 km) — sacred forest where 60,000 sages heard the Puranas`,
+  dos: `Do's:
+• Take a dip in the Sarayu River — considered purifying
+• Visit Ram Janmabhoomi with a devotional mood
+• Dress modestly and respectfully
+• Walk barefoot in the temple area if possible
+
+Don'ts:
+• No non-vegetarian food — most of Ayodhya is strictly vegetarian
+• Don't carry large bags to Ram Janmabhoomi — security is strict
+• Photography may be restricted inside the main temple
+• Don't litter at the ghats`,
+  bestTime: `Oct–Mar: Ideal weather (10–28°C). Diwali (Oct/Nov) is extraordinary.
+Ram Navami (Mar/Apr): Hot but the festival experience is unparalleled.
+Apr–Jun: Very hot (40–45°C). Avoid unless necessary.
+Jul–Sep: Monsoon — Sarayu can flood. Avoid.`,
+  contacts: `Ram Janmabhoomi Trust: sriramjanmbhoomi.org
+ISKCON Ayodhya: Contact through ISKCON website
+Ayodhya Railway Station: 139
+Airport: Maharishi Valmiki International Airport`,
+  devoteeTips: `• The new Ram Mandir is magnificent — allow at least 2 hours for the full experience
+• Ayodhya infrastructure is rapidly developing — expect changes in facilities and roads
+• Carry cash — digital payments still limited in some areas
+• The Deepotsav during Diwali is now a state-organized mega event — book accommodation months ahead
+• Walking between temples is feasible — most are within 3 km radius
+• Evening Sarayu Aarti is not to be missed — similar to Varanasi's Ganga Aarti but more intimate`
+},
+{
+  id:'badrinath', name:'Sri Badrinath Dham', icon:'🏔️',
+  location:'Chamoli, Uttarakhand, India', tag:'char-dham', tagLabel:'Char Dham',
+  overview: `Badrinath is one of the four sacred Char Dhams, situated at an altitude of 3,133 meters in the Himalayas. The presiding deity is Lord Badrinarayana (Vishnu) in a meditative posture, along with Nara-Narayana.
+
+The temple is nestled between the Nar and Narayana mountain ranges, on the banks of the Alaknanda River. It is believed that Lord Vishnu meditated here under a Badri (jujube) tree for the welfare of mankind.
+
+The temple is one of the 108 Divya Desams and is open only for approximately 6 months (May–November) due to extreme Himalayan winter conditions.`,
+  scriptural: `• Srimad Bhagavatam describes Nara-Narayana Rishi performing austerities at Badrikashram.
+• Mahabharata mentions Badrinath as a sacred pilgrimage site visited by the Pandavas.
+• Vishnu Purana describes it as the holiest of all pilgrimage sites.
+• Adi Shankaracharya is credited with establishing the present temple structure in the 8th century.
+• The Alvars and Ramanujacharya recognized Badrinath as a primary Divya Desam.
+• According to tradition, Lord Vishnu will eventually be worshipped at Badrinath as the only surviving temple in Kali Yuga.`,
+  howToReach: `City: Badrinath, District Chamoli, Uttarakhand, India
+Nearest Airport: Jolly Grant Airport, Dehradun — ~315 km
+Nearest Railway: Rishikesh Railway Station — ~295 km; Haridwar — ~320 km
+From Rishikesh: ~10-12 hours by road via Devprayag, Joshimath
+Helicopter: Available from Dehradun/Phata (seasonal)
+Route: Rishikesh → Devprayag → Rudraprayag → Joshimath → Badrinath
+Tip: The road journey through the Himalayas is beautiful but challenging. Start very early. Landslides are common in monsoon.`,
+  darshan: `Badrinath Temple:
+• Mahabhishek Puja: 4:30 AM
+• General Darshan: 7:00 AM – 1:00 PM, 4:00 PM – 9:00 PM
+• Gita Path: 6:15 AM
+• Sandhya Aarti: 7:30 PM (with beautiful lamps)
+
+Opening ceremony: Akshaya Tritiya (Apr/May) — Kapaat (doors) open with grand celebration
+Closing ceremony: Vijayadashami to Diwali period (Oct/Nov) — Kapaat close for winter
+
+Best darshan: Early morning immediately after doors open.`,
+  festivals: `• Kapaat Opening (Apr/May) — Grand ceremony when temple reopens for the season
+• Mata Murti Ka Mela (Sep) — Celebrates the mother of Nara-Narayana
+• Badri-Kedar Utsav (Jun) — Cultural festival
+• Kapaat Closing (Oct/Nov) — Emotional ceremony, deity is shifted to Joshimath for winter
+Best time to visit: May–Jun and Sep–Oct (pleasant weather, fewer landslides than monsoon).`,
+  accommodation: `GMVN Guest House: Government run, reliable
+Temple Committee Rest Houses: Basic, affordable
+Hotels in Badrinath: Multiple options (₹500–3000/night) — limited compared to city hotels
+Joshimath: More options, 45 km before Badrinath, can be a base
+Tip: Book in advance during peak season (May–Jun). Options are limited in this small Himalayan town.`,
+  prasadam: `Temple Prasadam: Available after darshan
+Free community kitchens (Bhandaras): Operated by various trusts during season
+Local Restaurants: Simple North Indian vegetarian fare
+Note: At 3,133m altitude, food options are basic but adequate. Most serve pure veg.
+Tip: Carry some snacks and dry fruits from lower altitudes — variety is limited in Badrinath.`,
+  seva: `• Mahabhishek Puja (early morning)
+• Abhishek with milk, curd, honey
+• Various archana options
+• Temple trust donations
+Contact Badrinath Temple Committee for details.`,
+  keyPlaces: [
+    {name:'Badrinath Temple', desc:'Main temple. Lord Badrinarayana (Vishnu) in padmasana. One of the Char Dhams.'},
+    {name:'Tapt Kund', desc:'Natural hot water spring right next to the temple. Bathe here before darshan — believed to be medicinal.'},
+    {name:'Neelkanth Peak', desc:'Stunning 6,597m peak visible from Badrinath. Considered the abode of Lord Shiva.'},
+    {name:'Mana Village', desc:'Last Indian village before the Tibet border (~3 km). Vyasa Cave where Mahabharata was written.'},
+    {name:'Vasudhara Falls', desc:'~9 km trek from Mana. Magnificent 122m waterfall. Legend says water doesn\'t fall on sinners.'},
+    {name:'Bheem Pul', desc:'Natural rock bridge in Mana. Legend says Bhima placed it for Draupadi to cross.'},
+    {name:'Charan Paduka', desc:'~3 km trek. Rock bearing Lord Vishnu\'s footprints. Beautiful viewpoint.'},
+    {name:'Joshimath', desc:'~45 km. Winter seat of Lord Badrinath. Adi Shankaracharya\'s math. Gateway to Badrinath.'},
+  ],
+  itinerary: `Day 1 — Badrinath:
+5:00 AM — Tapt Kund hot spring bath
+6:30 AM — Queue for morning darshan
+8:30 AM — Breakfast
+9:30 AM — Mana Village, Vyasa Cave, Bheem Pul
+12:00 PM — Lunch
+2:00 PM — Charan Paduka trek
+4:30 PM — Return, evening darshan
+7:30 PM — Sandhya Aarti (mesmerizing with lamp ceremony)
+8:30 PM — Dinner, rest
+
+Day 2 — Extended (if time permits):
+6:00 AM — Vasudhara Falls trek (full day, ~18 km return)
+OR drive to Joshimath — visit Shankaracharya Math, Narasimha Temple`,
+  dos: `Do's:
+• Bathe at Tapt Kund before darshan — it's tradition and the hot water is wonderful in the cold
+• Carry warm clothing — temperatures drop sharply, especially evenings (5–15°C even in summer)
+• Acclimatize properly — altitude sickness is possible
+• Visit Mana Village — the last village of India, fascinating experience
+
+Don'ts:
+• Don't attempt the journey during heavy monsoon (Jul–Aug) — landslide risk
+• Don't trek alone to remote spots without informing someone
+• Don't underestimate the altitude and cold
+• Don't litter — this is a fragile Himalayan ecosystem`,
+  bestTime: `Temple open only May–Nov (approximately).
+May–Jun: Best period. Roads clear, weather pleasant (10–18°C), wildflowers.
+Jul–Aug: Monsoon — landslides, road closures common. Risky.
+Sep–Oct: Excellent. Clear skies, stunning views, fewer crowds.
+Nov: Temple closing period — cold setting in.`,
+  contacts: `Badrinath Temple Committee: +91-1381-222-024
+GMVN Badrinath: +91-1381-222-012
+Joshimath GMVN: +91-1389-222-118
+Uttarakhand Tourism: 1364`,
+  devoteeTips: `• Carry Diamox or consult a doctor about altitude sickness medication
+• The Tapt Kund bath at dawn with snow peaks visible is a transcendent experience
+• Road conditions change daily — check with locals before starting the drive
+• If prone to motion sickness, take medication — the road has countless hairpin bends
+• Carry a rain jacket even in summer — mountain weather is unpredictable
+• The evening aarti with oil lamps against the Himalayan backdrop is unforgettable
+• If doing the full Char Dham Yatra (Yamunotri, Gangotri, Kedarnath, Badrinath), allow 10-12 days minimum`
+},
+{
+  id:'rameswaram', name:'Sri Rameswaram Dham', icon:'🌊',
+  location:'Ramanathapuram, Tamil Nadu, India', tag:'char-dham', tagLabel:'Char Dham',
+  overview: `Rameswaram is one of the four sacred Char Dhams, located on Pamban Island in the Gulf of Mannar. It is where Lord Ramachandra established and worshipped a Shiva Linga before crossing to Lanka to rescue Sita Devi.
+
+The Ramanathaswamy Temple houses the longest corridor among all Hindu temples in India. The island is connected to mainland India by the Pamban Bridge.
+
+Though primarily a Shiva Kshetra, it is deeply connected to Lord Rama's pastimes and is therefore supremely sacred for Vaishnavas as well — Lord Rama Himself established worship here.`,
+  scriptural: `• Valmiki Ramayana describes Lord Rama worshipping Lord Shiva here before building the bridge (Setu) to Lanka.
+• Srimad Bhagavatam references Setubandha Rameswaram as a sacred tirtha.
+• Skanda Purana extensively glorifies Rameswaram.
+• The Ramayana states that Rama installed two lingas — one brought by Sita (Ramalingam) and one made by Hanuman.
+• It is said that visiting Rameswaram and bathing in its 22 sacred wells (theerthams) inside the temple absolves all sins.
+• Adi Shankaracharya established a Shankara math here.`,
+  howToReach: `City: Rameswaram, District Ramanathapuram, Tamil Nadu, India
+Nearest Airport: Madurai Airport — ~175 km
+Nearest Railway: Rameswaram Railway Station — ~1 km from main temple
+From Madurai: ~4 hours by road, direct trains available
+From Chennai: ~10 hours by road, overnight train
+The Pamban Bridge (road + rail) connecting the island to mainland is an engineering marvel.
+Tip: The train ride across Pamban Bridge is spectacular — sit by the window!`,
+  darshan: `Ramanathaswamy Temple:
+• Opens: 5:00 AM
+• Morning Darshan: 5:00 AM – 1:00 PM
+• Evening Darshan: 3:00 PM – 9:00 PM
+• Special pujas and abhishekams throughout the day
+
+22 Theerthams (sacred wells): Devotees bathe in all 22 wells inside the temple corridor for purification. Temple workers draw water from each well and pour it on devotees.
+
+Best darshan: Early morning (5:00–7:00 AM), after completing the theertham bath.`,
+  festivals: `• Maha Shivaratri (Feb/Mar) — Grand celebrations
+• Ram Navami (Mar/Apr) — Lord Rama's appearance celebrated with great devotion
+• Arudra Darshan (Dec/Jan) — Special Shiva worship
+• Thirukalyanam (Jul) — Celestial wedding ceremony
+• Navarathri (Sep/Oct) — Nine nights of celebration
+Best time to visit: Oct–Apr (pleasant coastal weather).`,
+  accommodation: `Temple Trust Guest Houses: Basic, affordable, near the temple
+Hotels: Multiple options on the island (₹400–2500/night)
+TTDC Hotel Tamil Nadu: Government hotel, decent
+Tip: Rameswaram is a small island — most accommodation is within walking distance of the temple. Book ahead during Shivaratri and Ram Navami.`,
+  prasadam: `Temple Prasadam: Available at Ramanathaswamy Temple
+Annadanam: Free meals served at various mandapams near the temple
+Local Restaurants: South Indian vegetarian fare — idli, dosa, rice meals
+Fresh seafood is available but not recommended for devotees seeking sattvik food.
+Tip: Stick to the pure veg restaurants near the temple area.`,
+  seva: `• Abhishekam to the main deity
+• Archana (various types)
+• Special pujas on auspicious days
+• Anna danam (food distribution)
+Contact the temple trust office near the main entrance.`,
+  keyPlaces: [
+    {name:'Ramanathaswamy Temple', desc:'Main temple with the longest corridor in India (1,220m). 22 sacred wells. Ancient Dravidian architecture.'},
+    {name:'22 Theerthams', desc:'Sacred wells inside the temple. Bathing in all 22 grants complete purification.'},
+    {name:'Gandhamadhana Parvatham', desc:'Small hillock — highest point on the island. Believed to have Rama\'s footprints. Panoramic views.'},
+    {name:'Dhanushkodi', desc:'~18 km. Ghost town at the tip of the island, destroyed by 1964 cyclone. Where Adam\'s Bridge starts.'},
+    {name:'Adam\'s Bridge (Ram Setu)', desc:'Chain of limestone shoals connecting India to Sri Lanka. Visible from Dhanushkodi. Believed to be Rama\'s bridge.'},
+    {name:'Agni Theertham', desc:'Sacred beach next to the temple. Devotees bathe here before temple darshan.'},
+    {name:'Pamban Bridge', desc:'Cantilever bridge connecting island to mainland. Engineering marvel. Beautiful views.'},
+    {name:'Kothandaramaswamy Temple', desc:'~12 km. Temple where Vibhishana surrendered to Lord Rama. Survived the 1964 cyclone.'},
+    {name:'Five-faced Hanuman Temple (Panchmukhi)', desc:'Floating stone from Ram Setu is worshipped here alongside five-faced Hanuman.'},
+  ],
+  itinerary: `Day 1 — Rameswaram:
+5:00 AM — Agni Theertham bath (sea bath at dawn)
+5:30 AM — 22 Theerthams bath inside temple
+7:30 AM — Main deity darshan at Ramanathaswamy Temple
+9:00 AM — Breakfast
+10:00 AM — Gandhamadhana Parvatham
+11:00 AM — Panchmukhi Hanuman Temple
+12:30 PM — Lunch
+3:00 PM — Drive to Dhanushkodi, see Adam\'s Bridge point
+5:30 PM — Kothandaramaswamy Temple
+7:00 PM — Evening darshan at main temple
+8:30 PM — Dinner
+
+Day 2 (If time):
+6:00 AM — Revisit temple for peaceful morning darshan
+8:00 AM — Explore Pamban town, local markets
+10:00 AM — Depart`,
+  dos: `Do's:
+• Bathe at Agni Theertham before temple entry — it's tradition
+• Complete all 22 theerthams — carry a change of dry clothes
+• Visit Dhanushkodi — the landscape is surreal and deeply connected to the Ramayana
+• Wear clothes that can get wet for the theertham bath
+
+Don'ts:
+• Don't skip the 22 theerthams bath — it's the unique offering of this Dham
+• Don't swim deep at Agni Theertham — currents can be strong
+• Don't take vehicles beyond the permitted point at Dhanushkodi
+• Don't visit during cyclone warnings (Nov–Dec occasionally)`,
+  bestTime: `Oct–Apr: Best weather (25–35°C), sea is calm
+May–Jul: Hot and humid (35–40°C) but manageable
+Nov–Dec: Cyclone season — check weather before travel
+The island has a tropical coastal climate — expect warm weather year-round.`,
+  contacts: `Ramanathaswamy Temple Office: +91-4573-221-223
+TTDC: +91-4573-221-373
+Rameswaram Railway: 139`,
+  devoteeTips: `• The 22 theerthams bath takes about 1.5–2 hours — be prepared to be drenched in cold well water
+• Carry 2 sets of spare clothes — you'll need them after the theerthams
+• The Dhanushkodi trip is best done by shared auto — road ends midway, you walk the rest
+• Early morning at Agni Theertham with the sunrise is magical
+• The temple corridors are the longest in India — walk slowly and take in the architecture
+• If you can see Adam\'s Bridge on a clear day from Dhanushkodi, it\'s a deeply moving experience
+• The wind at Dhanushkodi can be intense — hold onto hats and loose items`
+},
+{
+  id:'udupi', name:'Sri Udupi Krishna', icon:'🪈',
+  location:'Udupi, Karnataka, India', tag:'divya-desam', tagLabel:'Madhva Heritage',
+  overview: `Udupi is home to the famous Sri Krishna Matha (monastery), established by the great Vaishnava acharya Sri Madhvacharya in the 13th century. The presiding deity is Lord Krishna as a small child (Bala Krishna), holding a churning rod.
+
+The unique Kanakana Kindi (small window) through which devotees take darshan is famous — it originates from the story of the devotee Kanakadasa who, being denied entry, prayed from behind the temple, and the wall broke open so he could see Krishna.
+
+Udupi represents the Dvaita (dualistic) Vaishnava tradition and has been a center of Vedantic scholarship for over 700 years.`,
+  scriptural: `• Madhvacharya (1238–1317 CE) founded the Krishna temple and the Ashta Mathas (eight monasteries) system.
+• The deity was found by Madhvacharya in a ball of gopichandana (sacred clay) that arrived on a ship.
+• The Paryaya system — where the headship of the temple rotates among 8 mathas every 2 years — has been followed for over 700 years.
+• Madhvacharya's commentaries on Brahma Sutras, Bhagavad Gita, and Bhagavatam established the Dvaita school of Vedanta.
+• Vadiraja Tirtha, Vyasatirtha, and other great Madhva saints enriched the tradition from Udupi.
+• ISKCON's philosophy shares significant common ground with Madhva's Dvaita tradition — Srila Prabhupada acknowledged Madhva in our sampradaya lineage (Brahma-Madhva-Gaudiya).`,
+  howToReach: `City: Udupi, Karnataka, India
+Nearest Airport: Mangalore International Airport — ~60 km
+Nearest Railway: Udupi Railway Station — ~4 km from Krishna Matha
+From Bangalore: ~8 hours by road, overnight bus or train
+From Mangalore: ~1.5 hours by road, local trains available
+Local Transport: Auto-rickshaws, city buses
+Tip: Udupi is well connected by the Konkan Railway. The coastal route from Goa/Mumbai is scenic.`,
+  darshan: `Sri Krishna Matha:
+• Mangala Pooja: 5:30 AM
+• Morning Darshan: 6:00 AM – 1:00 PM
+• Madhyahna Pooja: 12:00 PM
+• Chamara Seva: 12:30 PM
+• Evening Darshan: 4:00 PM – 8:30 PM
+• Maha Pooja: 7:30 PM
+• Ratri Pooja: 8:30 PM
+
+Darshan through the Kanakana Kindi (window) is the traditional and special way.
+Best time: Early morning (6:00–7:30 AM) or during Maha Pooja.`,
+  festivals: `• Paryaya Festival (even years, January) — Grand ceremony of peethadhipathi (head priest) transfer. Once in 2 years. Massive.
+• Krishna Janmashtami (Aug/Sep) — Grand celebration with Utsava murthy procession
+• Madhva Navami (Jan/Feb) — Disappearance of Sri Madhvacharya
+• Ratha Yatra — Annual chariot festival
+• Makara Sankranti — Harvest festival with special pujas
+Best time to visit: Oct–Mar. Paryaya year (next: Jan 2028) is extraordinary.`,
+  accommodation: `Matha Guest Houses: Each of the 8 mathas runs guest houses — very affordable, includes meals
+Hotels in Udupi: Multiple options (₹500–3000/night)
+Malpe Beach Resorts: ~6 km, beach-side options for a relaxed stay
+Tip: Staying at a matha guest house gives the most authentic experience — wake up to temple bells and receive prasadam meals.`,
+  prasadam: `Krishna Matha Free Meals: All 8 mathas serve free meals daily to thousands. The Damodar Matha and other mathas rotate kitchen duty.
+Udupi Cuisine: World famous! The entire "Udupi restaurant" concept originated here. Dosa, idli, sambar — all sattvik.
+Mitra Samaj: Famous local restaurant
+Woodlands: Traditional Udupi meals
+Tip: Udupi IS the origin of South Indian vegetarian cuisine. Every meal here is an experience. No onion/garlic in traditional matha food.`,
+  seva: `• Abhisheka to Bala Krishna
+• Anna Daana (food offering sponsorship)
+• Tulabhara (weighing against grains/flowers as offering)
+• Special pujas on festival days
+Contact the current Paryaya Matha office.`,
+  keyPlaces: [
+    {name:'Sri Krishna Matha', desc:'Main temple. Bala Krishna deity discovered by Madhvacharya. Kanakana Kindi darshan.'},
+    {name:'Ashta Mathas', desc:'Eight monasteries around the temple established by Madhva\'s direct disciples. Each takes turns managing the temple.'},
+    {name:'Madhva Sarovara', desc:'Sacred tank where Madhvacharya is said to have manifested the Krishna deity from gopichandana clay.'},
+    {name:'Anantheshwara Temple', desc:'Ancient temple predating Krishna Matha. Lord Shiva. Madhvacharya studied here as a child.'},
+    {name:'Chandramouleshwara Temple', desc:'Where Madhvacharya took sannyasa. Ancient and serene.'},
+    {name:'Malpe Beach', desc:'~6 km. Beautiful beach. Boat to St. Mary\'s Island (basalt rock columns — geological wonder).'},
+    {name:'Manipal', desc:'~5 km. University town with museums, planetarium, and the Manipal End Point viewpoint.'},
+    {name:'Pajaka Kshetra', desc:'~10 km. Birthplace of Sri Madhvacharya. Small temple and house marking the spot.'},
+  ],
+  itinerary: `Day 1 — Udupi:
+5:30 AM — Morning pooja at Krishna Matha
+7:00 AM — Breakfast prasadam at one of the mathas
+8:30 AM — Visit all Ashta Mathas (walking tour around the temple)
+10:00 AM — Anantheshwara Temple, Chandramouleshwara Temple
+11:30 AM — Madhva Sarovara
+12:00 PM — Lunch at matha (free prasadam)
+3:00 PM — Malpe Beach, boat to St. Mary's Island (if time)
+6:00 PM — Return for Maha Pooja (7:30 PM)
+8:30 PM — Dinner at a traditional Udupi restaurant
+
+Day 2 — Surroundings:
+7:00 AM — Pajaka Kshetra (Madhvacharya's birthplace)
+10:00 AM — Manipal (museum, viewpoint)
+12:00 PM — Lunch, depart or explore local markets`,
+  dos: `Do's:
+• Take darshan through Kanakana Kindi — it's the hallmark experience of Udupi
+• Eat at a matha guest house — the free prasadam tradition is 700+ years old
+• Learn about the Paryaya system — it's a unique democratic institution in Hinduism
+• Try the famous Udupi dosa — this is where it originated!
+
+Don'ts:
+• Don't wear shorts or sleeveless tops in the temple area
+• Don't skip the matha meals — they are simple, delicious, and sacred
+• Don't visit Malpe Beach during monsoon — rough seas
+• Don't confuse Udupi restaurants outside with the authentic matha food — the original is much simpler and purer`,
+  bestTime: `Oct–Mar: Ideal weather (22–33°C), pleasant coastal climate
+Apr–May: Warm but manageable
+Jun–Sep: Heavy monsoon — very rainy but the landscape is lush green
+Paryaya years (even years, January) offer the grandest celebrations.`,
+  contacts: `Sri Krishna Matha: +91-820-252-1422
+Udupi Tourism: udupi.nic.in
+Railway Station: 139`,
+  devoteeTips: `• The matha guest houses are the best-kept secret — ₹100–300/night with meals included
+• If visiting during Paryaya, book months ahead and prepare for massive crowds
+• The Kanakana Kindi darshan at 5:30 AM with the oil lamp is hauntingly beautiful
+• Udupi is compact — everything is walkable within 2–3 km
+• Buy sandalwood products and traditional bronze items from local shops
+• St. Mary's Island boat trip is worth it if weather permits — unique geological formations
+• Madhvacharya is in our Brahma-Madhva-Gaudiya sampradaya — this is our heritage too!`
+}
+];
+
+// User/admin can add custom dhamas
+let customDhamas = JSON.parse(localStorage.getItem('customDhamas') || '[]');
+function getAllDhamas() {
+  const customIds = new Set(customDhamas.map(d => d.id));
+  // Built-in dhamas, with custom overrides applied
+  const builtIn = DHAMAS.map(d => {
+    const override = customDhamas.find(c => c.id === d.id);
+    return override ? { ...d, ...override } : d;
+  });
+  // Custom-only dhamas (not overriding built-in)
+  const customOnly = customDhamas.filter(d => !DHAMAS.find(b => b.id === d.id));
+  return [...builtIn, ...customOnly];
+}
+
+function renderDhamas(filter) {
+  const q = (filter !== undefined ? filter : document.getElementById('dhamSearchInp')?.value || '').trim().toLowerCase();
+  const all = getAllDhamas();
+  const pool = q ? all.filter(d =>
+    d.name.toLowerCase().includes(q) ||
+    d.location.toLowerCase().includes(q) ||
+    (d.tagLabel||'').toLowerCase().includes(q)
+  ) : all;
+
+  const grid = document.getElementById('dhamasGrid');
+  if (!pool.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 16px;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">🛕</div>
+      <div style="font-size:0.85rem;color:var(--text3);">${q ? 'No dhamas match "'+q+'"' : 'No dhamas added yet.'}</div>
+    </div>`;
+    return;
+  }
+
+  const admin = hasPermission('dhamas');
+  grid.innerHTML = pool.map(d => {
+    const isCustom = d.id.startsWith('custom_');
+    const delBtn = admin && isCustom
+      ? `<button class="dham-card-del" onclick="event.stopPropagation();deleteCustomDham('${d.id}')" title="Delete">✕</button>`
+      : '';
+    return `<div class="dham-card" onclick="openDhamDetail('${d.id}')">
+      ${delBtn}
+      <div class="dham-card-img">${d.icon || '🛕'}</div>
+      <div class="dham-card-body">
+        <div class="dham-card-name">${d.name}</div>
+        <div class="dham-card-loc">📍 ${d.location}</div>
+        ${d.tag ? `<span class="dham-card-tag ${d.tag}">${d.tagLabel || d.tag}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  updateDhamAdminUI();
+}
+
+async function deleteCustomDham(id) {
+  if (!hasPermission('dhamas')) return;
+  if (!(await bsConfirm('Delete this Dham?'))) return;
+  customDhamas = customDhamas.filter(d => d.id !== id);
+  localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+  renderDhamas();
+  showToast('Dham deleted');
+}
+
+let _dhamDetailPrevScreen = 'dhamas';
+let _currentDhamId = null;
+
+// Rich text formatter for dham content
+function _fmtDhamText(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+  let inPara = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Empty line = paragraph break
+    if (!trimmed) {
+      if (inPara) { html += '</div>'; inPara = false; }
+      continue;
+    }
+
+    // Bullet point line (• or -)
+    if (/^[•\-]\s/.test(trimmed)) {
+      if (inPara) { html += '</div>'; inPara = false; }
+      const bulletText = trimmed.replace(/^[•\-]\s*/, '');
+      html += `<div class="dham-bullet"><span>${_fmtInline(bulletText)}</span></div>`;
+      continue;
+    }
+
+    // Time pattern: "6:00 AM — Activity" or "• Mangala Aarti: 4:30 AM"
+    const timeMatch = trimmed.match(/^(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*[—–\-]\s*(.+)/i);
+    if (timeMatch) {
+      if (inPara) { html += '</div>'; inPara = false; }
+      html += `<div class="dham-time-line"><span class="dham-time-badge">${timeMatch[1]}</span><span class="dham-time-desc">${_fmtInline(timeMatch[2])}</span></div>`;
+      continue;
+    }
+
+    // "Tip:" line
+    if (/^Tip:/i.test(trimmed)) {
+      if (inPara) { html += '</div>'; inPara = false; }
+      html += `<div class="dham-tip-box">💡 ${_fmtInline(trimmed)}</div>`;
+      continue;
+    }
+
+    // Section subheader (line ending with : and next line is not empty)
+    if (/^[A-Z].*:$/.test(trimmed) && trimmed.length < 60) {
+      if (inPara) { html += '</div>'; inPara = false; }
+      html += `<div style="font-weight:700;color:var(--text);font-size:0.84rem;margin-top:10px;margin-bottom:4px;">${_fmtInline(trimmed)}</div>`;
+      continue;
+    }
+
+    // Regular paragraph text
+    if (!inPara) {
+      html += '<div class="dham-para">';
+      inPara = true;
+    } else {
+      html += '\n';
+    }
+    html += _fmtInline(trimmed);
+  }
+  if (inPara) html += '</div>';
+  return html;
+}
+
+// Inline formatting helper
+function _fmtInline(text) {
+  // Bold **text** or terms before colons in info lines
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/((?:City|Nearest Airport|Nearest Railway|From \w+|Local Transport|Website|Temple open|Note|Do'?s|Don'?ts):\s*)/g, '<span class="dham-info-label">$1</span>');
+}
+
+function openDhamDetail(id) {
+  const d = getAllDhamas().find(x => x.id === id);
+  if (!d) return;
+  _currentDhamId = id;
+  document.getElementById('dhamDetailTitle').textContent = d.name;
+  const editBtn = document.getElementById('dhamDetailEditBtn');
+  if (editBtn) editBtn.style.display = hasPermission('dhamas') ? 'flex' : 'none';
+
+  const sections = [
+    { icon:'🕉️', title:'Overview',                          accent:'purple', content: d.overview, open:true },
+    { icon:'📖', title:'Scriptural & Historical Significance',accent:'gold',   content: d.scriptural },
+    { icon:'🗺️', title:'Location & How to Reach',            accent:'blue',   content: d.howToReach },
+    { icon:'🙏', title:'Temple Timings & Darshan',            accent:'green',  content: d.darshan },
+    { icon:'🎪', title:'Festivals & Special Days',            accent:'orange', content: d.festivals },
+    { icon:'🏨', title:'Accommodation',                       accent:'teal',   content: d.accommodation },
+    { icon:'🍚', title:'Prasadam & Food',                     accent:'gold',   content: d.prasadam },
+    { icon:'💐', title:'Seva & Donations',                    accent:'rose',   content: d.seva },
+    { icon:'📍', title:'Key Places to Visit',                 accent:'purple', content: null, places: d.keyPlaces },
+    { icon:'📋', title:'Suggested Itinerary',                 accent:'blue',   content: d.itinerary },
+    { icon:'✅', title:"Do's & Don'ts",                       accent:'green',  content: d.dos },
+    { icon:'🌤️', title:'Best Time to Visit',                  accent:'orange', content: d.bestTime },
+    { icon:'📞', title:'Important Contacts',                  accent:'teal',   content: d.contacts },
+    { icon:'💡', title:'Devotee Tips',                        accent:'gold',   content: d.devoteeTips },
+  ];
+
+  let html = `<div class="dham-hero">
+    <div class="dham-hero-icon">${d.icon || '🛕'}</div>
+    <div class="dham-hero-name">${d.name}</div>
+    <div class="dham-hero-loc">📍 ${d.location}</div>
+  </div>
+  <div class="dham-sections-wrap">`;
+
+  sections.forEach((sec, idx) => {
+    if (!sec.content && !sec.places) return;
+    const openCls = sec.open ? ' open' : '';
+    html += `<div class="dham-section${openCls}" data-accent="${sec.accent}">
+      <div class="dham-section-hdr" onclick="this.parentElement.classList.toggle('open')">
+        <div class="dham-section-icon">${sec.icon}</div>
+        <div class="dham-section-title">${sec.title}</div>
+        <div class="dham-section-chevron">▼</div>
+      </div>
+      <div class="dham-section-body">`;
+
+    if (sec.places && sec.places.length) {
+      html += sec.places.map((p,i) => `
+        <div class="dham-place-item">
+          <div class="dham-place-num">${i+1}</div>
+          <div class="dham-place-text"><strong>${p.name}</strong>${p.desc}</div>
+        </div>`).join('');
+    } else if (sec.content) {
+      if (sec.title.includes('Itinerary')) {
+        const days = sec.content.split(/(?=Day \d)/);
+        html += days.map(day => {
+          const lines = day.trim().split('\n');
+          const label = lines[0];
+          const body = lines.slice(1).join('\n').trim();
+          return `<div class="dham-itinerary-day">
+            <div class="dham-itinerary-label">${label}</div>
+            <div>${_fmtDhamText(body)}</div>
+          </div>`;
+        }).join('');
+      } else {
+        html += `<div>${_fmtDhamText(sec.content)}</div>`;
+      }
+    }
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+
+  document.getElementById('dhamDetailBody').innerHTML = html;
+
+  const currentScreen = document.querySelector('.screen.active')?.id?.replace('screen-','') || 'dhamas';
+  if (currentScreen !== 'dham-detail') {
+    _dhamDetailPrevScreen = currentScreen;
+  }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const ddEl = document.getElementById('screen-dham-detail');
+  ddEl.classList.add('active','scrn-anim-slidedown');
+  document.getElementById('headerDate').textContent = d.name;
+  document.getElementById('headerMasa').style.display = 'none';
+  document.getElementById('headerIcons').style.display = 'none';
+  document.getElementById('dhamDetailBody').scrollTop = 0;
+}
+
+function closeDhamDetail() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','scrn-anim-slidedown','scrn-anim-zoomin','scrn-anim-circleexpand','scrn-anim-blur','scrn-anim-combo'));
+  const prevEl = document.getElementById('screen-' + _dhamDetailPrevScreen);
+  prevEl.classList.add('active','scrn-anim-slidedown');
+  if (_dhamDetailPrevScreen === 'dhamas') {
+    document.getElementById('headerDate').textContent = 'Holy Dhamas';
+    document.getElementById('headerMasa').style.display = 'none';
+  }
+}
+
+// ===== ADMIN: ADD DHAM =====
+function openAddDham() {
+  if (!hasPermission('dhamas')) { showToast('Dhamas admin access required'); return; }
+  _editingDhamId = null;
+  // Clear form
+  ['dhamFName','dhamFLoc','dhamFIcon','dhamFOverview','dhamFScript','dhamFReach',
+   'dhamFDarshan','dhamFFest','dhamFAccom','dhamFFood','dhamFSeva','dhamFPlaces',
+   'dhamFItin','dhamFDos','dhamFBest','dhamFContacts','dhamFTips'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('dhamFTag').value = '';
+  const modalTitle = document.querySelector('#addDhamModal .modal-title');
+  if (modalTitle) modalTitle.textContent = '🛕 Add New Dham';
+  document.getElementById('addDhamModal').classList.add('open');
+}
+
+function saveNewDham() {
+  if (!hasPermission('dhamas')) return;
+  const name = document.getElementById('dhamFName').value.trim();
+  const loc  = document.getElementById('dhamFLoc').value.trim();
+  const overview = document.getElementById('dhamFOverview').value.trim();
+  if (!name || !loc || !overview) { showToast('Name, Location, and Overview are required'); return; }
+
+  const tagVal = document.getElementById('dhamFTag').value;
+  const TAG_LABELS = {'char-dham':'Char Dham','divya-desam':'Divya Desam','iskcon':'ISKCON','shakti-peetha':'Shakti Peetha'};
+
+  // Parse key places
+  const placesRaw = document.getElementById('dhamFPlaces').value.trim();
+  const keyPlaces = placesRaw ? placesRaw.split('\n').filter(l=>l.trim()).map(line => {
+    const parts = line.split('|');
+    return { name: (parts[0]||'').trim(), desc: (parts[1]||'').trim() };
+  }) : [];
+
+  const dhamData = {
+    name, location: loc,
+    icon: document.getElementById('dhamFIcon').value.trim() || '🛕',
+    tag: tagVal, tagLabel: TAG_LABELS[tagVal] || '',
+    overview,
+    scriptural: document.getElementById('dhamFScript').value.trim(),
+    howToReach: document.getElementById('dhamFReach').value.trim(),
+    darshan: document.getElementById('dhamFDarshan').value.trim(),
+    festivals: document.getElementById('dhamFFest').value.trim(),
+    accommodation: document.getElementById('dhamFAccom').value.trim(),
+    prasadam: document.getElementById('dhamFFood').value.trim(),
+    seva: document.getElementById('dhamFSeva').value.trim(),
+    keyPlaces,
+    itinerary: document.getElementById('dhamFItin').value.trim(),
+    dos: document.getElementById('dhamFDos').value.trim(),
+    bestTime: document.getElementById('dhamFBest').value.trim(),
+    contacts: document.getElementById('dhamFContacts').value.trim(),
+    devoteeTips: document.getElementById('dhamFTips').value.trim(),
+  };
+
+  if (_editingDhamId) {
+    // Edit mode — find and update
+    const isCustom = _editingDhamId.startsWith('custom_');
+    if (isCustom) {
+      const idx = customDhamas.findIndex(d => d.id === _editingDhamId);
+      if (idx >= 0) {
+        customDhamas[idx] = { ...customDhamas[idx], ...dhamData };
+        localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+      }
+    } else {
+      // Built-in dham — save overrides in customDhamas
+      const overrideIdx = customDhamas.findIndex(d => d.id === _editingDhamId);
+      if (overrideIdx >= 0) {
+        customDhamas[overrideIdx] = { ...customDhamas[overrideIdx], ...dhamData };
+      } else {
+        customDhamas.push({ id: _editingDhamId, ...dhamData });
+      }
+      localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+    }
+    closeModal('addDhamModal');
+    renderDhamas();
+    // Refresh detail if open
+    if (document.getElementById('screen-dham-detail').classList.contains('active')) {
+      openDhamDetail(_editingDhamId);
+    }
+    showToast('Dham updated ✓');
+    _editingDhamId = null;
+  } else {
+    // Add mode
+    const dham = { id: 'custom_' + Date.now(), ...dhamData };
+    customDhamas.push(dham);
+    localStorage.setItem('customDhamas', JSON.stringify(customDhamas));
+    closeModal('addDhamModal');
+    renderDhamas();
+    showToast('Dham added ✓');
+  }
+}
+
+// Update dham add button visibility
+function updateDhamAdminUI() {
+  const btn = document.getElementById('dhamAddBtn');
+  if (btn) btn.style.display = hasPermission('dhamas') ? '' : 'none';
+}
+
+let _editingDhamId = null;
+
+function openEditDham(id) {
+  if (!hasPermission('dhamas')) { showToast('Dhamas admin access required'); return; }
+  const d = getAllDhamas().find(x => x.id === id);
+  if (!d) { showToast('Dham not found'); return; }
+  _editingDhamId = id;
+  // Pre-fill form
+  document.getElementById('dhamFName').value = d.name || '';
+  document.getElementById('dhamFLoc').value = d.location || '';
+  document.getElementById('dhamFIcon').value = d.icon || '';
+  document.getElementById('dhamFTag').value = d.tag || '';
+  document.getElementById('dhamFOverview').value = d.overview || '';
+  document.getElementById('dhamFScript').value = d.scriptural || '';
+  document.getElementById('dhamFReach').value = d.howToReach || '';
+  document.getElementById('dhamFDarshan').value = d.darshan || '';
+  document.getElementById('dhamFFest').value = d.festivals || '';
+  document.getElementById('dhamFAccom').value = d.accommodation || '';
+  document.getElementById('dhamFFood').value = d.prasadam || '';
+  document.getElementById('dhamFSeva').value = d.seva || '';
+  document.getElementById('dhamFPlaces').value = (d.keyPlaces||[]).map(p => p.name + (p.desc ? ' | ' + p.desc : '')).join('\n');
+  document.getElementById('dhamFItin').value = d.itinerary || '';
+  document.getElementById('dhamFDos').value = d.dos || '';
+  document.getElementById('dhamFBest').value = d.bestTime || '';
+  document.getElementById('dhamFContacts').value = d.contacts || '';
+  document.getElementById('dhamFTips').value = d.devoteeTips || '';
+  // Update modal title
+  const modalTitle = document.querySelector('#addDhamModal .modal-title');
+  if (modalTitle) modalTitle.textContent = '✏️ Edit Dham';
+  document.getElementById('addDhamModal').classList.add('open');
+}
+
+// ===================================================================
+// SEVAKART — Devotee Service Directory
+// ===================================================================
+const SK_CATEGORIES = [
+  {id:'Deity Services', icon:'🪷', name:'Deity Services'},
+  {id:'Prasadam & Catering', icon:'🍲', name:'Prasadam'},
+  {id:'Kirtan & Events', icon:'🎵', name:'Kirtan & Events'},
+  {id:'Devotional Products', icon:'🛍️', name:'Products'},
+  {id:'Education', icon:'📖', name:'Education'},
+  {id:'Professional Services', icon:'💼', name:'Professional'},
+  {id:'Temple Supplies', icon:'🛕', name:'Temple'},
+  {id:'Yatra & Travel', icon:'🚐', name:'Yatra'}
+];
+
+// Data storage
+let skListings = JSON.parse(localStorage.getItem('skListings') || '[]');
+// Normalize listings from localStorage
+skListings = skListings.map(l => {
+  l.status = (l.status || 'pending').toString().trim().toLowerCase();
+  if (!l.ownerEmail && l.email) l.ownerEmail = l.email.toLowerCase();
+  if (l.ownerEmail) l.ownerEmail = l.ownerEmail.toString().trim().toLowerCase();
+  if (!l.ownerName && l.contactName) l.ownerName = l.contactName;
+  if (l.verified === undefined || l.verified === null) l.verified = false;
+  if (l.verified === 'false' || l.verified === 'FALSE') l.verified = false;
+  if (l.verified === 'true' || l.verified === 'TRUE') l.verified = true;
+  // Extract embedded metadata if present
+  if (l.fullDesc && l.fullDesc.includes('<!--SKMETA:')) {
+    const m = l.fullDesc.match(/<!--SKMETA:(.*?)-->/s);
+    if (m) {
+      try {
+        const meta = JSON.parse(m[1]);
+        for (const [k, v] of Object.entries(meta)) {
+          if ((l[k] === undefined || l[k] === null || l[k] === '') && v !== undefined && v !== null) l[k] = v;
+        }
+      } catch(e) {}
+      l.fullDesc = l.fullDesc.replace(/\n?<!--SKMETA:.*?-->/s, '').trim();
+    }
+  }
+  return l;
+});
+let skReviews = JSON.parse(localStorage.getItem('skReviews') || '[]');
+let skReports = JSON.parse(localStorage.getItem('skReports') || '[]');
+let _skFilter = {category:''};
+let _skViewingId = null;
+let _skPhotoData = [null,null,null];
+let _skPhotoSlot = 0;
+let _skReviewRating = 0;
+let _skRejectingId = null;
+let _skEditingId = null;
+
+// ---- ImgBB Photo Hosting ----
+// API key stored in admin config, synced to all devices
+// Get your free API key from https://api.imgbb.com/
+function _getImgbbKey() {
+  return localStorage.getItem('imgbbApiKey') || '';
+}
+function _setImgbbKey(key) {
+  localStorage.setItem('imgbbApiKey', key.trim());
+}
+
+async function _skUploadToImgBB(base64Data) {
+  const apiKey = _getImgbbKey();
+  if (!apiKey) {
+    throw new Error('ImgBB API key not configured');
+  }
+  // Strip data:image/jpeg;base64, prefix if present
+  const cleanBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+  const formData = new FormData();
+  formData.append('key', apiKey);
+  formData.append('image', cleanBase64);
+
+  const resp = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: formData
+  });
+  const data = await resp.json();
+  if (!data.success) throw new Error(data.error?.message || 'Upload failed');
+  return data.data.display_url; // permanent public URL
+}
+
+// Upload all photos, returns array of URLs
+async function _skUploadAllPhotos(photoDataArr, onProgress) {
+  const urls = [];
+  const toUpload = photoDataArr.filter(Boolean);
+  for (let i = 0; i < toUpload.length; i++) {
+    if (onProgress) onProgress(i + 1, toUpload.length);
+    const p = toUpload[i];
+    // If already a URL (edit mode), keep it
+    if (p.startsWith('http://') || p.startsWith('https://')) {
+      urls.push(p);
+      continue;
+    }
+    // Upload base64 to ImgBB
+    try {
+      const url = await _skUploadToImgBB(p);
+      urls.push(url);
+    } catch(e) {
+      console.error('Photo upload failed:', e);
+      // Continue with remaining photos
+    }
+  }
+  return urls;
+}
+
+function _skSave() {
+  localStorage.setItem('skListings', JSON.stringify(skListings));
+  localStorage.setItem('skReviews', JSON.stringify(skReviews));
+  localStorage.setItem('skReports', JSON.stringify(skReports));
+  // Sync to server with merge to prevent data loss
+  _skSyncToServer();
+}
+
+// All fields a complete listing should have
+const SK_LISTING_FIELDS = ['id','bizName','contactName','mobile','whatsapp','email','city','category',
+  'shortDesc','fullDesc','years','website','photos','ownerEmail','ownerName','status','verified','createdAt'];
+
+// Fields the server DOES NOT reliably save — these get embedded into fullDesc as metadata
+const SK_META_FIELDS = ['ownerEmail','ownerName','status','verified','createdAt'];
+
+// Column order the server uses (for reconstructing from arrays if needed)
+const SK_COL_MAP = ['id','bizName','contactName','mobile','whatsapp','email','city','category',
+  'shortDesc','fullDesc','years','website'];
+
+// ---- Metadata Embedding System ----
+// Embeds critical fields into fullDesc so they survive Google Sheets round-trips
+// Format: actual description + "\n<!--SKMETA:{json}-->"
+
+function _skEmbedMeta(listing) {
+  const l = Object.assign({}, listing);
+  // Extract actual description without old meta
+  let desc = (l.fullDesc || '').replace(/\n?<!--SKMETA:.*?-->/s, '').trim();
+  // Build meta object with all fields that server doesn't save
+  const meta = {};
+  for (const f of SK_META_FIELDS) {
+    if (l[f] !== undefined && l[f] !== null) meta[f] = l[f];
+  }
+  // Store photo URLs (only URLs, not base64 — safe to embed)
+  if (l.photos && l.photos.length) {
+    const urls = l.photos.filter(p => p && (p.startsWith('http://') || p.startsWith('https://')));
+    if (urls.length) meta.photoUrls = urls;
+    meta.photoCount = l.photos.length;
+  }
+  // Embed into fullDesc
+  l.fullDesc = desc + '\n<!--SKMETA:' + JSON.stringify(meta) + '-->';
+  return l;
+}
+
+function _skExtractMeta(listing) {
+  if (!listing) return listing;
+  const l = Object.assign({}, listing);
+  // Extract embedded metadata from fullDesc
+  const metaMatch = (l.fullDesc || '').match(/<!--SKMETA:(.*?)-->/s);
+  if (metaMatch) {
+    try {
+      const meta = JSON.parse(metaMatch[1]);
+      // Restore missing fields from embedded metadata
+      for (const [key, val] of Object.entries(meta)) {
+        if ((l[key] === undefined || l[key] === null || l[key] === '') && val !== undefined && val !== null) {
+          l[key] = val;
+        }
+      }
+      // Restore photo URLs — always prefer URLs from metadata over empty local
+      if (meta.photoUrls && meta.photoUrls.length) {
+        if (!l.photos || !l.photos.length || l.photos.every(p => !p || (!p.startsWith('http') && p.length > 500))) {
+          l.photos = meta.photoUrls;
+        }
+      }
+    } catch(e) { /* malformed meta, skip */ }
+    // Clean fullDesc — remove meta tag for display
+    l.fullDesc = l.fullDesc.replace(/\n?<!--SKMETA:.*?-->/s, '').trim();
+  }
+  return l;
+}
+
+// Normalize a listing from server — handle arrays, missing fields, reconstruct metadata
+function _skNormalizeListing(raw) {
+  if (!raw) return null;
+  let l;
+
+  // Handle array format (server returns rows without headers)
+  if (Array.isArray(raw)) {
+    l = {};
+    for (let i = 0; i < SK_COL_MAP.length && i < raw.length; i++) {
+      if (raw[i] !== undefined && raw[i] !== null && raw[i] !== '') {
+        l[SK_COL_MAP[i]] = raw[i];
+      }
+    }
+  } else {
+    l = Object.assign({}, raw);
+  }
+
+  // Must have an id
+  if (!l.id) return null;
+
+  // Extract embedded metadata first (restores ownerEmail, status, etc.)
+  l = _skExtractMeta(l);
+
+  // Normalize status
+  l.status = (l.status || 'pending').toString().trim().toLowerCase();
+
+  // Fallback: ownerEmail from email
+  if (!l.ownerEmail && l.email) l.ownerEmail = l.email;
+  if (l.ownerEmail) l.ownerEmail = l.ownerEmail.toString().trim().toLowerCase();
+
+  // Fallback: ownerName from contactName
+  if (!l.ownerName && l.contactName) l.ownerName = l.contactName;
+
+  // Fallback: verified defaults to false
+  if (l.verified === undefined || l.verified === null) l.verified = false;
+  // Handle string 'false'/'true' from server
+  if (l.verified === 'false' || l.verified === 'FALSE') l.verified = false;
+  if (l.verified === 'true' || l.verified === 'TRUE') l.verified = true;
+
+  // Fallback: createdAt from id timestamp
+  if (!l.createdAt && l.id) {
+    const tsMatch = l.id.match(/sk_(\d{13})/);
+    if (tsMatch) l.createdAt = new Date(parseInt(tsMatch[1])).toISOString();
+  }
+
+  // Ensure photos is an array
+  if (!l.photos) l.photos = [];
+  if (typeof l.photos === 'string') {
+    try { l.photos = JSON.parse(l.photos); } catch(e) { l.photos = []; }
+  }
+
+  return l;
+}
+
+// Deep field-level merge of two listing objects
+function _skDeepMergeListing(primary, secondary) {
+  if (!secondary) return Object.assign({}, primary);
+  if (!primary) return Object.assign({}, secondary);
+  const merged = Object.assign({}, secondary, primary);
+  for (const key of SK_LISTING_FIELDS) {
+    const pVal = primary[key];
+    const sVal = secondary[key];
+    const pEmpty = (pVal === undefined || pVal === null || pVal === '' || (Array.isArray(pVal) && pVal.length === 0));
+    const sEmpty = (sVal === undefined || sVal === null || sVal === '' || (Array.isArray(sVal) && sVal.length === 0));
+    if (pEmpty && !sEmpty) {
+      merged[key] = sVal;
+    }
+  }
+  for (const key of Object.keys(secondary)) {
+    if (merged[key] === undefined || merged[key] === null) merged[key] = secondary[key];
+  }
+  return merged;
+}
+
+// Merge two arrays of listings
+function _skMergeListings(primaryList, secondaryList) {
+  const merged = new Map();
+  for (const l of secondaryList) {
+    if (l && l.id) merged.set(l.id, Object.assign({}, l));
+  }
+  for (const l of primaryList) {
+    if (l && l.id) {
+      if (merged.has(l.id)) {
+        merged.set(l.id, _skDeepMergeListing(l, merged.get(l.id)));
+      } else {
+        merged.set(l.id, Object.assign({}, l));
+      }
+    }
+  }
+  return Array.from(merged.values());
+}
+
+// Flag to prevent concurrent syncs
+let _skSyncing = false;
+
+// Sync to Google Sheets — embed metadata, fetch→merge→push
+async function _skSyncToServer() {
+  if (_skSyncing) return;
+  _skSyncing = true;
+  try {
+    // Step 1: Fetch current server data
+    let serverListings = [];
+    try {
+      const fetchResp = await fetch(SONGS_API_URL + '?type=sevakart');
+      const fetchData = await fetchResp.json();
+      if (fetchData.success && fetchData.listings) {
+        serverListings = fetchData.listings.map(_skNormalizeListing).filter(Boolean);
+      }
+    } catch(e) { /* if fetch fails, proceed with local only */ }
+
+    // Step 2: Deep merge — local wins, server fills gaps
+    const mergedListings = _skMergeListings(skListings, serverListings);
+
+    // Update local state
+    skListings = mergedListings;
+    localStorage.setItem('skListings', JSON.stringify(skListings));
+
+    // Step 3: Embed metadata into each listing before sending to server
+    const listingsForServer = mergedListings.map(l => _skEmbedMeta(l));
+
+    // Push to server
+    const userEmail = (gUser && gUser.email) ? gUser.email : '';
+    await fetch(SONGS_API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({
+        action:'saveSevakart',
+        listings: listingsForServer,
+        reviews: skReviews,
+        reports: skReports,
+        updatedBy: userEmail
+      })
+    });
+  } catch(e) { /* offline fallback */ }
+  _skSyncing = false;
+}
+
+// Fetch and merge server data
+let _skFetching = false;
+async function _skFetchFromServer() {
+  if (_skFetching) return;
+  _skFetching = true;
+  try {
+    const resp = await fetch(SONGS_API_URL + '?type=sevakart');
+    const data = await resp.json();
+    if (data.success && data.listings) {
+      // Normalize all server listings (handles arrays, extracts embedded metadata)
+      const serverListings = data.listings.map(_skNormalizeListing).filter(Boolean);
+      // Deep merge: server is primary, local fills gaps
+      skListings = _skMergeListings(serverListings, skListings);
+      if (data.reviews) skReviews = data.reviews;
+      if (data.reports) skReports = data.reports;
+      localStorage.setItem('skListings', JSON.stringify(skListings));
+      localStorage.setItem('skReviews', JSON.stringify(skReviews));
+      localStorage.setItem('skReports', JSON.stringify(skReports));
+      // Re-render admin dashboard if currently visible
+      const admScreen = document.getElementById('screen-admin');
+      if (admScreen && admScreen.classList.contains('active')) {
+        renderAdminDashboard();
+      }
+      // Re-render admin sevakart detail if visible
+      const admSkScreen = document.getElementById('screen-admin-sevakart');
+      if (admSkScreen && admSkScreen.classList.contains('active')) {
+        renderAdminSevakart();
+      }
+      // Re-render SevaKart screens if currently visible
+      const skScreen = document.getElementById('screen-sevakart');
+      if (skScreen && skScreen.classList.contains('active')) {
+        skRenderHome();
+      }
+      // Re-render My Listings if visible
+      const myScreen = document.getElementById('screen-sevakart-mylistings');
+      if (myScreen && myScreen.classList.contains('active')) {
+        const titleEl = myScreen.querySelector('.sk-detail-htitle');
+        if (titleEl && titleEl.textContent === 'My Listings') {
+          _skRenderMyListings();
+        } else if (titleEl && titleEl.textContent === 'Pending Approvals') {
+          skShowPendingListings();
+        }
+      }
+    }
+  } catch(e) { /* offline - use localStorage */ }
+  _skFetching = false;
+}
+
+function _skGetApprovedListings() {
+  return skListings.filter(l => l.status === 'approved');
+}
+
+function _skGetRating(listingId) {
+  const revs = skReviews.filter(r => r.listingId === listingId);
+  if (!revs.length) return {avg:0, count:0};
+  const sum = revs.reduce((a,r) => a + r.rating, 0);
+  return {avg: (sum/revs.length).toFixed(1), count: revs.length};
+}
+
+function _skStarStr(rating) {
+  const full = Math.floor(rating);
+  let s = '';
+  for (let i=0;i<5;i++) s += i < full ? '★' : '☆';
+  return s;
 }
 
 // ---- Render Home ----
@@ -19657,10 +21709,6 @@ function init() {
 }
 
 init();
-// Safety nets: ensure Daily Muse renders even if updateHomeScreen had an error
-setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 200);
-setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 800);
-setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 2000);
 </script>
 
 <!-- PWA Service Worker Registration -->
