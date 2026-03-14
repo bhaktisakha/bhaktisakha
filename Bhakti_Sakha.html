@@ -14622,8 +14622,8 @@ function updateHomeScreen() {
   // Todo widget on home
   _updateHomeTodoWidget();
 
-  // Daily muse verse on home
-  _updateDailyMuse();
+  // Daily muse verse on home — deferred to next tick so DOM is fully rendered
+  setTimeout(_updateDailyMuse, 0);
   cpInit(); // Chant with Prabhupada player (4AM-8AM)
   jtInit(); // Japa Talk player (4AM-8AM)
   kbInit(); // Krsna Book player (8PM-4AM)
