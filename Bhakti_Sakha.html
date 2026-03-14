@@ -14616,8 +14616,8 @@ function updateHomeScreen() {
   // Todo widget on home
   _updateHomeTodoWidget();
 
-  // Daily muse verse on home — deferred to next tick so DOM is fully rendered
-  setTimeout(_updateDailyMuse, 0);
+  // Daily muse verse on home
+  _updateDailyMuse();
   cpInit(); // Chant with Prabhupada player (4AM-8AM)
   jtInit(); // Japa Talk player (4AM-8AM)
   kbInit(); // Krsna Book player (8PM-4AM)
@@ -19657,6 +19657,8 @@ function init() {
 }
 
 init();
+// Ensure Daily Muse renders after all init tasks complete
+setTimeout(_updateDailyMuse, 100);
 </script>
 
 <!-- PWA Service Worker Registration -->
