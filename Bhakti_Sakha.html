@@ -14605,25 +14605,25 @@ function updateHomeScreen() {
   }
 
   // Update Google account UI on home
-  updateHomeGoogleUI();
+  try { updateHomeGoogleUI(); } catch(e) {}
 
   // Today's events
-  updateHomeTodayCard();
+  try { updateHomeTodayCard(); } catch(e) {}
 
   // Upcoming events widget on home
-  _updateHomeEvtWidget();
+  try { _updateHomeEvtWidget(); } catch(e) {}
 
   // Todo widget on home
-  _updateHomeTodoWidget();
+  try { _updateHomeTodoWidget(); } catch(e) {}
 
-  // Daily muse verse on home
-  _updateDailyMuse();
-  cpInit(); // Chant with Prabhupada player (4AM-8AM)
-  jtInit(); // Japa Talk player (4AM-8AM)
-  kbInit(); // Krsna Book player (8PM-4AM)
+  // Daily muse verse on home — wrapped in try-catch so it ALWAYS runs
+  try { _updateDailyMuse(); } catch(e) {}
+  try { cpInit(); } catch(e) {} // Chant with Prabhupada player (4AM-8AM)
+  try { jtInit(); } catch(e) {} // Japa Talk player (4AM-8AM)
+  try { kbInit(); } catch(e) {} // Krsna Book player (8PM-4AM)
 
   // New & Happening badges
-  nhUpdateBadges();
+  try { nhUpdateBadges(); } catch(e) {}
 }
 
 function _updateHomeEvtWidget() {
@@ -19657,8 +19657,10 @@ function init() {
 }
 
 init();
-// Ensure Daily Muse renders after all init tasks complete
-setTimeout(_updateDailyMuse, 100);
+// Safety nets: ensure Daily Muse renders even if updateHomeScreen had an error
+setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 200);
+setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 800);
+setTimeout(function() { try { _updateDailyMuse(); } catch(e) {} }, 2000);
 </script>
 
 <!-- PWA Service Worker Registration -->
